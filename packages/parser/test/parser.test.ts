@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parse } from '@mdv/parser';
-import type { MdvBlock, MdvContent, MdvDirective, MdvDocument } from '@mdv/parser';
+import type { CodeFix, MdvBlock, MdvContent, MdvDirective, MdvDocument } from '@mdv/parser';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -27,6 +27,29 @@ function directives(node: MdvContent | MdvDocument): MdvDirective[] {
     if (Array.isArray(typed.children)) for (const child of typed.children) stack.push(child);
   }
   return found;
+}
+
+/**
+ * The fixes on the first diagnostic with this code, in the order it offered
+ * them. First and not all: a code repeats per offending line, and a fix only
+ * means anything next to the one line it was written for.
+ */
+function fixesFor(doc: MdvDocument, code: string): CodeFix[] {
+  const found = doc.diagnostics.find((diagnostic) => diagnostic.code === code);
+  return [...(found?.fixes ?? [])];
+}
+
+/** The document a fix produces — the only thing about a fix worth asserting. */
+function applyFix(source: string, fix: CodeFix | undefined): string {
+  if (fix === undefined) throw new Error('no fix to apply');
+  // Back to front, so an earlier edit's offsets are still valid.
+  const ordered = [...fix.edits].sort((a, b) => b.range.start.offset - a.range.start.offset);
+  let text = source;
+  for (const edit of ordered) {
+    text =
+      text.slice(0, edit.range.start.offset) + edit.newText + text.slice(edit.range.end.offset);
+  }
+  return text;
 }
 
 function slice(
@@ -217,6 +240,72 @@ describe('SPEC 5.1 — the separator determinism rule', () => {
 
   it('warns about an empty block with MDV1202', () => {
     expect(codes(parse('```mdv bar\n```\n'))).toContain('MDV1202');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SPEC 14.2 — the fixes MDV1203 carries
+//
+// A fix is asserted by applying it and re-parsing. Asserting on the edit's
+// offsets would test arithmetic; applying it tests the promise the field makes,
+// which is that a host can hand the edit to an author untouched.
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('SPEC 14.2 — MDV1203 offers a separator', () => {
+  it('inserts the separator above the offending line', () => {
+    const source = '```mdv pie\nregion | revenue\nAPAC   | 4210\n```\n';
+    const [fix, ...rest] = fixesFor(parse(source), 'MDV1203');
+    expect(rest).toEqual([]);
+    expect(fix?.title).toContain('Add');
+    // Not a preferred fix: whether these lines are data or a typo is the
+    // author's call, and nothing in the source says which.
+    expect(fix?.preferred).toBeUndefined();
+
+    const fixed = applyFix(source, fix);
+    expect(fixed).toBe('```mdv pie\n---\nregion | revenue\nAPAC   | 4210\n```\n');
+    expect(codes(parse(fixed))).not.toContain('MDV1203');
+    expect(firstBlock(parse(fixed)).raw.data).toBe('region | revenue\nAPAC   | 4210\n');
+  });
+
+  it('rewrites a miscounted row of hyphens in place, and prefers that', () => {
+    const source = '```mdv bar\ntitle: T\n----\nnot data\n```\n';
+    const fixes = fixesFor(parse(source), 'MDV1203');
+    expect(fixes.map((fix) => fix.preferred)).toEqual([true, undefined]);
+    expect(fixes[0]?.title).toContain('Change');
+
+    const fixed = applyFix(source, fixes[0]);
+    expect(fixed).toBe('```mdv bar\ntitle: T\n---\nnot data\n```\n');
+    expect(codes(parse(fixed))).not.toContain('MDV1203');
+    expect(firstBlock(parse(fixed)).raw.data).toBe('not data\n');
+  });
+
+  it('keeps the separator in the block when the fence is inside a list', () => {
+    // A separator written at column 0 here would be outside the list item, and
+    // so outside the block (SPEC 3.3).
+    const source = '- item\n\n  ~~~mdv pie\n  region | revenue\n  ~~~\n';
+    const fixed = applyFix(source, fixesFor(parse(source), 'MDV1203')[0]);
+    expect(fixed).toBe('- item\n\n  ~~~mdv pie\n  ---\n  region | revenue\n  ~~~\n');
+    expect(codes(parse(fixed))).not.toContain('MDV1203');
+    expect(directivesOrBlocks(parse(fixed)).raw.data).toBe('region | revenue\n');
+  });
+
+  it('puts the separator at the body column, not the line’s own indent', () => {
+    // The offending line is indented as if it were nested under `series:`, so
+    // the squiggle starts two columns right of where a separator may sit.
+    const source = '```mdv bar\nseries:\n  APAC | 4210\n```\n';
+    const fixed = applyFix(source, fixesFor(parse(source), 'MDV1203')[0]);
+    expect(fixed).toBe('```mdv bar\nseries:\n---\n  APAC | 4210\n```\n');
+    expect(codes(parse(fixed))).not.toContain('MDV1203');
+  });
+
+  it('offers nothing once the block already has a separator', () => {
+    // The same line above an existing separator is MDV1211, and there is no
+    // mechanical fix for it: the block's sections are already decided, so what
+    // the author meant by the line is anybody's guess.
+    const doc = parse('```mdv bar\nAPAC | 4210\n---\nEMEA | 3180\n```\n');
+    expect(codes(doc)).toContain('MDV1211');
+    expect(fixesFor(doc, 'MDV1203')).toEqual([]);
+    expect(fixesFor(doc, 'MDV1211')).toEqual([]);
   });
 });
 

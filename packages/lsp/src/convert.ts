@@ -26,8 +26,13 @@ import type {
   Diagnostic as LspDiagnostic,
   DiagnosticSeverityValue,
   Range as LspRange,
+  TextEdit as LspTextEdit,
 } from './protocol/types.js';
-import type { Diagnostic as MdvDiagnostic, Range as MdvRange } from '@mdv/parser';
+import type {
+  Diagnostic as MdvDiagnostic,
+  Range as MdvRange,
+  TextEdit as MdvTextEdit,
+} from '@mdv/parser';
 
 /** LSP's severity for an MDV severity (SPEC 14.3). */
 function severityOf(severity: MdvDiagnostic['severity']): DiagnosticSeverityValue {
@@ -70,6 +75,22 @@ export function toLspRange(document: TextDocument, range: MdvRange): LspRange {
   }
   // The very end of the document: leave it collapsed rather than invent text.
   return { start, end };
+}
+
+/**
+ * Convert a fix's replacement (SPEC 14.2).
+ *
+ * Deliberately not {@link toLspRange}: a collapsed range here is an *insertion*,
+ * and widening it to the next character — right for a squiggle nobody could
+ * otherwise see — would make the fix overwrite that character instead.
+ */
+export function toLspEdit(document: TextDocument, edit: MdvTextEdit): LspTextEdit {
+  const startOffset = Math.max(0, edit.range.start.offset);
+  const endOffset = Math.max(startOffset, edit.range.end.offset);
+  return {
+    range: { start: document.positionAt(startOffset), end: document.positionAt(endOffset) },
+    newText: edit.newText,
+  };
 }
 
 /** The Appendix C documentation URL for a code, when the code has one. */

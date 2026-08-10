@@ -15,7 +15,9 @@
 
 export { DocumentStore, TextDocument, type DocumentEvent } from './documents.js';
 
-export { toLspDiagnostic, toLspDiagnostics, toLspRange } from './convert.js';
+export { toLspDiagnostic, toLspDiagnostics, toLspEdit, toLspRange } from './convert.js';
+
+export { codeActions, type CodeActionSettings } from './features/code-actions.js';
 
 export { completion, type CompletionSettings } from './features/completion.js';
 

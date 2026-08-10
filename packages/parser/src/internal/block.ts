@@ -17,7 +17,7 @@
  * and it names the missing separator.
  */
 
-import type { AttrMap, AttrValue, MdvBlock, Range } from '../types.js';
+import type { AttrMap, AttrValue, CodeFix, MdvBlock, Range } from '../types.js';
 import type { DiagnosticBag } from './diagnostics.js';
 import { containerStrip, type SourceIndex } from './source.js';
 import { parseHeaderLines, type HeaderLine } from './header.js';
@@ -107,10 +107,12 @@ export function buildVisualBlock(
 
   for (const range of header.invalid) {
     if (separator === -1) {
+      const line = root.lineIndexAt(range.start.offset);
       bag.add('MDV1203', range, {
         detail:
           'This line is not an attribute. If it is data, add a `---` separator line ' +
           'above it; a block body without a separator is entirely a header (SPEC 5.1).',
+        fixes: separatorFixes(root, range, root.lineStart(line) + stripOf(line)),
       });
     } else {
       bag.add('MDV1211', range, {
@@ -183,6 +185,40 @@ export function buildVisualBlock(
   }
 
   return block;
+}
+
+/**
+ * The machine-applicable fixes for a header line that reads like data
+ * (`MDV1203`, SPEC 14.2).
+ *
+ * The diagnostic's own detail names one edit — write the separator above this
+ * line — so that is what the fix writes. Both fixes work from `bodyStart`, the
+ * offset where the block's body begins on this line, rather than from where the
+ * diagnostic's squiggle begins: a fence can sit inside a list item, and there a
+ * line starting at column 0 has left the block (SPEC 3.3), while a line the
+ * header had indented starts *past* the column a separator must sit in. The
+ * prefix between the two is repeated on the inserted line so the offending line
+ * keeps the indentation it had.
+ *
+ * A line that is *already* a row of hyphens is a separator whose author
+ * miscounted, since Appendix A wants exactly three; that one is rewritten in
+ * place rather than pushed down, and it is the fix an editor should offer first.
+ */
+function separatorFixes(root: SourceIndex, range: Range, bodyStart: number): CodeFix[] {
+  const indent = root.text.slice(root.lineStart(root.lineIndexAt(bodyStart)), bodyStart);
+  const add: CodeFix = {
+    title: 'Add a `---` separator above this line',
+    edits: [{ range: root.range(bodyStart, bodyStart), newText: `---\n${indent}` }],
+  };
+  if (!/^-{2,}[ \t]*$/.test(root.text.slice(range.start.offset, range.end.offset))) return [add];
+  return [
+    {
+      title: 'Change this line to the `---` separator',
+      edits: [{ range: root.range(bodyStart, range.end.offset), newText: '---' }],
+      preferred: true,
+    },
+    add,
+  ];
 }
 
 /** `true` when the info string of a fenced code block makes it a visual block. */

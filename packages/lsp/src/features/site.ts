@@ -52,6 +52,26 @@ export interface BlockSettings {
   readonly config?: MdvConfig | ((document: TextDocument) => MdvConfig | undefined);
 }
 
+/**
+ * The host's configuration for a document, minus its diagnostic sink.
+ *
+ * Every feature but `diagnostics` runs the pipeline to answer a request, and
+ * that run produces the same diagnostics `diagnostics` already reported. A sink
+ * that heard them twice would have no way to tell which run it was listening
+ * to, so it hears neither: the sink comes off before any of them runs. Shared
+ * from here because a feature that forgot would corrupt a host's problem list,
+ * and the mistake is invisible in that feature's own tests.
+ */
+export function configFor(
+  config: BlockSettings['config'],
+  document: TextDocument,
+): MdvConfig | undefined {
+  const resolved = typeof config === 'function' ? config(document) : config;
+  if (resolved?.onDiagnostic === undefined) return resolved;
+  const { onDiagnostic: _sink, ...rest } = resolved;
+  return rest;
+}
+
 /** Where the cursor sits in a block, which is the whole question. */
 export interface Site {
   readonly block: ResolvedBlock;
@@ -137,18 +157,8 @@ export class Sites {
     return { block, registry, chartType: registry.get(block.blockType), fenceLine, lastHeaderLine };
   }
 
-  /**
-   * The host's configuration, minus its diagnostic sink. Resolving a document
-   * to answer a keystroke produces the same diagnostics the `diagnostics`
-   * feature already reported; a sink that heard them twice would have no way to
-   * tell which run it was listening to.
-   */
   #configFor(document: TextDocument): MdvConfig | undefined {
-    const { config } = this.#options;
-    const resolved = typeof config === 'function' ? config(document) : config;
-    if (resolved?.onDiagnostic === undefined) return resolved;
-    const { onDiagnostic: _sink, ...rest } = resolved;
-    return rest;
+    return configFor(this.#options.config, document);
   }
 
   /**
