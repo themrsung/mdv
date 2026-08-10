@@ -17,6 +17,8 @@ export type { CompiledExpression, CompileOptions, EvalContext, Scope } from './c
 export { compileExpression } from './compile.js';
 export type { FunctionContext, FunctionDef } from './functions.js';
 export { FUNCTIONS, isWhitelisted, isoWeek, lookupFunction, percentile } from './functions.js';
+export type { CallSite } from './locate.js';
+export { callAt, expressionAt } from './locate.js';
 export { parseExpression } from './parse.js';
 export type { ParseError, ParseResult } from './parse.js';
 export type { ExprValue, TypeErrorSink } from './values.js';

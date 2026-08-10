@@ -79,7 +79,14 @@ export * from './dataset/index.js';
  * `readonly unknown[]` for the same cycle-avoidance reason `chartTypes` is — so
  * the MDVX evaluator stays reachable by subpath only. Renaming one of the two is
  * a breaking change to two tested modules and buys nothing today.
+ *
+ * The locator is the exception, by name rather than by star: an editor asking
+ * "which argument is the cursor in" is asking about a document, not evaluating
+ * anything, and it should not have to reach past the package's `exports` map to
+ * find out. These three names collide with nothing.
  */
+export type { CallSite } from './expr/locate.js';
+export { callAt, expressionAt } from './expr/locate.js';
 
 /**
  * The stages `resolve()` below is assembled from, exported because the pipeline
