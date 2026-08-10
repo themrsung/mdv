@@ -34,6 +34,7 @@
  * chart is worth navigating to wherever it sits.
  */
 
+import { visualBlocks } from '@mdv/core';
 import { parse } from '@mdv/parser';
 import type { MdvBlock, MdvDocument, UnistNode } from '@mdv/parser';
 
@@ -138,22 +139,6 @@ function blockName(block: MdvBlock, ordinal: number): { name: string; detail: st
     return { name: oneLine(title), detail: type };
   }
   return { name: `${type} ${ordinal}`, detail: undefined };
-}
-
-/** Every visual block in the document, in source order, wherever it is nested. */
-function visualBlocks(document: MdvDocument): MdvBlock[] {
-  const found: MdvBlock[] = [];
-  const walk = (node: unknown): void => {
-    if (typeof node !== 'object' || node === null) return;
-    const typed = node as { readonly type?: unknown; readonly children?: unknown };
-    if (typed.type === 'mdvBlock') found.push(node as MdvBlock);
-    // A block inside a block is not a thing, but a block inside a list item
-    // inside a quote is, so the walk does not stop at the first one it finds.
-    if (Array.isArray(typed.children)) for (const child of typed.children) walk(child);
-  };
-  walk(document);
-  found.sort((a, b) => startOf(a) - startOf(b));
-  return found;
 }
 
 /**
