@@ -226,6 +226,22 @@ export interface FrontMatter {
   range: Range;
   /** Per-key source ranges, for diagnostics and the LSP. */
   attrsPosition: AttrRanges;
+  /**
+   * Ranges of the *keys* themselves, keyed the same way as
+   * {@link attrsPosition} (so `datasets.q1` is the `q1` token, where
+   * `attrsPosition` is what `q1` is set to).
+   *
+   * Front matter alone carries this because it is the only place in MDV where a
+   * key is a name the author chose and can refer to elsewhere: a dataset id
+   * (SPEC 6.3). A block header's keys are attribute names fixed by the spec or
+   * by a plugin, so nothing ever needs to point at one. A rename needs it — the
+   * value under `datasets.q1` is the source of the data, not the id being
+   * renamed.
+   *
+   * Absent for a mapping key that is not a scalar, and for sequence indices,
+   * which are positions rather than written names.
+   */
+  attrsKeyPosition: AttrRanges;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -24,6 +24,7 @@ import { compareStrings } from './internal/source.js';
 const POSITIONAL: ReadonlySet<string> = new Set([
   'range',
   'attrsPosition',
+  'attrsKeyPosition',
   'mdvAttrsPosition',
   'dataPosition',
 ]);

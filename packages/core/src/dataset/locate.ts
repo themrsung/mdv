@@ -28,7 +28,8 @@ export interface DatasetSite {
   readonly id: string;
   /**
    * Whether this site introduces the id or points at it. A front-matter alias
-   * (`q1: "@sales"`) is one of each, at the same range.
+   * (`q1: "@sales"`) is one of each: the key declares `q1`, the value refers to
+   * `sales`.
    */
   readonly kind: 'declaration' | 'reference';
   /**
@@ -37,13 +38,13 @@ export interface DatasetSite {
    * `id`. Enough to say *why* a site is a site, in a diagnostic or a test.
    */
   readonly path: string;
-  /** The range of the value as written, quotes and all. */
-  readonly range: Range;
   /**
-   * The value as parsed, which is what {@link offset} indexes into. Empty when
-   * the id is not written in the value — a front-matter declaration wears its
-   * id as a key, which the parser does not range separately.
+   * The range of the text this site was read from, as written, quotes and all:
+   * the value, or the key for a front-matter declaration, which is where that
+   * id is actually spelled.
    */
+  readonly range: Range;
+  /** The text {@link range} covers, as parsed, which is what {@link offset} indexes into. */
   readonly text: string;
   /** Where the id starts inside {@link text}, or `-1` when it is not in it. */
   readonly offset: number;
@@ -52,10 +53,13 @@ export interface DatasetSite {
 /**
  * Every dataset id written in a document, in source order.
  *
- * Declarations come before the references nested inside them, and a block's
- * own reference comes before the ones in its pipeline, so the first site that
- * contains a position is always the widest — a caller hit-testing a cursor
- * wants the **last** containing site, not the first.
+ * Declarations come before the references written under them, and a block's
+ * own reference comes before the ones in its pipeline. Sites normally cover
+ * disjoint text — a front-matter declaration ranges the key, not the value
+ * hanging off it — but a hand-built document carrying no key ranges falls back
+ * to the value, and then a declaration does contain its references. A caller
+ * hit-testing a cursor therefore wants the **last** containing site, which is
+ * the narrowest under either shape.
  */
 export function locateDatasets(doc: MdvDocument): readonly DatasetSite[] {
   const sites: DatasetSite[] = [];
@@ -69,8 +73,16 @@ export function locateDatasets(doc: MdvDocument): readonly DatasetSite[] {
       if (range === undefined) continue;
 
       // The key is the declaration wherever it appears; the value is a
-      // reference only in the shorthand `q1: "@sales"` (SPEC 6.3).
-      sites.push({ id, kind: 'declaration', path, range, text: '', offset: -1 });
+      // reference only in the shorthand `q1: "@sales"` (SPEC 6.3). A key that
+      // the parser could not range on its own — one written as a flow
+      // collection, say — falls back to the value, so that the id is still
+      // found even though nothing can point at where it is written.
+      const keyRange = front.attrsKeyPosition[path];
+      sites.push(
+        keyRange === undefined
+          ? { id, kind: 'declaration', path, range, text: '', offset: -1 }
+          : { id, kind: 'declaration', path, range: keyRange, text: id, offset: 0 },
+      );
       if (typeof value === 'string') pushReference(sites, value, range, path);
       else if (isMap(value)) pushPipeline(sites, value, front.attrsPosition, `${path}.`);
     }

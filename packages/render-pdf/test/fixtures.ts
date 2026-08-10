@@ -245,6 +245,7 @@ export function frontMatter(fields: Partial<FrontMatter>): FrontMatter {
     extra: {},
     range: { start: ZERO, end: ZERO },
     attrsPosition: {},
+    attrsKeyPosition: {},
     ...fields,
   };
 }

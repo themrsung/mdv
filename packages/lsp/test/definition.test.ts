@@ -148,18 +148,19 @@ describe('textDocument/definition', () => {
     const source = DOC.replace('from: "@sales"', 'from: "@sa‸les"');
     const found = await definitionAt(source);
     expect(found?.uri).toBe(URI);
-    // `sales` is declared long-hand, and the parser ranges a mapping at its
-    // value, so the jump lands on the body of the declaration rather than on
-    // the key it is filed under. It is the right line either way.
-    expect(found?.range.start.line).toBe(lineOf(source, 'src: sales.csv'));
+    // `sales` is declared long-hand, and the jump lands on the key it is filed
+    // under — which is where the name is written — not on the body below it.
+    expect(found?.range.start.line).toBe(lineOf(source, 'sales:'));
+    expect(covered(source, found?.range as Range)).toBe('sales');
   });
 
   it('selects the id, not the value that carries it', async () => {
     const source = DOC.replace('data: "@q1"', 'data: "@q1‸"');
     const found = await definitionAt(source);
-    // The alias is a declaration written as a reference: the id is worn by the
-    // key, which nothing ranges, so the value it aliases is the best there is.
-    expect(covered(source, found?.range as Range)).toBe('"@sales[date, revenue]"');
+    // The alias is a declaration written as a reference: `q1` names the entry
+    // and `"@sales…"` says where its rows come from, so the jump goes to the
+    // key. Landing on the value would put the cursor on a different dataset.
+    expect(covered(source, found?.range as Range)).toBe('q1');
 
     const uses = await referencesAt(source);
     // A reference, though, knows exactly where its id sits inside the quotes —
@@ -236,7 +237,7 @@ describe('textDocument/definition', () => {
     const source = DOC.replace('from: "@sales"', 'from: "@sa‸les"');
     const uses = await referencesAt(source, true);
     expect(uses.map((use) => use.range.start.line)).toEqual([
-      lineOf(source, 'src: sales.csv'),
+      lineOf(source, 'sales:'),
       lineOf(source, 'q1:'),
       lineOf(source, 'from:'),
     ]);

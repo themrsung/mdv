@@ -94,20 +94,25 @@ describe('locateDatasets (SPEC 6.3)', () => {
   it('reads a front-matter alias as a declaration and a reference at once', () => {
     const sites = locateDatasets(parse(SOURCE)).filter((site) => site.path === 'datasets.q1');
     expect(sites.map((site) => site.kind)).toEqual(['declaration', 'reference']);
-    expect(sites[0]?.range).toEqual(sites[1]?.range);
-    // `q1` is worn by the key, which the parser does not range on its own, so
-    // the declaration says so rather than pointing into the wrong text.
-    expect(sites[0]).toMatchObject({ id: 'q1', text: '', offset: -1 });
+    // One line, two ids, two ranges: `q1` is worn by the key and `sales` by the
+    // value, so a rename of either touches only the half that spells it.
+    const written = (site: DatasetSite | undefined): string =>
+      site === undefined ? '' : SOURCE.slice(site.range.start.offset, site.range.end.offset);
+    expect(written(sites[0])).toBe('q1');
+    expect(written(sites[1])).toBe('"@sales[date, revenue]"');
+    expect(sites[0]).toMatchObject({ id: 'q1', text: 'q1', offset: 0 });
   });
 
-  it('nests a declaration around the references inside it', () => {
+  it('writes a declaration ahead of the references hanging off it', () => {
     const doc = parse(SOURCE);
     const outer = siteAt(doc, 'datasets.joined');
     const inner = siteAt(doc, 'datasets.joined.transform[0].join.with');
-    // The ordering contract for hit-testing: the widest site comes first, so a
-    // cursor resolves to the *last* site that contains it.
+    // The ordering contract for hit-testing: a declaration is listed before
+    // everything written under it. It does not swallow them — the declaration
+    // is the key, not the pipeline it introduces — so a cursor anywhere in the
+    // front matter is inside at most one site.
     expect(outer.range.start.offset).toBeLessThan(inner.range.start.offset);
-    expect(outer.range.end.offset).toBeGreaterThanOrEqual(inner.range.end.offset);
+    expect(outer.range.end.offset).toBeLessThanOrEqual(inner.range.start.offset);
   });
 
   it('names a dataset block by its id, which wears no `@`', () => {

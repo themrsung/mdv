@@ -39,7 +39,7 @@ function block(blockType: string, attrs: AttrMap = {}, data = ''): MdvBlock {
 }
 
 function frontmatter(partial: Partial<FrontMatter> = {}): FrontMatter {
-  return { extra: {}, range: RANGE, attrsPosition: {}, ...partial };
+  return { extra: {}, range: RANGE, attrsPosition: {}, attrsKeyPosition: {}, ...partial };
 }
 
 function document(children: readonly MdvBlock[], front?: FrontMatter): MdvDocument {

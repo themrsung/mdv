@@ -89,6 +89,7 @@ export function parseFrontMatter(
 
   const attrs: AttrMap = {};
   const positions: Record<string, Range> = {};
+  const keyPositions: Record<string, Range> = {};
   try {
     const document = parseDocument(text, { prettyErrors: false });
     for (const error of document.errors) {
@@ -98,7 +99,7 @@ export function parseFrontMatter(
         detail: firstLine(error.message),
       });
     }
-    collectPositions(document.contents, '', base, root, positions);
+    collectPositions(document.contents, '', base, root, positions, keyPositions);
     const value = toAttrValue(document.toJS({ maxAliasCount: 100 }));
     if (isAttrMap(value)) {
       for (const [key, entry] of Object.entries(value)) attrs[key] = entry;
@@ -112,7 +113,7 @@ export function parseFrontMatter(
     bag.add('MDV1300', range, { detail: describeYamlError(error) });
   }
 
-  const frontmatter = buildFrontMatter(attrs, positions, range, root);
+  const frontmatter = buildFrontMatter(attrs, positions, keyPositions, range, root);
   checkVersion(frontmatter, positions, bag, range);
   return { frontmatter, bodyLine: close + 1 };
 }
@@ -122,6 +123,7 @@ export function parseFrontMatter(
 function buildFrontMatter(
   attrs: AttrMap,
   positions: Record<string, Range>,
+  keyPositions: Record<string, Range>,
   range: Range,
   root: SourceIndex,
 ): FrontMatter {
@@ -162,7 +164,12 @@ function buildFrontMatter(
   // Built by assignment rather than by spreading conditionals: under
   // `exactOptionalPropertyTypes` an absent key and a key set to `undefined` are
   // different types, and only the former is what SPEC 3.4 means by "absent".
-  const frontmatter: FrontMatter = { extra, range, attrsPosition: positions };
+  const frontmatter: FrontMatter = {
+    extra,
+    range,
+    attrsPosition: positions,
+    attrsKeyPosition: keyPositions,
+  };
   const mdv = text('mdv');
   if (mdv !== undefined) frontmatter.mdv = mdv;
   const title = text('title');
@@ -255,13 +262,18 @@ function majorMinor(value: string): string {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Walk the YAML CST recording a range for every dotted path. */
+/**
+ * Walk the YAML CST recording a range for every dotted path: the value in
+ * `out`, and — where the path is worn by a mapping key — the key itself in
+ * `keys`. A sequence index is not written anywhere, so it has no key range.
+ */
 function collectPositions(
   node: unknown,
   path: string,
   base: number,
   root: SourceIndex,
   out: Record<string, Range>,
+  keys: Record<string, Range>,
 ): void {
   if (isMap(node)) {
     for (const item of node.items) {
@@ -269,8 +281,9 @@ function collectPositions(
       if (key === null) continue;
       const child = path === '' ? key : `${path}.${key}`;
       const target = item.value ?? item.key;
+      record(item.key, child, base, root, keys);
       record(target, child, base, root, out);
-      collectPositions(item.value, child, base, root, out);
+      collectPositions(item.value, child, base, root, out, keys);
     }
     return;
   }
@@ -278,7 +291,7 @@ function collectPositions(
     node.items.forEach((item, index) => {
       const child = `${path}[${index}]`;
       record(item, child, base, root, out);
-      collectPositions(item, child, base, root, out);
+      collectPositions(item, child, base, root, out, keys);
     });
   }
 }
