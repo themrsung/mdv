@@ -19,7 +19,11 @@ export {
 } from './errors.js';
 export type { ErrorCode } from './errors.js';
 
+export { BLOCK_SCHEMA, CLOSED_VALUES, COMMON_ATTRS, attrDoc, attrSchema } from './schemas.js';
+
 export type {
+  AttrDoc,
+  BlockSchema,
   ConformanceLevel,
   ErrorCodeEntry,
   ErrorGroupKey,
@@ -27,6 +31,7 @@ export type {
   ErrorTable,
   FixtureCategory,
   FixtureMeta,
+  SchemaNode,
 } from './types.js';
 
 /** The spec revision these artefacts were generated from. */

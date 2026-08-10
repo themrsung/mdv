@@ -5,25 +5,59 @@
   "description": "SPEC 8.1. Per-type schemas `allOf`-reference this file and add their own channels.",
   "type": "object",
   "properties": {
-    "type": { "type": "string", "description": "Only when omitted from the info string." },
-    "title": { "type": "string" },
-    "subtitle": { "type": "string" },
-    "caption": { "type": "string" },
+    "type": {
+      "type": "string",
+      "description": "Only when omitted from the info string.",
+      "examples": ["bar"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Rendered above the plot; also the default accessible name (SPEC 12.1).",
+      "examples": ["Quarterly revenue"]
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "A second line, rendered under the title.",
+      "examples": ["FY2026, in USD"]
+    },
+    "caption": {
+      "type": "string",
+      "description": "Rendered below the plot; the figure caption in PDF. A caption makes the block a figure.",
+      "examples": ["Source: the billing export."]
+    },
     "desc": {
       "type": "string",
-      "description": "The accessible description (SPEC 12.2). Generated when absent."
+      "description": "The accessible description (SPEC 12.2). Generated when absent.",
+      "examples": ["Revenue rose in every quarter."]
     },
-    "id": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$" },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+      "description": "Anchor and cross-reference target.",
+      "examples": ["revenue-by-quarter"]
+    },
     "data": {
       "type": "string",
       "pattern": "^@[A-Za-z_][A-Za-z0-9_-]*(\\[[^\\]]*\\])?$",
-      "description": "A dataset reference, optionally projected: \"@sales[date, revenue]\". Mutually exclusive with a data section and with src."
+      "description": "A dataset reference, optionally projected: \"@sales[date, revenue]\". Mutually exclusive with a data section and with src.",
+      "examples": ["@sales[date, revenue]"]
     },
-    "src": { "type": "string", "description": "External source (SPEC 6.4). Disabled by default." },
-    "integrity": { "type": "string", "pattern": "^sha(256|384|512)-[A-Za-z0-9+/=]+$" },
+    "src": {
+      "type": "string",
+      "description": "External source (SPEC 6.4). Disabled by default.",
+      "examples": ["./data/sales.csv"]
+    },
+    "integrity": {
+      "type": "string",
+      "pattern": "^sha(256|384|512)-[A-Za-z0-9+/=]+$",
+      "description": "Subresource integrity hash for `src`; a mismatch is MDV4021.",
+      "examples": ["sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE="]
+    },
     "format": {
       "enum": ["auto", "table", "csv", "tsv", "json", "ndjson", "columns", "matrix"],
-      "default": "auto"
+      "default": "auto",
+      "description": "The data-section syntax (SPEC 6.2).",
+      "examples": ["csv"]
     },
     "fields": {
       "type": "object",
@@ -44,78 +78,268 @@
               "unknown"
             ]
           },
-          "format": { "$ref": "./format.json" },
-          "parse": { "type": "string" },
-          "title": { "type": "string" }
+          "format": {
+            "$ref": "./format.json"
+          },
+          "parse": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
         },
         "unevaluatedProperties": false
-      }
+      },
+      "description": "Declared field types and formats, by column name (SPEC 6.1).",
+      "examples": [
+        {
+          "revenue": {
+            "type": "number",
+            "format": "$,.0f"
+          }
+        }
+      ]
     },
-    "transform": { "type": "array", "items": { "type": "object" } },
-    "width": { "$ref": "./dimension.json", "default": "100%" },
-    "height": { "$ref": "./dimension.json", "default": 300 },
-    "aspect": { "type": "number", "exclusiveMinimum": 0 },
+    "transform": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "The transform pipeline (SPEC 6.7), applied in order.",
+      "examples": [
+        [
+          {
+            "filter": "revenue > 0"
+          }
+        ]
+      ]
+    },
+    "width": {
+      "$ref": "./dimension.json",
+      "default": "100%",
+      "description": "Outer width; `100%` fills the container (SPEC 8.1).",
+      "examples": ["320px"]
+    },
+    "height": {
+      "$ref": "./dimension.json",
+      "default": 300,
+      "description": "Outer height; `aspect` overrides it when the width is fluid.",
+      "examples": [240]
+    },
+    "aspect": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Width : height; overrides `height` when the width is fluid.",
+      "examples": [1.6]
+    },
     "padding": {
       "oneOf": [
-        { "$ref": "./dimension.json" },
+        {
+          "$ref": "./dimension.json"
+        },
         {
           "type": "object",
           "properties": {
-            "top": { "$ref": "./dimension.json" },
-            "right": { "$ref": "./dimension.json" },
-            "bottom": { "$ref": "./dimension.json" },
-            "left": { "$ref": "./dimension.json" }
+            "top": {
+              "$ref": "./dimension.json"
+            },
+            "right": {
+              "$ref": "./dimension.json"
+            },
+            "bottom": {
+              "$ref": "./dimension.json"
+            },
+            "left": {
+              "$ref": "./dimension.json"
+            }
           },
           "unevaluatedProperties": false
         }
       ],
-      "default": { "top": 8, "right": 8, "bottom": 8, "left": 8 }
+      "default": {
+        "top": 8,
+        "right": 8,
+        "bottom": 8,
+        "left": 8
+      },
+      "description": "Inside the block's frame: one dimension for every side, or a box.",
+      "examples": [
+        {
+          "top": 16,
+          "bottom": 24
+        }
+      ]
     },
-    "theme": { "type": "string" },
+    "theme": {
+      "type": "string",
+      "description": "Per-block theme override; inherited when absent.",
+      "examples": ["dark"]
+    },
     "palette": {
-      "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "description": "A named palette or explicit colors; a custom palette MUST pass contrast validation (MDV3080).",
+      "examples": [["#1f77b4", "#ff7f0e"]]
     },
     "legend": {
       "oneOf": [
-        { "enum": ["auto", "top", "right", "bottom", "left", "inline", false] },
+        {
+          "enum": ["auto", "top", "right", "bottom", "left", "inline", false]
+        },
         {
           "type": "object",
           "properties": {
-            "position": { "enum": ["auto", "top", "right", "bottom", "left", "inline"] },
-            "title": { "oneOf": [{ "type": "string" }, { "const": false }] },
-            "orient": { "enum": ["horizontal", "vertical"] },
-            "columns": { "type": "integer", "minimum": 1 },
-            "maxItems": { "type": "integer", "minimum": 1, "default": 12 }
+            "position": {
+              "enum": ["auto", "top", "right", "bottom", "left", "inline"]
+            },
+            "title": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "const": false
+                }
+              ]
+            },
+            "orient": {
+              "enum": ["horizontal", "vertical"]
+            },
+            "columns": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "maxItems": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 12
+            }
           },
           "unevaluatedProperties": false
         }
       ],
-      "default": "auto"
+      "default": "auto",
+      "description": "Legend placement, or `false` to drop it (SPEC 7.4).",
+      "examples": ["top"]
     },
     "tooltip": {
-      "oneOf": [{ "type": "boolean" }, { "type": "array", "items": { "type": "string" } }],
-      "default": true
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ],
+      "default": true,
+      "description": "`false` to disable, or the fields to show (SPEC 7.5).",
+      "examples": [["region", "revenue"]]
     },
-    "animate": { "type": "boolean", "default": true },
-    "class": { "type": "string" },
-    "fallback": { "type": "string" },
-    "table": { "enum": ["details", "visible", "hidden", "none"], "default": "details" },
-    "row": { "$ref": "./channel.json" },
-    "column": { "$ref": "./channel.json" },
-    "columns": { "type": "integer", "minimum": 1 },
-    "shareX": { "type": "boolean", "default": true },
-    "shareY": { "type": "boolean", "default": true },
-    "facetHeight": { "$ref": "./dimension.json" },
+    "animate": {
+      "type": "boolean",
+      "default": true,
+      "description": "Forced off under `prefers-reduced-motion` and on static targets.",
+      "examples": [false]
+    },
+    "class": {
+      "type": "string",
+      "description": "Passed through to the container element for embedder styling.",
+      "examples": ["report-wide"]
+    },
+    "fallback": {
+      "type": "string",
+      "description": "A pre-rendered image for pipelines that cannot read MDV (SPEC 5.6). Readers ignore it.",
+      "examples": ["./img/revenue.png"]
+    },
+    "table": {
+      "enum": ["details", "visible", "hidden", "none"],
+      "default": "details",
+      "description": "The data-table fallback (SPEC 10.1).",
+      "examples": ["visible"]
+    },
+    "row": {
+      "$ref": "./channel.json",
+      "description": "Facet into one row per value of this field (SPEC 7.6).",
+      "examples": ["region"]
+    },
+    "column": {
+      "$ref": "./channel.json",
+      "description": "Facet into one column per value of this field (SPEC 7.6).",
+      "examples": ["region"]
+    },
+    "columns": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Wrap facets after this many panels (SPEC 7.6).",
+      "examples": [3]
+    },
+    "shareX": {
+      "type": "boolean",
+      "default": true,
+      "description": "A shared scale is what makes panels comparable (SPEC 7.6).",
+      "examples": [true]
+    },
+    "shareY": {
+      "type": "boolean",
+      "default": true,
+      "description": "`false` emits MDV3030 (info): unshared scales invite false comparison.",
+      "examples": [false]
+    },
+    "facetHeight": {
+      "$ref": "./dimension.json",
+      "description": "Per-panel height; panels keep the block's height when absent (SPEC 7.6).",
+      "examples": [160]
+    },
     "axis": {
       "type": "object",
       "properties": {
-        "x": { "oneOf": [{ "$ref": "./axis.json" }, { "const": false }] },
-        "y": { "oneOf": [{ "$ref": "./axis.json" }, { "const": false }] }
+        "x": {
+          "oneOf": [
+            {
+              "$ref": "./axis.json"
+            },
+            {
+              "const": false
+            }
+          ]
+        },
+        "y": {
+          "oneOf": [
+            {
+              "$ref": "./axis.json"
+            },
+            {
+              "const": false
+            }
+          ]
+        }
       },
-      "unevaluatedProperties": false
+      "unevaluatedProperties": false,
+      "description": "Axis configuration (SPEC 7.3); `false` hides an axis. There is no second value axis.",
+      "examples": [
+        {
+          "y": {
+            "grid": true
+          }
+        }
+      ]
     }
   },
-  "patternProperties": { "^x-": true },
+  "patternProperties": {
+    "^x-": true
+  },
   "not": {
     "required": ["data", "src"],
     "$comment": "MDV1204: a block may not carry both an out-of-band source and another one."
