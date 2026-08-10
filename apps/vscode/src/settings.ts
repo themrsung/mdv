@@ -15,7 +15,7 @@
  * | `validate.level` | pipeline — the conformance level a block is judged at |
  * | `validate.strict` | pipeline — promotes warnings to errors (SPEC 14.3) |
  * | `format.enable` | `format.ts` — registers or withholds the formatting provider |
- * | `format.attributeOrder` | `format.ts` — passed to `toMarkdown` |
+ * | `format.attributeOrder` | `format.ts` — becomes `FormatOptions.attrOrder`, all three values |
  * | `security.allowExternal` | pipeline — enables `src:` fetching |
  * | `security.allowedOrigins` | pipeline — the fetch allowlist |
  * | `export.pdf.pageSize` | `commands/exports.ts` |

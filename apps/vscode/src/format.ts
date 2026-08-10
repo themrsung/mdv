@@ -8,11 +8,11 @@
  * - `mdv.format.enable` decides whether the provider is registered at all, so
  *   turning it off actually removes MDV from the "Format Document" menu rather
  *   than making it a no-op.
- * - `mdv.format.attributeOrder` maps onto `FormatOptions.canonicalAttrOrder`:
- *   `canonical` → `true`, `preserve` → `false`. `alphabetical` has no
- *   `FormatOptions` counterpart in this tree; it degrades to `canonical` (whose
- *   order *is* "a fixed order, then alphabetical") and says so once in the log,
- *   rather than silently doing something else.
+ * - `mdv.format.attributeOrder` is `FormatOptions.attrOrder`, name for name and
+ *   value for value. The setting used to have only two destinations to choose
+ *   between and `alphabetical` degraded to `canonical`; the parser now
+ *   implements all three, so this is a pass-through and there is nothing left
+ *   to warn about.
  *
  * Formatting is a whole-document replace. `toMarkdown` is idempotent and MUST
  * NOT change the resolved AST (SPEC 27), so a no-op format returns no edits —
@@ -23,21 +23,17 @@
 import * as vscode from 'vscode';
 import type { FormatOptions } from '@mdv/parser';
 import { parse, toMarkdown } from '@mdv/parser';
-import { log, logError } from './log.js';
-import type { SettingsStore } from './settings.js';
+import { logError } from './log.js';
+import type { AttributeOrderSetting, SettingsStore } from './settings.js';
 import { isPreviewable, MDV_LANGUAGE } from './documents.js';
 
-let warnedAboutAlphabetical = false;
-
-function formatOptions(order: 'canonical' | 'alphabetical' | 'preserve'): FormatOptions {
-  if (order === 'alphabetical' && !warnedAboutAlphabetical) {
-    warnedAboutAlphabetical = true;
-    log(
-      'mdv.format.attributeOrder="alphabetical" is not distinct from "canonical" in this build; ' +
-        'the canonical order is a fixed prefix followed by alphabetical.',
-    );
-  }
-  return { canonicalAttrOrder: order !== 'preserve' };
+/**
+ * The setting is the option. It is spelled out rather than passed inline so the
+ * two vocabularies stay visibly identical — if SPEC 29.6 ever grows a fourth
+ * value, this is where the compiler will stop.
+ */
+function formatOptions(order: AttributeOrderSetting): FormatOptions {
+  return { attrOrder: order };
 }
 
 class MdvFormatter implements vscode.DocumentFormattingEditProvider {

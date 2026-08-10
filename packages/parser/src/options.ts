@@ -69,12 +69,21 @@ export interface FormatOptions {
    */
   alignTables?: boolean;
   /**
-   * Emit attributes in the canonical order (a fixed order, then alphabetical)
-   * rather than in source order.
+   * How attribute keys are ordered when a block header or directive is
+   * re-emitted.
    *
-   * @defaultValue true
+   * - `canonical` — the order SPEC 27 canonicalises to: a fixed prefix
+   *   (`id`, `class`, `type`, `title`, `subtitle`, `desc`) and then
+   *   alphabetical. This is what `mdv fmt` writes.
+   * - `alphabetical` — plain alphabetical, with no privileged prefix. Distinct
+   *   from `canonical` for any node carrying one of the six names above; it is
+   *   what a caller wants when the file is read by something that sorts, not by
+   *   a person.
+   * - `preserve` — source order, untouched.
+   *
+   * @defaultValue 'canonical'
    */
-  canonicalAttrOrder?: boolean;
+  attrOrder?: 'canonical' | 'alphabetical' | 'preserve';
   /**
    * Insert the delimiter row into `table` block data when it is missing.
    *

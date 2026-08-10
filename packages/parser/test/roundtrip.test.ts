@@ -151,6 +151,46 @@ describe('SPEC 19 — toMarkdown round-trips', () => {
   });
 });
 
+describe('SPEC 27 — attribute order', () => {
+  // Source order is deliberately none of the three answers, and `id` sits in
+  // the middle so the `#id` shorthand has to survive being moved around.
+  const source = '::mdv-callout{zebra=1 title=T alpha=2 id=hero desc=D}\n';
+
+  const attrsOf = (text: string): Record<string, unknown> => {
+    const directive = parse(text).children.find((child) => child.type === 'mdvDirective');
+    return (directive as { attrs: Record<string, unknown> }).attrs;
+  };
+
+  it('defaults to canonical: the fixed prefix in spec order, then alphabetical', () => {
+    expect(toMarkdown(parse(source))).toBe('::mdv-callout{#hero title=T desc=D alpha=2 zebra=1}\n');
+    expect(toMarkdown(parse(source), { attrOrder: 'canonical' })).toBe(toMarkdown(parse(source)));
+  });
+
+  it('sorts every key alphabetically when asked, prefix included', () => {
+    expect(toMarkdown(parse(source), { attrOrder: 'alphabetical' })).toBe(
+      '::mdv-callout{alpha=2 desc=D #hero title=T zebra=1}\n',
+    );
+  });
+
+  it('leaves the author’s order untouched when asked to preserve it', () => {
+    // Order is preserved; spelling is not part of the order, so `id` still
+    // takes the `#` shorthand where it stands.
+    expect(toMarkdown(parse(source), { attrOrder: 'preserve' })).toBe(
+      '::mdv-callout{zebra=1 title=T alpha=2 #hero desc=D}\n',
+    );
+  });
+
+  it('changes only the order — never the attributes themselves', () => {
+    const expected = attrsOf(source);
+    for (const attrOrder of ['canonical', 'alphabetical', 'preserve'] as const) {
+      const printed = toMarkdown(parse(source), { attrOrder });
+      expect(attrsOf(printed)).toEqual(expected);
+      // Each mode is still a fixed point of itself.
+      expect(toMarkdown(parse(printed), { attrOrder })).toBe(printed);
+    }
+  });
+});
+
 describe('SPEC 24.3 — determinism', () => {
   it('produces byte-identical output for the same input', () => {
     const a = canonicalAst(parse(appendixE));

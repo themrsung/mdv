@@ -7,8 +7,8 @@
  * - **A visual block re-emits `raw.header` and `raw.data` verbatim.** They are
  *   the source of truth for a block's body, and re-generating a header from
  *   `attrs` would silently drop comments, blank lines and the author's chosen
- *   quoting. The cost is that `canonicalAttrOrder` does not reach inside a block
- *   header; the benefit is that `mdv fmt` cannot lose a byte of it.
+ *   quoting. The cost is that `attrOrder` does not reach inside a block header;
+ *   the benefit is that `mdv fmt` cannot lose a byte of it.
  * - **Attributes written in the info string go back into the info string.**
  *   Which ones those are is recovered from `attrsPosition`: a key whose value
  *   sits on the block's first line was written there.
@@ -53,7 +53,7 @@ const CANONICAL_FIRST = ['id', 'class', 'type', 'title', 'subtitle', 'desc'];
 
 interface Resolved {
   readonly alignTables: boolean;
-  readonly canonicalAttrOrder: boolean;
+  readonly attrOrder: 'canonical' | 'alphabetical' | 'preserve';
   readonly bullet: '-' | '*' | '+';
   readonly fence: '`' | '~';
   readonly quote: '"' | "'";
@@ -63,7 +63,7 @@ interface Resolved {
 export function serializeDocument(doc: MdvDocument, options: FormatOptions = {}): string {
   const resolved: Resolved = {
     alignTables: options.alignTables ?? true,
-    canonicalAttrOrder: options.canonicalAttrOrder ?? true,
+    attrOrder: options.attrOrder ?? 'canonical',
     bullet: options.bullet ?? '-',
     fence: options.fence ?? '`',
     quote: options.quote ?? '"',
@@ -300,8 +300,19 @@ function isIdentList(value: AttrValue): value is string {
   );
 }
 
+/**
+ * Order the attribute keys of one node (SPEC 27).
+ *
+ * `alphabetical` is not a synonym for `canonical`: the canonical order is a
+ * fixed prefix *then* alphabetical, so the two differ for any node carrying one
+ * of {@link CANONICAL_FIRST}. Both sorts are total — the comparator falls
+ * through to `compareStrings`, which is the same code-unit ordering the rest of
+ * the serialiser uses — so neither depends on `Array.prototype.sort` stability
+ * or on the order the keys arrived in.
+ */
 function orderKeys(keys: readonly string[], resolved: Resolved): string[] {
-  if (!resolved.canonicalAttrOrder) return keys.slice();
+  if (resolved.attrOrder === 'preserve') return keys.slice();
+  if (resolved.attrOrder === 'alphabetical') return keys.slice().sort(compareStrings);
   const rank = (key: string): number => {
     const index = CANONICAL_FIRST.indexOf(key);
     return index === -1 ? CANONICAL_FIRST.length : index;
