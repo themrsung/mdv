@@ -92,7 +92,13 @@ export function buildSeries(input: BuildSeriesInput): SeriesResolution {
       identities.push(key);
     }
     return foldAndDescribe(
-      identities.map((id) => ({ id, label: id, source: seriesChannel?.field ?? '', valueColumn: valueColumn.index, matchKey: id })),
+      identities.map((id) => ({
+        id,
+        label: id,
+        source: seriesChannel?.field ?? '',
+        valueColumn: valueColumn.index,
+        matchKey: id,
+      })),
       palette,
       'long',
     );
@@ -147,7 +153,11 @@ interface RawSeries {
 }
 
 /** Apply the palette cap, folding the overflow into one "Other" series. */
-function foldAndDescribe(entries: readonly RawSeries[], palette: PaletteAllocator, form: SeriesForm): SeriesResolution {
+function foldAndDescribe(
+  entries: readonly RawSeries[],
+  palette: PaletteAllocator,
+  form: SeriesForm,
+): SeriesResolution {
   const plans: SeriesPlan[] = [];
   let folded = false;
   let otherAdded = false;
@@ -224,7 +234,7 @@ export function buildLegend(
 
   const named = series.filter((s) => s.id !== '');
   const object = typeof request === 'object' ? request : undefined;
-  const requested = typeof request === 'string' ? request : object?.position ?? 'auto';
+  const requested = typeof request === 'string' ? request : (object?.position ?? 'auto');
 
   if (requested === 'auto' && named.length < 2) return undefined;
   if (named.length === 0) return undefined;

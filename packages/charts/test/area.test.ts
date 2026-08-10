@@ -364,7 +364,9 @@ describe('area: accessibility', () => {
   });
 
   it('says so plainly when there is nothing to describe', () => {
-    expect(runChart(areaChart, EMPTY_TABLE, { encoding: XY }).description).toBe('Area chart with no data.');
+    expect(runChart(areaChart, EMPTY_TABLE, { encoding: XY }).description).toBe(
+      'Area chart with no data.',
+    );
   });
 
   it('offers the data as a table through `a11yTable`', () => {

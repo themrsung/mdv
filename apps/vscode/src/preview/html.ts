@@ -29,7 +29,7 @@
  *   document's own folder, and nothing else.
  */
 
-import * as vscode from 'vscode';
+import type * as vscode from 'vscode';
 import { stylesheet } from '@mdv/render-svg';
 
 /** 128 bits of nonce, hex-encoded. Fresh for every `getHtml` call. */

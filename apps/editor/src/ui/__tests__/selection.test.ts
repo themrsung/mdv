@@ -11,7 +11,13 @@
 
 import { describe, expect, it } from 'vitest';
 import type { Block, InlineContainer, MdvDocument, Point } from '../../engine/index.js';
-import { createEditor, fromAbsolute, resolveContainer, runsText, toAbsolute } from '../../engine/index.js';
+import {
+  createEditor,
+  fromAbsolute,
+  resolveContainer,
+  runsText,
+  toAbsolute,
+} from '../../engine/index.js';
 import type { NodeLike } from '../dom/contract.js';
 import { offsetInContainer } from '../dom/offsets.js';
 import {
@@ -33,12 +39,23 @@ function render(source: string): { readonly doc: MdvDocument; readonly root: Nod
 
 function containersOf(node: Block): readonly NodeLike[] {
   if (node.kind === 'paragraph' || node.kind === 'heading') {
-    return [container(node.id, [], node.runs.map((run) => run.text))];
+    return [
+      container(
+        node.id,
+        [],
+        node.runs.map((run) => run.text),
+      ),
+    ];
   }
   if (node.kind === 'table') {
     return node.rows.flatMap((row, rowIndex) =>
       row.cells.map((cell, colIndex) =>
-        container(node.id, [rowIndex, colIndex], cell.runs.map((run) => run.text), { tag: 'td' }),
+        container(
+          node.id,
+          [rowIndex, colIndex],
+          cell.runs.map((run) => run.text),
+          { tag: 'td' },
+        ),
       ),
     );
   }
@@ -50,7 +67,9 @@ function hostFor(root: NodeLike, blockId: string, path: readonly number[]): Node
   const wanted = path.join(',');
   const search = (node: NodeLike): NodeLike | null => {
     const attribute =
-      'getAttribute' in node ? (node as { getAttribute(n: string): string | null }).getAttribute : null;
+      'getAttribute' in node
+        ? (node as { getAttribute(n: string): string | null }).getAttribute
+        : null;
     if (
       attribute !== null &&
       attribute.call(node, 'data-mdv-container') === blockId &&
@@ -225,7 +244,12 @@ describe('domSelectionMatches', () => {
 
     expect(
       domSelectionMatches(
-        { anchorNode: firstText(host), anchorOffset: 4, focusNode: firstText(host), focusOffset: 4 },
+        {
+          anchorNode: firstText(host),
+          anchorOffset: 4,
+          focusNode: firstText(host),
+          focusOffset: 4,
+        },
         target!,
       ),
     ).toBe(false);

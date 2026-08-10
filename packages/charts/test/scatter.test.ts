@@ -18,7 +18,15 @@
 import { describe, expect, it } from 'vitest';
 import type { PathNode, SceneNode } from '@mdv/core';
 import { bubbleChart, scatterChart } from '../src/scatter.js';
-import { EMPTY_TABLE, codesOf, makeTable, nodesOfKind, nonFiniteNumbers, noRows, runChart } from './harness.js';
+import {
+  EMPTY_TABLE,
+  codesOf,
+  makeTable,
+  nodesOfKind,
+  nonFiniteNumbers,
+  noRows,
+  runChart,
+} from './harness.js';
 
 const XY = { x: { field: 'spend' }, y: { field: 'revenue' } };
 const SIZED = { ...XY, size: { field: 'weight' } };
@@ -71,7 +79,11 @@ describe('scatter: mark geometry', () => {
   });
 
   it('fills at the default 0.85 opacity, so overlaps stay readable', () => {
-    expect(dots(run.laid.nodes)[0]?.fill).toEqual({ kind: 'solid', color: '#111180', opacity: 0.85 });
+    expect(dots(run.laid.nodes)[0]?.fill).toEqual({
+      kind: 'solid',
+      color: '#111180',
+      opacity: 0.85,
+    });
   });
 
   it('gives every point a hit target on the point itself', () => {
@@ -198,12 +210,16 @@ describe('scatter: series', () => {
   }
 
   it('accepts three series without comment', () => {
-    const run = runChart(scatterChart, manySeries(3), { encoding: { ...XY, series: { field: 'team' } } });
+    const run = runChart(scatterChart, manySeries(3), {
+      encoding: { ...XY, series: { field: 'team' } },
+    });
     expect(codesOf(run)).not.toContain('MDV3061');
   });
 
   it('refuses a fourth: a scatter compares every pair of colours at once (MDV3061)', () => {
-    const run = runChart(scatterChart, manySeries(4), { encoding: { ...XY, series: { field: 'team' } } });
+    const run = runChart(scatterChart, manySeries(4), {
+      encoding: { ...XY, series: { field: 'team' } },
+    });
     expect(codesOf(run)).toContain('MDV3061');
   });
 });
@@ -251,12 +267,16 @@ describe('scatter: jitter is deterministic (SPEC 24.3)', () => {
   it('produces byte-identical coordinates across runs', () => {
     const a = runChart(scatterChart, cloud(), { encoding: XY, attrs: { jitter: 4 } });
     const b = runChart(scatterChart, cloud(), { encoding: XY, attrs: { jitter: 4 } });
-    expect(dots(a.laid.nodes).map((d) => [d.cx, d.cy])).toEqual(dots(b.laid.nodes).map((d) => [d.cx, d.cy]));
+    expect(dots(a.laid.nodes).map((d) => [d.cx, d.cy])).toEqual(
+      dots(b.laid.nodes).map((d) => [d.cx, d.cy]),
+    );
   });
 
   it('actually moves the points, but never further than asked', () => {
     const plain = dots(runChart(scatterChart, cloud(), { encoding: XY }).laid.nodes);
-    const jittered = dots(runChart(scatterChart, cloud(), { encoding: XY, attrs: { jitter: 4 } }).laid.nodes);
+    const jittered = dots(
+      runChart(scatterChart, cloud(), { encoding: XY, attrs: { jitter: 4 } }).laid.nodes,
+    );
     expect(jittered.map((d) => d.cx)).not.toEqual(plain.map((d) => d.cx));
     for (let i = 0; i < plain.length; i += 1) {
       expect(Math.abs((jittered[i]?.cx ?? 0) - (plain[i]?.cx ?? 0))).toBeLessThanOrEqual(4);
@@ -349,7 +369,9 @@ describe('scatter: degenerate data', () => {
 describe('scatter: accessibility', () => {
   it('describes itself through the registry contract', () => {
     const run = runChart(scatterChart, cloud(), { encoding: XY });
-    expect(run.description).toBe('Scatter chart. Revenue against spend, 4 points. Values range from 0 to 30.');
+    expect(run.description).toBe(
+      'Scatter chart. Revenue against spend, 4 points. Values range from 0 to 30.',
+    );
   });
 
   it('names itself a bubble when it is one', () => {
@@ -358,12 +380,18 @@ describe('scatter: accessibility', () => {
   });
 
   it('says so plainly when there is nothing to describe', () => {
-    expect(runChart(scatterChart, EMPTY_TABLE, { encoding: XY }).description).toBe('Scatter chart with no data.');
+    expect(runChart(scatterChart, EMPTY_TABLE, { encoding: XY }).description).toBe(
+      'Scatter chart with no data.',
+    );
   });
 
   it('offers the data as a table through `a11yTable`', () => {
     const run = runChart(bubbleChart, cloud(), { encoding: SIZED });
-    expect(run.encoded.a11yTable?.columns.map((c) => c.name)).toEqual(['Spend', 'Revenue', 'Weight']);
+    expect(run.encoded.a11yTable?.columns.map((c) => c.name)).toEqual([
+      'Spend',
+      'Revenue',
+      'Weight',
+    ]);
     expect(run.encoded.a11yTable?.rows[0]).toEqual(['0', '30', '1']);
   });
 });

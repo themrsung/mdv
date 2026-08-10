@@ -8,13 +8,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import {
-  escapeXml,
-  formatNumber,
-  isSafeId,
-  sanitiseClasses,
-  sanitiseUrl,
-} from '../src/format.js';
+import { escapeXml, formatNumber, isSafeId, sanitiseClasses, sanitiseUrl } from '../src/format.js';
 
 describe('formatNumber (SPEC 23.1: 3 decimals, -0 normalised to 0)', () => {
   it('rounds to the requested precision and strips trailing zeros', () => {
@@ -80,9 +74,7 @@ describe('escapeXml (SPEC 13.3)', () => {
   });
 
   it('neutralises a script tag and an attribute break-out', () => {
-    expect(escapeXml('<script>alert(1)</script>')).toBe(
-      '&lt;script&gt;alert(1)&lt;/script&gt;',
-    );
+    expect(escapeXml('<script>alert(1)</script>')).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(escapeXml('" onload="alert(1)')).toBe('&quot; onload=&quot;alert(1)');
     expect(escapeXml("' onmouseover='x")).toBe('&apos; onmouseover=&apos;x');
   });
@@ -116,7 +108,16 @@ describe('isSafeId (SPEC 13.3: ids are generated, never content-derived)', () =>
   });
 
   it('rejects anything that could break a reference or escape a selector', () => {
-    for (const bad of ['', '0-leading-digit', '-dash', 'has space', 'quote"', "apos'", 'a<b', 'π']) {
+    for (const bad of [
+      '',
+      '0-leading-digit',
+      '-dash',
+      'has space',
+      'quote"',
+      "apos'",
+      'a<b',
+      'π',
+    ]) {
       expect(isSafeId(bad)).toBe(false);
     }
   });

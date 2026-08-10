@@ -40,7 +40,10 @@ export async function validateThemeCommand(
   const term = createTerm(io, flags);
   const target = files[0];
   if (target === undefined) {
-    throw usageError('validate-theme: no theme given', 'Usage: mdv validate-theme <file.json|name>');
+    throw usageError(
+      'validate-theme: no theme given',
+      'Usage: mdv validate-theme <file.json|name>',
+    );
   }
 
   const schemeFlag = flags.scheme;

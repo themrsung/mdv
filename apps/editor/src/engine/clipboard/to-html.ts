@@ -28,7 +28,10 @@ export interface HtmlWriteOptions {
 
 /** Render blocks as standalone HTML. */
 export function blocksToHtml(blocks: readonly Block[], options: HtmlWriteOptions = {}): string {
-  const body = blocks.map((block) => blockToHtml(block)).filter((html) => html !== '').join('\n');
+  const body = blocks
+    .map((block) => blockToHtml(block))
+    .filter((html) => html !== '')
+    .join('\n');
   if (options.wrap === false) return body;
   return `<div data-mdv-fragment="1">\n${body}\n</div>`;
 }
@@ -113,7 +116,10 @@ function tableToHtml(table: TableBlock): string {
       ? ''
       : `<thead>\n<tr>${header.cells.map((cell, index) => cellHtml(cell.runs, 'th', index)).join('')}</tr>\n</thead>\n`;
   const rows = body
-    .map((row) => `<tr>${row.cells.map((cell, index) => cellHtml(cell.runs, 'td', index)).join('')}</tr>`)
+    .map(
+      (row) =>
+        `<tr>${row.cells.map((cell, index) => cellHtml(cell.runs, 'td', index)).join('')}</tr>`,
+    )
     .join('\n');
   const bodyHtml = body.length === 0 ? '' : `<tbody>\n${rows}\n</tbody>\n`;
   return `<table>\n${head}${bodyHtml}</table>`;

@@ -45,17 +45,86 @@ const TABLES: readonly (readonly [string, Table])[] = [
   ['columns but no rows', makeTable(KEY_VALUE, [])],
   ['exactly one row', makeTable(KEY_VALUE, [['only', 42]])],
   ['one row at zero', makeTable(KEY_VALUE, [['only', 0]])],
-  ['every value null', makeTable(KEY_VALUE, [['a', null], ['b', null]])],
-  ['every key null', makeTable(KEY_VALUE, [[null, 1], [null, 2]])],
-  ['a constant column', makeTable(KEY_VALUE, [['a', 7], ['b', 7], ['c', 7]])],
-  ['all zeroes', makeTable(KEY_VALUE, [['a', 0], ['b', 0]])],
-  ['negatives only', makeTable(KEY_VALUE, [['a', -5], ['b', -9]])],
-  ['straddling zero', makeTable(KEY_VALUE, [['a', -5], ['b', 0], ['c', 5]])],
-  ['duplicate keys', makeTable(KEY_VALUE, [['a', 1], ['a', 2], ['a', 3]])],
-  ['a single huge value', makeTable(KEY_VALUE, [['a', 1e308], ['b', 1]])],
-  ['a single tiny value', makeTable(KEY_VALUE, [['a', 5e-324], ['b', 1]])],
-  ['values spanning many orders', makeTable(KEY_VALUE, [['a', 1e-9], ['b', 1e9]])],
-  ['an empty-string key', makeTable(KEY_VALUE, [['', 1], ['b', 2]])],
+  [
+    'every value null',
+    makeTable(KEY_VALUE, [
+      ['a', null],
+      ['b', null],
+    ]),
+  ],
+  [
+    'every key null',
+    makeTable(KEY_VALUE, [
+      [null, 1],
+      [null, 2],
+    ]),
+  ],
+  [
+    'a constant column',
+    makeTable(KEY_VALUE, [
+      ['a', 7],
+      ['b', 7],
+      ['c', 7],
+    ]),
+  ],
+  [
+    'all zeroes',
+    makeTable(KEY_VALUE, [
+      ['a', 0],
+      ['b', 0],
+    ]),
+  ],
+  [
+    'negatives only',
+    makeTable(KEY_VALUE, [
+      ['a', -5],
+      ['b', -9],
+    ]),
+  ],
+  [
+    'straddling zero',
+    makeTable(KEY_VALUE, [
+      ['a', -5],
+      ['b', 0],
+      ['c', 5],
+    ]),
+  ],
+  [
+    'duplicate keys',
+    makeTable(KEY_VALUE, [
+      ['a', 1],
+      ['a', 2],
+      ['a', 3],
+    ]),
+  ],
+  [
+    'a single huge value',
+    makeTable(KEY_VALUE, [
+      ['a', 1e308],
+      ['b', 1],
+    ]),
+  ],
+  [
+    'a single tiny value',
+    makeTable(KEY_VALUE, [
+      ['a', 5e-324],
+      ['b', 1],
+    ]),
+  ],
+  [
+    'values spanning many orders',
+    makeTable(KEY_VALUE, [
+      ['a', 1e-9],
+      ['b', 1e9],
+    ]),
+  ],
+  [
+    'an empty-string key',
+    makeTable(KEY_VALUE, [
+      ['', 1],
+      ['b', 2],
+    ]),
+  ],
 ];
 
 /** Frames a real layout can genuinely hand a block. */
@@ -114,13 +183,25 @@ describe.each(level1ChartTypes.map((type) => [type.name, type] as const))('%s', 
       value: {},
       delta: [],
     };
-    const run = sweep(type, makeTable(KEY_VALUE, [['a', 1], ['b', 2]]), NORMAL, hostile);
+    const run = sweep(
+      type,
+      makeTable(KEY_VALUE, [
+        ['a', 1],
+        ['b', 2],
+      ]),
+      NORMAL,
+      hostile,
+    );
     expect(nonFiniteNumbers(run.laid)).toEqual([]);
     for (const diagnostic of run.diagnostics) expect(diagnostic.severity).not.toBe('fatal');
   });
 
   it('keeps every hit region inside a sane box', () => {
-    const table = makeTable(KEY_VALUE, [['a', 1], ['b', 2], ['c', 3]]);
+    const table = makeTable(KEY_VALUE, [
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]);
     for (const [label, frame] of FRAMES) {
       for (const hit of sweep(type, table, frame).laid.hits) {
         // Core grows every region to 24 × 24; it cannot grow a NaN, and it must
@@ -133,7 +214,11 @@ describe.each(level1ChartTypes.map((type) => [type.name, type] as const))('%s', 
   });
 
   it('produces the same scene twice: encoding is a pure function of its input', () => {
-    const table = makeTable(KEY_VALUE, [['a', 1], ['b', 2], ['c', 3]]);
+    const table = makeTable(KEY_VALUE, [
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]);
     const first = sweep(type, table, NORMAL);
     const second = sweep(type, table, NORMAL);
     expect(JSON.stringify(second.laid)).toBe(JSON.stringify(first.laid));
@@ -156,7 +241,11 @@ describe('the sweep itself', () => {
   });
 
   it('is worth running: the ordinary frame really does draw something', () => {
-    const table = makeTable(KEY_VALUE, [['a', 1], ['b', 2], ['c', 3]]);
+    const table = makeTable(KEY_VALUE, [
+      ['a', 1],
+      ['b', 2],
+      ['c', 3],
+    ]);
     for (const type of level1ChartTypes) {
       const run = sweep(type, table, NORMAL);
       expect(run.laid.nodes.length, type.name).toBeGreaterThan(0);

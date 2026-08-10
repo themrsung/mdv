@@ -106,7 +106,9 @@ describe('bar: negative values', () => {
       ['B', -40],
     ],
   );
-  const run = runChart(barChart, table, { encoding: { x: { field: 'label' }, y: { field: 'delta' } } });
+  const run = runChart(barChart, table, {
+    encoding: { x: { field: 'label' }, y: { field: 'delta' } },
+  });
   const bars = rects(nodesOfKind(run.laid.nodes, 'rect'));
 
   it('puts the zero line in the middle and hangs the negative bar below it', () => {
@@ -213,7 +215,10 @@ describe('bar: percent stacked', () => {
 });
 
 describe('bar: horizontal', () => {
-  const run = runChart(barChart, quarters(), { encoding: XY, attrs: { orientation: 'horizontal' } });
+  const run = runChart(barChart, quarters(), {
+    encoding: XY,
+    attrs: { orientation: 'horizontal' },
+  });
   const bars = rects(nodesOfKind(run.laid.nodes, 'rect'));
 
   it('runs the category down the frame and the value across it', () => {
@@ -283,13 +288,26 @@ describe('bar: degenerate input', () => {
   });
 
   it('draws nothing when the columns exist but no rows do', () => {
-    const run = runChart(barChart, noRows([['quarter', 'category'], ['revenue', 'number']]), { encoding: XY });
+    const run = runChart(
+      barChart,
+      noRows([
+        ['quarter', 'category'],
+        ['revenue', 'number'],
+      ]),
+      { encoding: XY },
+    );
     expect(nodesOfKind(run.laid.nodes, 'rect')).toEqual([]);
     expect(nonFiniteNumbers(run.laid)).toEqual([]);
   });
 
   it('draws a single row as one centred bar', () => {
-    const table = makeTable([['quarter', 'category'], ['revenue', 'number']], [['Q1', 250]]);
+    const table = makeTable(
+      [
+        ['quarter', 'category'],
+        ['revenue', 'number'],
+      ],
+      [['Q1', 250]],
+    );
     const run = runChart(barChart, table, { encoding: XY });
     const bars = rects(nodesOfKind(run.laid.nodes, 'rect'));
     const { start, width } = band(1);
@@ -374,7 +392,10 @@ describe('bar: a11y table', () => {
 
 describe('bar: marks are data space', () => {
   it('never puts a pixel in a mark', () => {
-    const run = runChart(barChart, quarters(), { encoding: XY, frame: { x: 0, y: 0, width: 1000, height: 1000 } });
+    const run = runChart(barChart, quarters(), {
+      encoding: XY,
+      frame: { x: 0, y: 0, width: 1000, height: 1000 },
+    });
     const values = run.encoded.marks.flatMap((m: BarMark) => [m.y0, m.y1]);
     expect(values).toEqual([0, 100, 0, 200, 0, 300, 0, 400]);
   });

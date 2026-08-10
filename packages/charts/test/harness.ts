@@ -56,7 +56,10 @@ export type FieldSpec = readonly [name: string, type: DataType];
  * Rows are given in row-major order, exactly as they appear in a Markdown table,
  * so a fixture reads like the document it stands in for.
  */
-export function makeTable(fields: readonly FieldSpec[], rows: readonly (readonly Value[])[]): Table {
+export function makeTable(
+  fields: readonly FieldSpec[],
+  rows: readonly (readonly Value[])[],
+): Table {
   const columns: Column[] = fields.map(([name, type]) => ({ name, type }));
   return { fields: columns, rows: rows.map((row) => [...row]) };
 }
@@ -189,7 +192,9 @@ export function makeTheme(scheme: ColorScheme = 'light'): Theme {
  * @param size - usable slots before overflow. Pass `3` to simulate the all-pairs
  * cap of SPEC 11.2 rule 3.
  */
-export function makePalette(size = 8): PaletteAllocator & { readonly assigned: ReadonlyMap<string, number> } {
+export function makePalette(
+  size = 8,
+): PaletteAllocator & { readonly assigned: ReadonlyMap<string, number> } {
   const slots = new Map<string, number>();
   let next = 0;
 
@@ -251,7 +256,9 @@ export function makeIds(blockIndex = 0): IdFactory {
   let counter = 0;
   const next = (infix?: string): string => {
     counter += 1;
-    return infix === undefined ? `mdv-${blockIndex}-${counter}` : `mdv-${blockIndex}-${infix}-${counter}`;
+    return infix === undefined
+      ? `mdv-${blockIndex}-${counter}`
+      : `mdv-${blockIndex}-${infix}-${counter}`;
   };
   return { next: next as IdFactory['next'] };
 }
@@ -366,7 +373,9 @@ export interface LayoutHarness {
 }
 
 /** Build a {@link LayoutContext}. */
-export function makeLayoutContext(options: { level?: ConformanceLevel; blockIndex?: number } = {}): LayoutHarness {
+export function makeLayoutContext(
+  options: { level?: ConformanceLevel; blockIndex?: number } = {},
+): LayoutHarness {
   const diagnostics: Diagnostic[] = [];
   return {
     diagnostics,
@@ -426,7 +435,8 @@ export function runChart<M extends Mark>(
 ): ChartRun<M> {
   const blockOptions: BlockOptions = { blockType: type.name, ...options };
   const harness = makeEncodeInput(table, blockOptions);
-  const input = options.palette === undefined ? harness.input : { ...harness.input, palette: options.palette };
+  const input =
+    options.palette === undefined ? harness.input : { ...harness.input, palette: options.palette };
   const validation = type.validate(input.block, table);
   const encoded = type.encode(input);
 
@@ -515,11 +525,17 @@ export function nodesOfKind<K extends SceneNode['kind']>(
   nodes: readonly SceneNode[],
   kind: K,
 ): Extract<SceneNode, { kind: K }>[] {
-  return flattenNodes(nodes).filter((node): node is Extract<SceneNode, { kind: K }> => node.kind === kind);
+  return flattenNodes(nodes).filter(
+    (node): node is Extract<SceneNode, { kind: K }> => node.kind === kind,
+  );
 }
 
 /** Diagnostic codes in order, for `expect(codesOf(run)).toContain('MDV3021')`. */
-export function codesOf(source: { diagnostics: readonly Diagnostic[] } | readonly Diagnostic[]): string[] {
-  const list = Array.isArray(source) ? source : (source as { diagnostics: readonly Diagnostic[] }).diagnostics;
+export function codesOf(
+  source: { diagnostics: readonly Diagnostic[] } | readonly Diagnostic[],
+): string[] {
+  const list = Array.isArray(source)
+    ? source
+    : (source as { diagnostics: readonly Diagnostic[] }).diagnostics;
   return list.map((d) => d.code);
 }

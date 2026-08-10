@@ -49,7 +49,12 @@ export interface LintFlags extends GlobalFlags {
 }
 
 /** Collect every diagnostic for one document, deduplicated and in source order. */
-async function lintOne(io: CliIo, file: string, flags: GlobalFlags, term: ReturnType<typeof createTerm>): Promise<FileDiagnostics> {
+async function lintOne(
+  io: CliIo,
+  file: string,
+  flags: GlobalFlags,
+  term: ReturnType<typeof createTerm>,
+): Promise<FileDiagnostics> {
   const source = await readTextFile(io, file);
   const config = await buildConfig(io, flags, file, term);
   const doc = parse(source);
@@ -93,7 +98,10 @@ export async function lintCommand(
 
   const format = (flags.format ?? 'pretty') as LintFormat;
   if (format !== 'pretty' && format !== 'json' && format !== 'sarif') {
-    throw usageError(`Unknown --format \`${flags.format ?? ''}\``, '--format accepts pretty, json, sarif');
+    throw usageError(
+      `Unknown --format \`${flags.format ?? ''}\``,
+      '--format accepts pretty, json, sarif',
+    );
   }
   const threshold = parseSeverity(flags.maxSeverity ?? 'error');
   if (threshold === undefined) {

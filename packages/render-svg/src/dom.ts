@@ -67,7 +67,8 @@ export function patchElementTree(element: Element, next: VNode, doc: Document): 
   for (const [name, value] of next.attrs) {
     wanted.add(name);
     const ns = namespaceFor(name);
-    const current = ns === null ? element.getAttribute(name) : element.getAttributeNS(ns, name.slice(4));
+    const current =
+      ns === null ? element.getAttribute(name) : element.getAttributeNS(ns, name.slice(4));
     if (current !== value) setAttribute(element, name, value);
   }
   // Remove attributes the new tree no longer wants. Snapshot the list first:

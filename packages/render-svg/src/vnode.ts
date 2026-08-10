@@ -38,9 +38,7 @@ export function el(
     if (value === undefined) continue;
     kept.push([name, value]);
   }
-  return text === undefined
-    ? { tag, attrs: kept, children }
-    : { tag, attrs: kept, children, text };
+  return text === undefined ? { tag, attrs: kept, children } : { tag, attrs: kept, children, text };
 }
 
 /** Count the nodes in a tree, for diagnostics and tests. */

@@ -159,7 +159,9 @@ describe('SPEC 11.3 — sequential ramps', () => {
     const p = generateSequential('#eb6834', 13, SCHEME_SURFACE.light);
     expect(p.steps).toHaveLength(13);
     expect(p.ordinalFloor).toBeLessThanOrEqual(p.ordinalCeiling);
-    expect(contrastRatio(p.steps[p.ordinalFloor] ?? '', SCHEME_SURFACE.light)).toBeGreaterThanOrEqual(2);
+    expect(
+      contrastRatio(p.steps[p.ordinalFloor] ?? '', SCHEME_SURFACE.light),
+    ).toBeGreaterThanOrEqual(2);
   });
 });
 
@@ -281,16 +283,18 @@ describe('SPEC 11.7 — colour-scheme selection', () => {
     expect(
       resolveColorScheme({ block: 'light', document: 'dark', embedder: 'dark', prefersDark: true }),
     ).toBe('light');
-    expect(resolveColorScheme({ document: 'dark', embedder: 'light', prefersDark: false })).toBe('dark');
+    expect(resolveColorScheme({ document: 'dark', embedder: 'light', prefersDark: false })).toBe(
+      'dark',
+    );
     expect(resolveColorScheme({ embedder: 'dark', prefersDark: false })).toBe('dark');
     expect(resolveColorScheme({ prefersDark: true })).toBe('dark');
   });
 
   it('lets `auto` fall through to the next level', () => {
     expect(resolveColorScheme({ block: 'auto', document: 'dark' })).toBe('dark');
-    expect(resolveColorScheme({ block: 'auto', document: 'auto', embedder: 'auto', prefersDark: true })).toBe(
-      'dark',
-    );
+    expect(
+      resolveColorScheme({ block: 'auto', document: 'auto', embedder: 'auto', prefersDark: true }),
+    ).toBe('dark');
   });
 
   it('defaults to light when nothing has an opinion', () => {

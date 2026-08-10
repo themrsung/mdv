@@ -89,8 +89,20 @@ export const metricChart: ChartType<Mark> = {
   // A stat tile has no readout layer: the number is already the whole message.
   family: 'none',
   channels: [
-    { name: 'value', required: false, accepts: ['number', 'integer', 'duration'], constant: true, doc: 'The figure, as a literal or a field.' },
-    { name: 'label', required: false, accepts: ['string', 'category'], constant: true, doc: 'The sentence-case caption above the figure.' },
+    {
+      name: 'value',
+      required: false,
+      accepts: ['number', 'integer', 'duration'],
+      constant: true,
+      doc: 'The figure, as a literal or a field.',
+    },
+    {
+      name: 'label',
+      required: false,
+      accepts: ['string', 'category'],
+      constant: true,
+      doc: 'The sentence-case caption above the figure.',
+    },
   ],
   defaultEncoding: {},
   defaults: { goodDirection: 'up', size: 'normal' },
@@ -113,9 +125,18 @@ export const metricChart: ChartType<Mark> = {
         ),
       );
     }
-    if (channel?.field !== undefined && findColumn(table, channel.field) === undefined && table.fields.length > 0) {
+    if (
+      channel?.field !== undefined &&
+      findColumn(table, channel.field) === undefined &&
+      table.fields.length > 0
+    ) {
       diagnostics.push(
-        blockDiagnostic('MDV3000', block, 'encode', `\`value\` names \`${channel.field}\`, which is not a column`),
+        blockDiagnostic(
+          'MDV3000',
+          block,
+          'encode',
+          `\`value\` names \`${channel.field}\`, which is not a column`,
+        ),
       );
     }
     return diagnostics;
@@ -123,9 +144,10 @@ export const metricChart: ChartType<Mark> = {
 
   encode(input: EncodeInput): EncodeResult<Mark> {
     const { attrs, block, table } = input;
-    const report = (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
-      input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
-    };
+    const report =
+      (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
+        input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
+      };
 
     // `format` on a `metric` is a *number* format (`"$~s"`, SPEC 8.13), not the
     // data-section syntax that `BlockAttrs.format` is typed as (SPEC 6.2). The
@@ -139,14 +161,28 @@ export const metricChart: ChartType<Mark> = {
     const rawLabel = stringAttr(attrs, 'label') ?? attrs.title;
     const label = rawLabel === undefined ? undefined : rawLabel.replace(/\s*:\s*$/, '');
 
-    const goodDirection = enumAttr(attrs, 'goodDirection', GOOD_DIRECTIONS, 'up', report('goodDirection', GOOD_DIRECTIONS, 'up'));
-    const size = enumAttr(attrs, 'size', TILE_SIZES, 'normal', report('size', TILE_SIZES, 'normal'));
-    const deltaValue = rawAttr(attrs, 'delta') === undefined ? undefined : numberAttr(attrs, 'delta', Number.NaN);
+    const goodDirection = enumAttr(
+      attrs,
+      'goodDirection',
+      GOOD_DIRECTIONS,
+      'up',
+      report('goodDirection', GOOD_DIRECTIONS, 'up'),
+    );
+    const size = enumAttr(
+      attrs,
+      'size',
+      TILE_SIZES,
+      'normal',
+      report('size', TILE_SIZES, 'normal'),
+    );
+    const deltaValue =
+      rawAttr(attrs, 'delta') === undefined ? undefined : numberAttr(attrs, 'delta', Number.NaN);
     const deltaOf = stringAttr(attrs, 'deltaOf');
 
     let delta: MetricPlan['delta'];
     if (deltaValue !== undefined && Number.isFinite(deltaValue)) {
-      const deltaFormat = stringAttr(attrs, 'deltaFormat') ?? (Math.abs(deltaValue) <= 1 ? '+.1%' : '+,.0f');
+      const deltaFormat =
+        stringAttr(attrs, 'deltaFormat') ?? (Math.abs(deltaValue) <= 1 ? '+.1%' : '+,.0f');
       delta = {
         text: formatNumber(deltaValue, deltaFormat),
         tone: toneFor(deltaValue, goodDirection),
@@ -167,7 +203,9 @@ export const metricChart: ChartType<Mark> = {
 
     const trend = resolveTrend(input);
 
-    const marks: TextMark[] = [{ mark: 'text', seriesId: '', datum: 0, x: 0, y: 0, text: valueText }];
+    const marks: TextMark[] = [
+      { mark: 'text', seriesId: '', datum: 0, x: 0, y: 0, text: valueText },
+    ];
     const rows = [readout(label ?? 'Value', valueText, undefined, true)];
     if (delta !== undefined) {
       rows.push(readout(deltaOf ?? 'Change', delta.text));
@@ -179,7 +217,15 @@ export const metricChart: ChartType<Mark> = {
       scales: {},
       // A stat tile has no axes: there is no domain to tick.
       axes: [],
-      a11yTable: metricTable(label, valueText, delta?.text, deltaOf, trend, presentationOf(attrs), table),
+      a11yTable: metricTable(
+        label,
+        valueText,
+        delta?.text,
+        deltaOf,
+        trend,
+        presentationOf(attrs),
+        table,
+      ),
       state: {
         label,
         value: valueText,
@@ -256,7 +302,8 @@ export const metricChart: ChartType<Mark> = {
     cursor += figureMetrics.descent;
 
     if (plan.delta !== undefined) {
-      const text = plan.deltaOf === undefined ? plan.delta.text : `${plan.delta.text} ${plan.deltaOf}`;
+      const text =
+        plan.deltaOf === undefined ? plan.delta.text : `${plan.delta.text} ${plan.deltaOf}`;
       const metrics = ctx.metrics.measure(text, deltaFont);
       const fitsBeside = figureRight + 8 + metrics.width <= x + width;
       const deltaX = fitsBeside ? figureRight + 8 : x;
@@ -289,7 +336,11 @@ export const metricChart: ChartType<Mark> = {
             d,
             // The de-emphasis hue: the sparkline is context for the figure, not
             // a second chart competing with it.
-            stroke: lineStroke(theme, theme.tokens['text-muted'], Math.max(1, theme.marks.line.width - 0.5)),
+            stroke: lineStroke(
+              theme,
+              theme.tokens['text-muted'],
+              Math.max(1, theme.marks.line.width - 0.5),
+            ),
           });
         }
         const current = points[points.length - 1];
@@ -326,8 +377,15 @@ export const metricChart: ChartType<Mark> = {
     const parts: string[] = ['Stat tile.'];
     parts.push(plan.label === undefined ? `Value ${plan.value}.` : `${plan.label}: ${plan.value}.`);
     if (plan.delta !== undefined) {
-      const direction = plan.delta.tone === 'neutral' ? 'changed by' : plan.delta.tone === 'good' ? 'improved by' : 'worsened by';
-      parts.push(`${direction} ${plan.delta.text}${plan.deltaOf === undefined ? '' : ` ${plan.deltaOf}`}.`);
+      const direction =
+        plan.delta.tone === 'neutral'
+          ? 'changed by'
+          : plan.delta.tone === 'good'
+            ? 'improved by'
+            : 'worsened by';
+      parts.push(
+        `${direction} ${plan.delta.text}${plan.deltaOf === undefined ? '' : ` ${plan.deltaOf}`}.`,
+      );
     }
     if (plan.trend.length > 1) parts.push(`Trend over ${plan.trend.length} periods.`);
     return parts.join(' ');
@@ -343,7 +401,9 @@ function resolveValue(input: EncodeInput): number | undefined {
   const field = channel?.field ?? (typeof raw === 'string' ? raw : undefined);
   if (field === undefined) return undefined;
 
-  const aggregate = /^\s*(sum|mean|avg|min|max|count|last|first)\s*\(\s*([^)]*)\s*\)\s*$/i.exec(field);
+  const aggregate = /^\s*(sum|mean|avg|min|max|count|last|first)\s*\(\s*([^)]*)\s*\)\s*$/i.exec(
+    field,
+  );
   const columnName = aggregate === null ? field : (aggregate[2] ?? '').trim();
   const found = findColumn(input.table, columnName);
   if (found === undefined) {
@@ -358,17 +418,25 @@ function resolveValue(input: EncodeInput): number | undefined {
   }
   if (values.length === 0) return undefined;
 
-  const op = aggregate === null ? (channel?.aggregate ?? 'last') : (aggregate[1] ?? 'last').toLowerCase();
+  const op =
+    aggregate === null ? (channel?.aggregate ?? 'last') : (aggregate[1] ?? 'last').toLowerCase();
   switch (op) {
-    case 'sum': return sumOf(values);
+    case 'sum':
+      return sumOf(values);
     case 'mean':
-    case 'avg': return sumOf(values) / values.length;
-    case 'min': return Math.min(...values);
-    case 'max': return Math.max(...values);
-    case 'count': return values.length;
-    case 'first': return values[0];
+    case 'avg':
+      return sumOf(values) / values.length;
+    case 'min':
+      return Math.min(...values);
+    case 'max':
+      return Math.max(...values);
+    case 'count':
+      return values.length;
+    case 'first':
+      return values[0];
     // A KPI without an explicit aggregate means "where it stands now".
-    default: return values[values.length - 1];
+    default:
+      return values[values.length - 1];
   }
 }
 
@@ -420,7 +488,13 @@ function deltaColor(
 }
 
 /** Lay the sparkline out inside its strip, flat-lining a constant series. */
-function sparklinePoints(values: readonly number[], x: number, y: number, width: number, height: number): Point[] {
+function sparklinePoints(
+  values: readonly number[],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Point[] {
   const usable = values.filter(isFiniteNumber);
   if (usable.length === 0) return [];
   let lo = usable[0] ?? 0;

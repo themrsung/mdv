@@ -115,7 +115,11 @@ export function createState(doc: MdvDocument, selection?: Selection): EditorStat
       const at = first ? startOfBlock(first) : undefined;
       return at
         ? caret(at)
-        : ({ kind: 'text', anchor: { blockId: doc.id, path: [0], offset: 0 }, focus: { blockId: doc.id, path: [0], offset: 0 } } satisfies Selection);
+        : ({
+            kind: 'text',
+            anchor: { blockId: doc.id, path: [0], offset: 0 },
+            focus: { blockId: doc.id, path: [0], offset: 0 },
+          } satisfies Selection);
     })();
   return { doc, selection: normalizeSelection(doc, initial), pendingMarks: null };
 }

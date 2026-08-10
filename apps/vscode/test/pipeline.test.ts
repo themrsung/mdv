@@ -19,10 +19,7 @@ describe('DocumentPipeline: rendering', () => {
     // `dataset` is not a drawing (SPEC 6.3), so two blocks, not three.
     expect(result.blocks.map((b) => b.blockType)).toEqual(['bar', 'line']);
     expect(result.blocks.map((b) => b.id)).toEqual(['revenue-bar', 'profit-line']);
-    expect(result.blocks.map((b) => b.title)).toEqual([
-      'Revenue by quarter',
-      'Profit by quarter',
-    ]);
+    expect(result.blocks.map((b) => b.title)).toEqual(['Revenue by quarter', 'Profit by quarter']);
     expect(result.blocks.every((b) => b.svg.startsWith('<svg'))).toBe(true);
     expect(result.blocks.every((b) => b.failed)).toBe(false);
   });

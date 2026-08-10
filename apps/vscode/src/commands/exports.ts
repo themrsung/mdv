@@ -75,7 +75,11 @@ export async function exportSvg(ctx: CommandContext): Promise<void> {
   const document = editor.document;
 
   await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: 'MDV: exporting SVG', cancellable: true },
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'MDV: exporting SVG',
+      cancellable: true,
+    },
     async (progress, token) => {
       const result = await runFor(document, ctx.pipelines, ctx.settings);
       if (token.isCancellationRequested) return;
@@ -126,7 +130,11 @@ export async function exportHtml(ctx: CommandContext): Promise<void> {
   const document = editor.document;
 
   await vscode.window.withProgress(
-    { location: vscode.ProgressLocation.Notification, title: 'MDV: exporting HTML', cancellable: true },
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'MDV: exporting HTML',
+      cancellable: true,
+    },
     async (_progress, token) => {
       const result = await runFor(document, ctx.pipelines, ctx.settings);
       if (token.isCancellationRequested) return;

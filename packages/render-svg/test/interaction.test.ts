@@ -70,11 +70,7 @@ function mount(sceneArg: Scene, handlers: InteractionHandlers = {}): Mounted {
     ...handlers,
   };
 
-  const detach = attachInteraction(
-    host as unknown as Element,
-    sceneArg,
-    recorded,
-  );
+  const detach = attachInteraction(host as unknown as Element, sceneArg, recorded);
 
   const byClass = (name: string): FakeElement | undefined =>
     host.children.find((c) => c.className === name);
@@ -99,7 +95,11 @@ function hover(m: Mounted, id: string): void {
   m.region(id).dispatchEvent({ type: 'pointerover' });
 }
 
-function key(m: Mounted, k: string, modifiers: Partial<Record<'altKey' | 'ctrlKey' | 'metaKey', boolean>> = {}): void {
+function key(
+  m: Mounted,
+  k: string,
+  modifiers: Partial<Record<'altKey' | 'ctrlKey' | 'metaKey', boolean>> = {},
+): void {
   m.svg.dispatchEvent({ type: 'keydown', key: k, ...modifiers });
 }
 
@@ -262,7 +262,9 @@ describe('keyboard (SPEC 12.4)', () => {
   it('rings the mark, not the larger hit rectangle, when a bbox is available', () => {
     const mark = m.svg.querySelector('[id="mdv-0-bar-0"]');
     // The hit rect is the 24 × 24 minimum; the bar itself is narrower.
-    Object.assign(mark as object, { getBBox: () => ({ x: 12, y: 40.5, width: 24, height: 100.25 }) });
+    Object.assign(mark as object, {
+      getBBox: () => ({ x: 12, y: 40.5, width: 24, height: 100.25 }),
+    });
     key(m, 'Home');
     const ring = m.svg.children.find((c) => c.className === 'mdv-focus-ring');
     expect(ring?.getAttribute('x')).toBe('12');

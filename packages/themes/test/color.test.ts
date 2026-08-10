@@ -166,7 +166,10 @@ describe('WCAG contrast', () => {
   });
 
   it('is symmetric', () => {
-    expect(contrastRatio('#2a78d6', '#ffffff')).toBeCloseTo(contrastRatio('#ffffff', '#2a78d6'), 12);
+    expect(contrastRatio('#2a78d6', '#ffffff')).toBeCloseTo(
+      contrastRatio('#ffffff', '#2a78d6'),
+      12,
+    );
   });
 
   it('uses the WCAG luminance coefficients', () => {
@@ -206,19 +209,23 @@ describe('CVD simulation (Brettel–Viénot–Mollon 1997)', () => {
       formatHex(simulateCvd(parseColor(hex), type));
 
     // Deuteranopia is the pure hue collapse: the two map to nearly one yellow.
-    expect(deltaEOklab(sim('#c0392b', 'deuteranopia'), sim('#3d8b37', 'deuteranopia'))).toBeLessThan(6);
+    expect(
+      deltaEOklab(sim('#c0392b', 'deuteranopia'), sim('#3d8b37', 'deuteranopia')),
+    ).toBeLessThan(6);
 
     // A protanope also loses the hue difference, but *gains* a lightness one:
     // protanopia suppresses long-wavelength luminance, so the red darkens while
     // the green does not. The pair stays separable — which is precisely why the
     // gate takes the minimum over both dichromacies rather than either alone.
-    expect(
-      deltaEOklab(sim('#c0392b', 'protanopia'), sim('#3d8b37', 'protanopia')),
-    ).toBeGreaterThan(6);
+    expect(deltaEOklab(sim('#c0392b', 'protanopia'), sim('#3d8b37', 'protanopia'))).toBeGreaterThan(
+      6,
+    );
 
     // A tritanope keeps the red–green axis intact; that is why tritanopia is
     // excluded from the gate and handed to the texture channel instead.
-    expect(deltaEOklab(sim('#c0392b', 'tritanopia'), sim('#3d8b37', 'tritanopia'))).toBeGreaterThan(15);
+    expect(deltaEOklab(sim('#c0392b', 'tritanopia'), sim('#3d8b37', 'tritanopia'))).toBeGreaterThan(
+      15,
+    );
   });
 
   it('collapses blue and green for tritanopes but not for the other two', () => {

@@ -46,11 +46,7 @@ const DIMENSION = /^\s*(-?\d+(?:\.\d+)?|-?\.\d+)\s*([a-z%]*)\s*$/;
  * @returns `undefined` when the value is absent or unparseable, so the caller
  * can apply its own default rather than being handed a zero.
  */
-export function resolveLengthPx(
-  value: unknown,
-  basisPx: number,
-  theme: Theme,
-): number | undefined {
+export function resolveLengthPx(value: unknown, basisPx: number, theme: Theme): number | undefined {
   if (typeof value === 'number') return Number.isFinite(value) ? value : undefined;
   if (typeof value !== 'string') return undefined;
   const match = DIMENSION.exec(value.toLowerCase());

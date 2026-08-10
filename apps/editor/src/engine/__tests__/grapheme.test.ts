@@ -53,13 +53,13 @@ const CLUSTERS: readonly (readonly [string, string, readonly string[]])[] = [
   ['skin tone modifier', '\u{1F44B}\u{1F3FE}', ['\u{1F44B}\u{1F3FE}']],
   // Regional indicators K + R.
   ['flag', '\u{1F1F0}\u{1F1F7}', ['\u{1F1F0}\u{1F1F7}']],
-  ['two flags', '\u{1F1F0}\u{1F1F7}\u{1F1EF}\u{1F1F5}', ['\u{1F1F0}\u{1F1F7}', '\u{1F1EF}\u{1F1F5}']],
-  // Three regional indicators: the third starts a new (incomplete) cluster.
   [
-    'odd regional indicator',
-    '\u{1F1F0}\u{1F1F7}\u{1F1EF}',
-    ['\u{1F1F0}\u{1F1F7}', '\u{1F1EF}'],
+    'two flags',
+    '\u{1F1F0}\u{1F1F7}\u{1F1EF}\u{1F1F5}',
+    ['\u{1F1F0}\u{1F1F7}', '\u{1F1EF}\u{1F1F5}'],
   ],
+  // Three regional indicators: the third starts a new (incomplete) cluster.
+  ['odd regional indicator', '\u{1F1F0}\u{1F1F7}\u{1F1EF}', ['\u{1F1F0}\u{1F1F7}', '\u{1F1EF}']],
   ['variation selector', '❤️', ['❤️']],
   ['CRLF', 'a\r\nb', ['a', '\r\n', 'b']],
   // Hangul jamo that compose into one syllable block.

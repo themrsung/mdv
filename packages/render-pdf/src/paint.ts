@@ -118,7 +118,8 @@ interface Ctx {
   missing: Set<number>;
   shaping: boolean;
   dropped: number;
-  resolveImage: ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined) | undefined;
+  resolveImage:
+    ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined) | undefined;
   /** Pattern space → page default space, for tiling-pattern matrices. */
   base: Matrix;
 }
@@ -191,15 +192,26 @@ export function pathOps(commands: readonly PathCommand[]): PdfOp[] {
 // Paint
 // ─────────────────────────────────────────────────────────────────────────────
 
-function stopsOf(stops: readonly { offset: number; color: string; opacity?: number }[], ctx: Ctx): ShadingStop[] {
+function stopsOf(
+  stops: readonly { offset: number; color: string; opacity?: number }[],
+  ctx: Ctx,
+): ShadingStop[] {
   const out = stops.map((s) => ({
     offset: clamp(s.offset, 0, 1),
     color: { ...colorFor(ctx, s.color, WHITE), a: s.opacity ?? 1 },
   }));
   // A shading needs at least two stops and a monotonically increasing domain.
-  if (out.length === 0) return [{ offset: 0, color: WHITE }, { offset: 1, color: WHITE }];
+  if (out.length === 0)
+    return [
+      { offset: 0, color: WHITE },
+      { offset: 1, color: WHITE },
+    ];
   const first = out[0] as ShadingStop;
-  if (out.length === 1) return [{ ...first, offset: 0 }, { ...first, offset: 1 }];
+  if (out.length === 1)
+    return [
+      { ...first, offset: 0 },
+      { ...first, offset: 1 },
+    ];
   return out;
 }
 
@@ -303,10 +315,7 @@ function planStroke(ctx: Ctx, stroke: Stroke | undefined, bbox: Bbox): StrokePla
         : { r: 0, g: 0, b: 0, a: 1 };
   const minPx = ctx.policy.minStrokePt / PT_PER_PX / (ctx.scale / PT_PER_PX);
   const width = Math.max(stroke.width, minPx);
-  const setup: PdfOp[] = [
-    O.strokeColor(color.r, color.g, color.b),
-    O.lineWidth(width),
-  ];
+  const setup: PdfOp[] = [O.strokeColor(color.r, color.g, color.b), O.lineWidth(width)];
   const cap = stroke.cap ?? 'butt';
   if (cap !== 'butt') setup.push(O.lineCap(cap === 'round' ? 1 : 2));
   const join = stroke.join ?? 'miter';
@@ -361,7 +370,11 @@ function paintShape(
   if (fillPlan.kind === 'pattern') {
     if (fillPlan.background !== undefined) {
       const bg = fillPlan.background;
-      ctx.ops.push(O.fillColor(bg.r, bg.g, bg.b), ...construct(), evenOdd ? O.fillEvenOdd() : O.fillNonZero());
+      ctx.ops.push(
+        O.fillColor(bg.r, bg.g, bg.b),
+        ...construct(),
+        evenOdd ? O.fillEvenOdd() : O.fillNonZero(),
+      );
     }
     ctx.ops.push(...O.patternFill(fillPlan.resource));
     ctx.ops.push(...construct(), evenOdd ? O.fillEvenOdd() : O.fillNonZero());
@@ -661,7 +674,11 @@ export function drawScene(scene: Scene, options: DrawSceneOptions): SceneDrawRes
   if (options.mcid !== undefined) ops.push(O.beginMarkedContent('Figure', options.mcid));
 
   if (scene.background !== undefined) {
-    const plan = planFill(ctx, scene.background, growBbox(growBbox(emptyBbox(), 0, 0), scene.width, scene.height));
+    const plan = planFill(
+      ctx,
+      scene.background,
+      growBbox(growBbox(emptyBbox(), 0, 0), scene.width, scene.height),
+    );
     if (plan.kind === 'solid') {
       ctx.ops.push(
         O.fillColor(plan.color.r, plan.color.g, plan.color.b),

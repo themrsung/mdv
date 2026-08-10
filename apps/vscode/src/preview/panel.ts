@@ -303,7 +303,9 @@ export class PreviewPanel implements vscode.Disposable {
     try {
       editor.revealRange(
         range,
-        focus ? vscode.TextEditorRevealType.InCenterIfOutsideViewport : vscode.TextEditorRevealType.AtTop,
+        focus
+          ? vscode.TextEditorRevealType.InCenterIfOutsideViewport
+          : vscode.TextEditorRevealType.AtTop,
       );
       if (focus) editor.selection = new vscode.Selection(range.start, range.start);
     } finally {

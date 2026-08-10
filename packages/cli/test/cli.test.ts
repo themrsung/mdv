@@ -31,7 +31,7 @@ describe('dispatch', () => {
     for (const name of COMMAND_NAMES) expect(ws.io.out).toContain(name);
   });
 
-  it('prints a command\'s help for `help <command>` and for `<command> --help`', async () => {
+  it("prints a command's help for `help <command>` and for `<command> --help`", async () => {
     const a = await workspace();
     const b = await workspace();
     expect(await run(['help', 'export'], a.io)).toBe(EXIT_CODES.ok);

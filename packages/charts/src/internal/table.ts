@@ -5,7 +5,16 @@
  * accessor here is read-only, and none of them copies a row unless it must.
  */
 
-import type { Channel, ChannelName, Column, DataType, Encoding, ScaleInput, Table, Value } from '@mdv/core';
+import type {
+  Channel,
+  ChannelName,
+  Column,
+  DataType,
+  Encoding,
+  ScaleInput,
+  Table,
+  Value,
+} from '@mdv/core';
 import { humanise } from './format.js';
 import { isFiniteNumber } from './num.js';
 
@@ -20,7 +29,9 @@ export interface BoundField {
 export function channelList(encoding: Encoding, name: ChannelName): readonly Channel[] {
   const value = encoding[name];
   if (value === undefined) return [];
-  return Array.isArray(value) ? value.filter((c): c is Channel => c !== undefined && c !== null) : [value];
+  return Array.isArray(value)
+    ? value.filter((c): c is Channel => c !== undefined && c !== null)
+    : [value];
 }
 
 /**
@@ -48,7 +59,10 @@ export function firstChannel(encoding: Encoding, name: ChannelName): Channel | u
  * Pie accepts its identity as `category`, `x` or `label` (SPEC 8.5); this is how
  * those aliases resolve without duplicating the lookup at each call site.
  */
-export function firstChannelOf(encoding: Encoding, names: readonly ChannelName[]): Channel | undefined {
+export function firstChannelOf(
+  encoding: Encoding,
+  names: readonly ChannelName[],
+): Channel | undefined {
   for (const name of names) {
     const channel = firstChannel(encoding, name);
     if (channel !== undefined) return channel;
@@ -57,7 +71,10 @@ export function firstChannelOf(encoding: Encoding, names: readonly ChannelName[]
 }
 
 /** Locate a column by exact, case-sensitive name (SPEC 6.1.2). */
-export function findColumn(table: Table, field: string | undefined): { column: Column; index: number } | undefined {
+export function findColumn(
+  table: Table,
+  field: string | undefined,
+): { column: Column; index: number } | undefined {
   if (field === undefined) return undefined;
   for (let i = 0; i < table.fields.length; i += 1) {
     const column = table.fields[i];
@@ -129,7 +146,10 @@ export function isDiscrete(type: DataType | undefined): boolean {
 }
 
 /** The title a channel should carry: explicit, else the humanised field name. */
-export function channelTitle(channel: Channel | undefined, column: Column | undefined): string | false {
+export function channelTitle(
+  channel: Channel | undefined,
+  column: Column | undefined,
+): string | false {
   if (channel?.title === false) return false;
   if (typeof channel?.title === 'string') return channel.title;
   if (column?.title !== undefined) return column.title;
@@ -142,7 +162,10 @@ export function humaniseColumn(column: Column): string {
 }
 
 /** The format spec in force for a channel: channel override, else the column's. */
-export function channelFormat(channel: Channel | undefined, column: Column | undefined): string | undefined {
+export function channelFormat(
+  channel: Channel | undefined,
+  column: Column | undefined,
+): string | undefined {
   return channel?.format ?? column?.format;
 }
 

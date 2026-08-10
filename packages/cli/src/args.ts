@@ -15,7 +15,9 @@ import { usageError } from './exit.js';
 export type OptionTable = NonNullable<ParseArgsConfig['options']>;
 
 /** Values `parseArgs` hands back. */
-export type OptionValues = Readonly<Record<string, string | boolean | (string | boolean)[] | undefined>>;
+export type OptionValues = Readonly<
+  Record<string, string | boolean | (string | boolean)[] | undefined>
+>;
 
 /** Global flags, accepted by every subcommand (SPEC 27). */
 export interface GlobalFlags {
@@ -268,10 +270,7 @@ export function globalFlags(values: OptionValues): GlobalFlags {
  * @throws CliError (exit 2) when both are given — an ambiguous command line is a
  * mistake, and picking one silently hides it.
  */
-export function togglePair(
-  values: OptionValues,
-  name: string,
-): boolean | undefined {
+export function togglePair(values: OptionValues, name: string): boolean | undefined {
   const on = booleanOption(values, name);
   const off = booleanOption(values, `no-${name}`);
   if (on === true && off === true) {

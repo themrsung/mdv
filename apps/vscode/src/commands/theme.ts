@@ -23,7 +23,10 @@ import type { PreviewThemeSetting } from '../settings.js';
 export async function validateTheme(): Promise<void> {
   const names = [...BUILTIN_THEME_NAMES];
   const picked = await vscode.window.showQuickPick(
-    [{ label: 'All built-in themes', name: undefined }, ...names.map((n) => ({ label: n, name: n }))],
+    [
+      { label: 'All built-in themes', name: undefined },
+      ...names.map((n) => ({ label: n, name: n })),
+    ],
     { title: 'Validate palette', placeHolder: 'Theme' },
   );
   if (picked === undefined) return;

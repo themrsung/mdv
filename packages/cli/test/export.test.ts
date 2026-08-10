@@ -48,8 +48,13 @@ describe('pdf', () => {
   it('writes a PDF 1.7 file', async () => {
     await ws.write('doc.mdv', SIMPLE_DOCUMENT);
     const code = await run(['export', 'doc.mdv', '-o', 'doc.pdf'], ws.io);
-    expect(ws.io.err).toBe('');
     expect(code).toBe(EXIT_CODES.ok);
+
+    // Status goes to stderr, content to stdout: a PDF export writes a file, so
+    // stdout stays empty and the progress line does not pollute a pipe.
+    expect(ws.io.out).toBe('');
+    expect(ws.io.err).toContain('Wrote doc.pdf');
+    expect(ws.io.err).not.toContain('error');
 
     const bytes = await ws.bytes('doc.pdf');
     expect(latin1.decode(bytes.slice(0, 8))).toBe('%PDF-1.7');
@@ -105,8 +110,12 @@ describe('pdf', () => {
 
     const text = latin1.decode(await ws.bytes('doc.pdf'));
     expect(text).toContain('/EmbeddedFiles');
-    expect(text).toContain('doc.mdv');
-    expect(text).toContain('text/vnd.mdv');
+    expect(text).toContain('/Type /Filespec');
+    expect(text).toContain('/F (doc.mdv)');
+    // The MIME type is a PDF *name* object, so the `/` of `text/vnd.mdv` is
+    // written `#2F` (PDF 32000-1 §7.3.5). SPEC 28.9 also asks for `/Source`.
+    expect(text).toContain('/Subtype /text#2Fvnd.mdv');
+    expect(text).toContain('/AFRelationship /Source');
     // The attachment stream is the document itself: uncompressed, it is findable.
     expect(text).toContain('title: Quarterly review');
   });

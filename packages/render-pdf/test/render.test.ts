@@ -91,10 +91,7 @@ function countMcids(node: StructElement): number {
 
 describe('operator trace (SPEC 28.10)', () => {
   it('matches the recorded trace for a small document', () => {
-    const doc = resolvedDocument([
-      heading(1, 'Title'),
-      paragraph('One short line.'),
-    ]);
+    const doc = resolvedDocument([heading(1, 'Title'), paragraph('One short line.')]);
     const build = buildPdf(doc, exportContext(), { compress: false });
     expect(buildTrace(build)).toMatchSnapshot();
   });
@@ -249,8 +246,9 @@ describe('links (SPEC 28.7)', () => {
       .flatMap((page) => page.ops)
       .filter((op) => op.op === 'Tj')
       .map((op) => op.args[0])
-      .filter((arg): arg is { k: 'text'; v: string; font: string } =>
-        typeof arg === 'object' && arg.k === 'text',
+      .filter(
+        (arg): arg is { k: 'text'; v: string; font: string } =>
+          typeof arg === 'object' && arg.k === 'text',
       )
       .map((arg) => arg.v)
       .join(' ');
@@ -271,7 +269,10 @@ describe('running heads (SPEC 28.2)', () => {
       chapter: 'Ch',
     };
     expect(
-      interpolateRunning('{title}/{subtitle}/{author}/{date}/{page}/{pages}/{section}/{chapter}', values),
+      interpolateRunning(
+        '{title}/{subtitle}/{author}/{date}/{page}/{pages}/{section}/{chapter}',
+        values,
+      ),
     ).toBe('T/S/A/D/3/9/Sec/Ch');
   });
 
@@ -318,9 +319,7 @@ describe('figures keep their caption on one page end to end', () => {
     );
     const result = renderDoc(doc);
     const pageOf = (tag: string): number =>
-      result.pages.findIndex((page) =>
-        page.mcidOwners.some((owner) => owner.type === tag),
-      );
+      result.pages.findIndex((page) => page.mcidOwners.some((owner) => owner.type === tag));
     expect(pageOf('Figure')).toBeGreaterThanOrEqual(0);
     expect(pageOf('Caption')).toBe(pageOf('Figure'));
   });

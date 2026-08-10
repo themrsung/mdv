@@ -39,7 +39,11 @@
  */
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactElement } from 'react';
+import type {
+  KeyboardEvent as ReactKeyboardEvent,
+  PointerEvent as ReactPointerEvent,
+  ReactElement,
+} from 'react';
 import type { CellRect, Editor, MdvDocument, Point, Selection } from '../../engine/index.js';
 import type { ImageEnvironment, ImageSource } from '../../engine/image/index.js';
 import {
@@ -59,9 +63,19 @@ import {
 import { BlockView } from '../blocks/BlockView.js';
 import { caretFromPoint, caretRect, linePositionIn, rectAt } from '../dom/caret.js';
 import type { ElementLike, NodeLike } from '../dom/contract.js';
-import { closestContainer, describeContainer, findBlockElement, findContainerElement } from '../dom/contract.js';
+import {
+  closestContainer,
+  describeContainer,
+  findBlockElement,
+  findContainerElement,
+} from '../dom/contract.js';
 import { diffText, offsetInContainer, textOf } from '../dom/offsets.js';
-import { domSelectionMatches, domTargetFor, pointFromDom, readDomSelection } from '../dom/selection.js';
+import {
+  domSelectionMatches,
+  domTargetFor,
+  pointFromDom,
+  readDomSelection,
+} from '../dom/selection.js';
 import type { EditorIntent } from '../input/intents.js';
 import {
   intentForInput,
@@ -98,7 +112,11 @@ interface SlashState {
   readonly start: number;
 }
 
-export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfaceProps): ReactElement {
+export function EditorSurface({
+  imageEnv,
+  onNotice,
+  onShellAction,
+}: EditorSurfaceProps): ReactElement {
   const api = useEditorApi();
   const { editor, doc, selection, revision } = api;
 
@@ -137,7 +155,11 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       const descriptor = describeContainer(host as unknown as ElementLike);
       if (descriptor === null) return;
       const current = editor.getDocument();
-      const probe: Point = { blockId: descriptor.blockId, path: [...descriptor.path, 0], offset: 0 };
+      const probe: Point = {
+        blockId: descriptor.blockId,
+        path: [...descriptor.path, 0],
+        offset: 0,
+      };
       const container = resolveContainer(current, probe);
       if (container === undefined) return;
 
@@ -202,7 +224,9 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
           editor.dispatch(commands.deleteForward());
           return;
         case 'deleteSelection':
-          editor.dispatch(current.kind === 'cells' ? commands.clearSelection() : commands.deleteBackward());
+          editor.dispatch(
+            current.kind === 'cells' ? commands.clearSelection() : commands.deleteBackward(),
+          );
           return;
         case 'toggleMark':
           editor.dispatch(commands.toggleMark(intent.mark));
@@ -228,7 +252,8 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
         case 'deleteWordForward':
         case 'deleteLineBackward':
         case 'deleteLineForward': {
-          const backwards = intent.kind === 'deleteWordBackward' || intent.kind === 'deleteLineBackward';
+          const backwards =
+            intent.kind === 'deleteWordBackward' || intent.kind === 'deleteLineBackward';
           if (current.kind !== 'text') {
             editor.dispatch(backwards ? commands.deleteBackward() : commands.deleteForward());
             return;
@@ -323,7 +348,8 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       if (host === null) return;
       const descriptor = describeContainer(host as unknown as ElementLike);
       const inCode =
-        descriptor !== null && findBlock(editor.getDocument(), descriptor.blockId)?.block.kind === 'code';
+        descriptor !== null &&
+        findBlock(editor.getDocument(), descriptor.blockId)?.block.kind === 'code';
 
       const intent = intentForInput(
         {
@@ -388,7 +414,9 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       onCopy(event);
       if (!event.defaultPrevented) return;
       const current = editor.getSelection();
-      editor.dispatch(current.kind === 'cells' ? commands.clearSelection() : commands.deleteBackward());
+      editor.dispatch(
+        current.kind === 'cells' ? commands.clearSelection() : commands.deleteBackward(),
+      );
     };
 
     const onDragOver = (event: Event): void => {
@@ -398,7 +426,9 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       drag.preventDefault();
       if (drag.dataTransfer !== null) drag.dataTransfer.dropEffect = 'copy';
       const target = dropTargetAt(root, drag.clientY);
-      setDropTarget((current) => (current?.afterBlockId === target.afterBlockId ? current : target));
+      setDropTarget((current) =>
+        current?.afterBlockId === target.afterBlockId ? current : target,
+      );
     };
 
     const onDragLeave = (event: Event): void => {
@@ -514,8 +544,12 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
     if (!focusInsideRef.current) return;
 
     if (selection.kind === 'node') {
-      const element = findBlockElement(root as unknown as NodeLike, selection.blockId) as unknown as HTMLElement | null;
-      if (element !== null && element !== document.activeElement) element.focus({ preventScroll: true });
+      const element = findBlockElement(
+        root as unknown as NodeLike,
+        selection.blockId,
+      ) as unknown as HTMLElement | null;
+      if (element !== null && element !== document.activeElement)
+        element.focus({ preventScroll: true });
       return;
     }
 
@@ -535,7 +569,8 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
     if (target === null) return;
 
     const focusHost = closestContainer(target.focus.node) as unknown as HTMLElement | null;
-    if (focusHost !== null && focusHost !== document.activeElement) focusHost.focus({ preventScroll: true });
+    if (focusHost !== null && focusHost !== document.activeElement)
+      focusHost.focus({ preventScroll: true });
 
     const domSelection = document.getSelection();
     if (domSelection === null) return;
@@ -547,7 +582,8 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
     };
     if (domSelectionMatches(currentDom, target)) return;
 
-    const sameHost = (closestContainer(target.anchor.node) as unknown as HTMLElement | null) === focusHost;
+    const sameHost =
+      (closestContainer(target.anchor.node) as unknown as HTMLElement | null) === focusHost;
     try {
       if (sameHost) {
         domSelection.setBaseAndExtent(
@@ -662,7 +698,9 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       const at = fromAbsolute(container, direction === 'previous' ? containerLength(container) : 0);
       crossBlockRef.current = extend;
       editor.select(
-        extend ? { kind: 'text', anchor: current.anchor, focus: at } : { kind: 'text', anchor: at, focus: at },
+        extend
+          ? { kind: 'text', anchor: current.anchor, focus: at }
+          : { kind: 'text', anchor: at, focus: at },
       );
       return true;
     },
@@ -732,7 +770,11 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
 
       // Paste-without-formatting arrives as a paste event carrying no modifier
       // state, so the intent is recorded here and read there.
-      if ((mod === 'meta' ? event.metaKey : event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'v') {
+      if (
+        (mod === 'meta' ? event.metaKey : event.ctrlKey) &&
+        event.shiftKey &&
+        event.key.toLowerCase() === 'v'
+      ) {
         plainPasteRef.current = true;
         return;
       }
@@ -873,9 +915,12 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
     setSlash(null);
   }, []);
 
-  const registerSlashKeys = useCallback((handler: ((key: string, shift: boolean) => boolean) | null) => {
-    slashKeyRef.current = handler;
-  }, []);
+  const registerSlashKeys = useCallback(
+    (handler: ((key: string, shift: boolean) => boolean) | null) => {
+      slashKeyRef.current = handler;
+    },
+    [],
+  );
 
   /* ---------------------------------------------------------------------- */
   /* Derived surface facts                                                   */
@@ -892,7 +937,9 @@ export function EditorSurface({ imageEnv, onNotice, onShellAction }: EditorSurfa
       selectedBlocks,
       nodeSelection: selection.kind === 'node' ? selection.blockId : null,
       cellSelection:
-        selection.kind === 'cells' ? { tableId: selection.tableId, rect: cellRect(selection) } : null,
+        selection.kind === 'cells'
+          ? { tableId: selection.tableId, rect: cellRect(selection) }
+          : null,
       activeBlockId:
         selection.kind === 'text'
           ? selection.focus.blockId
@@ -974,7 +1021,8 @@ function dropTargetAt(root: HTMLElement, clientY: number): DropTarget {
   let afterBlockId: string | null = null;
   for (const element of blocks) {
     const box = element.getBoundingClientRect();
-    if (clientY >= (box.top + box.bottom) / 2) afterBlockId = element.dataset['mdvBlock'] ?? afterBlockId;
+    if (clientY >= (box.top + box.bottom) / 2)
+      afterBlockId = element.dataset['mdvBlock'] ?? afterBlockId;
   }
   return { afterBlockId };
 }
@@ -1085,10 +1133,16 @@ function handleArrowKey(
   // Vertical: only leave the block from its first or last visual line.
   const domSelection = document.getSelection();
   if (domSelection === null || domSelection.focusNode === null) return;
-  const host = closestContainer(domSelection.focusNode as unknown as NodeLike) as unknown as Element | null;
+  const host = closestContainer(
+    domSelection.focusNode as unknown as NodeLike,
+  ) as unknown as Element | null;
   if (host === null) return;
   const line = linePositionIn(host, rectAt(domSelection.focusNode, domSelection.focusOffset));
-  const leaving = event.key === 'ArrowUp' ? line === 'first' || line === 'both' : line === 'last' || line === 'both';
+  const leaving =
+    event.key === 'ArrowUp'
+      ? line === 'first' || line === 'both'
+      : line === 'last' || line === 'both';
   if (!leaving) return;
-  if (moveToAdjacentBlock(event.key === 'ArrowUp' ? 'previous' : 'next', event.shiftKey)) event.preventDefault();
+  if (moveToAdjacentBlock(event.key === 'ArrowUp' ? 'previous' : 'next', event.shiftKey))
+    event.preventDefault();
 }

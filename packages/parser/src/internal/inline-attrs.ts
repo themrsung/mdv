@@ -67,8 +67,7 @@ export function parseInfoString(
     if (keyMatch === null) {
       const end = tokenEnd(text, i);
       bag.add('MDV1200', root.range(base + i, base + end), {
-        detail:
-          `\`${text.slice(i, end)}\` is neither a block type nor a \`key=value\` attribute.`,
+        detail: `\`${text.slice(i, end)}\` is neither a block type nor a \`key=value\` attribute.`,
       });
       i = end;
       continue;

@@ -83,7 +83,11 @@ export function blocksFromPayload(
  * Tab-separated text with a consistent shape is recognised as a grid by
  * {@link gridFromText} and handled separately by the paste command.
  */
-export function blocksFromText(text: string, ids: IdFactory, options: PasteOptions = {}): readonly Block[] {
+export function blocksFromText(
+  text: string,
+  ids: IdFactory,
+  options: PasteOptions = {},
+): readonly Block[] {
   const normalized = text.replace(/\r\n?/g, '\n').replace(/^\ufeff/, '');
   if (options.parseMarkdown) return read(normalized, { ids }).blocks;
 

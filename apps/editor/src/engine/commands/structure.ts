@@ -18,14 +18,7 @@ import type { IdFactory, NodeId } from '../ids.js';
 import { reassignIds } from '../ids.js';
 import { normalizeRuns, runsLength, runsText, sliceRuns } from '../inline.js';
 import { MappingBuilder, addressOf } from '../mapping.js';
-import type {
-  Block,
-  HeadingLevel,
-  ListBlock,
-  ListItem,
-  MdvDocument,
-  Run,
-} from '../model.js';
+import type { Block, HeadingLevel, ListBlock, ListItem, MdvDocument, Run } from '../model.js';
 import { isAtomicBlock, isRunBlock } from '../model.js';
 import type { Point, Selection } from '../selection.js';
 import {
@@ -166,7 +159,9 @@ export function splitBlock(): Command {
     const item = enclosingListItem(doc, block.id);
     if (item) {
       const found = findListItem(doc, item.itemId);
-      const isLastBlock = found ? found.item.blocks[found.item.blocks.length - 1]?.id === block.id : false;
+      const isLastBlock = found
+        ? found.item.blocks[found.item.blocks.length - 1]?.id === block.id
+        : false;
       const itemIsEmpty =
         found?.item.blocks.length === 1 && isRunBlock(block) && runsLength(block.runs) === 0;
       if (itemIsEmpty && isLastBlock) {
@@ -297,7 +292,10 @@ export function mergeBlocks(
   next = pruneEmptyContainers(next);
 
   const after = resolveContainer(next, { blockId: targetId, path: [0], offset: 0 });
-  return { doc: next, caret: after ? fromAbsolute(after, boundary) : { blockId: targetId, path: [0], offset: 0 } };
+  return {
+    doc: next,
+    caret: after ? fromAbsolute(after, boundary) : { blockId: targetId, path: [0], offset: 0 },
+  };
 }
 
 /**
@@ -324,7 +322,11 @@ export function mergeBackward(): Command {
           const target = findBlock(lifted, block.id)?.block;
           const point = target ? startOfBlock(target) : undefined;
           return {
-            state: { doc: lifted, selection: point ? caret(point) : state.selection, pendingMarks: null },
+            state: {
+              doc: lifted,
+              selection: point ? caret(point) : state.selection,
+              pendingMarks: null,
+            },
             label: 'outdent',
           };
         }
@@ -337,7 +339,11 @@ export function mergeBackward(): Command {
       const target = findBlock(lifted, block.id)?.block;
       const point = target ? startOfBlock(target) : undefined;
       return {
-        state: { doc: lifted, selection: point ? caret(point) : state.selection, pendingMarks: null },
+        state: {
+          doc: lifted,
+          selection: point ? caret(point) : state.selection,
+          pendingMarks: null,
+        },
         label: 'block type',
       };
     }
@@ -351,7 +357,11 @@ export function mergeBackward(): Command {
     }
     if (isAtomicBlock(previous)) {
       return {
-        state: { doc: state.doc, selection: { kind: 'node', blockId: previous.id }, pendingMarks: null },
+        state: {
+          doc: state.doc,
+          selection: { kind: 'node', blockId: previous.id },
+          pendingMarks: null,
+        },
         label: 'delete',
       };
     }
@@ -378,7 +388,11 @@ export function mergeForward(): Command {
     if (!next) return null;
     if (isAtomicBlock(next)) {
       return {
-        state: { doc: state.doc, selection: { kind: 'node', blockId: next.id }, pendingMarks: null },
+        state: {
+          doc: state.doc,
+          selection: { kind: 'node', blockId: next.id },
+          pendingMarks: null,
+        },
         label: 'delete',
       };
     }
@@ -452,14 +466,11 @@ export function setBlockType(spec: BlockTypeSpec): Command {
 }
 
 /** Convert one block. Returns `undefined` when the conversion is meaningless. */
-function retype(
-  block: Block,
-  spec: BlockTypeSpec,
-  ids: IdFactory,
-): readonly Block[] | undefined {
+function retype(block: Block, spec: BlockTypeSpec, ids: IdFactory): readonly Block[] | undefined {
   const runsOf = (): readonly Run[] => {
     if (isRunBlock(block)) return block.runs;
-    if (block.kind === 'code') return block.text === '' ? [] : [{ kind: 'text', id: ids(), text: block.text, marks: [] }];
+    if (block.kind === 'code')
+      return block.text === '' ? [] : [{ kind: 'text', id: ids(), text: block.text, marks: [] }];
     return [];
   };
 
@@ -482,7 +493,15 @@ function retype(
   if (spec.kind === 'heading') {
     if (block.kind === 'heading' && block.level === spec.level) return [block];
     if (block.kind === 'paragraph' || block.kind === 'heading' || block.kind === 'code') {
-      return [{ kind: 'heading', id: block.id, level: spec.level, style: 'atx', runs: normalizeRuns(runsOf()) }];
+      return [
+        {
+          kind: 'heading',
+          id: block.id,
+          level: spec.level,
+          style: 'atx',
+          runs: normalizeRuns(runsOf()),
+        },
+      ];
     }
     return undefined;
   }
@@ -492,7 +511,9 @@ function retype(
   if (spec.kind !== 'code') return undefined;
 
   if (block.kind === 'code') {
-    return spec.info === undefined || spec.info === block.info ? [block] : [{ ...block, info: spec.info }];
+    return spec.info === undefined || spec.info === block.info
+      ? [block]
+      : [{ ...block, info: spec.info }];
   }
   if (block.kind === 'paragraph' || block.kind === 'heading') {
     return [
@@ -531,7 +552,10 @@ function toggleQuote(
   }
   const wrapped = wrapContiguous(doc, targets, (children, ids) => makeQuote(ids, children), ctx);
   if (!wrapped) return null;
-  return { state: { doc: wrapped, selection: state.selection, pendingMarks: null }, label: 'block type' };
+  return {
+    state: { doc: wrapped, selection: state.selection, pendingMarks: null },
+    label: 'block type',
+  };
 }
 
 function toggleList(
@@ -553,15 +577,38 @@ function toggleList(
         // Same kind: unwrap, flattening every item's blocks in order.
         const flattened = list.items.flatMap((item) => item.blocks);
         return {
-          state: { doc: replaceBlockWith(doc, list.id, flattened), selection: state.selection, pendingMarks: null },
+          state: {
+            doc: replaceBlockWith(doc, list.id, flattened),
+            selection: state.selection,
+            pendingMarks: null,
+          },
           label: 'block type',
         };
       }
       const converted: ListBlock = wantOrdered
-        ? { kind: 'list', id: list.id, ordered: true, start: spec.kind === 'orderedList' ? (spec.start ?? 1) : 1, delimiter: spec.kind === 'orderedList' ? (spec.delimiter ?? '.') : '.', tight: list.tight, items: list.items }
-        : { kind: 'list', id: list.id, ordered: false, bullet: spec.kind === 'bulletList' ? (spec.bullet ?? '-') : '-', tight: list.tight, items: list.items };
+        ? {
+            kind: 'list',
+            id: list.id,
+            ordered: true,
+            start: spec.kind === 'orderedList' ? (spec.start ?? 1) : 1,
+            delimiter: spec.kind === 'orderedList' ? (spec.delimiter ?? '.') : '.',
+            tight: list.tight,
+            items: list.items,
+          }
+        : {
+            kind: 'list',
+            id: list.id,
+            ordered: false,
+            bullet: spec.kind === 'bulletList' ? (spec.bullet ?? '-') : '-',
+            tight: list.tight,
+            items: list.items,
+          };
       return {
-        state: { doc: replaceBlockWith(doc, list.id, [converted]), selection: state.selection, pendingMarks: null },
+        state: {
+          doc: replaceBlockWith(doc, list.id, [converted]),
+          selection: state.selection,
+          pendingMarks: null,
+        },
         label: 'block type',
       };
     }
@@ -584,7 +631,10 @@ function toggleList(
     ctx,
   );
   if (!wrapped) return null;
-  return { state: { doc: wrapped, selection: state.selection, pendingMarks: null }, label: 'block type' };
+  return {
+    state: { doc: wrapped, selection: state.selection, pendingMarks: null },
+    label: 'block type',
+  };
 }
 
 /**
@@ -702,7 +752,11 @@ export function indentItem(
   const nested: ListBlock = sameKind
     ? ({ ...sameKind, items: [...sameKind.items, found.item] } as ListBlock)
     : found.list.ordered
-      ? orderedList(ctx.ids, [found.item], { start: 1, delimiter: found.list.delimiter, tight: found.list.tight })
+      ? orderedList(ctx.ids, [found.item], {
+          start: 1,
+          delimiter: found.list.delimiter,
+          tight: found.list.tight,
+        })
       : bulletList(ctx.ids, [found.item], { bullet: found.list.bullet, tight: found.list.tight });
 
   const blocks = sameKind
@@ -798,7 +852,9 @@ export function selectBlock(blockId: NodeId): Command {
       : (() => {
           const from = startOfBlock(location.block);
           const to = endOfBlock(location.block);
-          return from && to ? { kind: 'text' as const, anchor: from, focus: to } : { kind: 'node' as const, blockId };
+          return from && to
+            ? { kind: 'text' as const, anchor: from, focus: to }
+            : { kind: 'node' as const, blockId };
         })();
     return { state: { ...state, selection, pendingMarks: null }, label: 'replace' };
   };

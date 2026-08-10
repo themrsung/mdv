@@ -32,7 +32,8 @@ function directives(node: MdvContent | MdvDocument): MdvDirective[] {
 function slice(
   source: string,
   node: {
-    position?: { start: { offset?: number | undefined }; end: { offset?: number | undefined } } | undefined;
+    position?:
+      { start: { offset?: number | undefined }; end: { offset?: number | undefined } } | undefined;
   },
 ): string {
   const start = node.position?.start.offset ?? 0;
@@ -139,7 +140,9 @@ describe('SPEC 3.4 — front matter', () => {
 
 describe('SPEC 4 — base syntax', () => {
   it('parses GFM tables, strikethrough, task lists and footnotes', () => {
-    const doc = parse('| a | b |\n|---|---|\n| 1 | 2 |\n\n~~gone~~\n\n- [x] done\n\nRef[^1]\n\n[^1]: note\n');
+    const doc = parse(
+      '| a | b |\n|---|---|\n| 1 | 2 |\n\n~~gone~~\n\n- [x] done\n\nRef[^1]\n\n[^1]: note\n',
+    );
     const types = doc.children.map((child) => child.type);
     expect(types).toContain('table');
     expect(types).toContain('footnoteDefinition');
@@ -149,7 +152,8 @@ describe('SPEC 4 — base syntax', () => {
     const doc = parse('<div>hi</div>\n');
     expect(codes(doc)).toContain('MDV4011');
     expect(doc.children[0]?.type).toBe('paragraph');
-    const text = (doc.children[0] as { children?: { type?: string; value?: string }[] }).children?.[0];
+    const text = (doc.children[0] as { children?: { type?: string; value?: string }[] })
+      .children?.[0];
     expect(text?.type).toBe('text');
     expect(text?.value).toBe('<div>hi</div>');
   });
@@ -272,7 +276,7 @@ describe('SPEC 5.3.1 — supported constructs', () => {
     'title: Revenue        # trailing comment',
     'stack: percent',
     'quoted: "Q1: results"',
-    'apostrophe: \'it\'\'s\'',
+    "apostrophe: 'it''s'",
     'y: [revenue, profit]',
     'range: {min: 0, max: 100}',
     'axis:',
@@ -311,7 +315,10 @@ describe('SPEC 5.3.1 — supported constructs', () => {
       y: ['revenue', 'profit'],
       range: { min: 0, max: 100 },
       axis: { x: { title: 'Quarter' } },
-      filters: [{ filter: 'x > 1', keep: true }, { type: 'sma', period: 20 }],
+      filters: [
+        { filter: 'x > 1', keep: true },
+        { type: 'sma', period: 20 },
+      ],
       literal: 'one\ntwo\n',
       folded: 'one two\n',
       nothing: null,
@@ -437,11 +444,7 @@ describe('SPEC 9.2 — inline directives', () => {
     const source = 'Revenue was :mdv-value[@sales.revenue.sum]{format=",.0f"} last year.\n';
     const doc = parse(source);
     const paragraph = doc.children[0] as { children: MdvContent[] };
-    expect(paragraph.children.map((child) => child.type)).toEqual([
-      'text',
-      'mdvDirective',
-      'text',
-    ]);
+    expect(paragraph.children.map((child) => child.type)).toEqual(['text', 'mdvDirective', 'text']);
     const directive = paragraph.children[1] as MdvDirective;
     expect(directive.name).toBe('mdv-value');
     expect(directive.kind).toBe('inline');
@@ -538,7 +541,9 @@ describe('SPEC 9.1 — block directives', () => {
 describe('SPEC 10 — enhanced tables', () => {
   it('recognises the mdv table block', () => {
     const block = firstBlock(
-      parse('```mdv table\ncolumns:\n  region: {label: Region, align: left}\nsort: [-revenue]\n---\nregion | revenue\nAPAC   | 42100\n```\n'),
+      parse(
+        '```mdv table\ncolumns:\n  region: {label: Region, align: left}\nsort: [-revenue]\n---\nregion | revenue\nAPAC   | 42100\n```\n',
+      ),
     );
     expect(block.blockType).toBe('table');
     expect(block.attrs['columns']).toEqual({ region: { label: 'Region', align: 'left' } });
@@ -546,8 +551,14 @@ describe('SPEC 10 — enhanced tables', () => {
   });
 
   it('lifts an attribute line off a GFM table (SPEC 10.2)', () => {
-    const doc = parse('| region | revenue |\n|--------|--------:|\n| APAC   |   42100 |\n{.mdv-table sortable=true total="revenue:sum"}\n');
-    const table = doc.children[0] as { type: string; children: unknown[]; data?: Record<string, unknown> };
+    const doc = parse(
+      '| region | revenue |\n|--------|--------:|\n| APAC   |   42100 |\n{.mdv-table sortable=true total="revenue:sum"}\n',
+    );
+    const table = doc.children[0] as {
+      type: string;
+      children: unknown[];
+      data?: Record<string, unknown>;
+    };
     expect(table.type).toBe('table');
     expect(table.children).toHaveLength(2);
     expect(table.data?.['mdvAttrs']).toEqual({
@@ -646,11 +657,7 @@ describe('inline directives and link references', () => {
   it('keeps the label when a matching link definition exists', () => {
     const doc = parse('See :mdv-ref[fig-revenue] here.\n\n[fig-revenue]: https://example.com\n');
     const paragraph = doc.children[0] as { children: MdvContent[] };
-    expect(paragraph.children.map((child) => child.type)).toEqual([
-      'text',
-      'mdvDirective',
-      'text',
-    ]);
+    expect(paragraph.children.map((child) => child.type)).toEqual(['text', 'mdvDirective', 'text']);
     expect((paragraph.children[1] as MdvDirective).label).toBe('fig-revenue');
   });
 

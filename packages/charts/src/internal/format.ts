@@ -17,7 +17,25 @@
 import { isFiniteNumber } from './num.js';
 
 /** SI prefixes for the `s` format type, exponent −24 … +24 in steps of 3. */
-const SI_PREFIXES = ['y', 'z', 'a', 'f', 'p', 'n', 'µ', 'm', '', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+const SI_PREFIXES = [
+  'y',
+  'z',
+  'a',
+  'f',
+  'p',
+  'n',
+  'µ',
+  'm',
+  '',
+  'k',
+  'M',
+  'G',
+  'T',
+  'P',
+  'E',
+  'Z',
+  'Y',
+];
 /** Index of the empty (10^0) prefix in {@link SI_PREFIXES}. */
 const SI_ZERO_INDEX = 8;
 
@@ -43,7 +61,14 @@ export interface NumberFormatSpec {
  * string must never take out a block (SPEC 14.1).
  */
 export function parseNumberFormat(spec: string): NumberFormatSpec {
-  const out: NumberFormatSpec = { prefix: '', sign: '', group: false, trim: false, type: 'auto', suffix: '' };
+  const out: NumberFormatSpec = {
+    prefix: '',
+    sign: '',
+    group: false,
+    trim: false,
+    type: 'auto',
+    suffix: '',
+  };
   let i = 0;
   while (i < spec.length) {
     const ch = spec[i];
@@ -77,7 +102,14 @@ export function parseNumberFormat(spec: string): NumberFormatSpec {
     i += 1;
   }
   const type = spec[i];
-  if (type === 'f' || type === 'e' || type === 'g' || type === 'd' || type === 's' || type === '%') {
+  if (
+    type === 'f' ||
+    type === 'e' ||
+    type === 'g' ||
+    type === 'd' ||
+    type === 's' ||
+    type === '%'
+  ) {
     out.type = type;
     i += 1;
   }
@@ -130,7 +162,12 @@ function toPrecisionDigits(value: number, digits: number): string {
 }
 
 /** Format with an SI prefix (`12900` → `12.9k`). */
-function siFormat(value: number, precision: number | undefined, trim: boolean, useGrouping: boolean): string {
+function siFormat(
+  value: number,
+  precision: number | undefined,
+  trim: boolean,
+  useGrouping: boolean,
+): string {
   const abs = Math.abs(value);
   if (abs === 0) return fixed(0, precision ?? 0, useGrouping, trim);
   const exponent = Math.floor(Math.log10(abs) / 3) * 3;
@@ -213,10 +250,33 @@ export function formatNumber(value: number | null | undefined, spec?: string): s
 // Dates (SPEC 6.6, 6.9)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_SHORT = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 const MONTHS_LONG = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 const DAYS_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DAYS_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -250,29 +310,61 @@ export function formatDate(date: Date, spec = '%Y-%m-%d'): string {
       i += 1;
     }
     const token = spec[i];
-    const p = (value: number, width: number): string => (noPad ? String(Math.trunc(value)) : pad(value, width));
+    const p = (value: number, width: number): string =>
+      noPad ? String(Math.trunc(value)) : pad(value, width);
     switch (token) {
-      case 'Y': out += String(date.getUTCFullYear()); break;
-      case 'y': out += pad(date.getUTCFullYear() % 100, 2); break;
-      case 'm': out += p(date.getUTCMonth() + 1, 2); break;
-      case 'd': out += p(date.getUTCDate(), 2); break;
-      case 'H': out += p(date.getUTCHours(), 2); break;
-      case 'M': out += p(date.getUTCMinutes(), 2); break;
-      case 'S': out += p(date.getUTCSeconds(), 2); break;
-      case 'L': out += pad(date.getUTCMilliseconds(), 3); break;
-      case 'b': out += MONTHS_SHORT[date.getUTCMonth()] ?? ''; break;
-      case 'B': out += MONTHS_LONG[date.getUTCMonth()] ?? ''; break;
-      case 'a': out += DAYS_SHORT[date.getUTCDay()] ?? ''; break;
-      case 'A': out += DAYS_LONG[date.getUTCDay()] ?? ''; break;
+      case 'Y':
+        out += String(date.getUTCFullYear());
+        break;
+      case 'y':
+        out += pad(date.getUTCFullYear() % 100, 2);
+        break;
+      case 'm':
+        out += p(date.getUTCMonth() + 1, 2);
+        break;
+      case 'd':
+        out += p(date.getUTCDate(), 2);
+        break;
+      case 'H':
+        out += p(date.getUTCHours(), 2);
+        break;
+      case 'M':
+        out += p(date.getUTCMinutes(), 2);
+        break;
+      case 'S':
+        out += p(date.getUTCSeconds(), 2);
+        break;
+      case 'L':
+        out += pad(date.getUTCMilliseconds(), 3);
+        break;
+      case 'b':
+        out += MONTHS_SHORT[date.getUTCMonth()] ?? '';
+        break;
+      case 'B':
+        out += MONTHS_LONG[date.getUTCMonth()] ?? '';
+        break;
+      case 'a':
+        out += DAYS_SHORT[date.getUTCDay()] ?? '';
+        break;
+      case 'A':
+        out += DAYS_LONG[date.getUTCDay()] ?? '';
+        break;
       case 'j': {
         const start = Date.UTC(date.getUTCFullYear(), 0, 1);
         out += pad(Math.floor((time - start) / 86_400_000) + 1, 3);
         break;
       }
-      case 'p': out += date.getUTCHours() < 12 ? 'AM' : 'PM'; break;
-      case 'z': out += '+0000'; break;
-      case '%': out += '%'; break;
-      default: out += `%${token ?? ''}`;
+      case 'p':
+        out += date.getUTCHours() < 12 ? 'AM' : 'PM';
+        break;
+      case 'z':
+        out += '+0000';
+        break;
+      case '%':
+        out += '%';
+        break;
+      default:
+        out += `%${token ?? ''}`;
     }
   }
   return out;
@@ -280,7 +372,10 @@ export function formatDate(date: Date, spec = '%Y-%m-%d'): string {
 
 /** Humanise a field name for an axis or legend title: `total_revenue` → `Total revenue`. */
 export function humanise(field: string): string {
-  const spaced = field.replace(/[_-]+/g, ' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2').trim();
+  const spaced = field
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim();
   if (spaced === '') return field;
   const lower = spaced.toLowerCase();
   return (lower[0] ?? '').toUpperCase() + lower.slice(1);
@@ -302,7 +397,10 @@ export function formatValue(value: unknown, spec?: string): string {
  * An unknown placeholder is left verbatim so the author can see their typo,
  * rather than silently rendering an empty label.
  */
-export function expandTemplate(template: string, fields: Readonly<Record<string, unknown>>): string {
+export function expandTemplate(
+  template: string,
+  fields: Readonly<Record<string, unknown>>,
+): string {
   return template.replace(/\{(\w+)(?::([^}]*))?\}/g, (whole, name: string, spec?: string) => {
     if (!Object.hasOwn(fields, name)) return whole;
     return formatValue(fields[name], spec);

@@ -6,7 +6,15 @@
  */
 
 export type { HtmlElement, HtmlNode, HtmlText } from './html.js';
-export { classList, decodeEntities, escapeHtml, nodesText, parseHtml, parseStyle, textContent } from './html.js';
+export {
+  classList,
+  decodeEntities,
+  escapeHtml,
+  nodesText,
+  parseHtml,
+  parseStyle,
+  textContent,
+} from './html.js';
 
 export { blocksFromHtml, runsAreBlank, safeUrl, textFromHtml } from './from-html.js';
 

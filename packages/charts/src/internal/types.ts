@@ -19,7 +19,8 @@ export type Orientation = 'vertical' | 'horizontal';
 export const ORIENTATIONS: readonly Orientation[] = ['vertical', 'horizontal'];
 
 /** `curve` (SPEC 8.3). */
-export type CurveKind = 'linear' | 'monotone' | 'step' | 'stepBefore' | 'stepAfter' | 'natural' | 'basis';
+export type CurveKind =
+  'linear' | 'monotone' | 'step' | 'stepBefore' | 'stepAfter' | 'natural' | 'basis';
 
 /** Every legal `curve` spelling. */
 export const CURVE_KINDS: readonly CurveKind[] = [
@@ -54,4 +55,11 @@ export const SORT_MODES: readonly SortMode[] = ['none', 'asc', 'desc'];
 export type PointShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'cross' | 'star';
 
 /** Every legal `shape` spelling. */
-export const POINT_SHAPES: readonly PointShape[] = ['circle', 'square', 'triangle', 'diamond', 'cross', 'star'];
+export const POINT_SHAPES: readonly PointShape[] = [
+  'circle',
+  'square',
+  'triangle',
+  'diamond',
+  'cross',
+  'star',
+];

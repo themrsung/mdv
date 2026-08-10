@@ -15,7 +15,9 @@ import { clamp } from './num.js';
 
 /** A flat fill in the given color. */
 export function solid(color: ColorString, opacity?: number): Paint {
-  return opacity === undefined ? { kind: 'solid', color } : { kind: 'solid', color, opacity: clamp(opacity, 0, 1) };
+  return opacity === undefined
+    ? { kind: 'solid', color }
+    : { kind: 'solid', color, opacity: clamp(opacity, 0, 1) };
 }
 
 /**
@@ -33,7 +35,12 @@ export function seriesFill(series: SeriesDescriptor, opacity?: number): Paint {
 }
 
 /** The line mark: **2 px, round join and cap** (SPEC 11.4). */
-export function lineStroke(theme: Theme, color: ColorString, width?: number, dash?: readonly number[]): Stroke {
+export function lineStroke(
+  theme: Theme,
+  color: ColorString,
+  width?: number,
+  dash?: readonly number[],
+): Stroke {
   const stroke: Stroke = {
     paint: solid(color),
     width: width ?? theme.marks.line.width,

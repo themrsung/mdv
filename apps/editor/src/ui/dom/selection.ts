@@ -56,7 +56,11 @@ export interface DomTarget {
  * Returns `null` when the position is outside every container, or inside one
  * the document no longer has — both mean "not an edit position".
  */
-export function pointFromDom(doc: MdvDocument, node: NodeLike | null, offset: number): Point | null {
+export function pointFromDom(
+  doc: MdvDocument,
+  node: NodeLike | null,
+  offset: number,
+): Point | null {
   if (node === null) return null;
   const host = closestContainer(node);
   if (host === null) return null;
@@ -105,12 +109,18 @@ export function readDomSelection(doc: MdvDocument, selection: DomSelectionLike):
 }
 
 /** Where in the DOM a text selection belongs, or `null` if it cannot be placed. */
-export function domTargetFor(root: NodeLike, doc: MdvDocument, selection: Selection): DomTarget | null {
+export function domTargetFor(
+  root: NodeLike,
+  doc: MdvDocument,
+  selection: Selection,
+): DomTarget | null {
   if (selection.kind !== 'text') return null;
   const anchor = pointToDom(root, doc, selection.anchor);
   if (anchor === null) return null;
   const focus =
-    selection.anchor === selection.focus ? anchor : (pointToDom(root, doc, selection.focus) ?? anchor);
+    selection.anchor === selection.focus
+      ? anchor
+      : (pointToDom(root, doc, selection.focus) ?? anchor);
   return { anchor, focus };
 }
 
@@ -135,7 +145,10 @@ function samePosition(node: NodeLike | null, offset: number, wanted: DomPosition
   const wantedHost = closestContainer(wanted.node);
   if (host === null || wantedHost === null || host !== wantedHost) return false;
 
-  return offsetInContainer(host, node, offset) === offsetInContainer(wantedHost, wanted.node, wanted.offset);
+  return (
+    offsetInContainer(host, node, offset) ===
+    offsetInContainer(wantedHost, wanted.node, wanted.offset)
+  );
 }
 
 /**
@@ -144,7 +157,9 @@ function samePosition(node: NodeLike | null, offset: number, wanted: DomPosition
  * Exposed for the pointer code, which needs the block id of whatever was hit
  * before it has a document to resolve it against.
  */
-export function containerAt(node: NodeLike | null): { element: ElementLike; blockId: string; path: readonly number[] } | null {
+export function containerAt(
+  node: NodeLike | null,
+): { element: ElementLike; blockId: string; path: readonly number[] } | null {
   if (node === null) return null;
   const element = closestContainer(node);
   if (element === null) return null;

@@ -39,7 +39,13 @@ import { SourcePane } from '../source/SourcePane.js';
 import type { FileHandle } from '../state/files.js';
 import { UNTITLED, openFile, saveText, withMdvExtension } from '../state/files.js';
 import type { DraftRecord, StorageLike } from '../state/persistence.js';
-import { clearDraft, describeAge, loadDraft, saveDraft, shouldOfferRecovery } from '../state/persistence.js';
+import {
+  clearDraft,
+  describeAge,
+  loadDraft,
+  saveDraft,
+  shouldOfferRecovery,
+} from '../state/persistence.js';
 import { EditorContext, useEditorStore } from '../state/store.js';
 import { useTheme } from '../state/theme.js';
 import type { ViewPrefs } from '../state/view-prefs.js';
@@ -96,7 +102,9 @@ export function EditorApp(props: EditorAppProps): ReactElement {
   const [notices, setNotices] = useState<readonly ImageNotice[]>([]);
   const [linkOpen, setLinkOpen] = useState(false);
   const [recovery, setRecovery] = useState<DraftRecord | null>(null);
-  const [imageAlign, setImageAlignState] = useState<ReadonlyMap<string, ImageAlign>>(() => new Map());
+  const [imageAlign, setImageAlignState] = useState<ReadonlyMap<string, ImageAlign>>(
+    () => new Map(),
+  );
 
   // Serialising on every revision is what the source pane and the dirty flag
   // both need, and documents are small enough that doing it once here is
@@ -122,7 +130,12 @@ export function EditorApp(props: EditorAppProps): ReactElement {
   useEffect(() => {
     if (storage === null || !dirty) return;
     const timer = setTimeout(() => {
-      saveDraft(storage, { version: 1, text, savedAt: Date.now(), fileName: file.handle?.name ?? null });
+      saveDraft(storage, {
+        version: 1,
+        text,
+        savedAt: Date.now(),
+        fileName: file.handle?.name ?? null,
+      });
     }, DRAFT_DEBOUNCE_MS);
     return () => {
       clearTimeout(timer);
@@ -165,7 +178,11 @@ export function EditorApp(props: EditorAppProps): ReactElement {
       try {
         opened = await openFile();
       } catch {
-        pushNotice({ id: `open-${String(Date.now())}`, tone: 'error', message: 'That file could not be read.' });
+        pushNotice({
+          id: `open-${String(Date.now())}`,
+          tone: 'error',
+          message: 'That file could not be read.',
+        });
         return;
       }
       if (opened === null) return;
@@ -184,9 +201,15 @@ export function EditorApp(props: EditorAppProps): ReactElement {
         const current = editor.toText();
         let result;
         try {
-          result = await saveText(current, withMdvExtension(file.name), file.handle, { forcePicker });
+          result = await saveText(current, withMdvExtension(file.name), file.handle, {
+            forcePicker,
+          });
         } catch {
-          pushNotice({ id: `save-${String(Date.now())}`, tone: 'error', message: 'Saving failed.' });
+          pushNotice({
+            id: `save-${String(Date.now())}`,
+            tone: 'error',
+            message: 'Saving failed.',
+          });
           return;
         }
         if (result.kind === 'cancelled') return;
@@ -198,7 +221,11 @@ export function EditorApp(props: EditorAppProps): ReactElement {
         });
         if (storage !== null) clearDraft(storage);
         if (result.kind === 'downloaded') {
-          pushNotice({ id: `save-${String(Date.now())}`, tone: 'info', message: `Downloaded ${result.name}.` });
+          pushNotice({
+            id: `save-${String(Date.now())}`,
+            tone: 'info',
+            message: `Downloaded ${result.name}.`,
+          });
         }
       })();
     },
@@ -343,17 +370,32 @@ export function EditorApp(props: EditorAppProps): ReactElement {
             </div>
           ) : null}
 
-          {view === 'source' ? null : <Toolbar mod={mod} onLink={() => { setLinkOpen(true); }} />}
+          {view === 'source' ? null : (
+            <Toolbar
+              mod={mod}
+              onLink={() => {
+                setLinkOpen(true);
+              }}
+            />
+          )}
 
           <div className="mdv-panes">
             {view === 'source' ? null : (
               <main className="mdv-pane mdv-pane--document" aria-label="Document">
-                <EditorSurface imageEnv={imageEnv} onNotice={pushNotice} onShellAction={onShellAction} />
+                <EditorSurface
+                  imageEnv={imageEnv}
+                  onNotice={pushNotice}
+                  onShellAction={onShellAction}
+                />
               </main>
             )}
             {view === 'document' ? null : (
               <aside className="mdv-pane mdv-pane--source" aria-label="Source">
-                <SourcePane text={text} editable={sourceEditable} onToggleEditable={setSourceEditable} />
+                <SourcePane
+                  text={text}
+                  editable={sourceEditable}
+                  onToggleEditable={setSourceEditable}
+                />
               </aside>
             )}
           </div>

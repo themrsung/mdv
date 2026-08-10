@@ -14,7 +14,12 @@
  */
 
 import type { Command } from '../state.js';
-import type { IngestedImage, IngestOptions, ImageEnvironment, ImageSource } from '../image/index.js';
+import type {
+  IngestedImage,
+  IngestOptions,
+  ImageEnvironment,
+  ImageSource,
+} from '../image/index.js';
 import { ingestImage } from '../image/index.js';
 import { insertImage } from '../commands/insert.js';
 import type { ClipboardPayload } from './payload.js';

@@ -61,7 +61,11 @@ const DEFAULT_TONE_STEP = 0.2;
  * The stripe ink for a fill: a lightness step of the fill's *own* hue, away from
  * the surface so the texture survives a grayscale conversion.
  */
-export function toneOnTone(fill: ColorString, scheme: ColorScheme, toneStep = DEFAULT_TONE_STEP): ColorString {
+export function toneOnTone(
+  fill: ColorString,
+  scheme: ColorScheme,
+  toneStep = DEFAULT_TONE_STEP,
+): ColorString {
   return shiftLightness(fill, scheme === 'light' ? -toneStep : toneStep);
 }
 
@@ -167,7 +171,14 @@ export function divergingTexture(
   const prefix = options.idPrefix ?? 'mdv-tex';
   if (sign === 0) {
     const spacing = options.spacing ?? DEFAULT_SPACING;
-    return { kind: 'pattern', id: `${prefix}-div-mid`, width: spacing, height: spacing, angle: 45, content: [] };
+    return {
+      kind: 'pattern',
+      id: `${prefix}-div-mid`,
+      width: spacing,
+      height: spacing,
+      angle: 45,
+      content: [],
+    };
   }
   const n = Math.max(1, Math.trunc(steps));
   const i = Math.min(n - 1, Math.max(0, Math.trunc(step)));

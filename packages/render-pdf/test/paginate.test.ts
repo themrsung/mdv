@@ -15,7 +15,13 @@ import { createDocStyle } from '../src/style.js';
 import { createStandardFontMetrics } from '../src/fonts.js';
 import { resolveOptions } from '../src/options.js';
 import { paginate } from '../src/paginate.js';
-import type { BlockLayout, BlockSize, PageElement, PaginateResult, PdfPage } from '../src/paginate.js';
+import type {
+  BlockLayout,
+  BlockSize,
+  PageElement,
+  PaginateResult,
+  PdfPage,
+} from '../src/paginate.js';
 import { naturalSize } from '../src/size.js';
 import type { PdfExportOptions } from '../src/options.js';
 import {
@@ -59,6 +65,24 @@ function tagsOn(page: PdfPage): string[] {
     .map((tag) => tag.split('@')[0] as string);
 }
 
+/** Every glyph drawn on a page, in draw order, as one string. */
+function textOn(page: PdfPage): string {
+  const out: string[] = [];
+  for (const el of page.elements) {
+    for (const d of el.drawables) {
+      if (d.kind === 'text') out.push(d.line.runs.map((r) => r.run.text).join(''));
+    }
+  }
+  return out.join('\n');
+}
+
+function pageOfText(result: PaginateResult, needle: string): number {
+  for (const page of result.pages) {
+    if (textOn(page).includes(needle)) return page.index;
+  }
+  return -1;
+}
+
 function pageOfTag(result: PaginateResult, tag: string): number {
   for (const page of result.pages) {
     if (tagsOn(page).includes(tag)) return page.index;
@@ -82,6 +106,45 @@ describe('page breaking', () => {
     ]);
     const result = run(doc);
     expect(result.pages.length).toBe(2);
+  });
+
+  it('keeps `:::mdv-page{break=avoid}` content on one page (SPEC 28.4)', () => {
+    const wrapped = ['keep-alpha', 'keep-beta', 'keep-gamma'];
+    const body = Array.from({ length: 26 }, (_, i) => paragraph(filler(i)));
+    const doc = resolvedDocument([
+      ...body,
+      directive(
+        'mdv-page',
+        { break: 'avoid' },
+        wrapped.map((t) => paragraph(t)),
+      ),
+    ]);
+    // The control: the same prose, unwrapped, straddles the boundary. Without
+    // this the fixture could drift into "fits anyway" and assert nothing.
+    const loose = run(resolvedDocument([...body, ...wrapped.map((t) => paragraph(t))]));
+    expect(new Set(wrapped.map((t) => pageOfText(loose, t))).size).toBe(2);
+
+    const result = run(doc);
+    const pages = wrapped.map((t) => pageOfText(result, t));
+    for (const page of pages) expect(page).toBeGreaterThanOrEqual(0);
+    expect(new Set(pages).size).toBe(1);
+    expect(result.diagnostics).toEqual([]);
+  });
+
+  it('splits a `break=avoid` taller than the page and warns MDV5121', () => {
+    const doc = resolvedDocument([
+      directive(
+        'mdv-page',
+        { break: 'avoid' },
+        Array.from({ length: 60 }, (_, i) => paragraph(filler(i))),
+      ),
+    ]);
+    const result = run(doc);
+    expect(result.pages.length).toBeGreaterThan(1);
+    const codes = result.diagnostics.map((d) => d.code);
+    expect(codes).toContain('MDV5121');
+    // Warned once for the wrapper, not once per page it spilled onto.
+    expect(codes.filter((c) => c === 'MDV5121').length).toBe(1);
   });
 
   it('switches to landscape for `:::mdv-page{orientation=landscape}`', () => {
@@ -114,9 +177,7 @@ describe('widows and orphans (SPEC 28.3 rule 1)', () => {
 
       // Count the lines of the final paragraph that landed on each page by
       // walking backwards: the last paragraph's atoms are the trailing `P`s.
-      const perPage = result.pages.map(
-        (page) => tagsOn(page).filter((tag) => tag === 'P').length,
-      );
+      const perPage = result.pages.map((page) => tagsOn(page).filter((tag) => tag === 'P').length);
       const last = perPage[perPage.length - 1] ?? 0;
       expect(last).toBeGreaterThanOrEqual(1);
     }
@@ -245,11 +306,7 @@ describe('destinations and the outline (SPEC 28.7)', () => {
       paragraph('c'),
     ]);
     const result = run(doc);
-    expect(result.outline.map((entry) => entry.title)).toEqual([
-      'One',
-      'One point one',
-      'Two',
-    ]);
+    expect(result.outline.map((entry) => entry.title)).toEqual(['One', 'One point one', 'Two']);
     expect(result.outline.map((entry) => entry.level)).toEqual([1, 2, 1]);
     for (const entry of result.outline) {
       expect(result.destinations.has(entry.anchor)).toBe(true);

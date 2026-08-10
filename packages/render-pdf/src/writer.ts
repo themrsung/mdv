@@ -19,13 +19,7 @@
  *   order this file walks in and the cross-reference table is plain text.
  */
 
-import {
-  AFRelationship,
-  PDFDocument,
-  PDFHexString,
-  PDFName,
-  PDFString,
-} from 'pdf-lib';
+import { AFRelationship, PDFDocument, PDFHexString, PDFName, PDFString } from 'pdf-lib';
 import type { PDFDict, PDFFont, PDFPage, PDFRef } from 'pdf-lib';
 import { SPEC_VERSION } from '@mdv/spec';
 
@@ -72,7 +66,10 @@ export function pdfUri(url: string): string {
   return out;
 }
 
-function encodeTextArg(arg: Extract<PdfArg, { k: 'text' }>, fonts: ReadonlyMap<string, PDFFont>): string {
+function encodeTextArg(
+  arg: Extract<PdfArg, { k: 'text' }>,
+  fonts: ReadonlyMap<string, PDFFont>,
+): string {
   const font = fonts.get(arg.font);
   // A text operator whose font was never allocated cannot happen: the resource
   // name came from the same pool. Emitting an empty string rather than throwing
@@ -184,7 +181,10 @@ function nestOutline(entries: readonly OutlineEntry[]): OutlineNode[] {
   const stack: OutlineNode[] = [];
   for (const entry of entries) {
     const node: OutlineNode = { entry, children: [] };
-    while (stack.length > 0 && (stack[stack.length - 1] as OutlineNode).entry.level >= entry.level) {
+    while (
+      stack.length > 0 &&
+      (stack[stack.length - 1] as OutlineNode).entry.level >= entry.level
+    ) {
       stack.pop();
     }
     const parent = stack[stack.length - 1];
@@ -346,10 +346,7 @@ export async function writePdf(build: PdfBuild, ctx: PdfExportContext): Promise<
 
   // ── catalog ────────────────────────────────────────────────────────────────
   pdf.catalog.set(PDFName.of('Lang'), PDFString.of(meta.lang));
-  pdf.catalog.set(
-    PDFName.of('ViewerPreferences'),
-    context.obj({ DisplayDocTitle: true }),
-  );
+  pdf.catalog.set(PDFName.of('ViewerPreferences'), context.obj({ DisplayDocTitle: true }));
 
   // ── info dictionary (SPEC 28.9) ────────────────────────────────────────────
   pdf.setTitle(meta.title === '' ? 'Untitled' : meta.title);
@@ -374,13 +371,44 @@ export async function writePdf(build: PdfBuild, ctx: PdfExportContext): Promise<
     // source must be handed over as bytes or it is silently mangled.
     const bytes =
       typeof ctx.source === 'string' ? new TextEncoder().encode(ctx.source) : ctx.source;
-    await pdf.attach(bytes, ctx.sourceName ?? 'source.mdv', {
-      mimeType: 'text/vnd.mdv',
-      description: 'MDV source of this document',
-      creationDate: ctx.buildTime,
-      modificationDate: ctx.buildTime,
-      afRelationship: AFRelationship.Source,
-    });
+    const sourceName = ctx.sourceName ?? 'source.mdv';
+
+    // …and `attach` is still not used, because it *always* flate-compresses the
+    // payload. That would make `--no-compress` a lie for the one stream a
+    // reader is most likely to want to eyeball, so the filespec is built here
+    // (the same shape pdf-lib's `FileEmbedder` builds) with the compression
+    // decision left to `options.compress`, exactly as for content streams.
+    const fileDict = {
+      Type: 'EmbeddedFile',
+      Subtype: 'text/vnd.mdv',
+      Params: {
+        Size: bytes.length,
+        CreationDate: PDFString.fromDate(ctx.buildTime),
+        ModDate: PDFString.fromDate(ctx.buildTime),
+      },
+    };
+    const fileRef = context.register(
+      options.compress ? context.flateStream(bytes, fileDict) : context.stream(bytes, fileDict),
+    );
+    const specRef = context.register(
+      context.obj({
+        Type: 'Filespec',
+        F: PDFString.of(sourceName),
+        UF: PDFHexString.fromText(sourceName),
+        EF: { F: fileRef },
+        Desc: PDFHexString.fromText('MDV source of this document'),
+        AFRelationship: AFRelationship.Source,
+      }),
+    );
+    // The name tree and `/AF` are written whole: this document has exactly one
+    // attachment, so there is nothing to merge into.
+    pdf.catalog.set(
+      PDFName.of('Names'),
+      context.obj({
+        EmbeddedFiles: { Names: [PDFHexString.fromText(sourceName), specRef] },
+      }),
+    );
+    pdf.catalog.set(PDFName.of('AF'), context.obj([specRef]));
   }
 
   // ── /ID (SPEC 28.10) ───────────────────────────────────────────────────────
@@ -565,7 +593,9 @@ function writeStructureTree(
   for (let i = 0; i < build.rendered.pages.length; i += 1) {
     const page = build.rendered.pages[i];
     if (page === undefined) continue;
-    const owners = page.mcidOwners.map((owner) => refs.get(owner)).filter((r): r is PDFRef => r !== undefined);
+    const owners = page.mcidOwners
+      .map((owner) => refs.get(owner))
+      .filter((r): r is PDFRef => r !== undefined);
     nums.push(i, context.register(context.obj(owners as never)));
   }
   const parentTree = context.register(context.obj({ Nums: nums as never }));
@@ -614,8 +644,7 @@ function writeOutline(
       const pageRef = pageRefOf(node.entry.pageIndex);
       const top = page === undefined ? 0 : page.heightPt - node.entry.yPt;
 
-      const children =
-        node.children.length === 0 ? undefined : emit(node.children, self);
+      const children = node.children.length === 0 ? undefined : emit(node.children, self);
       const descendants = countDescendants(node.children);
 
       context.assign(

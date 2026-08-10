@@ -132,6 +132,7 @@ extract.
 :::
 
 :::mdv-page{break=before}
+:::
 
 ## Appendix — data
 

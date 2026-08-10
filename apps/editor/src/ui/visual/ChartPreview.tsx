@@ -106,7 +106,9 @@ export function ChartPreview({ source, scheme, blockType }: ChartPreviewProps): 
   if (failure !== null) {
     return (
       <div className="mdv-preview mdv-preview--unavailable" role="status">
-        <p className="mdv-preview__title">No preview for this {blockType === '' ? 'block' : blockType} block</p>
+        <p className="mdv-preview__title">
+          No preview for this {blockType === '' ? 'block' : blockType} block
+        </p>
         <p className="mdv-preview__body">
           The chart renderer (<code>@mdv/react</code>) could not draw it:{' '}
           <span className="mdv-preview__reason">{failure}</span>
@@ -125,7 +127,9 @@ export function ChartPreview({ source, scheme, blockType }: ChartPreviewProps): 
   return (
     <div className="mdv-preview">
       <PreviewBoundary onError={onError} resetKey={source}>
-        <Suspense fallback={<div className="mdv-preview__loading">Loading the chart renderer…</div>}>
+        <Suspense
+          fallback={<div className="mdv-preview__loading">Loading the chart renderer…</div>}
+        >
           <LazyPreview source={source} scheme={scheme} />
         </Suspense>
       </PreviewBoundary>

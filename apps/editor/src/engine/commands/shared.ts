@@ -212,7 +212,10 @@ export function deleteTextRange(
       containerPath(start).every((value, index) => value === containerPath(end)[index]);
     if (samePath) {
       const result = spliceAt(doc, start, startAbs, endAbs, [], builder);
-      return { doc: result.doc, selection: { kind: 'text', anchor: result.caret, focus: result.caret } };
+      return {
+        doc: result.doc,
+        selection: { kind: 'text', anchor: result.caret, focus: result.caret },
+      };
     }
     // Two containers inside one block can only be two cells of one table.
     return deleteWithinTable(doc, start, end, startAbs, endAbs, builder);
@@ -267,7 +270,9 @@ export function deleteTextRange(
   const caretContainer = resolveContainer(next, start);
   const caret = caretContainer
     ? fromAbsolute(caretContainer, Math.min(startAbs, runsLength(caretContainer.runs)))
-    : (startOfBlock(findBlock(next, start.blockId)?.block ?? { kind: 'paragraph', id: start.blockId, runs: [] }) ?? start);
+    : (startOfBlock(
+        findBlock(next, start.blockId)?.block ?? { kind: 'paragraph', id: start.blockId, runs: [] },
+      ) ?? start);
   return { doc: next, selection: { kind: 'text', anchor: caret, focus: caret } };
 }
 
@@ -280,7 +285,12 @@ function clearTableTail(doc: MdvDocument, at: Point): MdvDocument {
   const row = path[0] ?? 0;
   const col = path[1] ?? 0;
   let next = table;
-  for (const ref of refsInRect({ top: row, left: 0, bottom: table.rows.length - 1, right: table.align.length - 1 })) {
+  for (const ref of refsInRect({
+    top: row,
+    left: 0,
+    bottom: table.rows.length - 1,
+    right: table.align.length - 1,
+  })) {
     if (ref.row === row && ref.col <= col) continue;
     next = setCellRuns(next, ref, []);
   }
@@ -313,7 +323,7 @@ function deleteWithinTable(
   builder: MappingBuilder,
 ): EditOutcome {
   const startContainer = requireContainer(doc, start);
-  const endContainer = requireContainer(doc, end);
+  requireContainer(doc, end); // validates the address; the runs are not needed
   builder.splice(addressOf(start), startAbs, runsLength(startContainer.runs), 0);
   builder.splice(addressOf(end), 0, endAbs, 0);
 
@@ -322,7 +332,11 @@ function deleteWithinTable(
   next = clearTableHead(next, end);
   const endAfter = resolveContainer(next, end);
   if (endAfter) {
-    next = writeContainer(next, endAfter, sliceRuns(endAfter.runs, endAbs, runsLength(endAfter.runs)));
+    next = writeContainer(
+      next,
+      endAfter,
+      sliceRuns(endAfter.runs, endAbs, runsLength(endAfter.runs)),
+    );
   }
   const caretContainer = resolveContainer(next, start);
   const caret = caretContainer ? fromAbsolute(caretContainer, startAbs) : start;
@@ -350,7 +364,12 @@ export function deleteCellRange(
   const next = replaceBlockWith(doc, tableId, [clearCells(table, area)]);
   return {
     doc: next,
-    selection: { kind: 'cells', tableId, anchor: { row: area.top, col: area.left }, focus: { row: area.bottom, col: area.right } },
+    selection: {
+      kind: 'cells',
+      tableId,
+      anchor: { row: area.top, col: area.left },
+      focus: { row: area.bottom, col: area.right },
+    },
   };
 }
 
@@ -402,6 +421,10 @@ export function containerAt(doc: MdvDocument, at: Point): ReturnType<typeof requ
 }
 
 /** The container of a block's `[row, col]` cell, when the block is a table. */
-export function cellContainer(block: Block, row: number, col: number): ReturnType<typeof containerOf> {
+export function cellContainer(
+  block: Block,
+  row: number,
+  col: number,
+): ReturnType<typeof containerOf> {
   return containerOf(block, [row, col]);
 }

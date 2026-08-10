@@ -28,9 +28,7 @@ export function cellText(value: Value): string {
 
 /** RFC 4180 quoting. */
 function csvCell(text: string): string {
-  return /[",\r\n]/.test(text) || text !== text.trim()
-    ? `"${text.replace(/"/g, '""')}"`
-    : text;
+  return /[",\r\n]/.test(text) || text !== text.trim() ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 /** A table as RFC 4180 CSV with a header row and CRLF-free LF line endings. */
@@ -95,9 +93,7 @@ export function tableToText(table: Table, maxRows = 20): string {
 
   const numeric = table.fields.map((field) => field.type === 'number');
   const shown = table.rows.slice(0, maxRows);
-  const cells = shown.map((row) =>
-    table.fields.map((_, index) => cellText(row[index] ?? null)),
-  );
+  const cells = shown.map((row) => table.fields.map((_, index) => cellText(row[index] ?? null)));
 
   const widths = table.fields.map((field, index) => {
     let width = widthOf(field.name);
@@ -118,7 +114,9 @@ export function tableToText(table: Table, maxRows = 20): string {
     );
   }
   if (table.rows.length > shown.length) {
-    lines.push(`… ${table.rows.length - shown.length} more row${table.rows.length - shown.length === 1 ? '' : 's'}`);
+    lines.push(
+      `… ${table.rows.length - shown.length} more row${table.rows.length - shown.length === 1 ? '' : 's'}`,
+    );
   }
   return `${lines.join('\n')}\n`;
 }

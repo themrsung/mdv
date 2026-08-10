@@ -113,6 +113,11 @@
       "code": "MDV5120",
       "severity": "warning",
       "summary": "Chart scaled below 60 % to fit the page — rotated to landscape"
+    },
+    {
+      "code": "MDV5121",
+      "severity": "warning",
+      "summary": "`break=avoid` content is taller than one page and was split"
     }
   ]
 }

@@ -19,7 +19,16 @@
 
 import { describe, expect, it } from 'vitest';
 import { metricChart } from '../src/metric.js';
-import { EMPTY_TABLE, attrsOf, codesOf, makeTable, nodesOfKind, nonFiniteNumbers, noRows, runChart } from './harness.js';
+import {
+  EMPTY_TABLE,
+  attrsOf,
+  codesOf,
+  makeTable,
+  nodesOfKind,
+  nonFiniteNumbers,
+  noRows,
+  runChart,
+} from './harness.js';
 
 /** Four months of revenue, so `last`, `sum` and friends all differ. */
 function months() {
@@ -52,7 +61,9 @@ describe('metric: the figure', () => {
   });
 
   it('honours an explicit format over the automatic one', () => {
-    const run = runChart(metricChart, EMPTY_TABLE, { attrs: attrsOf({ value: 1_400_000, format: '.2s' }) });
+    const run = runChart(metricChart, EMPTY_TABLE, {
+      attrs: attrsOf({ value: 1_400_000, format: '.2s' }),
+    });
     expect(textOf(run, 'mdv-metric-value')?.text).toBe('1.4M');
   });
 
@@ -79,7 +90,9 @@ describe('metric: the figure', () => {
   });
 
   it('takes the aggregate from the channel too', () => {
-    const run = runChart(metricChart, months(), { encoding: { value: { field: 'revenue', aggregate: 'sum' } } });
+    const run = runChart(metricChart, months(), {
+      encoding: { value: { field: 'revenue', aggregate: 'sum' } },
+    });
     expect(textOf(run, 'mdv-metric-value')?.text).toBe('1,000');
   });
 
@@ -106,7 +119,9 @@ describe('metric: the label', () => {
   });
 
   it('falls back to the block title', () => {
-    const run = runChart(metricChart, EMPTY_TABLE, { attrs: { value: 1, title: 'Monthly revenue' } });
+    const run = runChart(metricChart, EMPTY_TABLE, {
+      attrs: { value: 1, title: 'Monthly revenue' },
+    });
     expect(textOf(run, 'mdv-metric-label')?.text).toBe('Monthly revenue');
   });
 
@@ -191,7 +206,10 @@ describe('metric: the delta (SPEC 8.13)', () => {
   });
 
   it('colours a rise green when up is good', () => {
-    expect(textOf(withDelta({ delta: 0.1 }), 'mdv-metric-delta')?.fill).toEqual({ kind: 'solid', color: '#0ca30c' });
+    expect(textOf(withDelta({ delta: 0.1 }), 'mdv-metric-delta')?.fill).toEqual({
+      kind: 'solid',
+      color: '#0ca30c',
+    });
   });
 
   it('colours a rise red when up is bad — churn going up is not good news', () => {
@@ -210,7 +228,10 @@ describe('metric: the delta (SPEC 8.13)', () => {
   });
 
   it('treats no change as neutral whatever the goodDirection', () => {
-    expect(textOf(withDelta({ delta: 0 }), 'mdv-metric-delta')?.fill).toEqual({ kind: 'solid', color: '#4a4a4a' });
+    expect(textOf(withDelta({ delta: 0 }), 'mdv-metric-delta')?.fill).toEqual({
+      kind: 'solid',
+      color: '#4a4a4a',
+    });
   });
 
   it('uses status colour, never a categorical slot: a bad quarter is not "series 4"', () => {
@@ -235,7 +256,13 @@ describe('metric: the delta (SPEC 8.13)', () => {
 
 describe('metric: the trend sparkline (SPEC 8.13)', () => {
   const run = runChart(metricChart, EMPTY_TABLE, {
-    attrs: { value: 1_400_000, label: 'Revenue', delta: -0.082, deltaOf: 'vs. last month', trend: [1, 2, 3, 4] },
+    attrs: {
+      value: 1_400_000,
+      label: 'Revenue',
+      delta: -0.082,
+      deltaOf: 'vs. last month',
+      trend: [1, 2, 3, 4],
+    },
   });
 
   it('draws the sparkline across the foot of the tile', () => {
@@ -352,7 +379,10 @@ describe('metric: degenerate input', () => {
       { x: 0, y: 0, width: 400, height: 0 },
       { x: 0, y: 0, width: Number.NaN, height: 200 },
     ]) {
-      const run = runChart(metricChart, EMPTY_TABLE, { attrs: { value: 1, trend: [1, 2, 3] }, frame });
+      const run = runChart(metricChart, EMPTY_TABLE, {
+        attrs: { value: 1, trend: [1, 2, 3] },
+        frame,
+      });
       expect(run.laid.nodes).toEqual([]);
       expect(nonFiniteNumbers(run.laid)).toEqual([]);
     }
@@ -365,7 +395,13 @@ describe('metric: degenerate input', () => {
       { x: 0, y: 0, width: 4, height: 2000 },
     ]) {
       const run = runChart(metricChart, EMPTY_TABLE, {
-        attrs: { value: 1_400_000, label: 'Revenue', delta: 0.1, deltaOf: 'vs. Q3', trend: [1, 2, 3] },
+        attrs: {
+          value: 1_400_000,
+          label: 'Revenue',
+          delta: 0.1,
+          deltaOf: 'vs. Q3',
+          trend: [1, 2, 3],
+        },
         frame,
       });
       expect(nonFiniteNumbers(run.laid)).toEqual([]);
@@ -382,7 +418,13 @@ describe('metric: degenerate input', () => {
 describe('metric: accessibility', () => {
   it('describes label, figure, direction and trend in one sentence each', () => {
     const run = runChart(metricChart, EMPTY_TABLE, {
-      attrs: { value: 1_400_000, label: 'Revenue', delta: -0.082, deltaOf: 'vs. last month', trend: [1, 2, 3, 4] },
+      attrs: {
+        value: 1_400_000,
+        label: 'Revenue',
+        delta: -0.082,
+        deltaOf: 'vs. last month',
+        trend: [1, 2, 3, 4],
+      },
     });
     expect(run.description).toBe(
       'Stat tile. Revenue: 1,400,000. worsened by -8.2% vs. last month. Trend over 4 periods.',
@@ -397,12 +439,20 @@ describe('metric: accessibility', () => {
   });
 
   it('falls back to "Value" with no label', () => {
-    expect(runChart(metricChart, EMPTY_TABLE, { attrs: { value: 10 } }).description).toBe('Stat tile. Value 10.');
+    expect(runChart(metricChart, EMPTY_TABLE, { attrs: { value: 10 } }).description).toBe(
+      'Stat tile. Value 10.',
+    );
   });
 
   it('offers the figure, its delta and every period as a table', () => {
     const run = runChart(metricChart, EMPTY_TABLE, {
-      attrs: { value: 1_400_000, label: 'Revenue', delta: -0.082, deltaOf: 'vs. last month', trend: [1, 2] },
+      attrs: {
+        value: 1_400_000,
+        label: 'Revenue',
+        delta: -0.082,
+        deltaOf: 'vs. last month',
+        trend: [1, 2],
+      },
     });
     expect(run.encoded.a11yTable?.caption).toBe('Revenue');
     expect(run.encoded.a11yTable?.columns.map((c) => c.name)).toEqual(['Measure', 'Value']);
@@ -428,7 +478,9 @@ describe('metric: the contract', () => {
 
   it('produces exactly one mark, in data space', () => {
     const run = runChart(metricChart, EMPTY_TABLE, { attrs: { value: 5 } });
-    expect(run.encoded.marks).toEqual([{ mark: 'text', seriesId: '', datum: 0, x: 0, y: 0, text: '5' }]);
+    expect(run.encoded.marks).toEqual([
+      { mark: 'text', seriesId: '', datum: 0, x: 0, y: 0, text: '5' },
+    ]);
   });
 
   it('never throws for document content, however wrong', () => {

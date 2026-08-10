@@ -70,7 +70,9 @@ export interface ResolvedPdfOptions {
   keywords: readonly string[];
 }
 
-function slots(value: { left?: string; center?: string; right?: string } | undefined): RunningSlots | undefined {
+function slots(
+  value: { left?: string; center?: string; right?: string } | undefined,
+): RunningSlots | undefined {
   if (value === undefined) return undefined;
   const left = value.left ?? '';
   const center = value.center ?? '';
@@ -235,18 +237,22 @@ export function mergePdfOptions(
     ...base,
     ...compact(over),
     ...compact({
-      header: base.header === undefined && over.header === undefined
-        ? undefined
-        : { ...base.header, ...compact(over.header ?? {}) },
-      footer: base.footer === undefined && over.footer === undefined
-        ? undefined
-        : { ...base.footer, ...compact(over.footer ?? {}) },
-      numbering: base.numbering === undefined && over.numbering === undefined
-        ? undefined
-        : { ...base.numbering, ...compact(over.numbering ?? {}) },
-      toc: base.toc === undefined && over.toc === undefined
-        ? undefined
-        : { ...base.toc, ...compact(over.toc ?? {}) },
+      header:
+        base.header === undefined && over.header === undefined
+          ? undefined
+          : { ...base.header, ...compact(over.header ?? {}) },
+      footer:
+        base.footer === undefined && over.footer === undefined
+          ? undefined
+          : { ...base.footer, ...compact(over.footer ?? {}) },
+      numbering:
+        base.numbering === undefined && over.numbering === undefined
+          ? undefined
+          : { ...base.numbering, ...compact(over.numbering ?? {}) },
+      toc:
+        base.toc === undefined && over.toc === undefined
+          ? undefined
+          : { ...base.toc, ...compact(over.toc ?? {}) },
     }),
   };
 }

@@ -35,10 +35,35 @@ import type { PlannedEncodeResult } from './internal/plan.js';
 import type { Orientation, SortMode, StackMode } from './internal/types.js';
 import { ORIENTATIONS, SORT_MODES, STACK_MODES } from './internal/types.js';
 import { annotationNodes, parseAnnotations } from './internal/annotations.js';
-import { autoNumberAttr, boolOrStringAttr, enumAttr, numberAttr, stringAttr } from './internal/attrs.js';
-import { axisSpecFor, isDegenerateFrame, makeAxis, rangeDownFrame, rangeToFrame } from './internal/cartesian.js';
-import { blockDiagnostic, incompatibleField, missingChannel, unknownEnum } from './internal/diagnostics.js';
-import { buildA11yTable, composeDescription, countPhrase, extremesOf, presentationOf, subjectPhrase, viewColumn } from './internal/a11y.js';
+import {
+  autoNumberAttr,
+  boolOrStringAttr,
+  enumAttr,
+  numberAttr,
+  stringAttr,
+} from './internal/attrs.js';
+import {
+  axisSpecFor,
+  isDegenerateFrame,
+  makeAxis,
+  rangeDownFrame,
+  rangeToFrame,
+} from './internal/cartesian.js';
+import {
+  blockDiagnostic,
+  incompatibleField,
+  missingChannel,
+  unknownEnum,
+} from './internal/diagnostics.js';
+import {
+  buildA11yTable,
+  composeDescription,
+  countPhrase,
+  extremesOf,
+  presentationOf,
+  subjectPhrase,
+  viewColumn,
+} from './internal/a11y.js';
 import { buildLegend, buildSeries } from './internal/series.js';
 import { barRadii, clampRadii, px } from './internal/geometry.js';
 import {
@@ -124,9 +149,26 @@ const CHANNELS: readonly ChannelSpec[] = [
     defaultScale: 'ordinal',
     doc: 'Long-form alternative to a list-valued y: one series per distinct value.',
   },
-  { name: 'color', required: false, accepts: ['string', 'category'], constant: true, doc: 'Fixed color or color field.' },
-  { name: 'label', required: false, accepts: ['string', 'number', 'integer', 'category'], doc: 'Direct value labels.' },
-  { name: 'tooltip', required: false, accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'], list: true, doc: 'Extra readout fields.' },
+  {
+    name: 'color',
+    required: false,
+    accepts: ['string', 'category'],
+    constant: true,
+    doc: 'Fixed color or color field.',
+  },
+  {
+    name: 'label',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category'],
+    doc: 'Direct value labels.',
+  },
+  {
+    name: 'tooltip',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'],
+    list: true,
+    doc: 'Extra readout fields.',
+  },
 ];
 
 /**
@@ -145,13 +187,20 @@ function readAttrs(input: EncodeInput): {
   sortField: string | undefined;
 } {
   const { attrs, block } = input;
-  const report = (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
-    input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
-  };
+  const report =
+    (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
+      input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
+    };
   const sortRaw = stringAttr(attrs, 'sort');
   const sortIsMode = sortRaw === undefined || SORT_MODES.some((mode) => mode === sortRaw);
   return {
-    orientation: enumAttr(attrs, 'orientation', ORIENTATIONS, 'vertical', report('orientation', ORIENTATIONS, 'vertical')),
+    orientation: enumAttr(
+      attrs,
+      'orientation',
+      ORIENTATIONS,
+      'vertical',
+      report('orientation', ORIENTATIONS, 'vertical'),
+    ),
     stack: enumAttr(attrs, 'stack', STACK_MODES, 'none', report('stack', STACK_MODES, 'none')),
     corner: numberAttr(attrs, 'corner', input.theme.marks.bar.cornerRadius, 0, 64),
     barWidth: autoNumberAttr(attrs, 'barWidth', 1, 512),
@@ -170,7 +219,14 @@ export const barChart: ChartType<BarMark> = {
   family: 'mark',
   channels: CHANNELS,
   defaultEncoding: {},
-  defaults: { stack: 'none', orientation: 'vertical', barPadding: 0.2, groupPadding: 0.1, corner: 4, baseline: 0 },
+  defaults: {
+    stack: 'none',
+    orientation: 'vertical',
+    barPadding: 0.2,
+    groupPadding: 0.1,
+    corner: 4,
+    baseline: 0,
+  },
   schemaId: 'https://mdv.dev/schema/1.0/block/bar.json',
   minWidth: 240,
 
@@ -183,7 +239,12 @@ export const barChart: ChartType<BarMark> = {
       diagnostics.push(missingChannel(block, 'x', 'the category each bar stands for'));
     } else if (findColumn(table, xChannel.field) === undefined && table.fields.length > 0) {
       diagnostics.push(
-        blockDiagnostic('MDV3000', block, 'encode', `\`x\` names \`${xChannel.field}\`, which is not a column`),
+        blockDiagnostic(
+          'MDV3000',
+          block,
+          'encode',
+          `\`x\` names \`${xChannel.field}\`, which is not a column`,
+        ),
       );
     }
 
@@ -191,7 +252,10 @@ export const barChart: ChartType<BarMark> = {
       diagnostics.push(missingChannel(block, 'y', 'the measure the bars encode'));
     }
 
-    if (isChannelList(block.encoding, 'y') && firstChannel(block.encoding, 'series')?.field !== undefined) {
+    if (
+      isChannelList(block.encoding, 'y') &&
+      firstChannel(block.encoding, 'series')?.field !== undefined
+    ) {
       diagnostics.push(
         blockDiagnostic(
           'MDV3010',
@@ -208,7 +272,11 @@ export const barChart: ChartType<BarMark> = {
       if (bound === undefined) continue;
       if (!isQuantitative(bound.column.type) && bound.column.type !== 'unknown') {
         diagnostics.push(
-          incompatibleField(block, 'y', bound.column.name, bound.column.type, ['number', 'integer', 'duration']),
+          incompatibleField(block, 'y', bound.column.name, bound.column.type, [
+            'number',
+            'integer',
+            'duration',
+          ]),
         );
       }
     }
@@ -228,13 +296,21 @@ export const barChart: ChartType<BarMark> = {
     }
     if (resolution.folded) {
       input.diagnostic(
-        blockDiagnostic('MDV3062', block, 'encode', 'More series than palette slots; the surplus folded into "Other"'),
+        blockDiagnostic(
+          'MDV3062',
+          block,
+          'encode',
+          'More series than palette slots; the surplus folded into "Other"',
+        ),
       );
     }
 
     const seriesChannel = firstChannel(encoding, 'series');
     const seriesColumn = findColumn(table, seriesChannel?.field);
-    const valueFormat = channelFormat(channelList(encoding, 'y')[0], table.fields[resolution.plans[0]?.valueColumn ?? -1]);
+    const valueFormat = channelFormat(
+      channelList(encoding, 'y')[0],
+      table.fields[resolution.plans[0]?.valueColumn ?? -1],
+    );
 
     // ── Categories, in first-appearance order (never sorted by string) ────────
     const categories: { key: string; value: ScaleInput }[] = [];
@@ -270,7 +346,8 @@ export const barChart: ChartType<BarMark> = {
           if (plan.matchKey !== undefined) {
             if (seriesColumn === undefined) continue;
             const identity = cell(table, row, seriesColumn.index);
-            const identityKey = identity instanceof Date ? identity.toISOString() : String(identity);
+            const identityKey =
+              identity instanceof Date ? identity.toISOString() : String(identity);
             if (identityKey !== plan.matchKey) continue;
           }
           const numeric = cellNumber(cell(table, row, plan.valueColumn));
@@ -286,7 +363,8 @@ export const barChart: ChartType<BarMark> = {
     // ── Sorting (SPEC 8.2 `sort`) ─────────────────────────────────────────────
     const order = categories.map((_, i) => i);
     if (options.sort !== 'none' || options.sortField !== undefined) {
-      const sortColumn = options.sortField === undefined ? undefined : findColumn(table, options.sortField);
+      const sortColumn =
+        options.sortField === undefined ? undefined : findColumn(table, options.sortField);
       const magnitude = (ci: number): number => {
         if (sortColumn !== undefined) {
           const rows = rowsByCategory.get(categories[ci]?.key ?? '') ?? [];
@@ -317,9 +395,12 @@ export const barChart: ChartType<BarMark> = {
     const columns: ReturnType<typeof stackColumn>[] = [];
     const labelRequest = boolOrStringAttr(attrs, 'label');
     const wantsLabels =
-      labelRequest !== undefined && (labelRequest.kind === 'bool' ? labelRequest.value : labelRequest.value !== 'none');
+      labelRequest !== undefined &&
+      (labelRequest.kind === 'bool' ? labelRequest.value : labelRequest.value !== 'none');
     const labelColumn =
-      labelRequest?.kind === 'string' && labelRequest.value !== 'none' && labelRequest.value !== 'true'
+      labelRequest?.kind === 'string' &&
+      labelRequest.value !== 'none' &&
+      labelRequest.value !== 'true'
         ? findColumn(table, labelRequest.value)
         : undefined;
 
@@ -437,7 +518,7 @@ export const barChart: ChartType<BarMark> = {
           block,
           'encode',
           'The bar value axis does not include zero',
-          'Truncating a bar chart\'s axis misstates magnitude. Remove `zero: false`, or use a line chart, which may be truncated.',
+          "Truncating a bar chart's axis misstates magnitude. Remove `zero: false`, or use a line chart, which may be truncated.",
         ),
       );
     }
@@ -475,7 +556,9 @@ export const barChart: ChartType<BarMark> = {
       ...(percent ? { formatOverride: '.0%' } : {}),
       baselineByDefault: false,
     });
-    const axes: AxisModel[] = [categoryAxis, valueAxis].filter((axis): axis is AxisModel => axis !== undefined);
+    const axes: AxisModel[] = [categoryAxis, valueAxis].filter(
+      (axis): axis is AxisModel => axis !== undefined,
+    );
 
     const result: BarEncodeResult = {
       marks,
@@ -540,7 +623,8 @@ export const barChart: ChartType<BarMark> = {
       const groupIndex = clamp(mark.groupIndex ?? 0, 0, groupCount - 1);
       const slotWidth = band / groupCount;
       // The 2 px surface gap is what separates adjacent bars — never a stroke.
-      const withinGroup = groupCount > 1 ? Math.max(1, slotWidth * (1 - plan.groupPadding) - gap) : slotWidth;
+      const withinGroup =
+        groupCount > 1 ? Math.max(1, slotWidth * (1 - plan.groupPadding) - gap) : slotWidth;
       let thickness = Math.min(withinGroup, maxThickness);
       if (plan.barWidth !== undefined) thickness = Math.min(plan.barWidth, slotWidth);
       thickness = Math.max(1, thickness);
@@ -552,8 +636,18 @@ export const barChart: ChartType<BarMark> = {
       const nearInset = entry.gapNear ? gap / 2 : 0;
       const farInset = entry.gapFar ? gap / 2 : 0;
       const growsPositive = mark.y1 >= mark.y0;
-      const signedNear = near + (vertical ? (growsPositive ? -nearInset : nearInset) : growsPositive ? nearInset : -nearInset);
-      const signedFar = far + (vertical ? (growsPositive ? farInset : -farInset) : growsPositive ? -farInset : farInset);
+      const signedNear =
+        near +
+        (vertical
+          ? growsPositive
+            ? -nearInset
+            : nearInset
+          : growsPositive
+            ? nearInset
+            : -nearInset);
+      const signedFar =
+        far +
+        (vertical ? (growsPositive ? farInset : -farInset) : growsPositive ? -farInset : farInset);
       const length = Math.abs(signedFar - signedNear);
       const start = Math.min(signedNear, signedFar);
 
@@ -644,7 +738,8 @@ export const barChart: ChartType<BarMark> = {
     const xColumn = findColumn(input.table, xChannel?.field)?.column;
     const measure = encoded.series[0]?.label;
     const scale = encoded.scales.y;
-    const format = (value: number): string => (scale === undefined ? formatNumber(value) : scale.format(value));
+    const format = (value: number): string =>
+      scale === undefined ? formatNumber(value) : scale.format(value);
 
     const categories = new Set<string>();
     for (const mark of encoded.marks) categories.add(discreteKey(mark.x));
@@ -657,7 +752,7 @@ export const barChart: ChartType<BarMark> = {
     const labelOf = (key: string): string => {
       const found = encoded.marks.find((mark) => discreteKey(mark.x) === key);
       const raw = found?.x;
-      return raw === undefined ? key : encoded.scales.x?.format(raw) ?? String(raw);
+      return raw === undefined ? key : (encoded.scales.x?.format(raw) ?? String(raw));
     };
     const extremes = extremesOf(
       [...totals].map(([key, value]) => ({ label: labelOf(key), value })),
@@ -668,7 +763,10 @@ export const barChart: ChartType<BarMark> = {
     const scopeParts = [countPhrase(categories.size, 'category', 'categories')];
     if (seriesCount > 1) scopeParts.push(countPhrase(seriesCount, 'series', 'series'));
 
-    const subject = subjectPhrase(measure, xColumn === undefined ? undefined : humaniseColumn(xColumn));
+    const subject = subjectPhrase(
+      measure,
+      xColumn === undefined ? undefined : humaniseColumn(xColumn),
+    );
 
     return composeDescription({
       chartKind: 'Bar chart',
@@ -685,7 +783,9 @@ export const barChart: ChartType<BarMark> = {
 };
 
 /** `stack: percent` forces the domain to `[0, 1]`, widened when signs are mixed. */
-function pickPercentDomain(extent: readonly [number, number] | undefined): readonly [number, number] {
+function pickPercentDomain(
+  extent: readonly [number, number] | undefined,
+): readonly [number, number] {
   if (extent === undefined) return [0, 1];
   const lo = Math.min(0, extent[0]);
   const hi = Math.max(1, extent[1]);
@@ -751,7 +851,12 @@ function emptyResult(
       y: createContinuousScale('linear', { domain: [0, 1] }),
     },
     axes: [],
-    a11yTable: buildA11yTable(input.table, [], input.attrs.title ?? 'Chart data', presentationOf(input.attrs)),
+    a11yTable: buildA11yTable(
+      input.table,
+      [],
+      input.attrs.title ?? 'Chart data',
+      presentationOf(input.attrs),
+    ),
     state: { ...DEFAULT_PLAN, orientation: options.orientation, stack: options.stack, entries: [] },
   };
 }

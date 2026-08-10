@@ -55,11 +55,7 @@ export function isRectangular(table: TableBlock): boolean {
  * GFM.
  */
 export function makeRectangular(table: TableBlock, ids: IdFactory): TableBlock {
-  const width = Math.max(
-    1,
-    table.align.length,
-    ...table.rows.map((row) => row.cells.length),
-  );
+  const width = Math.max(1, table.align.length, ...table.rows.map((row) => row.cells.length));
   const align: ColumnAlign[] = [];
   for (let index = 0; index < width; index += 1) align.push(table.align[index] ?? 'none');
 
@@ -194,12 +190,7 @@ function emptyRow(table: TableBlock, ids: IdFactory): TableRow {
  * `at` is clamped to `[1, rowCount]`: a GFM table's first row is its header, so
  * nothing can be inserted above it. Use {@link insertColumn} for the other axis.
  */
-export function insertRow(
-  table: TableBlock,
-  ids: IdFactory,
-  at: number,
-  count = 1,
-): TableBlock {
+export function insertRow(table: TableBlock, ids: IdFactory, at: number, count = 1): TableBlock {
   const total = Math.max(1, Math.trunc(count));
   const index = Math.max(1, Math.min(Math.trunc(at), table.rows.length));
   const added = Array.from({ length: total }, () => emptyRow(table, ids));
@@ -323,11 +314,7 @@ function tableCellPlaceholder(row: TableRow, index: number): TableCell {
 }
 
 /** Set one column's alignment. */
-export function setColumnAlign(
-  table: TableBlock,
-  col: number,
-  align: ColumnAlign,
-): TableBlock {
+export function setColumnAlign(table: TableBlock, col: number, align: ColumnAlign): TableBlock {
   const index = Math.trunc(col);
   if (index < 0 || index >= columnCount(table)) return table;
   if (table.align[index] === align) return table;
@@ -341,17 +328,15 @@ export function setColumnAlign(
 /* -------------------------------------------------------------------------- */
 
 /** Replace the runs of one cell. Out-of-range references are ignored. */
-export function setCellRuns(
-  table: TableBlock,
-  ref: CellRef,
-  runs: readonly Run[],
-): TableBlock {
+export function setCellRuns(table: TableBlock, ref: CellRef, runs: readonly Run[]): TableBlock {
   if (!cellAt(table, ref.row, ref.col)) return table;
   const rows = table.rows.map((row, r) => {
     if (r !== ref.row) return row;
     return {
       ...row,
-      cells: row.cells.map((cell, c) => (c === ref.col ? { ...cell, runs: normalizeRuns(runs) } : cell)),
+      cells: row.cells.map((cell, c) =>
+        c === ref.col ? { ...cell, runs: normalizeRuns(runs) } : cell,
+      ),
     };
   });
   return { ...table, rows };
@@ -462,7 +447,10 @@ export function tableFromGrid(
       Array.from({ length: width }, (_unused, index) => tableCell(ids, line[index] ?? [])),
     ),
   );
-  const alignment = Array.from({ length: width }, (_unused, index): ColumnAlign => align[index] ?? 'none');
+  const alignment = Array.from(
+    { length: width },
+    (_unused, index): ColumnAlign => align[index] ?? 'none',
+  );
   const id = ids();
   return assertRectangular({ kind: 'table', id, align: alignment, rows });
 }

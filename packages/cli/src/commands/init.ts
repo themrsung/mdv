@@ -66,10 +66,7 @@ export async function initCommand(
   }
 
   if ((await exists(io, target)) && flags.force !== true) {
-    throw usageError(
-      `${displayPath(io, target)} already exists`,
-      'Pass --force to overwrite it.',
-    );
+    throw usageError(`${displayPath(io, target)} already exists`, 'Pass --force to overwrite it.');
   }
 
   await writeTextFile(io, target, SCAFFOLD);

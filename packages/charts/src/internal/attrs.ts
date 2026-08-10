@@ -54,7 +54,12 @@ export function numberAttr(
  * @returns `undefined` for `auto` or an unusable value — the caller then derives
  * the number from the layout, which is what `auto` means.
  */
-export function autoNumberAttr(attrs: BlockAttrs, name: string, min?: number, max?: number): number | undefined {
+export function autoNumberAttr(
+  attrs: BlockAttrs,
+  name: string,
+  min?: number,
+  max?: number,
+): number | undefined {
   const value = rawAttr(attrs, name);
   if (value === undefined || value === 'auto') return undefined;
   const numeric = numberAttr(attrs, name, Number.NaN, min, max);
@@ -115,9 +120,17 @@ export function listAttr(attrs: BlockAttrs, name: string): readonly unknown[] {
 }
 
 /** Read an object-valued attribute. Arrays are rejected: they are not records. */
-export function recordAttr(attrs: BlockAttrs, name: string): Readonly<Record<string, unknown>> | undefined {
+export function recordAttr(
+  attrs: BlockAttrs,
+  name: string,
+): Readonly<Record<string, unknown>> | undefined {
   const value = rawAttr(attrs, name);
-  if (typeof value !== 'object' || value === null || Array.isArray(value) || value instanceof Date) {
+  if (
+    typeof value !== 'object' ||
+    value === null ||
+    Array.isArray(value) ||
+    value instanceof Date
+  ) {
     return undefined;
   }
   return value as Readonly<Record<string, unknown>>;

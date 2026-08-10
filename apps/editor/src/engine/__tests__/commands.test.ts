@@ -24,7 +24,16 @@ import {
   splitBlock,
   toggleMark,
 } from '../commands/index.js';
-import { at, blockAt, caretAt, editorFor, rangeAcross, rangeIn, source, textOf } from './helpers.js';
+import {
+  at,
+  blockAt,
+  caretAt,
+  editorFor,
+  rangeAcross,
+  rangeIn,
+  source,
+  textOf,
+} from './helpers.js';
 import { caret } from '../selection.js';
 
 describe('insertText', () => {

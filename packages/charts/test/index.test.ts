@@ -47,7 +47,16 @@ function byName(name: string): ChartType {
 
 describe('the Level 1 set (SPEC 16.1)', () => {
   it('implements all eight named types', () => {
-    expect([...LEVEL_1_TYPE_NAMES]).toEqual(['area', 'bar', 'donut', 'line', 'metric', 'pie', 'scatter', 'table']);
+    expect([...LEVEL_1_TYPE_NAMES]).toEqual([
+      'area',
+      'bar',
+      'donut',
+      'line',
+      'metric',
+      'pie',
+      'scatter',
+      'table',
+    ]);
     for (const name of LEVEL_1_TYPE_NAMES) expect(byName(name).level).toBe(1);
   });
 
@@ -71,7 +80,9 @@ describe('the Level 1 set (SPEC 16.1)', () => {
 
   it('gives every type a schema id, so a document can be validated ahead of render', () => {
     for (const type of level1ChartTypes) {
-      expect(type.schemaId, type.name).toMatch(/^https:\/\/mdv\.dev\/schema\/1\.0\/block\/[a-z]+\.json$/);
+      expect(type.schemaId, type.name).toMatch(
+        /^https:\/\/mdv\.dev\/schema\/1\.0\/block\/[a-z]+\.json$/,
+      );
     }
   });
 
@@ -172,7 +183,9 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
   });
 
   it('draws the real table, not a placeholder', () => {
-    expect(nodesOfKind(run.laid.nodes, 'text').filter((node) => node.cls === 'mdv-table-header')).toHaveLength(5);
+    expect(
+      nodesOfKind(run.laid.nodes, 'text').filter((node) => node.cls === 'mdv-table-header'),
+    ).toHaveLength(5);
     expect(run.laid.hits).toHaveLength(2);
   });
 
@@ -193,7 +206,9 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
   it('does not complain about the attributes of the type it is standing in for', () => {
     // `table`'s own validate would report `nodeWidth` as an unknown column; that
     // would bury the one diagnostic that matters under a dozen that do not.
-    const fussy = runChart(byName('sankey'), prices(), { attrs: { nodeWidth: 12, linkOpacity: 0.4 } });
+    const fussy = runChart(byName('sankey'), prices(), {
+      attrs: { nodeWidth: 12, linkOpacity: 0.4 },
+    });
     expect(codesOf(fussy)).toEqual(['MDV1500']);
   });
 
@@ -218,7 +233,11 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
   });
 
   it('can be built for a type this package does not list', () => {
-    const custom = createUnimplementedChartType({ name: 'chord', level: 3, summary: 'a chord diagram' });
+    const custom = createUnimplementedChartType({
+      name: 'chord',
+      level: 3,
+      summary: 'a chord diagram',
+    });
     const run2 = runChart(custom, prices(), {});
     expect(codesOf(run2)).toEqual(['MDV1500']);
     expect(run2.laid.hits).toHaveLength(2);

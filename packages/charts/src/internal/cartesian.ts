@@ -7,13 +7,26 @@
  * where they sit.
  */
 
-import type { AxisModel, AxisSpec, BlockAttrs, Channel, ChannelName, Column, Rect, Scale } from '@mdv/core';
+import type {
+  AxisModel,
+  AxisSpec,
+  BlockAttrs,
+  Channel,
+  ChannelName,
+  Column,
+  Rect,
+  Scale,
+} from '@mdv/core';
 import { channelFormat, channelTitle } from './table.js';
 import { finite } from './num.js';
 import { setScaleRange } from './scale.js';
 
 /** The author's axis request for one channel, or `false` to suppress the axis. */
-export function axisSpecFor(attrs: BlockAttrs, channel: ChannelName, binding: Channel | undefined): AxisSpec | false {
+export function axisSpecFor(
+  attrs: BlockAttrs,
+  channel: ChannelName,
+  binding: Channel | undefined,
+): AxisSpec | false {
   const fromChannel = binding?.axis;
   if (fromChannel === false) return false;
   const axes = attrs.axis;
@@ -47,8 +60,10 @@ export interface AxisRequest {
 export function makeAxis(request: AxisRequest): AxisModel | undefined {
   if (request.spec === false) return undefined;
   const spec = request.spec;
-  const title = spec.title !== undefined ? spec.title : channelTitle(request.binding, request.column);
-  const format = request.formatOverride ?? spec.format ?? channelFormat(request.binding, request.column);
+  const title =
+    spec.title !== undefined ? spec.title : channelTitle(request.binding, request.column);
+  const format =
+    request.formatOverride ?? spec.format ?? channelFormat(request.binding, request.column);
   const axis: AxisModel = {
     channel: request.channel,
     position: spec.position ?? request.position,
@@ -72,7 +87,11 @@ export function makeAxis(request: AxisRequest): AxisModel | undefined {
  * Getting this backwards is the classic upside-down chart, so it happens in one
  * place for every type.
  */
-export function rangeToFrame(frame: Rect, horizontal: Scale | undefined, vertical: Scale | undefined): void {
+export function rangeToFrame(
+  frame: Rect,
+  horizontal: Scale | undefined,
+  vertical: Scale | undefined,
+): void {
   const x = finite(frame.x, 0);
   const y = finite(frame.y, 0);
   const width = Math.max(0, finite(frame.width, 0));

@@ -40,10 +40,23 @@ import type { SortMode } from './internal/types.js';
 import { SORT_MODES } from './internal/types.js';
 import { arcPath, polar, px } from './internal/geometry.js';
 import { blockDiagnostic, missingChannel, unknownEnum } from './internal/diagnostics.js';
-import { buildA11yTable, composeDescription, countPhrase, presentationOf, viewColumn } from './internal/a11y.js';
+import {
+  buildA11yTable,
+  composeDescription,
+  countPhrase,
+  presentationOf,
+  viewColumn,
+} from './internal/a11y.js';
 import { buildLegend } from './internal/series.js';
 import { clamp, compareNumbers, finite, sum as sumOf } from './internal/num.js';
-import { enumAttr, fractionOrPxAttr, numberAttr, rawAttr, recordAttr, stringAttr } from './internal/attrs.js';
+import {
+  enumAttr,
+  fractionOrPxAttr,
+  numberAttr,
+  rawAttr,
+  recordAttr,
+  stringAttr,
+} from './internal/attrs.js';
 import { expandTemplate, formatNumber } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
 import { labelFont, seriesFill, solid } from './internal/paint.js';
@@ -115,8 +128,20 @@ const CHANNELS: readonly ChannelSpec[] = [
     defaultScale: 'linear',
     doc: 'The magnitude each slice encodes. Also accepted as `y`.',
   },
-  { name: 'color', required: false, accepts: ['string', 'category'], constant: true, doc: 'Fixed color or color field.' },
-  { name: 'tooltip', required: false, accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'], list: true, doc: 'Extra readout fields.' },
+  {
+    name: 'color',
+    required: false,
+    accepts: ['string', 'category'],
+    constant: true,
+    doc: 'Fixed color or color field.',
+  },
+  {
+    name: 'tooltip',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'],
+    list: true,
+    doc: 'Extra readout fields.',
+  },
 ];
 
 /** Build one of the two pie-family types. */
@@ -128,7 +153,14 @@ function createPieType(name: 'pie' | 'donut', defaultInner: number): ChartType<A
     family: 'mark',
     channels: CHANNELS,
     defaultEncoding: {},
-    defaults: { innerRadius: defaultInner, padAngle: 1, sort: 'desc', startAngle: -90, label: 'auto', other: 0.02 },
+    defaults: {
+      innerRadius: defaultInner,
+      padAngle: 1,
+      sort: 'desc',
+      startAngle: -90,
+      label: 'auto',
+      other: 0.02,
+    },
     schemaId: `https://mdv.dev/schema/1.0/block/${name}.json`,
     minWidth: 240,
 
@@ -139,7 +171,10 @@ function createPieType(name: 'pie' | 'donut', defaultInner: number): ChartType<A
 
       if (categoryChannel?.field === undefined) {
         diagnostics.push(missingChannel(block, 'category', 'the identity of each slice'));
-      } else if (findColumn(table, categoryChannel.field) === undefined && table.fields.length > 0) {
+      } else if (
+        findColumn(table, categoryChannel.field) === undefined &&
+        table.fields.length > 0
+      ) {
         diagnostics.push(
           blockDiagnostic(
             'MDV3000',
@@ -185,14 +220,18 @@ function createPieType(name: 'pie' | 'donut', defaultInner: number): ChartType<A
 
     describe(input: DescribeInput<ArcMark>): string {
       const { encoded } = input;
-      if (encoded.marks.length === 0) return `${name === 'donut' ? 'Donut' : 'Pie'} chart with no data.`;
+      if (encoded.marks.length === 0)
+        return `${name === 'donut' ? 'Donut' : 'Pie'} chart with no data.`;
       const largest = [...encoded.marks].sort((a, b) => compareNumbers(b.fraction, a.fraction))[0];
       const categoryChannel = firstChannelOf(input.block.encoding, ['category', 'x', 'label']);
       const categoryColumn = findColumn(input.table, categoryChannel?.field)?.column;
       // The measure is the `value` column, not `series[0].source` — for a pie
       // the series identity *is* the category, so reading the source here would
       // describe "revenue by quarter" as "quarter by quarter".
-      const valueColumn = findColumn(input.table, firstChannelOf(input.block.encoding, ['value', 'y'])?.field)?.column;
+      const valueColumn = findColumn(
+        input.table,
+        firstChannelOf(input.block.encoding, ['value', 'y'])?.field,
+      )?.column;
       const measure = valueColumn === undefined ? 'Share' : humaniseColumn(valueColumn);
 
       return composeDescription({
@@ -203,7 +242,9 @@ function createPieType(name: 'pie' | 'donut', defaultInner: number): ChartType<A
         scope: countPhrase(encoded.marks.length, 'slice'),
         ...(largest === undefined
           ? {}
-          : { extreme: `Largest: ${largest.category} at ${formatNumber(largest.fraction, '.0%')}` }),
+          : {
+              extreme: `Largest: ${largest.category} at ${formatNumber(largest.fraction, '.0%')}`,
+            }),
       });
     },
   };
@@ -217,11 +258,24 @@ function encodePie(input: EncodeInput, defaultInner: number): EncodeResult<ArcMa
   const categoryBound = bindField(table, categoryChannel);
   const valueBound = bindField(table, valueChannel);
 
-  const report = (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
-    input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
-  };
-  const sortMode: SortMode = enumAttr(attrs, 'sort', SORT_MODES, 'desc', report('sort', SORT_MODES, 'desc'));
-  const labelMode: LabelMode = enumAttr(attrs, 'label', LABEL_MODES, 'auto', report('label', LABEL_MODES, 'auto'));
+  const report =
+    (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
+      input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
+    };
+  const sortMode: SortMode = enumAttr(
+    attrs,
+    'sort',
+    SORT_MODES,
+    'desc',
+    report('sort', SORT_MODES, 'desc'),
+  );
+  const labelMode: LabelMode = enumAttr(
+    attrs,
+    'label',
+    LABEL_MODES,
+    'auto',
+    report('label', LABEL_MODES, 'auto'),
+  );
   const padAngleDegrees = numberAttr(attrs, 'padAngle', 1, 0, 30);
   const startAngleDegrees = numberAttr(attrs, 'startAngle', -90);
   const otherRaw = rawAttr(attrs, 'other');
@@ -386,7 +440,9 @@ function encodePie(input: EncodeInput, defaultInner: number): EncodeResult<ArcMa
     axes: [],
     a11yTable: buildA11yTable(
       table,
-      [viewColumn(categoryBound), viewColumn(valueBound)].filter((c): c is NonNullable<typeof c> => c !== undefined),
+      [viewColumn(categoryBound), viewColumn(valueBound)].filter(
+        (c): c is NonNullable<typeof c> => c !== undefined,
+      ),
       attrs.title ?? attrs.caption ?? 'Chart data',
       presentationOf(attrs),
     ),
@@ -428,7 +484,8 @@ function readCenter(
   if (typeof record['title'] === 'string') out.title = record['title'];
   const value = record['value'];
   if (typeof value === 'number') out.value = formatNumber(value, format);
-  else if (typeof value === 'string') out.value = evaluateAggregate(value, input, valueColumn, total, format);
+  else if (typeof value === 'string')
+    out.value = evaluateAggregate(value, input, valueColumn, total, format);
   return out;
 }
 
@@ -469,7 +526,11 @@ function evaluateAggregate(
 }
 
 /** Shared layout for `pie` and `donut`. */
-function layoutPie(encoded: EncodeResult<ArcMark>, frame: Rect, ctx: LayoutContext): ChartLayoutResult {
+function layoutPie(
+  encoded: EncodeResult<ArcMark>,
+  frame: Rect,
+  ctx: LayoutContext,
+): ChartLayoutResult {
   const plan = planOf<ArcMark, PiePlan>(encoded, DEFAULT_PLAN);
   const nodes: SceneNode[] = [];
   const hits: ChartHitRegion[] = [];

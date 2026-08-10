@@ -187,11 +187,7 @@ export function clampingMap(after: MdvDocument): PointMap {
  * Map a whole selection, falling back to normalisation for any endpoint the map
  * cannot place. The result is always valid for `after`.
  */
-export function mapSelection(
-  after: MdvDocument,
-  selection: Selection,
-  map: PointMap,
-): Selection {
+export function mapSelection(after: MdvDocument, selection: Selection, map: PointMap): Selection {
   if (selection.kind !== 'text') return normalizeSelection(after, selection);
   const anchor = map(selection.anchor);
   const focus = map(selection.focus);

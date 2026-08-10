@@ -24,7 +24,12 @@ import type {
   ResolvedBlock,
   Table,
 } from '@mdv/core';
-import { LINE_CHANNELS, describeLineArea, encodeLineArea, layoutLineArea } from './internal/line-area.js';
+import {
+  LINE_CHANNELS,
+  describeLineArea,
+  encodeLineArea,
+  layoutLineArea,
+} from './internal/line-area.js';
 import { findColumn, firstChannel, humaniseColumn } from './internal/table.js';
 import { validateLineLike } from './line.js';
 
@@ -54,7 +59,11 @@ export const areaChart: ChartType<LineMark> = {
   describe(input: DescribeInput<LineMark>): string {
     const xChannel = firstChannel(input.block.encoding, 'x');
     const xColumn = findColumn(input.table, xChannel?.field)?.column;
-    return describeLineArea('Area chart', input.encoded, xColumn === undefined ? undefined : humaniseColumn(xColumn));
+    return describeLineArea(
+      'Area chart',
+      input.encoded,
+      xColumn === undefined ? undefined : humaniseColumn(xColumn),
+    );
   },
 };
 

@@ -148,17 +148,35 @@ export const LINE_CHANNELS: readonly ChannelSpec[] = [
     defaultScale: 'ordinal',
     doc: 'Long-form alternative to a list-valued y.',
   },
-  { name: 'color', required: false, accepts: ['string', 'category'], constant: true, doc: 'Fixed color or color field.' },
-  { name: 'label', required: false, accepts: ['string', 'number', 'integer', 'category'], doc: 'Direct labels.' },
-  { name: 'tooltip', required: false, accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'], list: true, doc: 'Extra readout fields.' },
+  {
+    name: 'color',
+    required: false,
+    accepts: ['string', 'category'],
+    constant: true,
+    doc: 'Fixed color or color field.',
+  },
+  {
+    name: 'label',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category'],
+    doc: 'Direct labels.',
+  },
+  {
+    name: 'tooltip',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'],
+    list: true,
+    doc: 'Extra readout fields.',
+  },
 ];
 
 /** Read the attributes of SPEC 8.3 / 8.4. */
 function readAttrs(input: EncodeInput, mode: 'line' | 'area', seriesCount: number) {
   const { attrs, block, theme } = input;
-  const report = (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
-    input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
-  };
+  const report =
+    (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
+      input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
+    };
   // Area stacks by default beyond one series: three translucent fills over one
   // another are unreadable (SPEC 8.4).
   const stackDefault: StackMode = mode === 'area' && seriesCount > 1 ? 'normal' : 'none';
@@ -169,18 +187,47 @@ function readAttrs(input: EncodeInput, mode: 'line' | 'area', seriesCount: numbe
   let labelPolicy: 'none' | 'end' | 'extremes' = 'none';
   if (labelRequest?.kind === 'bool') labelPolicy = labelRequest.value ? 'end' : 'none';
   else if (labelRequest?.kind === 'string') {
-    labelPolicy = labelRequest.value === 'end' ? 'end' : labelRequest.value === 'extremes' ? 'extremes' : 'none';
+    labelPolicy =
+      labelRequest.value === 'end'
+        ? 'end'
+        : labelRequest.value === 'extremes'
+          ? 'extremes'
+          : 'none';
   }
 
   return {
     curve: enumAttr(attrs, 'curve', CURVE_KINDS, 'linear', report('curve', CURVE_KINDS, 'linear')),
     strokeWidth: numberAttr(attrs, 'strokeWidth', theme.marks.line.width, 0.5, 24),
     dash: dashRaw.length > 0 ? dashRaw : undefined,
-    points: enumAttr(attrs, 'points', POINT_POLICIES, 'none', report('points', POINT_POLICIES, 'none')),
+    points: enumAttr(
+      attrs,
+      'points',
+      POINT_POLICIES,
+      'none',
+      report('points', POINT_POLICIES, 'none'),
+    ),
     // Markers are ≥ 8 px in diameter — an 8 px dot is the floor, not a default.
-    pointSize: numberAttr(attrs, 'pointSize', theme.marks.marker.minDiameter, theme.marks.marker.minDiameter, 64),
-    nullPolicy: enumAttr(attrs, 'nullPolicy', NULL_POLICIES, 'gap', report('nullPolicy', NULL_POLICIES, 'gap')),
-    stack: enumAttr(attrs, 'stack', STACK_MODES, stackDefault, report('stack', STACK_MODES, stackDefault)),
+    pointSize: numberAttr(
+      attrs,
+      'pointSize',
+      theme.marks.marker.minDiameter,
+      theme.marks.marker.minDiameter,
+      64,
+    ),
+    nullPolicy: enumAttr(
+      attrs,
+      'nullPolicy',
+      NULL_POLICIES,
+      'gap',
+      report('nullPolicy', NULL_POLICIES, 'gap'),
+    ),
+    stack: enumAttr(
+      attrs,
+      'stack',
+      STACK_MODES,
+      stackDefault,
+      report('stack', STACK_MODES, stackDefault),
+    ),
     fillOpacity: numberAttr(attrs, 'fillOpacity', theme.marks.area.fillOpacity, 0, 1),
     drawLine: attrs['line'] === false ? false : true,
     labelPolicy,
@@ -206,7 +253,12 @@ export function encodeLineArea(input: EncodeInput, mode: 'line' | 'area'): Encod
   }
   if (resolution.folded) {
     input.diagnostic(
-      blockDiagnostic('MDV3062', block, 'encode', 'More series than palette slots; the surplus folded into "Other"'),
+      blockDiagnostic(
+        'MDV3062',
+        block,
+        'encode',
+        'More series than palette slots; the surplus folded into "Other"',
+      ),
     );
   }
 
@@ -221,10 +273,12 @@ export function encodeLineArea(input: EncodeInput, mode: 'line' | 'area'): Encod
   const continuous = temporal || isQuantitative(xType);
 
   // ── Collect each series' points ────────────────────────────────────────────
-  const raw: { descriptor: SeriesDescriptor; points: SeriesPoint[] }[] = resolution.plans.map((plan) => ({
-    descriptor: plan.descriptor,
-    points: [],
-  }));
+  const raw: { descriptor: SeriesDescriptor; points: SeriesPoint[] }[] = resolution.plans.map(
+    (plan) => ({
+      descriptor: plan.descriptor,
+      points: [],
+    }),
+  );
   let categoryOrder: ScaleInput[] = [];
   const categorySeen = new Set<string>();
 
@@ -330,7 +384,13 @@ export function encodeLineArea(input: EncodeInput, mode: 'line' | 'area'): Encod
   }
 
   // ── Scales ─────────────────────────────────────────────────────────────────
-  const xScale = buildXScale(xChannel?.scale?.type, temporal, continuous, categoryOrder, xBound.column.format);
+  const xScale = buildXScale(
+    xChannel?.scale?.type,
+    temporal,
+    continuous,
+    categoryOrder,
+    xBound.column.format,
+  );
   const yScaleType = resolveScaleType(yChannel, 'linear');
   const yScale = createContinuousScale(yScaleType === 'log' ? 'log' : yScaleType, {
     domain: domainResult.domain,
@@ -373,7 +433,9 @@ export function encodeLineArea(input: EncodeInput, mode: 'line' | 'area'): Encod
     };
     if (mode === 'area') {
       mark.fill = true;
-      mark.baseline = stacked ? 0 : Math.max(domainResult.domain[0], Math.min(0, domainResult.domain[1]));
+      mark.baseline = stacked
+        ? 0
+        : Math.max(domainResult.domain[0], Math.min(0, domainResult.domain[1]));
     }
     return mark;
   });
@@ -474,7 +536,9 @@ function buildXScale(
   if (requested === 'point' || (!continuous && !temporal)) {
     return createPointScale({ domain: categories, ...(format === undefined ? {} : { format }) });
   }
-  const numeric = categories.map((value) => toNumeric(value)).filter((value): value is number => value !== undefined);
+  const numeric = categories
+    .map((value) => toNumeric(value))
+    .filter((value): value is number => value !== undefined);
   const extent = extentOf(numeric) ?? [0, 1];
   if (temporal) {
     return createTimeScale({
@@ -505,7 +569,8 @@ export function layoutLineArea(
 
   const xScale = encoded.scales.x;
   const yScale = encoded.scales.y;
-  if (xScale === undefined || yScale === undefined || isDegenerateFrame(frame)) return { nodes, hits };
+  if (xScale === undefined || yScale === undefined || isDegenerateFrame(frame))
+    return { nodes, hits };
   rangeToFrame(frame, xScale, yScale);
 
   const theme = ctx.theme;
@@ -531,7 +596,9 @@ export function layoutLineArea(
     const runs = splitRuns(geometry.points);
 
     for (const run of runs) {
-      const projected = run.map(project).filter((p): p is { top: Point; base: Point } => p !== undefined);
+      const projected = run
+        .map(project)
+        .filter((p): p is { top: Point; base: Point } => p !== undefined);
       if (projected.length === 0) continue;
       const upper = projected.map((p) => p.top);
 
@@ -552,7 +619,12 @@ export function layoutLineArea(
       if (plan.mode === 'line' || plan.drawLine) {
         const d = curvePath(upper, plan.curve);
         if (d.length > 0) {
-          const stroke: Stroke = lineStroke(theme, geometry.descriptor.color, plan.strokeWidth, plan.dash);
+          const stroke: Stroke = lineStroke(
+            theme,
+            geometry.descriptor.color,
+            plan.strokeWidth,
+            plan.dash,
+          );
           strokes.push({ kind: 'path', cls: 'mdv-mark mdv-mark-line', d, stroke });
         }
       }
@@ -724,7 +796,12 @@ function emptyResult(
       y: createContinuousScale('linear', { domain: [0, 1] }),
     },
     axes: [],
-    a11yTable: buildA11yTable(input.table, [], input.attrs.title ?? 'Chart data', presentationOf(input.attrs)),
+    a11yTable: buildA11yTable(
+      input.table,
+      [],
+      input.attrs.title ?? 'Chart data',
+      presentationOf(input.attrs),
+    ),
     state: { ...DEFAULT_PLAN, mode, curve: options.curve, points: options.points },
   };
 }
@@ -736,11 +813,15 @@ export function describeLineArea(
   xTitle: string | undefined,
 ): string {
   const plan = planOf<LineMark, LineAreaPlan>(encoded, DEFAULT_PLAN);
-  const pointCount = plan.series.reduce((total, s) => total + s.points.filter((p) => p.y !== null).length, 0);
+  const pointCount = plan.series.reduce(
+    (total, s) => total + s.points.filter((p) => p.y !== null).length,
+    0,
+  );
   if (pointCount === 0) return `${kind} with no data.`;
 
   const yScale = encoded.scales.y;
-  const format = (value: number): string => (yScale === undefined ? formatNumber(value) : yScale.format(value));
+  const format = (value: number): string =>
+    yScale === undefined ? formatNumber(value) : yScale.format(value);
   const xScale = encoded.scales.x;
 
   let low: { value: number; x: ScaleInput } | undefined;
@@ -753,18 +834,21 @@ export function describeLineArea(
       if (high === undefined || value > high.value) high = { value, x: point.x };
     }
   }
-  const at = (value: ScaleInput): string => (xScale === undefined ? String(value) : xScale.format(value));
+  const at = (value: ScaleInput): string =>
+    xScale === undefined ? String(value) : xScale.format(value);
   const seriesCount = encoded.series.filter((s) => s.id !== '').length;
   const scope: string[] = [];
   if (seriesCount > 1) scope.push(`${seriesCount} series`);
   scope.push(`${pointCount} point${pointCount === 1 ? '' : 's'}`);
 
   const sentences = [`${kind}.`];
-  if (xTitle !== undefined && xTitle !== '') sentences.push(`Plotted over ${xTitle.toLowerCase()}, ${scope.join(', ')}.`);
+  if (xTitle !== undefined && xTitle !== '')
+    sentences.push(`Plotted over ${xTitle.toLowerCase()}, ${scope.join(', ')}.`);
   else sentences.push(`${scope.join(', ')}.`);
   if (low !== undefined && high !== undefined) {
-    sentences.push(`Values range from ${format(low.value)} at ${at(low.x)} to ${format(high.value)} at ${at(high.x)}.`);
+    sentences.push(
+      `Values range from ${format(low.value)} at ${at(low.x)} to ${format(high.value)} at ${at(high.x)}.`,
+    );
   }
   return sentences.join(' ');
 }
-

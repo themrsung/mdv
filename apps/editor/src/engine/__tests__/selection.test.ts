@@ -18,8 +18,25 @@ import { describe, expect, it } from 'vitest';
 
 import { deleteBackward, insertText, mergeBackward, splitBlock } from '../commands/index.js';
 import { MappingBuilder, mapSelection } from '../mapping.js';
-import { caret, isCollapsed, isNormalized, normalizeSelection, orderedPoints, point, range } from '../selection.js';
-import { absoluteOf, at, blockAt, caretAt, editorFor, inCell, rangeAcross, rangeIn } from './helpers.js';
+import {
+  caret,
+  isCollapsed,
+  isNormalized,
+  normalizeSelection,
+  orderedPoints,
+  point,
+  range,
+} from '../selection.js';
+import {
+  absoluteOf,
+  at,
+  blockAt,
+  caretAt,
+  editorFor,
+  inCell,
+  rangeAcross,
+  rangeIn,
+} from './helpers.js';
 
 describe('normalisation', () => {
   it('clamps an offset past the end of a block', () => {

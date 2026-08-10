@@ -16,7 +16,8 @@ import type { Dirent } from 'node:fs';
 import { access, mkdir, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve as resolvePath, sep } from 'node:path';
 
-import { CliError, errorText, ioError } from './exit.js';
+import type { CliError } from './exit.js';
+import { errorText, ioError } from './exit.js';
 
 /** Injected process surface, so `run` is a pure-ish function under test. */
 export interface CliIo {

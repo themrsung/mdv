@@ -113,6 +113,44 @@ function alignClass(align: unknown): string | undefined {
   return undefined;
 }
 
+/** One attribute of a directive, as a string. Absent beats malformed. */
+function attr(node: MdastNode, key: string): string | undefined {
+  const attrs = node['attrs'];
+  if (typeof attrs !== 'object' || attrs === null) return undefined;
+  const value = (attrs as Record<string, unknown>)[key];
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  return undefined;
+}
+
+/** An attribute restricted to a closed set; anything else is ignored (SPEC 15.2). */
+function oneOf(value: string | undefined, allowed: readonly string[]): string | undefined {
+  return value !== undefined && allowed.includes(value) ? value : undefined;
+}
+
+/**
+ * `:::mdv-page` — a marker with no visuals of its own (SPEC 28.4).
+ *
+ * A screen has no pages, so an embedded document must not grow a rule the
+ * embedder never asked for. What survives is the *intent*, in attributes a host
+ * stylesheet can act on, and — under `@media print` — the CSS fragmentation
+ * properties they map to, so printing the HTML agrees with exporting the PDF.
+ * In the wrapping form the children render inside the marker, which is what
+ * makes `break=avoid` expressible as `break-inside: avoid`.
+ */
+function pageBreak(ctx: MarkdownContext, node: MdastNode, key: string): ReactElement {
+  const props: Record<string, unknown> = { key, className: 'mdv-page-break' };
+  const kind = oneOf(attr(node, 'break'), ['before', 'after', 'avoid']);
+  const orientation = oneOf(attr(node, 'orientation'), ['portrait', 'landscape']);
+  const size = attr(node, 'size');
+  if (kind !== undefined) props['data-mdv-break'] = kind;
+  if (orientation !== undefined) props['data-mdv-orientation'] = orientation;
+  if (size !== undefined) props['data-mdv-size'] = size;
+  const children = kids(node);
+  if (children.length === 0) return host(ctx, 'div', props, null);
+  return host(ctx, 'div', props, renderChildren(ctx, node, key));
+}
+
 /** Render a node's children as a fragment-safe array. */
 function renderChildren(ctx: MarkdownContext, node: MdastNode, prefix: string): ReactNode[] {
   const out: ReactNode[] = [];
@@ -139,6 +177,7 @@ export function renderNode(ctx: MarkdownContext, node: MdastNode, key: string): 
     case 'mdvError':
       return ctx.renderError(node, key);
     case 'mdvDirective':
+      if (str(node, 'name') === 'mdv-page') return pageBreak(ctx, node, key);
       // An unknown directive renders its content as ordinary content and is an
       // info diagnostic, never an error (SPEC 15.2).
       return createElement(Fragment, { key }, ...renderChildren(ctx, node, key));

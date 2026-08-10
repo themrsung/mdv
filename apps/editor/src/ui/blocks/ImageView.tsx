@@ -85,7 +85,10 @@ function ImageViewImpl({ block, selected, align, onAlign }: ImageViewProps): Rea
 
   return (
     <div className={`mdv-image mdv-image--${align}`} ref={wrapper}>
-      <figure className="mdv-image__frame" style={shownWidth === null ? undefined : { width: `${String(shownWidth)}px` }}>
+      <figure
+        className="mdv-image__frame"
+        style={shownWidth === null ? undefined : { width: `${String(shownWidth)}px` }}
+      >
         {failed ? (
           <div className="mdv-image__broken">Image has no source.</div>
         ) : (

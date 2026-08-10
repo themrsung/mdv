@@ -24,7 +24,13 @@ describe('sha384', () => {
 
   it('matches the two-block vector', () => {
     expect(
-      hex(sha384(utf8('abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu'))),
+      hex(
+        sha384(
+          utf8(
+            'abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu',
+          ),
+        ),
+      ),
     ).toBe(
       '09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039',
     );

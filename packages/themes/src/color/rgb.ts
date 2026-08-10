@@ -138,7 +138,7 @@ export function parseColor(input: string): Rgb {
     }
     case 'hsl':
     case 'hsla': {
-      const h = ((((angle(p0, input) % 360) + 360) % 360) / 360);
+      const h = (((angle(p0, input) % 360) + 360) % 360) / 360;
       const sat = clamp01(scalar(p1, 1, input) / (p1.endsWith('%') ? 1 : 100));
       const l = clamp01(scalar(p2, 1, input) / (p2.endsWith('%') ? 1 : 100));
       if (sat === 0) return { r: l, g: l, b: l, a };
@@ -272,7 +272,12 @@ export function over(fg: Rgb, bg: Rgb): Rgb {
   const a = fg.a;
   const mix = (f: number, b: number): number =>
     encodeGamma(decodeGamma(f) * a + decodeGamma(b) * (1 - a));
-  return { r: clamp01(mix(fg.r, bg.r)), g: clamp01(mix(fg.g, bg.g)), b: clamp01(mix(fg.b, bg.b)), a: 1 };
+  return {
+    r: clamp01(mix(fg.r, bg.r)),
+    g: clamp01(mix(fg.g, bg.g)),
+    b: clamp01(mix(fg.b, bg.b)),
+    a: 1,
+  };
 }
 
 /** True when every channel is inside `0…1` — i.e. the color is inside the sRGB gamut. */

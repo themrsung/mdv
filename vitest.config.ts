@@ -47,6 +47,11 @@ export default defineConfig({
       'packages/*/src/**/*.test.ts',
       'apps/*/test/**/*.test.ts',
       'apps/*/test/**/*.test.tsx',
+      // The editor's tests live beside the modules they specify, not in a
+      // top-level `test/` dir. Without these two globs the whole of
+      // `apps/editor` (530 tests) is silently absent from the root run.
+      'apps/*/src/**/__tests__/**/*.test.ts',
+      'apps/*/src/**/__tests__/**/*.test.tsx',
     ],
     exclude: ['**/node_modules/**', '**/dist/**', '**/coverage/**', 'packages/spec/tests/**'],
     coverage: {

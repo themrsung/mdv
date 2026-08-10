@@ -217,6 +217,12 @@ interface Atom {
   keepWithNext: boolean;
   breakBefore: boolean;
   breakAfter: boolean;
+  /**
+   * The `:::mdv-page{break=avoid}` wrapper this atom came from, if any. Atoms
+   * sharing one are welded into a keep-chain; the name survives onto the chain
+   * so a refused keep can be reported as `MDV5121` against the right wrapper.
+   */
+  keep: string | undefined;
   /** A `:::mdv-page` geometry change, applied to the page this atom opens. */
   geometry: { orientation?: 'portrait' | 'landscape'; size?: string } | undefined;
   /** Footnote identifiers referenced by this atom. */
@@ -243,6 +249,7 @@ function atom(partial: Partial<Atom> & { heightPt: number; draw: DrawFn }): Atom
     keepWithNext: false,
     breakBefore: false,
     breakAfter: false,
+    keep: undefined,
     geometry: undefined,
     noteIds: [],
     anchor: undefined,
@@ -328,6 +335,7 @@ class Paginator {
   readonly #outline: OutlineEntry[] = [];
   readonly #destinations = new Map<string, Destination>();
   readonly #diagnostics: Diagnostic[] = [];
+  readonly #keepsSplit = new Set<string>();
   readonly #noteCache = new Map<string, { atoms: Atom[]; heightPt: number }>();
   readonly #notesById = new Map<string, FlowNote>();
 
@@ -432,17 +440,20 @@ class Paginator {
     const width = this.#page.box.widthPt - this.#page.margins.leftPt - this.#page.margins.rightPt;
     const top = this.#page.box.heightPt - this.#page.margins.bottomPt - this.#page.notesHeight;
     this.#page.elements.push(
-      element([], [
-        {
-          kind: 'rule',
-          x1Pt: x,
-          y1Pt: top + style.footnoteGapPt / 2,
-          x2Pt: x + Math.min(width, 144),
-          y2Pt: top + style.footnoteGapPt / 2,
-          color: style.colors.border,
-          widthPt: 0.5,
-        },
-      ]),
+      element(
+        [],
+        [
+          {
+            kind: 'rule',
+            x1Pt: x,
+            y1Pt: top + style.footnoteGapPt / 2,
+            x2Pt: x + Math.min(width, 144),
+            y2Pt: top + style.footnoteGapPt / 2,
+            color: style.colors.border,
+            widthPt: 0.5,
+          },
+        ],
+      ),
     );
     let y = top + style.footnoteGapPt;
     for (const id of this.#page.notes) {
@@ -475,9 +486,7 @@ class Paginator {
           atoms.push(
             atom({
               heightPt: line.heightPt,
-              draw: (x, y) => [
-                element([tag], [{ kind: 'text', xPt: x + indent, yPt: y, line }]),
-              ],
+              draw: (x, y) => [element([tag], [{ kind: 'text', xPt: x + indent, yPt: y, line }])],
             }),
           );
         }
@@ -607,9 +616,25 @@ class Paginator {
       return;
     }
     if (this.#rotateChain(chain)) return;
-    // Nothing fits and nothing can shrink: place it and let it break.
+    // Nothing fits and nothing can shrink: place it and let it break. A
+    // `break=avoid` is a request, not a guarantee (SPEC 28.3 rule 7), so
+    // refusing one is a warning rather than a failed export.
+    this.#reportKeepSplit(chain);
     if (!this.#isEmpty()) this.#breakPage();
     this.#placeAll(chain);
+  }
+
+  /** Warn once per `:::mdv-page{break=avoid}` the paginator could not honour. */
+  #reportKeepSplit(chain: readonly Atom[]): void {
+    for (const a of chain) {
+      if (a.keep === undefined || this.#keepsSplit.has(a.keep)) continue;
+      this.#keepsSplit.add(a.keep);
+      this.#diagnostics.push(
+        renderDiagnostic('MDV5121', {
+          detail: 'The content is taller than one page, so the break was taken inside it.',
+        }),
+      );
+    }
   }
 
   /** Ask the visual atom in a chain to shrink into `heightAvail`. */
@@ -681,18 +706,22 @@ class Paginator {
         const item = items[cursor];
         cursor += 1;
         if (item === undefined) continue;
-        const produced = [...this.#atomsFor(item)];
+        const produced =
+          item.keep === undefined
+            ? [...this.#atomsFor(item)]
+            : [...this.#atomsFor(item)].map((a) => ({ ...a, keep: item.keep }));
         // SPEC 28.3 rule 2: a figure and its caption are one unit. The flow
         // stamps the members of an `mdv-figure` with a shared `group`; welding
         // the last atom of each member to whatever follows is what makes the
-        // boundary between them unbreakable.
+        // boundary between them unbreakable. Rule 7 works the same way, one
+        // level out: `:::mdv-page{break=avoid}` stamps a shared `keep`.
         const next = items[cursor];
         const last = produced[produced.length - 1];
         if (
           last !== undefined &&
-          item.group !== undefined &&
           next !== undefined &&
-          next.group === item.group
+          ((item.group !== undefined && next.group === item.group) ||
+            (item.keep !== undefined && next.keep === item.keep))
         ) {
           produced[produced.length - 1] = { ...last, keepWithNext: true };
         }
@@ -721,6 +750,11 @@ class Paginator {
         if (next === undefined || next.breakBefore || next.geometry !== undefined) break;
         chain.push(next);
         queue.shift();
+      }
+      // Truncating at the guard is itself a refused keep, and the tail is about
+      // to be laid out as if the wrapper had never asked.
+      if (chain.length === MAX_CHAIN && (chain[chain.length - 1] as Atom).keepWithNext) {
+        this.#reportKeepSplit(chain);
       }
 
       this.#placeChain(chain);
@@ -768,7 +802,12 @@ class Paginator {
     this.#page.frontMatter = true;
 
     const style = this.#style;
-    const titleLines = layoutRuns([{ text: toc.title }], this.columnWidth, style.tocTitle, this.#metrics);
+    const titleLines = layoutRuns(
+      [{ text: toc.title }],
+      this.columnWidth,
+      style.tocTitle,
+      this.#metrics,
+    );
     const titleTag = `H1@${this.#nextKey()}`;
     for (let i = 0; i < titleLines.length; i += 1) {
       const line = titleLines[i];
@@ -825,7 +864,9 @@ class Paginator {
     return atom({
       heightPt: line.heightPt,
       spaceBeforePt: entry.level === 1 ? this.#style.listGapPt : 0,
-      draw: (x, y) => [element(['TOC@toc', tag], [{ kind: 'text', xPt: x + indent, yPt: y, line }])],
+      draw: (x, y) => [
+        element(['TOC@toc', tag], [{ kind: 'text', xPt: x + indent, yPt: y, line }]),
+      ],
     });
   }
 
@@ -871,8 +912,7 @@ class Paginator {
   #trackRuns(item: FlowItem): void {
     if (item.quoteDepth > 0 && this.#prevQuoteDepth === 0) this.#quoteRun += 1;
     this.#prevQuoteDepth = item.quoteDepth;
-    const isList =
-      item.kind === 'paragraph' && (item.role === 'listItem' || item.indent > 0);
+    const isList = item.kind === 'paragraph' && (item.role === 'listItem' || item.indent > 0);
     if (isList && !this.#prevList) this.#listRun += 1;
     this.#prevList = isList;
   }
@@ -949,9 +989,7 @@ class Paginator {
       baselinePt: style.sizePt * style.lineHeight * 0.78,
     };
     const lines =
-      item.runs.length === 0
-        ? [emptyLine]
-        : layoutRuns(item.runs, width, style, this.#metrics);
+      item.runs.length === 0 ? [emptyLine] : layoutRuns(item.runs, width, style, this.#metrics);
     const markerWidth =
       item.marker === undefined
         ? 0
@@ -1122,17 +1160,20 @@ class Paginator {
       heightPt: gap,
       spaceBeforePt: gap,
       draw: (x, y, w) => [
-        element([], [
-          {
-            kind: 'rule',
-            x1Pt: x,
-            y1Pt: y + gap / 2,
-            x2Pt: x + w,
-            y2Pt: y + gap / 2,
-            color: this.#style.colors.border,
-            widthPt: 0.5,
-          },
-        ]),
+        element(
+          [],
+          [
+            {
+              kind: 'rule',
+              x1Pt: x,
+              y1Pt: y + gap / 2,
+              x2Pt: x + w,
+              y2Pt: y + gap / 2,
+              color: this.#style.colors.border,
+              widthPt: 0.5,
+            },
+          ],
+        ),
       ],
     });
   }
@@ -1149,7 +1190,8 @@ class Paginator {
       heightPt: 0,
       // `break=avoid` asks *not* to break here, which for a control that draws
       // nothing means: do nothing at all.
-      breakBefore: item.breakKind === 'before' || (item.breakKind === undefined && geometry !== undefined),
+      breakBefore:
+        item.breakKind === 'before' || (item.breakKind === undefined && geometry !== undefined),
       breakAfter: item.breakKind === 'after',
       geometry,
       draw: () => [],
@@ -1393,7 +1435,6 @@ class Paginator {
     const heightPt = pxToPt(scene.height) * scale;
     const alt = sceneAlt(scene, item.block);
     const authorScale = item.scale ?? 1;
-    const self = this;
 
     return atom({
       heightPt,
@@ -1405,16 +1446,17 @@ class Paginator {
       keepWithNext: item.breakAvoid || item.keepWithNext,
       anchor: item.anchor,
       anchorLabel: item.label,
-      refit(heightAvailPt: number, availableWidthPt: number): Atom | undefined {
+      // Arrows, not shorthand methods: these close over the pager, not the atom.
+      refit: (heightAvailPt: number, availableWidthPt: number): Atom | undefined => {
         if (heightAvailPt >= heightPt) return undefined;
         const unscaled = heightPt / scale;
         if (unscaled <= 0) return undefined;
         const target = Math.min(heightAvailPt / unscaled, authorScale);
         if (target < MIN_BLOCK_SCALE) return undefined;
-        return self.#sceneAtom(item, availableWidthPt, target, key);
+        return this.#sceneAtom(item, availableWidthPt, target, key);
       },
-      rotate(availableWidthPt: number, heightAvailPt: number): Atom {
-        self.#diagnostics.push(
+      rotate: (availableWidthPt: number, heightAvailPt: number): Atom => {
+        this.#diagnostics.push(
           renderDiagnostic('MDV5120', {
             blockId: item.block.id,
             range: item.block.range,
@@ -1423,13 +1465,13 @@ class Paginator {
               'on a landscape page of its own.',
           }),
         );
-        const landscape = self.#sceneAtom(item, availableWidthPt, authorScale, key);
+        const landscape = this.#sceneAtom(item, availableWidthPt, authorScale, key);
         if (landscape.heightPt <= heightAvailPt) return landscape;
         const shrink = Math.max(
           MIN_BLOCK_SCALE,
           (heightAvailPt / landscape.heightPt) * authorScale,
         );
-        return self.#sceneAtom(item, availableWidthPt, shrink, key);
+        return this.#sceneAtom(item, availableWidthPt, shrink, key);
       },
       draw: (x, y, w) => [
         element(

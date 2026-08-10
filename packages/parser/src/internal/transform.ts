@@ -452,7 +452,11 @@ function collectProtected(
   while (stack.length > 0) {
     const node = stack.pop();
     if (node === null || typeof node !== 'object') continue;
-    const typed = node as { type?: string; position?: { start: { offset?: number }; end: { offset?: number } }; children?: unknown };
+    const typed = node as {
+      type?: string;
+      position?: { start: { offset?: number }; end: { offset?: number } };
+      children?: unknown;
+    };
     if (typed.type === 'code' || typed.type === 'html') {
       const start = typed.position?.start.offset;
       const end = typed.position?.end.offset;
@@ -476,12 +480,7 @@ function reparseTail(node: RootContent, line: number, ctx: TransformContext): Md
   return parseFragment(subLines(ctx, line + 1, last, position.start.column), ctx);
 }
 
-function subLines(
-  ctx: TransformContext,
-  from: number,
-  to: number,
-  column: number,
-): SubLine[] {
+function subLines(ctx: TransformContext, from: number, to: number, column: number): SubLine[] {
   const lines: SubLine[] = [];
   for (let line = from; line <= to; line += 1) {
     lines.push({ line, strip: containerStrip(ctx.root, line, column) });
@@ -529,7 +528,11 @@ function lineEndOffset(ctx: TransformContext, line: number): number {
   return ctx.root.lineEnd(line);
 }
 
-function lastLineOf(node: RootContent | undefined, ctx: TransformContext, fallback: number): number {
+function lastLineOf(
+  node: RootContent | undefined,
+  ctx: TransformContext,
+  fallback: number,
+): number {
   const end = node?.position?.end.offset;
   if (end === undefined) return fallback;
   return ctx.root.lineIndexAt(Math.max(0, end - 1));

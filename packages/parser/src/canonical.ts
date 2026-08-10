@@ -72,9 +72,7 @@ export function canonicalValue(value: unknown, positions = true): unknown {
 /** `position` collapses to `[startOffset, endOffset]` (SPEC 19). */
 function canonicalPosition(value: unknown): unknown {
   const position = value as
-    | { start?: { offset?: unknown }; end?: { offset?: unknown } }
-    | null
-    | undefined;
+    { start?: { offset?: unknown }; end?: { offset?: unknown } } | null | undefined;
   const start = position?.start?.offset;
   const end = position?.end?.offset;
   if (typeof start !== 'number' || typeof end !== 'number') return null;

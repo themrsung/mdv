@@ -137,7 +137,10 @@ export function siblingsOf(doc: MdvDocument, parent: ParentRef): readonly Block[
   return block.items.find((item) => item.id === parent.itemId)?.blocks ?? [];
 }
 
-function mapBlockChildren(block: Block, map: (blocks: readonly Block[]) => readonly Block[]): Block {
+function mapBlockChildren(
+  block: Block,
+  map: (blocks: readonly Block[]) => readonly Block[],
+): Block {
   if (block.kind === 'blockquote') {
     const children = map(block.children);
     return children === block.children ? block : { ...block, children };

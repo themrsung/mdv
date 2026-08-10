@@ -79,7 +79,7 @@ import { toSvgString } from '@mdv/render-svg';
 
 import { cascadeAttrs, encodingFromAttrs } from './cascade.js';
 import { chartRegistry } from './registry.js';
-import { builtinTheme, themeForBlock, type BuiltinName } from './theme.js';
+import { builtinTheme, themeForBlock } from './theme.js';
 import type { BlockData, PipelineInputs, PipelineResult, RenderedBlock } from './types.js';
 
 /** Block types that are data or configuration, not drawings (SPEC 5.2). */
@@ -428,10 +428,7 @@ export class DocumentPipeline {
     resolved: boolean,
   ): PipelineResult {
     // ── Stages 5–7, per block ───────────────────────────────────────────────
-    const diagnostics: Diagnostic[] = [
-      ...document.diagnostics,
-      ...data.diagnostics,
-    ];
+    const diagnostics: Diagnostic[] = [...document.diagnostics, ...data.diagnostics];
     const rendered: RenderedBlock[] = [];
     const tables: BlockData[] = [];
     let laidOut = 0;

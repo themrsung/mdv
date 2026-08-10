@@ -11,7 +11,12 @@
 import { describe, expect, it } from 'vitest';
 import { createSvgRenderer } from '../src/index.js';
 import type { FakeDocument, FakeElement } from './fake-dom.js';
-import { FakeElement as FakeElementClass, fakeDocument, fakeHost, installElementGlobal } from './fake-dom.js';
+import {
+  FakeElement as FakeElementClass,
+  fakeDocument,
+  fakeHost,
+  installElementGlobal,
+} from './fake-dom.js';
 import { PLAIN_RECT, hit, root, scene } from './fixtures.js';
 
 installElementGlobal();
@@ -148,7 +153,9 @@ describe('destroy', () => {
 
   it('leaves the host reusable by a second render', () => {
     const { host } = setup();
-    createSvgRenderer().render(scene(), host as unknown as Element).destroy();
+    createSvgRenderer()
+      .render(scene(), host as unknown as Element)
+      .destroy();
     createSvgRenderer().render(interactive, host as unknown as Element);
     expect(host.children.map((c) => c.localName)).toStrictEqual(['svg', 'div', 'div']);
   });

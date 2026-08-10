@@ -192,7 +192,12 @@ export function containerOf(block: Block, path: readonly number[]): InlineContai
     const row = block.rows[path[0] ?? -1];
     const cell = row?.cells[path[1] ?? -1];
     if (!row || !cell) return undefined;
-    return { blockId: block.id, path: [path[0] ?? 0, path[1] ?? 0], runs: cell.runs, storage: 'runs' };
+    return {
+      blockId: block.id,
+      path: [path[0] ?? 0, path[1] ?? 0],
+      runs: cell.runs,
+      storage: 'runs',
+    };
   }
   return undefined;
 }
@@ -322,7 +327,8 @@ export function comparePoints(doc: MdvDocument, a: Point, b: Point): number {
   const ai = order.get(a.blockId);
   const bi = order.get(b.blockId);
   if (ai === undefined || bi === undefined) {
-    if (ai === undefined && bi === undefined) return a.blockId < b.blockId ? -1 : a.blockId > b.blockId ? 1 : 0;
+    if (ai === undefined && bi === undefined)
+      return a.blockId < b.blockId ? -1 : a.blockId > b.blockId ? 1 : 0;
     return ai === undefined ? 1 : -1;
   }
   if (ai !== bi) return ai - bi;
@@ -336,10 +342,7 @@ export function comparePoints(doc: MdvDocument, a: Point, b: Point): number {
 }
 
 /** The selection's start and end points in document order. */
-export function orderedPoints(
-  doc: MdvDocument,
-  selection: TextSelection,
-): readonly [Point, Point] {
+export function orderedPoints(doc: MdvDocument, selection: TextSelection): readonly [Point, Point] {
   return comparePoints(doc, selection.anchor, selection.focus) <= 0
     ? [selection.anchor, selection.focus]
     : [selection.focus, selection.anchor];
@@ -462,7 +465,12 @@ export function normalizeSelection(doc: MdvDocument, selection: Selection): Sele
       const cols = t.rows[row]?.cells.length ?? 1;
       return { row, col: Math.max(0, Math.min(Math.trunc(ref.col), cols - 1)) };
     };
-    return { kind: 'cells', tableId: t.id, anchor: clamp(selection.anchor), focus: clamp(selection.focus) };
+    return {
+      kind: 'cells',
+      tableId: t.id,
+      anchor: clamp(selection.anchor),
+      focus: clamp(selection.focus),
+    };
   }
 
   const anchor = normalizePoint(doc, selection.anchor);

@@ -49,16 +49,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * The shell is a flex column, not a grid, because its children are
+ * conditional: the toolbar is absent in source view, and the recovery banner
+ * and the notice stack come and go. Positional `grid-template-rows` silently
+ * assigns the wrong track the moment a child is skipped, which stranded the
+ * flexible row on the dialog and left `.mdv-panes` content-sized. Flex sizes
+ * children by what they are, not by what position they happen to occupy.
+ */
 .mdv-app {
-  display: grid;
-  grid-template-rows: auto auto auto 1fr;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
+}
+
+/* Chrome keeps its intrinsic height; only the panes absorb the slack. */
+.mdv-app > * {
+  flex: 0 0 auto;
 }
 
 .mdv-panes {
   display: grid;
   grid-template-columns: 1fr;
+  /* `min-height: 0` lets this shrink below content height so the panes
+     themselves scroll instead of overflowing the clipped shell. */
+  flex: 1 1 auto;
   min-height: 0;
 }
 
@@ -438,6 +454,21 @@ body {
   margin-top: 0.35em;
 }
 
+/*
+ * The same control in chrome rather than in a task list: no baseline nudge,
+ * since it is aligned by its flex parent and not by a line of body text.
+ */
+.mdv-check--tight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mdv-space-1);
+  margin-top: 0;
+  color: var(--mdv-text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .mdv-hr {
   height: 0;
   margin: var(--mdv-space-6) 0;
@@ -495,6 +526,67 @@ body {
   font-family: var(--mdv-font-mono);
   font-size: 12px;
   color: var(--mdv-text-secondary);
+}
+
+/*
+ * The page rule (SPEC 28.4).
+ *
+ * `@mdv/react` draws nothing for `:::mdv-page` — an embedded document has no
+ * pages to break. An editor does: the author is composing something that will
+ * be exported, and the one thing they need to see is *where* the page ends.
+ * So this is editor furniture, deliberately unlike anything the reader shows,
+ * and it is dashed rather than solid so it never reads as a thematic break.
+ */
+.mdv-pagerule {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+  min-height: 20px;
+  color: var(--mdv-text-secondary);
+  user-select: none;
+}
+
+.mdv-pagerule::before,
+.mdv-pagerule::after {
+  content: '';
+  flex: 1 1 0;
+  border-top: var(--mdv-hairline) dashed var(--mdv-axis);
+}
+
+.mdv-pagerule__label {
+  flex: 0 0 auto;
+  font-family: var(--mdv-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The wrapping form keeps content together, so it is drawn as a frame. */
+.mdv-pagerule--wrap {
+  display: block;
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border: var(--mdv-hairline) dashed var(--mdv-axis);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-sunken);
+}
+
+.mdv-pagerule--wrap::before,
+.mdv-pagerule--wrap::after {
+  content: none;
+}
+
+.mdv-pagerule--wrap .mdv-pagerule__label {
+  display: block;
+  margin-bottom: var(--mdv-space-1);
+}
+
+.mdv-pagerule__body {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--mdv-font-mono);
+  font-size: 12px;
+  color: var(--mdv-text-primary);
 }
 
 .mdv-run--raw {
@@ -600,13 +692,40 @@ body {
   background: var(--mdv-accent-soft);
 }
 
+/*
+ * Row handles sit beside the table, not above it. Without this the strip is a
+ * plain block and stacks on top, pushing the grid down. The column strip's
+ * leading `.mdv-table-corner` is the spacer that matches this strip's width,
+ * so both use the same `--mdv-gap`.
+ */
+.mdv-table-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mdv-gap);
+  min-width: 0;
+}
+
+.mdv-table-body > .mdv-table {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/*
+ * No gap inside a strip. Table rows and columns are flush against each other,
+ * so any spacing here would accumulate and walk the handles out of registration
+ * with the lines they point at. The separation the eye wants is between the
+ * strip and the table, and that is `.mdv-table-body`'s gap. Sizes come from
+ * `useHandleMetrics`; these rules only cover the moment before it has measured.
+ */
 .mdv-table-handles {
   display: flex;
-  gap: var(--mdv-gap);
+  gap: 0;
 }
 
 .mdv-table-handles--rows {
   flex-direction: column;
+  align-items: stretch;
+  flex: 0 0 auto;
 }
 
 .mdv-table-handle-cell,
@@ -621,6 +740,25 @@ body {
   background: var(--mdv-chrome-sunken);
   color: var(--mdv-text-muted);
   cursor: pointer;
+}
+
+/*
+ * A measured cell is exactly its line's size, so it must not flex, and the
+ * button inside it fills it rather than setting it. The cell cannot clip: the
+ * handle menu is absolutely positioned within it and has to escape. The button
+ * clips instead, so a narrow column shows a cropped glyph rather than a bulging
+ * strip.
+ */
+.mdv-table-handle-cell,
+.mdv-table-corner {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.mdv-table-handle-cell > .mdv-handle {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .mdv-handle:hover,
@@ -739,6 +877,20 @@ body {
 .mdv-preview__title {
   font-size: 13px;
   font-weight: 600;
+}
+
+.mdv-preview__body {
+  margin: var(--mdv-space-1) 0 0;
+  max-width: 44ch;
+  color: var(--mdv-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.mdv-preview__loading {
+  color: var(--mdv-text-muted);
+  font-size: 12px;
 }
 
 /* -------------------------------------------------------------------------- */

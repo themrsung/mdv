@@ -119,7 +119,11 @@ function VisualBlockEditorImpl({ block, selected, scheme }: VisualBlockEditorPro
 
   const setAttribute = useCallback(
     (key: string, value: AttrValue | undefined) => {
-      run(commands.updateVisualBlock(block.id, { header: io.setHeaderAttribute(block.header, key, value) }));
+      run(
+        commands.updateVisualBlock(block.id, {
+          header: io.setHeaderAttribute(block.header, key, value),
+        }),
+      );
     },
     [block.header, block.id, run],
   );
@@ -160,7 +164,11 @@ function VisualBlockEditorImpl({ block, selected, scheme }: VisualBlockEditorPro
             value={block.blockType}
             spellCheck={false}
             onChange={(event) => {
-              run(commands.updateVisualBlock(block.id, { blockType: event.target.value.trim().toLowerCase() }));
+              run(
+                commands.updateVisualBlock(block.id, {
+                  blockType: event.target.value.trim().toLowerCase(),
+                }),
+              );
             }}
           />
         </label>
@@ -211,9 +219,7 @@ function VisualBlockEditorImpl({ block, selected, scheme }: VisualBlockEditorPro
       {tab === 'form' ? (
         <div className="mdv-visual__form">
           <div className="mdv-visual__attrs">
-            {entries.length === 0 ? (
-              <p className="mdv-visual__empty">No attributes yet.</p>
-            ) : null}
+            {entries.length === 0 ? <p className="mdv-visual__empty">No attributes yet.</p> : null}
             {entries.map(([key, value]) => (
               <div className="mdv-attr" key={key}>
                 <span className="mdv-attr__key">{key}</span>
@@ -281,7 +287,10 @@ function VisualBlockEditorImpl({ block, selected, scheme }: VisualBlockEditorPro
                 }}
               />
               <span>
-                Data section <span className="mdv-hint">(writes the <code>---</code> separator)</span>
+                Data section{' '}
+                <span className="mdv-hint">
+                  (writes the <code>---</code> separator)
+                </span>
               </span>
             </label>
             {block.data !== null ? (

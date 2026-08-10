@@ -123,7 +123,8 @@ const DELIMITER_ROW = /^\s*\|?\s*:?-{1,}:?\s*(\|\s*:?-{1,}:?\s*)*\|?\s*$/;
  */
 export function findTableAt(document: vscode.TextDocument, line: number): FoundTable | undefined {
   const total = document.lineCount;
-  const hasPipe = (n: number): boolean => n >= 0 && n < total && document.lineAt(n).text.includes('|');
+  const hasPipe = (n: number): boolean =>
+    n >= 0 && n < total && document.lineAt(n).text.includes('|');
 
   // Walk up to the first line of the run of pipe-bearing lines.
   let start = line;
@@ -248,9 +249,7 @@ export async function pasteData(ctx: CommandContext): Promise<void> {
     prompt: 'Dataset id — blocks reference it as `data: "@id"`',
     value: 'data',
     validateInput: (value) =>
-      /^[A-Za-z_][A-Za-z0-9_-]*$/.test(value)
-        ? undefined
-        : 'An id matches [A-Za-z_][A-Za-z0-9_-]*',
+      /^[A-Za-z_][A-Za-z0-9_-]*$/.test(value) ? undefined : 'An id matches [A-Za-z_][A-Za-z0-9_-]*',
   });
   if (id === undefined) return;
 
@@ -258,9 +257,15 @@ export async function pasteData(ctx: CommandContext): Promise<void> {
     .split('\n')
     .map((line) => (line.length > 0 ? line : ''))
     .join('\n');
-  const block = ['```mdv dataset', `id: ${id}`, `format: ${format}`, '---', indented, '```', ''].join(
-    '\n',
-  );
+  const block = [
+    '```mdv dataset',
+    `id: ${id}`,
+    `format: ${format}`,
+    '---',
+    indented,
+    '```',
+    '',
+  ].join('\n');
 
   await editor.edit((builder) => {
     builder.insert(editor.selection.active, block);
@@ -350,5 +355,8 @@ export async function showData(ctx: CommandContext, provider: ResolvedDataProvid
   ].join('\n');
   const uri = provider.publish(document.uri, block.id, `${header}${renderTable(data.table)}\n`);
   const shown = await vscode.workspace.openTextDocument(uri);
-  await vscode.window.showTextDocument(shown, { preview: true, viewColumn: vscode.ViewColumn.Beside });
+  await vscode.window.showTextDocument(shown, {
+    preview: true,
+    viewColumn: vscode.ViewColumn.Beside,
+  });
 }

@@ -23,7 +23,7 @@ import type { Diagnostic } from '@mdv/core';
 import { toSvgString } from '@mdv/render-svg';
 
 import type { GlobalFlags } from '../args.js';
-import { EXIT_CODES, usageError } from '../exit.js';
+import { usageError } from '../exit.js';
 import { absolute, displayPath, writeBinaryFile, writeTextFile } from '../io.js';
 import type { CliIo } from '../io.js';
 import { loadDocument, outcomeFor, printTheme, singleInput } from '../pipeline.js';
@@ -115,7 +115,8 @@ export function resolveTarget(flags: ExportFlags): ExportTarget {
     }
     return lower as ExportTarget;
   }
-  const fromOut = flags.out === undefined || flags.out === '-' ? undefined : targetFromPath(flags.out);
+  const fromOut =
+    flags.out === undefined || flags.out === '-' ? undefined : targetFromPath(flags.out);
   return fromOut ?? 'pdf';
 }
 

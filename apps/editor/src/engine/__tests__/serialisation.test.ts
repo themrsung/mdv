@@ -112,7 +112,9 @@ describe('no visible text is lost', () => {
     expect(paragraph?.kind).toBe('paragraph');
     if (paragraph?.kind !== 'paragraph') return;
 
-    const types = paragraph.runs.map((run) => (run.kind === 'text' ? run.marks.map((mark) => mark.type) : []));
+    const types = paragraph.runs.map((run) =>
+      run.kind === 'text' ? run.marks.map((mark) => mark.type) : [],
+    );
     expect(types.flat()).toContain('strong');
     expect(types.flat()).toContain('emphasis');
     expect(types.flat()).toContain('code');

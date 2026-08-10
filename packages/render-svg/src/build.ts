@@ -163,7 +163,10 @@ function transformValue(t: Transform, ctx: Ctx): string {
 }
 
 /** Stroke attributes, in fixed order. Returns `[]` for no stroke. */
-function strokeAttrs(stroke: Stroke | undefined, ctx: Ctx): (readonly [string, string | undefined])[] {
+function strokeAttrs(
+  stroke: Stroke | undefined,
+  ctx: Ctx,
+): (readonly [string, string | undefined])[] {
   if (stroke === undefined) return [];
   const p = paintAttrs(stroke.paint, ctx);
   return [
@@ -179,12 +182,7 @@ function strokeAttrs(stroke: Stroke | undefined, ctx: Ctx): (readonly [string, s
         : stroke.dash.map((d) => ctx.n(d)).join(' '),
     ],
     ['stroke-dashoffset', stroke.dashOffset === undefined ? undefined : ctx.n(stroke.dashOffset)],
-    [
-      'stroke-opacity',
-      stroke.opacity !== undefined
-        ? ctx.alpha(stroke.opacity)
-        : p.opacity,
-    ],
+    ['stroke-opacity', stroke.opacity !== undefined ? ctx.alpha(stroke.opacity) : p.opacity],
   ];
 }
 
@@ -332,7 +330,11 @@ function buildRect(node: RectNode, ctx: Ctx): VNode[] {
 
   if (perCorner !== undefined) {
     out.push(
-      el('path', [...common, ['d', pathData(roundedRectPath(node, perCorner), ctx.o.precision)], ...paintTail]),
+      el('path', [
+        ...common,
+        ['d', pathData(roundedRectPath(node, perCorner), ctx.o.precision)],
+        ...paintTail,
+      ]),
     );
     return out;
   }
@@ -542,7 +544,10 @@ function buildGroup(node: GroupNode, ctx: Ctx): VNode[] {
       [
         ['id', node.id === undefined ? undefined : ctx.id(node.id)],
         ['class', ctx.cls(node.cls)],
-        ['transform', node.transform === undefined ? undefined : transformValue(node.transform, ctx)],
+        [
+          'transform',
+          node.transform === undefined ? undefined : transformValue(node.transform, ctx),
+        ],
         ['clip-path', node.clip === undefined ? undefined : ctx.ref(node.clip)],
         ['opacity', node.opacity === undefined ? undefined : ctx.alpha(node.opacity)],
         ['role', node.role],
@@ -648,10 +653,7 @@ function buildDef(def: Def, ctx: Ctx): VNode[] {
             // The tile geometry is authored upright and the *lattice* is rotated,
             // so a 45° hatch tiles seamlessly instead of showing a seam wherever
             // a rotated tile's corner lands (SPEC 12.6).
-            [
-              'patternTransform',
-              def.angle === 0 ? undefined : `rotate(${ctx.n(def.angle)})`,
-            ],
+            ['patternTransform', def.angle === 0 ? undefined : `rotate(${ctx.n(def.angle)})`],
           ],
           content,
         ),
@@ -680,7 +682,9 @@ function buildDef(def: Def, ctx: Ctx): VNode[] {
  * (SPEC 12.4), and "same" includes which part is prominent.
  */
 export function readoutLabel(region: HitRegion): string {
-  return region.readout.map((r) => (r.label.length === 0 ? r.value : `${r.value}, ${r.label}`)).join('; ');
+  return region.readout
+    .map((r) => (r.label.length === 0 ? r.value : `${r.value}, ${r.label}`))
+    .join('; ');
 }
 
 /**
@@ -733,7 +737,10 @@ function buildOverlay(scene: Scene, ctx: Ctx): VNode[] {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Resolve partial options against {@link DEFAULTS}. */
-export function resolveOptions(options: Partial<BuildOptions> | undefined, scene: Scene): BuildOptions {
+export function resolveOptions(
+  options: Partial<BuildOptions> | undefined,
+  scene: Scene,
+): BuildOptions {
   return {
     precision: options?.precision ?? DEFAULTS.precision,
     classes: options?.classes ?? DEFAULTS.classes,

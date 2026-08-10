@@ -49,14 +49,24 @@ interface Manifest {
     untrustedWorkspaces: { supported: string; restrictedConfigurations: string[] };
   };
   contributes: {
-    languages: { id: string; extensions?: string[]; configuration?: string; icon?: Record<string, string> }[];
+    languages: {
+      id: string;
+      extensions?: string[];
+      configuration?: string;
+      icon?: Record<string, string>;
+    }[];
     grammars: { language?: string; scopeName: string; path: string; injectTo?: string[] }[];
     snippets: { language: string; path: string }[];
     customEditors: { viewType: string; selector: { filenamePattern: string }[] }[];
     commands: { command: string; title: string; category?: string }[];
     keybindings: { command: string; key: string; mac?: string; when?: string }[];
     menus: Record<string, { command: string; when?: string; group?: string }[]>;
-    configuration: { properties: Record<string, { type?: string | string[]; default?: unknown; enum?: string[]; scope?: string }> };
+    configuration: {
+      properties: Record<
+        string,
+        { type?: string | string[]; default?: unknown; enum?: string[]; scope?: string }
+      >;
+    };
   };
 }
 
@@ -265,9 +275,9 @@ describe('the TextMate grammars', () => {
   it('injects into markdown without re-injecting into itself', () => {
     expect(injection.injectionSelector).toContain('L:text.html.markdown');
     expect(injection.injectionSelector).toContain('-text.html.markdown.mdv');
-    expect(contributes.grammars.find((g) => g.scopeName === injection.scopeName)?.injectTo).toEqual([
-      'text.html.markdown',
-    ]);
+    expect(contributes.grammars.find((g) => g.scopeName === injection.scopeName)?.injectTo).toEqual(
+      ['text.html.markdown'],
+    );
   });
 
   it('compiles every pattern as a regular expression', () => {
@@ -343,7 +353,10 @@ describe('the snippets', () => {
         .replace(/\$\d+/g, '');
       const document = parse(expanded);
       const errors = document.diagnostics.filter((d) => d.severity === 'error');
-      expect(errors.map((d) => `${d.code}: ${d.message}`), name).toEqual([]);
+      expect(
+        errors.map((d) => `${d.code}: ${d.message}`),
+        name,
+      ).toEqual([]);
       // A fence the parser did not recognise stays a plain Markdown `code`
       // node, so counting `mdvBlock` nodes is what distinguishes "parsed" from
       // "quietly ignored".

@@ -67,7 +67,9 @@ export function ordinalBounds(
   for (let i = 0; i < steps.length; i += 1) {
     const s = steps[i];
     if (s === undefined) continue;
-    if (contrastRatioRgb(over(parseColor(s), surfaceRgb), surfaceRgb) >= ORDINAL_RAMP_CONTRAST_MIN) {
+    if (
+      contrastRatioRgb(over(parseColor(s), surfaceRgb), surfaceRgb) >= ORDINAL_RAMP_CONTRAST_MIN
+    ) {
       floor = i;
       break;
     }
@@ -75,7 +77,9 @@ export function ordinalBounds(
   for (let i = steps.length - 1; i >= 0; i -= 1) {
     const s = steps[i];
     if (s === undefined) continue;
-    if (contrastRatioRgb(over(parseColor(s), surfaceRgb), surfaceRgb) >= ORDINAL_RAMP_CONTRAST_MIN) {
+    if (
+      contrastRatioRgb(over(parseColor(s), surfaceRgb), surfaceRgb) >= ORDINAL_RAMP_CONTRAST_MIN
+    ) {
       ceiling = i;
       break;
     }
@@ -234,7 +238,9 @@ export function lightnessOf(color: ColorString): number {
  */
 export function labelOnFill(fill: ColorString, ink: ColorString, paper: ColorString): ColorString {
   const f = parseColor(fill);
-  return contrastRatioRgb(parseColor(ink), f) >= contrastRatioRgb(parseColor(paper), f) ? ink : paper;
+  return contrastRatioRgb(parseColor(ink), f) >= contrastRatioRgb(parseColor(paper), f)
+    ? ink
+    : paper;
 }
 
 /** Convert any accepted colour spelling to canonical lowercase hex. */

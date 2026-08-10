@@ -33,12 +33,26 @@ export function lineTo(x: number, y: number): PathCommand {
 }
 
 /** `C` command. */
-export function cubicTo(x1: number, y1: number, x2: number, y2: number, x: number, y: number): PathCommand {
+export function cubicTo(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x: number,
+  y: number,
+): PathCommand {
   return { c: 'C', x1: p(x1), y1: p(y1), x2: p(x2), y2: p(y2), x: p(x), y: p(y) };
 }
 
 /** `A` command with SVG semantics. */
-export function arcTo(rx: number, ry: number, largeArc: boolean, sweep: boolean, x: number, y: number): PathCommand {
+export function arcTo(
+  rx: number,
+  ry: number,
+  largeArc: boolean,
+  sweep: boolean,
+  x: number,
+  y: number,
+): PathCommand {
   return { c: 'A', rx: p(rx), ry: p(ry), rotate: 0, largeArc, sweep, x: p(x), y: p(y) };
 }
 
@@ -283,7 +297,14 @@ function monotonePath(pts: readonly Point[]): PathCommand[] {
     if (a === undefined || b === undefined) continue;
     const dx = (b.x - a.x) / 3;
     out.push(
-      cubicTo(a.x + dx, a.y + (slopes[i] ?? 0) * dx, b.x - dx, b.y - (slopes[i + 1] ?? 0) * dx, b.x, b.y),
+      cubicTo(
+        a.x + dx,
+        a.y + (slopes[i] ?? 0) * dx,
+        b.x - dx,
+        b.y - (slopes[i + 1] ?? 0) * dx,
+        b.x,
+        b.y,
+      ),
     );
   }
   return out;
@@ -374,7 +395,11 @@ function basisPath(pts: readonly Point[]): PathCommand[] {
  * stacked band's shared edge is drawn identically by the series above and the
  * series below it — otherwise a hairline of surface shows through the seam.
  */
-export function areaPath(upper: readonly Point[], lower: readonly Point[], curve: CurveKind): PathCommand[] {
+export function areaPath(
+  upper: readonly Point[],
+  lower: readonly Point[],
+  curve: CurveKind,
+): PathCommand[] {
   const top = curvePath(upper, curve);
   if (top.length === 0) return [];
   const bottom = curvePath([...lower].reverse(), curve);
@@ -382,7 +407,9 @@ export function areaPath(upper: readonly Point[], lower: readonly Point[], curve
   const [, ...bottomRest] = bottom;
   const firstBottom = bottom[0];
   const join: PathCommand[] =
-    firstBottom !== undefined && firstBottom.c === 'M' ? [lineTo(firstBottom.x, firstBottom.y)] : [];
+    firstBottom !== undefined && firstBottom.c === 'M'
+      ? [lineTo(firstBottom.x, firstBottom.y)]
+      : [];
   return [...top, ...join, ...bottomRest, closePath()];
 }
 
@@ -427,7 +454,13 @@ export function shapePath(shape: PointShape, cx: number, cy: number, r: number):
     }
     case 'diamond': {
       const half = Math.sqrt(area / 2);
-      return [moveTo(x, y - half), lineTo(x + half, y), lineTo(x, y + half), lineTo(x - half, y), closePath()];
+      return [
+        moveTo(x, y - half),
+        lineTo(x + half, y),
+        lineTo(x, y + half),
+        lineTo(x - half, y),
+        closePath(),
+      ];
     }
     case 'cross': {
       // A plus sign of five equal squares.

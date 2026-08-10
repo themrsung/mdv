@@ -46,7 +46,11 @@ function wrapInMark(mark: Mark, children: ReactNode): ReactNode {
 function RunViewImpl({ run, index }: { readonly run: Run; readonly index: number }): ReactNode {
   if (run.kind === 'raw') {
     return (
-      <span data-mdv-run={index} className="mdv-run mdv-run--raw" title={`Raw source: ${run.source}`}>
+      <span
+        data-mdv-run={index}
+        className="mdv-run mdv-run--raw"
+        title={`Raw source: ${run.source}`}
+      >
         {run.text}
       </span>
     );

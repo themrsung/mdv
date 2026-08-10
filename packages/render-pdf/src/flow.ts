@@ -62,6 +62,13 @@ export interface FlowBase {
    * for a figure and its caption, and for a callout's title and body.
    */
   group: string | undefined;
+  /**
+   * Items sharing a keep are held on one page: `:::mdv-page{break=avoid}`
+   * (SPEC 28.3 rule 7). Separate from {@link group} because the two nest — a
+   * figure inside an avoid wrapper keeps its own group — and because a keep is
+   * a request the paginator may have to refuse, reporting `MDV5121`.
+   */
+  keep: string | undefined;
   /** A named destination for `:mdv-ref[]` and the outline, if this item is one. */
   anchor: string | undefined;
 }
@@ -78,13 +85,7 @@ export interface HeadingItem extends FlowBase {
 }
 
 /** The role a paragraph plays, which picks its {@link TextStyle}. */
-export type ParagraphRole =
-  | 'body'
-  | 'caption'
-  | 'subheading'
-  | 'footnote'
-  | 'callout'
-  | 'listItem';
+export type ParagraphRole = 'body' | 'caption' | 'subheading' | 'footnote' | 'callout' | 'listItem';
 
 /** Any run of prose: body text, a list item, a caption, a footnote body. */
 export interface ParagraphItem extends FlowBase {
@@ -156,13 +157,7 @@ export interface PageControlItem extends FlowBase {
 
 /** Everything the paginator can place. */
 export type FlowItem =
-  | HeadingItem
-  | ParagraphItem
-  | CodeItem
-  | RuleItem
-  | TableItem
-  | VisualItem
-  | PageControlItem;
+  HeadingItem | ParagraphItem | CodeItem | RuleItem | TableItem | VisualItem | PageControlItem;
 
 /** A footnote, keyed by its marker. */
 export interface FlowNote {
@@ -209,22 +204,6 @@ function attrString(attrs: AttrMap | undefined, key: string): string | undefined
 function numberToString(value: number): string {
   if (!Number.isFinite(value)) return '';
   return Number.isInteger(value) && Math.abs(value) < 1e21 ? value.toFixed(0) : String(value);
-}
-
-function attrNumber(attrs: AttrMap | undefined, key: string): number | undefined {
-  const raw: AttrValue | undefined = attrs?.[key];
-  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-  if (typeof raw === 'string') {
-    const parsed = Number.parseFloat(raw);
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return undefined;
-}
-
-function attrMap(attrs: AttrMap | undefined, key: string): AttrMap | undefined {
-  const raw: AttrValue | undefined = attrs?.[key];
-  if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) return raw as AttrMap;
-  return undefined;
 }
 
 /**
@@ -319,6 +298,8 @@ interface Ctx {
   pendingRefs: { run: { text: string }; name: string }[];
   /** Visual blocks by AST node, so a block keeps the resolve-stage identity. */
   blocks: Map<MdvBlock, ResolvedBlock>;
+  /** Names `:::mdv-page{break=avoid}` keeps, so nested wrappers stay distinct. */
+  keepCounter: number;
   /** Figure/table counters, and the section prefix from `numbering.restartAt`. */
   restartAt: number;
   sectionCounter: number;
@@ -480,10 +461,17 @@ interface Frame {
   indent: number;
   quoteDepth: number;
   group: string | undefined;
+  keep: string | undefined;
   callout: 'note' | 'tip' | 'warning' | 'danger' | undefined;
 }
 
-const ROOT_FRAME: Frame = { indent: 0, quoteDepth: 0, group: undefined, callout: undefined };
+const ROOT_FRAME: Frame = {
+  indent: 0,
+  quoteDepth: 0,
+  group: undefined,
+  keep: undefined,
+  callout: undefined,
+};
 
 function base(frame: Frame, over: Partial<FlowBase> = {}): FlowBase {
   return {
@@ -491,6 +479,7 @@ function base(frame: Frame, over: Partial<FlowBase> = {}): FlowBase {
     quoteDepth: frame.quoteDepth,
     keepWithNext: false,
     group: frame.group,
+    keep: frame.keep,
     anchor: undefined,
     ...over,
   };
@@ -524,11 +513,7 @@ function walkOne(node: MdvContent | RootContent, ctx: Ctx, frame: Frame): void {
       emitTable(node, ctx, frame);
       return;
     case 'html':
-      emitCode(
-        { type: 'code', value: node.value, lang: null, meta: null } as Code,
-        ctx,
-        frame,
-      );
+      emitCode({ type: 'code', value: node.value, lang: null, meta: null } as Code, ctx, frame);
       return;
     case 'mdvBlock':
       emitVisual(node, ctx, frame);
@@ -735,7 +720,12 @@ function emitVisual(node: MdvBlock, ctx: Ctx, frame: Frame): void {
     // caller handed us a document whose AST and block list disagree. Show the
     // source rather than dropping the block silently (SPEC 14.1 principle 2).
     emitCode(
-      { type: 'code', value: `${node.raw.header}\n---\n${node.raw.data}`, lang: null, meta: null } as Code,
+      {
+        type: 'code',
+        value: `${node.raw.header}\n---\n${node.raw.data}`,
+        lang: null,
+        meta: null,
+      } as Code,
       ctx,
       frame,
     );
@@ -766,9 +756,7 @@ function blockTitle(block: ResolvedBlock): string | undefined {
 }
 
 function emitError(node: MdvError, ctx: Ctx, frame: Frame): void {
-  ctx.items.push(
-    paragraph([{ text: node.diagnostic.message, bold: true }], ctx, frame, 'body'),
-  );
+  ctx.items.push(paragraph([{ text: node.diagnostic.message, bold: true }], ctx, frame, 'body'));
   emitCode({ type: 'code', value: node.raw, lang: null, meta: null } as Code, ctx, frame);
 }
 
@@ -788,19 +776,30 @@ function emitDirective(node: MdvDirective, ctx: Ctx, frame: Frame): void {
     case 'mdv-page': {
       const breakRaw = attrString(node.attrs, 'break');
       const orientationRaw = attrString(node.attrs, 'orientation');
+      const breakKind =
+        breakRaw === 'before' || breakRaw === 'after' || breakRaw === 'avoid'
+          ? breakRaw
+          : undefined;
       ctx.items.push({
         ...base(frame),
         kind: 'page',
-        breakKind:
-          breakRaw === 'before' || breakRaw === 'after' || breakRaw === 'avoid'
-            ? breakRaw
-            : undefined,
+        breakKind,
         orientation:
           orientationRaw === 'landscape' || orientationRaw === 'portrait'
             ? orientationRaw
             : undefined,
         size: attrString(node.attrs, 'size'),
       });
+      // `break=avoid` does nothing in the marker form — there is nothing to
+      // keep — and in the wrapping form holds the children on one page
+      // (SPEC 28.3 rule 7). The outermost wrapper wins: an inner `avoid` is
+      // already implied by the outer one, and re-keying here would split the
+      // outer chain at the inner boundary.
+      if (breakKind === 'avoid' && children.length > 0 && frame.keep === undefined) {
+        ctx.keepCounter += 1;
+        walk(children, ctx, { ...frame, keep: `keep-${String(ctx.keepCounter)}` });
+        return;
+      }
       walk(children, ctx, frame);
       return;
     }
@@ -949,6 +948,7 @@ export function buildFlow(doc: ResolvedDocument, options: FlowOptions = {}): Flo
     externalSeen: new Set<string>(),
     pendingRefs: [],
     blocks,
+    keepCounter: 0,
     restartAt: restartMatch === null ? 0 : Number.parseInt(restartMatch[1] ?? '1', 10),
     sectionCounter: 0,
     figureCounter: 0,
@@ -1001,6 +1001,7 @@ function buildNotes(ctx: Ctx): FlowNote[] {
         indent: 0,
         quoteDepth: 0,
         group: `note-${id}`,
+        keep: undefined,
         callout: undefined,
       });
     } else {

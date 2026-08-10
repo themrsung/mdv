@@ -220,10 +220,17 @@ function parseFlowMapping(text: string, diagnostics: AttrDiagnostic[], line: num
   for (const part of splitFlow(body)) {
     const colon = findFlowColon(part);
     if (colon < 0) {
-      diagnostics.push({ code: 'MDV1213', message: `flow mapping entry without a key: ${part.trim()}`, line });
+      diagnostics.push({
+        code: 'MDV1213',
+        message: `flow mapping entry without a key: ${part.trim()}`,
+        line,
+      });
       continue;
     }
-    const key = part.slice(0, colon).trim().replace(/^["']|["']$/g, '');
+    const key = part
+      .slice(0, colon)
+      .trim()
+      .replace(/^["']|["']$/g, '');
     out[key] = parseScalar(part.slice(colon + 1), diagnostics, line);
   }
   return out;
@@ -283,7 +290,11 @@ function parseBlockMapping(
       continue;
     }
     if (line.tabbed) {
-      diagnostics.push({ code: 'MDV1210', message: 'tabs are not permitted for indentation', line: line.number });
+      diagnostics.push({
+        code: 'MDV1210',
+        message: 'tabs are not permitted for indentation',
+        line: line.number,
+      });
     }
     if (line.indent < indent) break;
     if (line.indent > indent) {
@@ -293,7 +304,11 @@ function parseBlockMapping(
     }
     if (line.text.startsWith('- ') || line.text === '-') break;
     if (line.text.startsWith('? ')) {
-      diagnostics.push({ code: 'MDV1211', message: 'complex keys are not supported', line: line.number });
+      diagnostics.push({
+        code: 'MDV1211',
+        message: 'complex keys are not supported',
+        line: line.number,
+      });
       cursor.index += 1;
       continue;
     }
@@ -314,7 +329,14 @@ function parseBlockMapping(
     const rest = match[2].trim();
     cursor.index += 1;
 
-    if (rest === '|' || rest === '>' || rest === '|-' || rest === '>-' || rest === '|+' || rest === '>+') {
+    if (
+      rest === '|' ||
+      rest === '>' ||
+      rest === '|-' ||
+      rest === '>-' ||
+      rest === '|+' ||
+      rest === '>+'
+    ) {
       out[key] = readMultiline(lines, cursor, indent + 2, rest);
       continue;
     }
@@ -410,7 +432,9 @@ function readMultiline(
     const blank = line.text.trim() === '';
     if (!blank && line.indent < Math.max(indent, blockIndent < 0 ? indent : blockIndent)) break;
     if (!blank && blockIndent < 0) blockIndent = line.indent;
-    collected.push(blank ? '' : ' '.repeat(line.indent - (blockIndent < 0 ? 0 : blockIndent)) + line.text);
+    collected.push(
+      blank ? '' : ' '.repeat(line.indent - (blockIndent < 0 ? 0 : blockIndent)) + line.text,
+    );
     cursor.index += 1;
   }
   while (collected.length > 0 && collected[collected.length - 1] === '') collected.pop();

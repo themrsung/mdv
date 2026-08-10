@@ -140,7 +140,11 @@ function toChannel(value: AttrValue, columns: ReadonlySet<string>): Channel | un
     const field = value['field'];
     if (typeof field === 'string' && field.length > 0) channel.field = field;
     const constant = value['value'];
-    if (typeof constant === 'string' || typeof constant === 'number' || typeof constant === 'boolean') {
+    if (
+      typeof constant === 'string' ||
+      typeof constant === 'number' ||
+      typeof constant === 'boolean'
+    ) {
       channel.value = constant;
     }
     const title = value['title'];

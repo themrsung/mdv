@@ -87,7 +87,9 @@ class MdvCompletionProvider implements vscode.CompletionItemProvider {
     if (fence === undefined) return [];
     if (!inHeader(document, fence.line, position.line)) return [];
 
-    const blockType = (/^mdv[ \t]+([A-Za-z][A-Za-z0-9-]*)/.exec(fence.info)?.[1] ?? '').toLowerCase();
+    const blockType = (
+      /^mdv[ \t]+([A-Za-z][A-Za-z0-9-]*)/.exec(fence.info)?.[1] ?? ''
+    ).toLowerCase();
     const chartType = blockType.length > 0 ? chartRegistry().get(blockType) : undefined;
 
     // ── 2. Channel keys at the start of a header line ───────────────────────
@@ -104,9 +106,8 @@ class MdvCompletionProvider implements vscode.CompletionItemProvider {
 
     // ── 3. Column names after a channel key ─────────────────────────────────
     if (!this.#settings.current.completion.columnNames) return [];
-    const afterKey = /^[ \t]*([A-Za-z][A-Za-z0-9_-]*)[ \t]*:[ \t]*(?:\[[^\]]*)?[A-Za-z0-9_-]*$/.exec(
-      linePrefix,
-    );
+    const afterKey =
+      /^[ \t]*([A-Za-z][A-Za-z0-9_-]*)[ \t]*:[ \t]*(?:\[[^\]]*)?[A-Za-z0-9_-]*$/.exec(linePrefix);
     if (afterKey === null) return [];
     const key = afterKey[1];
     if (key === undefined) return [];

@@ -15,7 +15,15 @@
 import { describe, expect, it } from 'vitest';
 import type { PathCommand, PathNode, TextNode } from '@mdv/core';
 import { donutChart, pieChart } from '../src/pie.js';
-import { EMPTY_TABLE, codesOf, makeTable, nodesOfKind, nonFiniteNumbers, noRows, runChart } from './harness.js';
+import {
+  EMPTY_TABLE,
+  codesOf,
+  makeTable,
+  nodesOfKind,
+  nonFiniteNumbers,
+  noRows,
+  runChart,
+} from './harness.js';
 
 const XY = { category: { field: 'fruit' }, value: { field: 'count' } };
 
@@ -67,7 +75,12 @@ describe('pie: slice geometry', () => {
 
   it('emits one arc mark per category with exact fractions', () => {
     // Sorted descending by value, which is the SPEC 8.5 default.
-    expect(run.encoded.marks.map((m) => m.category)).toEqual(['Damson', 'Cherry', 'Banana', 'Apple']);
+    expect(run.encoded.marks.map((m) => m.category)).toEqual([
+      'Damson',
+      'Cherry',
+      'Banana',
+      'Apple',
+    ]);
     expect(run.encoded.marks.map((m) => m.fraction)).toEqual([0.4, 0.3, 0.2, 0.1]);
   });
 
@@ -98,9 +111,22 @@ describe('pie: slice geometry', () => {
   });
 
   it('takes the large-arc flag only for slices past a half turn', () => {
-    const big = runChart(pieChart, makeTable([['fruit', 'category'], ['count', 'number']], [['Apple', 9], ['Banana', 1]]), {
-      encoding: XY,
-    });
+    const big = runChart(
+      pieChart,
+      makeTable(
+        [
+          ['fruit', 'category'],
+          ['count', 'number'],
+        ],
+        [
+          ['Apple', 9],
+          ['Banana', 1],
+        ],
+      ),
+      {
+        encoding: XY,
+      },
+    );
     const [major, minor] = arcs(big.laid.nodes);
     expect((major?.d[1] as { largeArc: boolean }).largeArc).toBe(true);
     expect((minor?.d[1] as { largeArc: boolean }).largeArc).toBe(false);
@@ -121,7 +147,12 @@ describe('pie: slice geometry', () => {
 describe('pie: ordering and start angle', () => {
   it('keeps document order for `sort: none`', () => {
     const run = runChart(pieChart, fruit(), { encoding: XY, attrs: { sort: 'none' } });
-    expect(run.encoded.marks.map((m) => m.category)).toEqual(['Apple', 'Banana', 'Cherry', 'Damson']);
+    expect(run.encoded.marks.map((m) => m.category)).toEqual([
+      'Apple',
+      'Banana',
+      'Cherry',
+      'Damson',
+    ]);
   });
 
   it('reverses for `sort: asc`', () => {
@@ -130,7 +161,10 @@ describe('pie: ordering and start angle', () => {
   });
 
   it('rotates the whole pie for an explicit startAngle', () => {
-    const run = runChart(pieChart, fruit(), { encoding: XY, attrs: { startAngle: 0, padAngle: 0 } });
+    const run = runChart(pieChart, fruit(), {
+      encoding: XY,
+      attrs: { startAngle: 0, padAngle: 0 },
+    });
     // 0° in the document convention is 3 o'clock: the first edge is due right.
     const first = arcs(run.laid.nodes)[0]?.d[0] as { x: number; y: number };
     expect(first.x).toBeCloseTo(300, 6);
@@ -173,7 +207,12 @@ describe('pie: small slices (SPEC 8.5)', () => {
   it('respects a custom `other` threshold', () => {
     // 20 % folds everything but the two big shares of ~50 %.
     const run = runChart(pieChart, fruit(), { encoding: XY, attrs: { other: 0.2 } });
-    expect(run.encoded.marks.map((m) => m.category)).toEqual(['Damson', 'Cherry', 'Banana', 'Other']);
+    expect(run.encoded.marks.map((m) => m.category)).toEqual([
+      'Damson',
+      'Cherry',
+      'Banana',
+      'Other',
+    ]);
   });
 
   it('labels only the slices at or above 5 % under `label: auto`', () => {
@@ -183,7 +222,10 @@ describe('pie: small slices (SPEC 8.5)', () => {
   });
 
   it('labels every slice when the author insists', () => {
-    const run = runChart(pieChart, withSlivers(), { encoding: XY, attrs: { other: false, label: 'outside' } });
+    const run = runChart(pieChart, withSlivers(), {
+      encoding: XY,
+      attrs: { other: false, label: 'outside' },
+    });
     expect(run.laid.labels).toHaveLength(5);
   });
 
@@ -260,7 +302,9 @@ describe('pie: refusals', () => {
   });
 
   it('reports the missing channels rather than throwing', () => {
-    const codes = codesOf(pieChart.validate(runChart(pieChart, fruit(), { encoding: {} }).block, fruit()));
+    const codes = codesOf(
+      pieChart.validate(runChart(pieChart, fruit(), { encoding: {} }).block, fruit()),
+    );
     expect(codes).toEqual(['MDV3000', 'MDV3000']);
   });
 });
@@ -398,7 +442,9 @@ describe('pie: accessibility', () => {
   });
 
   it('says so plainly when there is nothing to describe', () => {
-    expect(runChart(pieChart, EMPTY_TABLE, { encoding: XY }).description).toBe('Pie chart with no data.');
+    expect(runChart(pieChart, EMPTY_TABLE, { encoding: XY }).description).toBe(
+      'Pie chart with no data.',
+    );
   });
 
   it('offers the data as a table through `a11yTable`', () => {

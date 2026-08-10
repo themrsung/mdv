@@ -10,13 +10,28 @@
  */
 
 export type { ReadOptions } from './read.js';
-export { read, readBlocks, normalizeSource, splitVisualBody, parseVisualInfo, splitTableRow, parseInline } from './read.js';
+export {
+  read,
+  readBlocks,
+  normalizeSource,
+  splitVisualBody,
+  parseVisualInfo,
+  splitTableRow,
+  parseInline,
+} from './read.js';
 
 export type { WriteOptions } from './write.js';
 export { write, writeBlocks, writeInline, visualInfoString } from './write.js';
 
 export type { AttrDiagnostic, AttrMap, AttrParseResult, AttrValue } from './attrs.js';
-export { formatScalar, parseAttributes, parseScalar, quoteIfNeeded, setHeaderAttribute, stripComment } from './attrs.js';
+export {
+  formatScalar,
+  parseAttributes,
+  parseScalar,
+  quoteIfNeeded,
+  setHeaderAttribute,
+  stripComment,
+} from './attrs.js';
 
 export type { EscapeContext } from './escape.js';
 export { escapeDestination, escapeInline, escapeQuoted, unescapeInline } from './escape.js';

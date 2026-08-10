@@ -287,14 +287,10 @@ class HeaderParser {
       }
       const tail = stripPlainComment(text, read.end);
       if (tail.text.length > 0) {
-        this.bag.add(
-          'MDV1211',
-          this.root.range(line.offset + read.end, line.offset + tail.end),
-          {
-            message: 'Unexpected content after a value',
-            detail: `Nothing may follow \`${text.slice(cursor, read.end)}\` except a comment.`,
-          },
-        );
+        this.bag.add('MDV1211', this.root.range(line.offset + read.end, line.offset + tail.end), {
+          message: 'Unexpected content after a value',
+          detail: `Nothing may follow \`${text.slice(cursor, read.end)}\` except a comment.`,
+        });
       }
       return read.value;
     }
@@ -439,7 +435,11 @@ class HeaderParser {
     const lastLine = body.length > 0 ? (body[body.length - 1] as number) : li;
     this.lastConsumed = lastLine;
     this.at = scan;
-    this.record(path, line.offset + cursor, this.lineAt(lastLine).offset + this.lineAt(lastLine).text.length);
+    this.record(
+      path,
+      line.offset + cursor,
+      this.lineAt(lastLine).offset + this.lineAt(lastLine).text.length,
+    );
     return value;
   }
 

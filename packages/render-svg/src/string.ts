@@ -21,7 +21,16 @@ import type { VNode } from './vnode.js';
  * holds text confuses some XML-to-HTML adapters into swallowing the next
  * sibling. Everything else self-closes when empty, which is smaller.
  */
-const NEVER_SELF_CLOSE = new Set(['svg', 'g', 'title', 'desc', 'defs', 'text', 'clipPath', 'pattern']);
+const NEVER_SELF_CLOSE = new Set([
+  'svg',
+  'g',
+  'title',
+  'desc',
+  'defs',
+  'text',
+  'clipPath',
+  'pattern',
+]);
 
 function serialiseInto(node: VNode, out: string[]): void {
   out.push('<', node.tag);

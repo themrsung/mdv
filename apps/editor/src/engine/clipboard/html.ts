@@ -38,16 +38,40 @@ export type HtmlNode = HtmlElement | HtmlText;
 
 /** Elements that never have children and never need a close tag. */
 const VOID_ELEMENTS = new Set([
-  'area', 'base', 'basefont', 'br', 'col', 'command', 'embed', 'frame', 'hr',
-  'img', 'input', 'isindex', 'keygen', 'link', 'meta', 'param', 'source',
-  'track', 'wbr',
+  'area',
+  'base',
+  'basefont',
+  'br',
+  'col',
+  'command',
+  'embed',
+  'frame',
+  'hr',
+  'img',
+  'input',
+  'isindex',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
 ]);
 
 /** Elements whose content is raw text, not markup. */
 const RAW_TEXT_ELEMENTS = new Set(['script', 'style', 'textarea', 'title', 'xmp']);
 
 /** Elements dropped wholesale, content and all. */
-const DISCARDED_ELEMENTS = new Set(['script', 'style', 'head', 'meta', 'link', 'title', 'noscript']);
+const DISCARDED_ELEMENTS = new Set([
+  'script',
+  'style',
+  'head',
+  'meta',
+  'link',
+  'title',
+  'noscript',
+]);
 
 /**
  * Implied end tags: opening the key closes any of the values still open,
@@ -67,15 +91,47 @@ const IMPLIED_END: Readonly<Record<string, readonly string[]>> = {
   option: ['option', 'p'],
   optgroup: ['option', 'optgroup'],
   // Block-level openers close an open paragraph, per the HTML5 parser.
-  div: ['p'], blockquote: ['p'], pre: ['p'], ul: ['p'], ol: ['p'], table: ['p'],
-  h1: ['p'], h2: ['p'], h3: ['p'], h4: ['p'], h5: ['p'], h6: ['p'],
-  hr: ['p'], section: ['p'], article: ['p'], aside: ['p'], header: ['p'],
-  footer: ['p'], nav: ['p'], main: ['p'], figure: ['p'], form: ['p'],
-  address: ['p'], fieldset: ['p'], dl: ['p'],
+  div: ['p'],
+  blockquote: ['p'],
+  pre: ['p'],
+  ul: ['p'],
+  ol: ['p'],
+  table: ['p'],
+  h1: ['p'],
+  h2: ['p'],
+  h3: ['p'],
+  h4: ['p'],
+  h5: ['p'],
+  h6: ['p'],
+  hr: ['p'],
+  section: ['p'],
+  article: ['p'],
+  aside: ['p'],
+  header: ['p'],
+  footer: ['p'],
+  nav: ['p'],
+  main: ['p'],
+  figure: ['p'],
+  form: ['p'],
+  address: ['p'],
+  fieldset: ['p'],
+  dl: ['p'],
 };
 
 /** Elements an implied close is not allowed to escape from. */
-const SCOPE_BOUNDARY = new Set(['table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'ul', 'ol', 'li', 'blockquote']);
+const SCOPE_BOUNDARY = new Set([
+  'table',
+  'thead',
+  'tbody',
+  'tfoot',
+  'tr',
+  'td',
+  'th',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+]);
 
 /**
  * An element while it is still being filled in.
@@ -118,7 +174,10 @@ export function parseHtml(source: string): readonly HtmlNode[] {
 
     // A `<` that cannot start a tag is literal text; leave it in the run.
     const next = source[lt + 1];
-    if (next === undefined || !(isNameStart(next) || next === '/' || next === '!' || next === '?')) {
+    if (
+      next === undefined ||
+      !(isNameStart(next) || next === '/' || next === '!' || next === '?')
+    ) {
       index = lt + 1;
       continue;
     }
@@ -163,7 +222,12 @@ export function parseHtml(source: string): readonly HtmlNode[] {
       const close = indexOfInsensitive(source, closeTag, index);
       const body = source.slice(index, close < 0 ? source.length : close);
       if (!DISCARDED_ELEMENTS.has(name)) {
-        top().children.push({ kind: 'element', name, attrs, children: [{ kind: 'text', text: body }] });
+        top().children.push({
+          kind: 'element',
+          name,
+          attrs,
+          children: [{ kind: 'text', text: body }],
+        });
       }
       if (close < 0) {
         index = source.length;
@@ -271,7 +335,13 @@ function readTag(source: string, start: number): Tag | undefined {
     }
 
     const attrStart = index;
-    while (index < source.length && !isSpace(source[index] ?? '') && source[index] !== '=' && source[index] !== '>' && source[index] !== '/') {
+    while (
+      index < source.length &&
+      !isSpace(source[index] ?? '') &&
+      source[index] !== '=' &&
+      source[index] !== '>' &&
+      source[index] !== '/'
+    ) {
       index += 1;
     }
     if (index === attrStart) {
@@ -298,7 +368,8 @@ function readTag(source: string, start: number): Tag | undefined {
       index = close < 0 ? source.length : close + 1;
     } else {
       const valueStart = index;
-      while (index < source.length && !isSpace(source[index] ?? '') && source[index] !== '>') index += 1;
+      while (index < source.length && !isSpace(source[index] ?? '') && source[index] !== '>')
+        index += 1;
       value = source.slice(valueStart, index);
     }
     if (!(attrName in attrs)) attrs[attrName] = decodeEntities(value);
@@ -375,36 +446,80 @@ function indexOfInsensitive(source: string, needle: string, from: number): numbe
  * does with an unterminated entity anyway.
  */
 const ENTITIES: Readonly<Record<string, string>> = {
-  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
-  copy: '©', reg: '®', trade: '™', hellip: '…',
-  mdash: '—', ndash: '–', lsquo: '‘', rsquo: '’',
-  ldquo: '“', rdquo: '”', bull: '•', middot: '·',
-  deg: '°', plusmn: '±', times: '×', divide: '÷',
-  frac12: '½', frac14: '¼', frac34: '¾', sup2: '²',
-  sup3: '³', laquo: '«', raquo: '»', sect: '§',
-  para: '¶', dagger: '†', Dagger: '‡', permil: '‰',
-  larr: '←', uarr: '↑', rarr: '→', darr: '↓',
-  harr: '↔', ne: '≠', le: '≤', ge: '≥',
-  euro: '€', pound: '£', yen: '¥', cent: '¢',
-  emsp: ' ', ensp: ' ', thinsp: ' ', shy: '­',
-  zwnj: '‌', zwj: '‍', lrm: '‎', rlm: '‏',
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+  copy: '©',
+  reg: '®',
+  trade: '™',
+  hellip: '…',
+  mdash: '—',
+  ndash: '–',
+  lsquo: '‘',
+  rsquo: '’',
+  ldquo: '“',
+  rdquo: '”',
+  bull: '•',
+  middot: '·',
+  deg: '°',
+  plusmn: '±',
+  times: '×',
+  divide: '÷',
+  frac12: '½',
+  frac14: '¼',
+  frac34: '¾',
+  sup2: '²',
+  sup3: '³',
+  laquo: '«',
+  raquo: '»',
+  sect: '§',
+  para: '¶',
+  dagger: '†',
+  Dagger: '‡',
+  permil: '‰',
+  larr: '←',
+  uarr: '↑',
+  rarr: '→',
+  darr: '↓',
+  harr: '↔',
+  ne: '≠',
+  le: '≤',
+  ge: '≥',
+  euro: '€',
+  pound: '£',
+  yen: '¥',
+  cent: '¢',
+  emsp: ' ',
+  ensp: ' ',
+  thinsp: ' ',
+  shy: '­',
+  zwnj: '‌',
+  zwj: '‍',
+  lrm: '‎',
+  rlm: '‏',
 };
 
 /** Decode numeric and known named character references. */
 export function decodeEntities(text: string): string {
   if (!text.includes('&')) return text;
-  return text.replace(/&(#[Xx][0-9A-Fa-f]+|#\d+|[A-Za-z][A-Za-z0-9]{1,31});/g, (match, body: string) => {
-    if (body.startsWith('#')) {
-      const isHex = body[1] === 'x' || body[1] === 'X';
-      const code = Number.parseInt(isHex ? body.slice(2) : body.slice(1), isHex ? 16 : 10);
-      if (!Number.isFinite(code) || code <= 0 || code > 0x10ffff) return match;
-      // Surrogate halves are not valid scalar values; a browser substitutes
-      // U+FFFD rather than producing a lone surrogate, and so do we.
-      if (code >= 0xd800 && code <= 0xdfff) return '�';
-      return String.fromCodePoint(code);
-    }
-    return ENTITIES[body] ?? match;
-  });
+  return text.replace(
+    /&(#[Xx][0-9A-Fa-f]+|#\d+|[A-Za-z][A-Za-z0-9]{1,31});/g,
+    (match, body: string) => {
+      if (body.startsWith('#')) {
+        const isHex = body[1] === 'x' || body[1] === 'X';
+        const code = Number.parseInt(isHex ? body.slice(2) : body.slice(1), isHex ? 16 : 10);
+        if (!Number.isFinite(code) || code <= 0 || code > 0x10ffff) return match;
+        // Surrogate halves are not valid scalar values; a browser substitutes
+        // U+FFFD rather than producing a lone surrogate, and so do we.
+        if (code >= 0xd800 && code <= 0xdfff) return '�';
+        return String.fromCodePoint(code);
+      }
+      return ENTITIES[body] ?? match;
+    },
+  );
 }
 
 /** Escape text for insertion into HTML character data or a quoted attribute. */

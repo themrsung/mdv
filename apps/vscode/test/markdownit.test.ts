@@ -111,10 +111,7 @@ describe('createMarkdownItExtension', () => {
     extend(harness);
     const env = withSource(harness, '```ts\nconst x = 1;\n```\n');
 
-    const html = harness.render(
-      { info: 'ts', content: 'const x = 1;\n', map: [0, 3] },
-      env,
-    );
+    const html = harness.render({ info: 'ts', content: 'const x = 1;\n', map: [0, 3] }, env);
     expect(html).toBe('<pre>default</pre>');
     expect(harness.fallbacks).toBe(1);
   });

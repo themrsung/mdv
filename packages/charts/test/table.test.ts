@@ -16,7 +16,16 @@
 import { describe, expect, it } from 'vitest';
 import type { Rect, Table } from '@mdv/core';
 import { tableChart } from '../src/table.js';
-import { EMPTY_TABLE, attrsOf, codesOf, makeTable, nodesOfKind, nonFiniteNumbers, noRows, runChart } from './harness.js';
+import {
+  EMPTY_TABLE,
+  attrsOf,
+  codesOf,
+  makeTable,
+  nodesOfKind,
+  nonFiniteNumbers,
+  noRows,
+  runChart,
+} from './harness.js';
 
 /** Two regions and their revenue — the smallest table with a real column pair. */
 function regions() {
@@ -42,7 +51,10 @@ const PINNED = { columns: { region: { width: 200 }, revenue: { width: 200 } } };
  * as a map, while the shared `BlockAttrs` declares `columns` as SPEC 7.6's facet
  * wrap *count*. Every fixture below would otherwise carry the same cast.
  */
-function runTable(table: Table, options: { attrs?: Readonly<Record<string, unknown>>; frame?: Rect } = {}) {
+function runTable(
+  table: Table,
+  options: { attrs?: Readonly<Record<string, unknown>>; frame?: Rect } = {},
+) {
   return runChart(tableChart, table, {
     ...(options.attrs === undefined ? {} : { attrs: attrsOf(options.attrs) }),
     ...(options.frame === undefined ? {} : { frame: options.frame }),
@@ -102,7 +114,10 @@ describe('table: header and rows', () => {
   });
 
   it('stops drawing at the bottom of the frame instead of overflowing it', () => {
-    const short = runTable(regions(), { attrs: PINNED, frame: { x: 0, y: 0, width: 400, height: 40 } });
+    const short = runTable(regions(), {
+      attrs: PINNED,
+      frame: { x: 0, y: 0, width: 400, height: 40 },
+    });
     // Header (27.47) plus one row is already past 40, so only the first row lands.
     expect(texts(short, 'mdv-table-cell')).toHaveLength(2);
   });
@@ -130,7 +145,9 @@ describe('table: column configuration (SPEC 10.1)', () => {
   });
 
   it('takes an explicit alignment over the inferred one', () => {
-    const run = runTable(regions(), { attrs: { columns: { revenue: { width: 400, align: 'center' } } } });
+    const run = runTable(regions(), {
+      attrs: { columns: { revenue: { width: 400, align: 'center' } } },
+    });
     expect(texts(run, 'mdv-table-cell')[0]?.anchor).toBe('middle');
   });
 
@@ -150,7 +167,9 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
     const run = runTable(regions(), {
       attrs: { columns: { region: { width: 200 }, revenue: { width: 200, heat: 'bar' } } },
     });
-    const bars = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-bar');
+    const bars = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-bar',
+    );
     // The bar measures from zero, not from the column minimum: 100/250 and 250/250
     // of the 198 px inner width.
     expect(bars.map((node) => node.w)).toEqual([79.2, 198]);
@@ -160,7 +179,9 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
   it('anchors the bar at zero so a small value looks small', () => {
     const table = makeTable([['n', 'number']], [[90], [100]]);
     const run = runTable(table, { attrs: { columns: { n: { heat: 'bar' } } } });
-    const bars = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-bar');
+    const bars = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-bar',
+    );
     // The lone column fills the 400 px frame, so the inner width is 398: the bars
     // are 90 % and 100 % of it, not 0 % and 100 %, which is what measuring from
     // the column minimum would draw.
@@ -171,7 +192,9 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
     const run = runTable(regions(), {
       attrs: { columns: { region: { width: 200 }, revenue: { width: 200, heat: 'sequential' } } },
     });
-    const heat = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat');
+    const heat = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-heat',
+    );
     expect(heat.map((node) => node.fill)).toEqual([
       { kind: 'solid', color: '#e6f4f4' },
       { kind: 'solid', color: '#0b5f5f' },
@@ -190,14 +213,18 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
   it('keeps the midpoint neutral, because zero must read as "nothing" (SPEC 11.3)', () => {
     const table = makeTable([['delta', 'number']], [[-10], [0], [10]]);
     const run = runTable(table, { attrs: { columns: { delta: { heat: 'diverging' } } } });
-    const heat = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat');
+    const heat = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-heat',
+    );
     expect(heat[1]?.fill).toEqual({ kind: 'solid', color: '#f2f2f2' });
   });
 
   it('gives each arm its own hue, at matching strength', () => {
     const table = makeTable([['delta', 'number']], [[-10], [0], [10]]);
     const run = runTable(table, { attrs: { columns: { delta: { heat: 'diverging' } } } });
-    const heat = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat');
+    const heat = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-heat',
+    );
     // `lowSteps` reads from the low extreme inwards and `highSteps` outwards, so
     // −10 must land on the *first* low step, not the last.
     expect(heat[0]?.fill).toEqual({ kind: 'solid', color: '#801111' });
@@ -206,8 +233,12 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
 
   it('moves the diverging neutral to an explicit midpoint', () => {
     const table = makeTable([['score', 'number']], [[0], [50], [100]]);
-    const run = runTable(table, { attrs: { columns: { score: { heat: 'diverging', midpoint: 50 } } } });
-    const heat = nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat');
+    const run = runTable(table, {
+      attrs: { columns: { score: { heat: 'diverging', midpoint: 50 } } },
+    });
+    const heat = nodesOfKind(run.laid.nodes, 'rect').filter(
+      (node) => node.cls === 'mdv-table-cell-heat',
+    );
     expect(heat[1]?.fill).toEqual({ kind: 'solid', color: '#f2f2f2' });
     expect(heat[0]?.fill).toEqual({ kind: 'solid', color: '#801111' });
     expect(heat[2]?.fill).toEqual({ kind: 'solid', color: '#111180' });
@@ -216,12 +247,16 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
   it('tints nothing when every value is the same: there is no magnitude to show', () => {
     const table = makeTable([['n', 'number']], [[5], [5]]);
     const run = runTable(table, { attrs: { columns: { n: { heat: 'sequential' } } } });
-    expect(nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat')).toHaveLength(0);
+    expect(
+      nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-heat'),
+    ).toHaveLength(0);
   });
 
   it('draws a per-cell sparkline from a comma-separated series', () => {
     const table = makeTable([['history', 'string']], [['1,2,3']]);
-    const run = runTable(table, { attrs: { columns: { history: { type: 'sparkline', width: 400 } } } });
+    const run = runTable(table, {
+      attrs: { columns: { history: { type: 'sparkline', width: 400 } } },
+    });
     const spark = nodesOfKind(run.laid.nodes, 'path')[0];
     // Inner box: x from 8 to 392, y from 27.47 + 6 down 15.47.
     expect(spark?.d).toEqual([
@@ -240,7 +275,9 @@ describe('table: in-cell encodings supplement the value, never replace it (SPEC 
   it('sets a badge behind its text without hiding it', () => {
     const table = makeTable([['status', 'string']], [['ok']]);
     const run = runTable(table, { attrs: { columns: { status: { type: 'badge', width: 400 } } } });
-    expect(nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-badge')).toHaveLength(1);
+    expect(
+      nodesOfKind(run.laid.nodes, 'rect').filter((node) => node.cls === 'mdv-table-cell-badge'),
+    ).toHaveLength(1);
     expect(texts(run, 'mdv-table-cell')[0]?.text).toBe('ok');
   });
 });
@@ -320,7 +357,9 @@ describe('table: sorting (SPEC 10.1)', () => {
   });
 
   it('names a sort column that is not in the data (MDV1501)', () => {
-    expect(codesOf(runTable(scores(), { attrs: { sort: 'rank' } }).validation)).toEqual(['MDV1501']);
+    expect(codesOf(runTable(scores(), { attrs: { sort: 'rank' } }).validation)).toEqual([
+      'MDV1501',
+    ]);
   });
 });
 
@@ -342,7 +381,12 @@ describe('table: grouping and totals (SPEC 10.1)', () => {
   it('heads each group and subtotals it, so no one adds rows up by eye', () => {
     const run = runTable(sales(), { attrs: { group: 'region' } });
     expect(texts(run, 'mdv-table-group').map((node) => node.text)).toEqual(['North', 'South']);
-    expect(texts(run, 'mdv-table-subtotal').map((node) => node.text)).toEqual(['', '500', '', '250']);
+    expect(texts(run, 'mdv-table-subtotal').map((node) => node.text)).toEqual([
+      '',
+      '500',
+      '',
+      '250',
+    ]);
   });
 
   it('keeps groups in first-appearance order, not alphabetical', () => {
@@ -467,7 +511,11 @@ describe('table: degenerate input', () => {
       { x: 0, y: 0, width: Number.NaN, height: 200 },
     ]) {
       const run = runTable(regions(), {
-        attrs: { zebra: true, total: { revenue: 'sum' }, columns: { region: {}, revenue: { heat: 'bar' } } },
+        attrs: {
+          zebra: true,
+          total: { revenue: 'sum' },
+          columns: { region: {}, revenue: { heat: 'bar' } },
+        },
         frame,
       });
       expect(nonFiniteNumbers(run.laid)).toEqual([]);
@@ -477,7 +525,14 @@ describe('table: degenerate input', () => {
   it('never throws for document content, however wrong', () => {
     expect(() =>
       runTable(regions(), {
-        attrs: { columns: 'nope', sort: 7, total: [1, 2], group: 42, zebra: 'maybe', sticky: 'sideways' },
+        attrs: {
+          columns: 'nope',
+          sort: 7,
+          total: [1, 2],
+          group: 42,
+          zebra: 'maybe',
+          sticky: 'sideways',
+        },
       }),
     ).not.toThrow();
   });
@@ -519,7 +574,9 @@ describe('table: the duality with charts (SPEC 10.3)', () => {
   });
 
   it('describes its shape rather than reading itself aloud', () => {
-    expect(runTable(regions(), {}).description).toBe('Table. 2 rows across 2 columns: Region, Revenue.');
+    expect(runTable(regions(), {}).description).toBe(
+      'Table. 2 rows across 2 columns: Region, Revenue.',
+    );
   });
 
   it('says so when there is nothing to show', () => {

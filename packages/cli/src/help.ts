@@ -90,9 +90,9 @@ Writes a working scaffold document (default document.mdv).`,
 /** The global usage text. */
 export function globalHelp(version: string): string {
   const width = Math.max(...COMMAND_NAMES.map((name) => name.length));
-  const commands = COMMAND_NAMES.map(
-    (name) => `  ${name.padEnd(width)}  ${SUMMARY[name]}`,
-  ).join('\n');
+  const commands = COMMAND_NAMES.map((name) => `  ${name.padEnd(width)}  ${SUMMARY[name]}`).join(
+    '\n',
+  );
 
   return `mdv ${version} — Markdown Visual
 

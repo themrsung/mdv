@@ -48,7 +48,8 @@ function selectedKinds(blocks: readonly Block[]): {
   let heading: HeadingLevel | null = null;
   for (const block of blocks) {
     kinds.add(block.kind);
-    if (block.kind === 'heading') heading = heading === null || heading === block.level ? block.level : heading;
+    if (block.kind === 'heading')
+      heading = heading === null || heading === block.level ? block.level : heading;
   }
   return { heading, kinds };
 }
@@ -158,16 +159,72 @@ export function Toolbar({ mod, onLink }: ToolbarProps): ReactElement {
       },
     ],
     [
-      blockButton('h1', 'Heading 1', 'H1', { kind: 'heading', level: 1 }, heading === 1, `Heading 1 (${shortcutLabel(mod, { alt: true, key: '1' })})`),
-      blockButton('h2', 'Heading 2', 'H2', { kind: 'heading', level: 2 }, heading === 2, `Heading 2 (${shortcutLabel(mod, { alt: true, key: '2' })})`),
-      blockButton('h3', 'Heading 3', 'H3', { kind: 'heading', level: 3 }, heading === 3, `Heading 3 (${shortcutLabel(mod, { alt: true, key: '3' })})`),
-      blockButton('paragraph', 'Paragraph', '¶', { kind: 'paragraph' }, kinds.has('paragraph') && heading === null, `Paragraph (${shortcutLabel(mod, { alt: true, key: '0' })})`),
+      blockButton(
+        'h1',
+        'Heading 1',
+        'H1',
+        { kind: 'heading', level: 1 },
+        heading === 1,
+        `Heading 1 (${shortcutLabel(mod, { alt: true, key: '1' })})`,
+      ),
+      blockButton(
+        'h2',
+        'Heading 2',
+        'H2',
+        { kind: 'heading', level: 2 },
+        heading === 2,
+        `Heading 2 (${shortcutLabel(mod, { alt: true, key: '2' })})`,
+      ),
+      blockButton(
+        'h3',
+        'Heading 3',
+        'H3',
+        { kind: 'heading', level: 3 },
+        heading === 3,
+        `Heading 3 (${shortcutLabel(mod, { alt: true, key: '3' })})`,
+      ),
+      blockButton(
+        'paragraph',
+        'Paragraph',
+        '¶',
+        { kind: 'paragraph' },
+        kinds.has('paragraph') && heading === null,
+        `Paragraph (${shortcutLabel(mod, { alt: true, key: '0' })})`,
+      ),
     ],
     [
-      blockButton('ul', 'Bulleted list', '•', { kind: 'bulletList' }, inList, `Bulleted list (${shortcutLabel(mod, { shift: true, key: '8' })})`),
-      blockButton('ol', 'Numbered list', '1.', { kind: 'orderedList' }, false, `Numbered list (${shortcutLabel(mod, { shift: true, key: '7' })})`),
-      blockButton('quote', 'Quote', '❝', { kind: 'quote' }, kinds.has('blockquote'), `Quote (${shortcutLabel(mod, { shift: true, key: '9' })})`),
-      blockButton('codeblock', 'Code block', '{ }', { kind: 'code' }, kinds.has('code'), `Code block (${shortcutLabel(mod, { alt: true, key: 'c' })})`),
+      blockButton(
+        'ul',
+        'Bulleted list',
+        '•',
+        { kind: 'bulletList' },
+        inList,
+        `Bulleted list (${shortcutLabel(mod, { shift: true, key: '8' })})`,
+      ),
+      blockButton(
+        'ol',
+        'Numbered list',
+        '1.',
+        { kind: 'orderedList' },
+        false,
+        `Numbered list (${shortcutLabel(mod, { shift: true, key: '7' })})`,
+      ),
+      blockButton(
+        'quote',
+        'Quote',
+        '❝',
+        { kind: 'quote' },
+        kinds.has('blockquote'),
+        `Quote (${shortcutLabel(mod, { shift: true, key: '9' })})`,
+      ),
+      blockButton(
+        'codeblock',
+        'Code block',
+        '{ }',
+        { kind: 'code' },
+        kinds.has('code'),
+        `Code block (${shortcutLabel(mod, { alt: true, key: 'c' })})`,
+      ),
     ],
     [
       {
@@ -207,25 +264,28 @@ export function Toolbar({ mod, onLink }: ToolbarProps): ReactElement {
 
   const flat = groups.flat();
 
-  const onKeyDown = useCallback(
-    (event: ReactKeyboardEvent<HTMLDivElement>): void => {
-      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-      if (step === 0) return;
-      event.preventDefault();
-      const buttons = Array.from(listRef.current?.querySelectorAll('button') ?? []);
-      const index = buttons.findIndex((button) => button === document.activeElement);
-      const next = buttons[(index + step + buttons.length) % buttons.length];
-      if (next !== undefined) {
-        for (const button of buttons) button.tabIndex = -1;
-        next.tabIndex = 0;
-        next.focus();
-      }
-    },
-    [],
-  );
+  const onKeyDown = useCallback((event: ReactKeyboardEvent<HTMLDivElement>): void => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    const buttons = Array.from(listRef.current?.querySelectorAll('button') ?? []);
+    const index = buttons.findIndex((button) => button === document.activeElement);
+    const next = buttons[(index + step + buttons.length) % buttons.length];
+    if (next !== undefined) {
+      for (const button of buttons) button.tabIndex = -1;
+      next.tabIndex = 0;
+      next.focus();
+    }
+  }, []);
 
   return (
-    <div className="mdv-toolbar" role="toolbar" aria-label="Formatting" ref={listRef} onKeyDown={onKeyDown}>
+    <div
+      className="mdv-toolbar"
+      role="toolbar"
+      aria-label="Formatting"
+      ref={listRef}
+      onKeyDown={onKeyDown}
+    >
       {groups.map((group, groupIndex) => (
         <div className="mdv-toolbar__group" key={group[0]?.id ?? String(groupIndex)}>
           {group.map((entry) => (

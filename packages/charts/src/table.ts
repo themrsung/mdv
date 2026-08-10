@@ -41,9 +41,24 @@ import type { CurveKind } from './internal/types.js';
 import { CURVE_KINDS } from './internal/types.js';
 import { alignFor, presentationOf } from './internal/a11y.js';
 import { blockDiagnostic } from './internal/diagnostics.js';
-import { boolAttr, enumAttr, listAttr, numberAttr, recordAttr, stringAttr } from './internal/attrs.js';
+import {
+  boolAttr,
+  enumAttr,
+  listAttr,
+  numberAttr,
+  recordAttr,
+  stringAttr,
+} from './internal/attrs.js';
 import { cell, cellNumber, findColumn, humaniseColumn } from './internal/table.js';
-import { clamp, compareNumbers, compareStrings, finite, isFiniteNumber, safeDiv, sum as sumOf } from './internal/num.js';
+import {
+  clamp,
+  compareNumbers,
+  compareStrings,
+  finite,
+  isFiniteNumber,
+  safeDiv,
+  sum as sumOf,
+} from './internal/num.js';
 import { curvePath, px } from './internal/geometry.js';
 import { formatValue } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
@@ -111,7 +126,13 @@ interface TablePlan {
   hasTotals: boolean;
 }
 
-const DEFAULT_PLAN: TablePlan = { columns: [], rows: [], zebra: false, sticky: 'header', hasTotals: false };
+const DEFAULT_PLAN: TablePlan = {
+  columns: [],
+  rows: [],
+  zebra: false,
+  sticky: 'header',
+  hasTotals: false,
+};
 
 type TableEncodeResult = PlannedEncodeResult<Mark, TablePlan>;
 
@@ -157,7 +178,12 @@ export const tableChart: ChartType<Mark> = {
       const field = entry.startsWith('-') ? entry.slice(1) : entry;
       if (findColumn(table, field) === undefined && table.fields.length > 0) {
         diagnostics.push(
-          blockDiagnostic('MDV1501', block, 'encode', `\`sort\` names \`${field}\`, which is not a column`),
+          blockDiagnostic(
+            'MDV1501',
+            block,
+            'encode',
+            `\`sort\` names \`${field}\`, which is not a column`,
+          ),
         );
       }
     }
@@ -202,13 +228,18 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
     const found = findColumn(table, name);
     if (found === undefined) continue;
     const config = configured?.[name];
-    const record = typeof config === 'object' && config !== null && !Array.isArray(config)
-      ? (config as Readonly<Record<string, unknown>>)
-      : undefined;
+    const record =
+      typeof config === 'object' && config !== null && !Array.isArray(config)
+        ? (config as Readonly<Record<string, unknown>>)
+        : undefined;
 
-    const declaredType = typeof record?.['type'] === 'string' ? (record['type'] as string) : undefined;
+    const declaredType =
+      typeof record?.['type'] === 'string' ? (record['type'] as string) : undefined;
     const renderer: CellRenderer =
-      declaredType === 'sparkline' || declaredType === 'bar' || declaredType === 'link' || declaredType === 'badge'
+      declaredType === 'sparkline' ||
+      declaredType === 'bar' ||
+      declaredType === 'link' ||
+      declaredType === 'badge'
         ? declaredType
         : 'auto';
     const numeric =
@@ -221,7 +252,8 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
 
     const heatText = typeof record?.['heat'] === 'string' ? (record['heat'] as string) : 'none';
     const heat: HeatMode = HEAT_MODES.find((mode) => mode === heatText) ?? 'none';
-    const alignText = typeof record?.['align'] === 'string' ? (record['align'] as string) : undefined;
+    const alignText =
+      typeof record?.['align'] === 'string' ? (record['align'] as string) : undefined;
     const align: 'left' | 'right' | 'center' =
       alignText === 'right' || alignText === 'center' || alignText === 'left'
         ? alignText
@@ -230,11 +262,16 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
           : alignFor(found.column.type);
 
     const widthRaw = record?.['width'];
-    const width = typeof widthRaw === 'number' && Number.isFinite(widthRaw) && widthRaw > 0 ? widthRaw : undefined;
-    const curveText = typeof record?.['curve'] === 'string' ? (record['curve'] as string) : 'linear';
+    const width =
+      typeof widthRaw === 'number' && Number.isFinite(widthRaw) && widthRaw > 0
+        ? widthRaw
+        : undefined;
+    const curveText =
+      typeof record?.['curve'] === 'string' ? (record['curve'] as string) : 'linear';
     const curve: CurveKind = CURVE_KINDS.find((kind) => kind === curveText) ?? 'linear';
     const midpointRaw = record?.['midpoint'];
-    const midpoint = typeof midpointRaw === 'number' && Number.isFinite(midpointRaw) ? midpointRaw : 0;
+    const midpoint =
+      typeof midpointRaw === 'number' && Number.isFinite(midpointRaw) ? midpointRaw : 0;
 
     const values: number[] = [];
     for (let row = 0; row < table.rows.length; row += 1) {
@@ -246,17 +283,25 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
 
     const totalRaw = totals?.[name];
     const total: TotalOp | undefined =
-      totalRaw === 'sum' || totalRaw === 'mean' || totalRaw === 'min' || totalRaw === 'max' || totalRaw === 'count'
+      totalRaw === 'sum' ||
+      totalRaw === 'mean' ||
+      totalRaw === 'min' ||
+      totalRaw === 'max' ||
+      totalRaw === 'count'
         ? totalRaw
         : undefined;
 
     columns.push({
       index: found.index,
-      label: typeof record?.['label'] === 'string' ? (record['label'] as string) : humaniseColumn(found.column),
+      label:
+        typeof record?.['label'] === 'string'
+          ? (record['label'] as string)
+          : humaniseColumn(found.column),
       align,
       renderer,
       heat,
-      format: typeof record?.['format'] === 'string' ? (record['format'] as string) : found.column.format,
+      format:
+        typeof record?.['format'] === 'string' ? (record['format'] as string) : found.column.format,
       width,
       midpoint,
       curve,
@@ -275,7 +320,10 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
       descending: entry.startsWith('-'),
       column: findColumn(table, entry.startsWith('-') ? entry.slice(1) : entry),
     }))
-    .filter((key): key is { descending: boolean; column: NonNullable<ReturnType<typeof findColumn>> } => key.column !== undefined);
+    .filter(
+      (key): key is { descending: boolean; column: NonNullable<ReturnType<typeof findColumn>> } =>
+        key.column !== undefined,
+    );
 
   if (sortKeys.length > 0) {
     order = [...order].sort((a, b) => {
@@ -297,7 +345,12 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
 
   if (groupColumn === undefined) {
     for (const rowIndex of order) {
-      rows.push({ kind: 'data', datum: rowIndex, cells: buildCells(rowIndex), readout: rowReadout(columns, buildCells(rowIndex)) });
+      rows.push({
+        kind: 'data',
+        datum: rowIndex,
+        cells: buildCells(rowIndex),
+        readout: rowReadout(columns, buildCells(rowIndex)),
+      });
     }
   } else {
     const groups = new Map<string, number[]>();
@@ -366,7 +419,9 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
   const a11yTable: A11yTable = {
     caption: attrs.caption ?? attrs.title ?? 'Table',
     columns: a11yColumns,
-    rows: rows.filter((row) => row.kind === 'data').map((row) => row.cells.map((viewCell) => viewCell.text)),
+    rows: rows
+      .filter((row) => row.kind === 'data')
+      .map((row) => row.cells.map((viewCell) => viewCell.text)),
     presentation: presentationOf(attrs),
   };
 
@@ -404,9 +459,12 @@ function encodeTable(input: EncodeInput): EncodeResult<Mark> {
 function compareCells(left: unknown, right: unknown): number {
   if (left === null || left === undefined) return right === null || right === undefined ? 0 : 1;
   if (right === null || right === undefined) return -1;
-  const leftNumber = left instanceof Date ? left.getTime() : typeof left === 'number' ? left : Number.NaN;
-  const rightNumber = right instanceof Date ? right.getTime() : typeof right === 'number' ? right : Number.NaN;
-  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) return compareNumbers(leftNumber, rightNumber);
+  const leftNumber =
+    left instanceof Date ? left.getTime() : typeof left === 'number' ? left : Number.NaN;
+  const rightNumber =
+    right instanceof Date ? right.getTime() : typeof right === 'number' ? right : Number.NaN;
+  if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber))
+    return compareNumbers(leftNumber, rightNumber);
   return compareStrings(String(left), String(right));
 }
 
@@ -419,7 +477,11 @@ function resolveCell(table: Table, row: number, column: ViewColumn): ViewCell {
       .split(',')
       .map((part) => Number(part.trim()))
       .filter((value): value is number => Number.isFinite(value));
-    return { text: parts.length === 0 ? '—' : `${parts.length} points`, value: undefined, spark: parts };
+    return {
+      text: parts.length === 0 ? '—' : `${parts.length} points`,
+      value: undefined,
+      spark: parts,
+    };
   }
   const numeric = cellNumber(raw);
   return {
@@ -441,7 +503,11 @@ function rowReadout(columns: readonly ViewColumn[], cells: readonly ViewCell[]):
 }
 
 /** Subtotal cells for one group. */
-function subtotalCells(table: Table, columns: readonly ViewColumn[], members: readonly number[]): ViewCell[] {
+function subtotalCells(
+  table: Table,
+  columns: readonly ViewColumn[],
+  members: readonly number[],
+): ViewCell[] {
   return columns.map((column) => {
     if (!column.numeric) return { text: '', value: undefined, spark: undefined };
     const values: number[] = [];
@@ -459,16 +525,25 @@ function subtotalCells(table: Table, columns: readonly ViewColumn[], members: re
 function aggregate(op: TotalOp, values: readonly number[]): number {
   if (values.length === 0) return 0;
   switch (op) {
-    case 'mean': return sumOf(values) / values.length;
-    case 'min': return Math.min(...values);
-    case 'max': return Math.max(...values);
-    case 'count': return values.length;
-    default: return sumOf(values);
+    case 'mean':
+      return sumOf(values) / values.length;
+    case 'min':
+      return Math.min(...values);
+    case 'max':
+      return Math.max(...values);
+    case 'count':
+      return values.length;
+    default:
+      return sumOf(values);
   }
 }
 
 /** Draw the table into the scene graph. */
-function layoutTable(encoded: EncodeResult<Mark>, frame: Rect, ctx: LayoutContext): ChartLayoutResult {
+function layoutTable(
+  encoded: EncodeResult<Mark>,
+  frame: Rect,
+  ctx: LayoutContext,
+): ChartLayoutResult {
   const plan = planOf<Mark, TablePlan>(encoded, DEFAULT_PLAN);
   const nodes: SceneNode[] = [];
   const hits: ChartHitRegion[] = [];
@@ -607,9 +682,19 @@ function layoutTable(encoded: EncodeResult<Mark>, frame: Rect, ctx: LayoutContex
         }
       }
 
-      if (column.renderer === 'sparkline' && viewCell.spark !== undefined && viewCell.spark.length > 1) {
+      if (
+        column.renderer === 'sparkline' &&
+        viewCell.spark !== undefined &&
+        viewCell.spark.length > 1
+      ) {
         const d = curvePath(
-          sparkPoints(viewCell.spark, left + CELL_PAD_X, y + CELL_PAD_Y, Math.max(0, columnWidth - CELL_PAD_X * 2), rowHeight - CELL_PAD_Y * 2),
+          sparkPoints(
+            viewCell.spark,
+            left + CELL_PAD_X,
+            y + CELL_PAD_Y,
+            Math.max(0, columnWidth - CELL_PAD_X * 2),
+            rowHeight - CELL_PAD_Y * 2,
+          ),
           column.curve,
         );
         if (d.length > 0) {
@@ -617,7 +702,12 @@ function layoutTable(encoded: EncodeResult<Mark>, frame: Rect, ctx: LayoutContex
             kind: 'path',
             cls: 'mdv-table-cell-sparkline',
             d,
-            stroke: { paint: solid(theme.tokens['text-muted']), width: 1.5, cap: 'round', join: 'round' },
+            stroke: {
+              paint: solid(theme.tokens['text-muted']),
+              width: 1.5,
+              cap: 'round',
+              join: 'round',
+            },
           });
         }
         return;
@@ -626,7 +716,10 @@ function layoutTable(encoded: EncodeResult<Mark>, frame: Rect, ctx: LayoutContex
       if (column.renderer === 'badge') {
         const metrics = ctx.metrics.measure(viewCell.text, bodyFont);
         const badgeWidth = metrics.width + CELL_PAD_X;
-        const badgeX = column.align === 'right' ? left + columnWidth - badgeWidth - CELL_PAD_X : left + CELL_PAD_X / 2;
+        const badgeX =
+          column.align === 'right'
+            ? left + columnWidth - badgeWidth - CELL_PAD_X
+            : left + CELL_PAD_X / 2;
         nodes.push({
           kind: 'rect',
           cls: 'mdv-table-cell-badge',
@@ -778,7 +871,11 @@ function textNode(
 ): SceneNode {
   const anchor = align === 'right' ? 'end' : align === 'center' ? 'middle' : 'start';
   const x =
-    align === 'right' ? left + columnWidth - CELL_PAD_X : align === 'center' ? left + columnWidth / 2 : left + CELL_PAD_X;
+    align === 'right'
+      ? left + columnWidth - CELL_PAD_X
+      : align === 'center'
+        ? left + columnWidth / 2
+        : left + CELL_PAD_X;
   const node: SceneNode = {
     kind: 'text',
     cls,
@@ -796,7 +893,10 @@ function textNode(
 }
 
 /** How full an in-cell bar should be, 0…1. */
-function magnitudeFraction(value: number | undefined, extent: [number, number] | undefined): number {
+function magnitudeFraction(
+  value: number | undefined,
+  extent: [number, number] | undefined,
+): number {
   if (value === undefined || extent === undefined) return 0;
   const [lo, hi] = extent;
   const base = Math.min(0, lo);
@@ -806,7 +906,11 @@ function magnitudeFraction(value: number | undefined, extent: [number, number] |
 }
 
 /** The heat tint for a cell (SPEC 10.1 `heat`). */
-function heatColor(theme: Theme, column: ViewColumn, value: number | undefined): ColorString | undefined {
+function heatColor(
+  theme: Theme,
+  column: ViewColumn,
+  value: number | undefined,
+): ColorString | undefined {
   if (value === undefined || column.extent === undefined) return undefined;
   const [lo, hi] = column.extent;
 
@@ -835,7 +939,13 @@ function heatColor(theme: Theme, column: ViewColumn, value: number | undefined):
 }
 
 /** Lay out an in-cell sparkline. */
-function sparkPoints(values: readonly number[], x: number, y: number, width: number, height: number): { x: number; y: number }[] {
+function sparkPoints(
+  values: readonly number[],
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): { x: number; y: number }[] {
   const usable = values.filter(isFiniteNumber);
   if (usable.length === 0 || width <= 0 || height <= 0) return [];
   let lo = usable[0] ?? 0;

@@ -7,7 +7,12 @@
  * {@link insertBlocks} rather than each inventing its own placement rule.
  */
 
-import { emptyTable, image as makeImage, paragraph as makeParagraph, visualBlock } from '../builders.js';
+import {
+  emptyTable,
+  image as makeImage,
+  paragraph as makeParagraph,
+  visualBlock,
+} from '../builders.js';
 import type { IdFactory, NodeId } from '../ids.js';
 import { normalizeRuns, runsLength, runsText, sliceRuns, spliceRuns } from '../inline.js';
 import { MappingBuilder, addressOf } from '../mapping.js';
@@ -23,7 +28,6 @@ import {
   fromAbsolute,
   requireContainer,
   resolveContainer,
-  startOfBlock,
   toAbsolute,
   writeContainer,
 } from '../selection.js';
@@ -78,7 +82,11 @@ export function insertBlocksAtSelection(blocks: readonly Block[]): Command {
 
     const at =
       selection.kind === 'cells'
-        ? ({ blockId: selection.tableId, path: [cellRect(selection).top, cellRect(selection).left, 0], offset: 0 } satisfies Point)
+        ? ({
+            blockId: selection.tableId,
+            path: [cellRect(selection).top, cellRect(selection).left, 0],
+            offset: 0,
+          } satisfies Point)
         : selection.anchor;
 
     const location = findBlock(doc, at.blockId);
@@ -270,11 +278,19 @@ export function insertFragment(blocks: readonly Block[]): Command {
       caretOffset = runsLength(headRuns);
     }
 
-    builder.splice(addressOf(at), abs, total, fused && first.kind === 'paragraph' ? runsLength(first.runs) : 0);
+    builder.splice(
+      addressOf(at),
+      abs,
+      total,
+      fused && first.kind === 'paragraph' ? runsLength(first.runs) : 0,
+    );
 
     let next = writeContainer(doc, container, headRuns);
     if (middle.length > 0 || tailBlocks.length > 0) {
-      next = insertIntoParent(next, location.parent, location.index + 1, [...middle, ...tailBlocks]);
+      next = insertIntoParent(next, location.parent, location.index + 1, [
+        ...middle,
+        ...tailBlocks,
+      ]);
     }
 
     return {
@@ -412,7 +428,13 @@ export function insertThematicBreak(): Command {
 /** Replace an image's attributes in place — the image inspector's commit. */
 export function updateImage(
   blockId: NodeId,
-  patch: { readonly alt?: string; readonly title?: string | null; readonly src?: string; readonly width?: number | null; readonly height?: number | null },
+  patch: {
+    readonly alt?: string;
+    readonly title?: string | null;
+    readonly src?: string;
+    readonly width?: number | null;
+    readonly height?: number | null;
+  },
 ): Command {
   return (state) => {
     const location = findBlock(state.doc, blockId);

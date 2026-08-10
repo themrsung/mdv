@@ -8,9 +8,10 @@
  * `@mdv/render-svg` ships the chart half: the surface, the hit layer, the
  * tooltip, the crosshair, the focus ring and the live region. This file adds
  * only what exists in the React binding and nowhere else — the document flow,
- * the block wrapper, the virtualisation placeholder, the table view of SPEC 12.3
- * and the HTML error card of SPEC 14. Every rule is scoped under `.mdv-root`,
- * and there is not one element selector that is not.
+ * the block wrapper, the virtualisation placeholder, the table view of SPEC 12.3,
+ * the HTML error card of SPEC 14 and the page-break marker of SPEC 28.4. Every
+ * rule is scoped under `.mdv-root`, and there is not one element selector that
+ * is not.
  *
  * Nothing here is emitted as an inline `style` attribute anywhere in the
  * package. `style-src 'self' 'nonce-…'` blocks inline style *attributes* as well
@@ -36,6 +37,8 @@ export const REACT_CLASS_NAMES = Object.freeze({
   tableSummary: 'mdv-table-summary',
   dataTable: 'mdv-data-table',
   visuallyHidden: 'mdv-visually-hidden',
+  /** The `:::mdv-page` marker: addressable, but invisible on screen (SPEC 28.4). */
+  pageBreak: 'mdv-page-break',
   errorCard: 'mdv-error-card',
   errorHead: 'mdv-error-head',
   errorCode: 'mdv-error-code',
@@ -53,6 +56,7 @@ export const CLASS_NAMES = Object.freeze({ ...CHART_CLASSES, ...REACT_CLASS_NAME
 const SHEET = `\
 .mdv-root .mdv-document,.mdv-root.mdv-document{display:flow-root}
 .mdv-root .mdv-block{display:block;margin:1em 0;max-width:100%}
+.mdv-root .mdv-page-break{display:block}
 .mdv-root .mdv-chart-surface{display:block;position:relative;max-width:100%}
 .mdv-root .mdv-placeholder{display:block;width:100%;\
 border:var(--mdv-hairline) dashed var(--mdv-border);border-radius:var(--mdv-radius);\
@@ -88,6 +92,10 @@ font-family:var(--mdv-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace)
 font-size:calc(var(--mdv-font-size) * 0.92);white-space:pre;color:var(--mdv-text-secondary)}
 @media (forced-colors:active){.mdv-root .mdv-error-card{border-color:CanvasText}\
 .mdv-root .mdv-error-code{color:CanvasText}}
+@media print{\
+.mdv-root .mdv-page-break[data-mdv-break=before]{page-break-before:always;break-before:page}\
+.mdv-root .mdv-page-break[data-mdv-break=after]{page-break-after:always;break-after:page}\
+.mdv-root .mdv-page-break[data-mdv-break=avoid]{page-break-inside:avoid;break-inside:avoid}}
 `.replace(/\n/g, '');
 
 /**

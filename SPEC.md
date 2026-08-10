@@ -1534,7 +1534,7 @@ levels for extension syntax. All MDV directive names are prefixed `mdv-`.
 | `mdv-callout` | `type` (`note`\|`tip`\|`warning`\|`danger`), `title` | Admonition. Status colors ship with an icon and a label, never color alone. |
 | `mdv-tabs` / `mdv-tab` | `title`, `default` | Tabbed panels. In PDF all tabs render sequentially, each with its title as a subheading. |
 | `mdv-columns` | `count`, `gap` | Multi-column text flow. |
-| `mdv-page` | `break`, `orientation`, `size` | Print/PDF control ([§28.4](#284-pagination-control)). Ignored on screen. |
+| `mdv-page` | `break`, `orientation`, `size` | Print/PDF control ([§28.4](#284-pagination-control)). On screen it is a semantic marker with no visuals; an editor draws a page rule. |
 | `mdv-details` | `summary`, `open` | Collapsible section; always expanded in PDF. |
 
 Filters, where an embedder provides them, sit in **one row above** the content
@@ -2808,16 +2808,69 @@ into the text column:
    `:::mdv-details` renders expanded. Collapsed table views
    ([§12.3](#123-the-table-view)) render only when `pdf.expandTables: true`
    (default false) — the description and the chart carry the content otherwise.
+7. Content wrapped in `:::mdv-page{break=avoid}` ([§28.4](#284-pagination-control))
+   is kept on one page, tables included. It is a request, not a guarantee:
+   content taller than a page is split and reported as `MDV5121` (warning),
+   because dropping it or letting it run off the paper would be worse.
 
 ## 28.4 Pagination control
 
-```markdown
-:::mdv-page{break=before}
-:::mdv-page{break=after orientation=landscape size=A3}
-```
+`mdv-page` is an ordinary block directive ([§9.1](#91-block-directives)) and
+follows the same grammar as every other one: three colons, the `mdv-` prefix, an
+attribute block, and a closing `:::`. There is no separate page-break keyword and
+no leaf form — a page break is a `:::mdv-page` whose attributes say where to
+break.
 
-Attributes: `break` (`before`/`after`/`avoid`), `orientation`, `size`. Ignored on
-screen. Equivalent per-block attributes: `pdf: {break: before, scale: 0.8}`.
+It carries no content of its own, so the usual shape is an empty container, the
+**marker** form:
+
+````markdown
+:::mdv-page{break=before}
+:::
+
+## Appendix — data
+````
+
+Written with content inside, the attributes apply to that content — the
+**wrapping** form, which is the only way to say "keep all of this together":
+
+````markdown
+:::mdv-page{break=avoid}
+### Pricing
+| Plan | Price |
+|---|---|
+| Team | $19 |
+:::
+````
+
+| Attribute | Values | Effect |
+|---|---|---|
+| `break` | `before` \| `after` \| `avoid` | `before` and `after` force a page break at the marker, or around the wrapped content. `avoid` keeps the wrapped content on one page (rule 7) and does nothing in the marker form, because there is nothing to keep. |
+| `orientation` | `portrait` \| `landscape` | Page geometry from here on. Defaults to `pdf.orientation`. |
+| `size` | any `pdf.pageSize` value | Page geometry from here on. Defaults to `pdf.pageSize`. |
+
+- A geometry change opens a new page whether or not `break` is present: a page
+  has one size and one orientation.
+- Geometry **persists** until the next `:::mdv-page` that changes it. It is not
+  scoped to the wrapped content, even in the wrapping form.
+- A break at the very start or the very end of a document produces no blank page.
+- Unknown attribute values are ignored rather than an error, per
+  [§15.2](#152-forbidden-behavior) — an unrecognised `break` leaves the flow
+  untouched.
+
+Equivalent per-block attributes for a single visual block:
+`pdf: {break: before, scale: 0.8}`, where `pdf: {break: avoid}` means "do not
+break after this block".
+
+**On screen** the directive draws nothing. `@mdv/react` emits a semantic marker
+— an empty `<div class="mdv-page-break">` carrying `data-mdv-break` and, when
+present, `data-mdv-orientation` and `data-mdv-size`; the wrapping form renders
+its children inside that element. The stylesheet gives it no visuals, so an
+embedded document is not littered with rules an embedder never asked for, but it
+is addressable, and under `@media print` it maps to the CSS fragmentation
+properties (`break-before: page`, `break-inside: avoid`) so that printing the
+HTML agrees with exporting the PDF. **Editors SHOULD show it**, since an
+invisible block is an uneditable one: the MDV editor draws a labelled page rule.
 
 ## 28.5 Charts in PDF
 
@@ -3156,6 +3209,7 @@ Type key: `f` field · `f[]` field or field list · `n` number · `s` string ·
 | `barWidth` | n\|`auto` | bar, histogram | `auto` | 8.2 |
 | `baseline` | n\|f | bar, area | `0` | 8.2, 8.4 |
 | `bins` | n\|`auto` | histogram, heatmap | `auto` | 8.7, 8.9 |
+| `break` | e | `:::mdv-page` | — | 28.4 |
 | `caption` | s | all | — | 8.1 |
 | `category` | f | pie, funnel, treemap, radar | *req* | 8.5 |
 | `cellLabel` | b\|fmt | heatmap | `auto` | 8.9 |
@@ -3183,7 +3237,7 @@ Type key: `f` field · `f[]` field or field list · `n` number · `s` string ·
 | `nullPolicy` | e | line, area | `gap` | 6.5 |
 | `nullValues` | l | all | see 6.5 | 6.5 |
 | `open`/`high`/`low`/`close` | f | ohlc | auto-detected | 8.10 |
-| `orientation` | e | bar, funnel | `vertical` | 8.2 |
+| `orientation` | e | bar, funnel; `:::mdv-page` | `vertical`; `pdf.orientation` | 8.2, 28.4 |
 | `other` | n\|`false` | pie | `0.02` | 8.5 |
 | `overlay` | l | ohlc | — | 8.11.1 |
 | `padding` | d\|o | all | `8` | 8.1 |
@@ -3197,7 +3251,7 @@ Type key: `f` field · `f[]` field or field list · `n` number · `s` string ·
 | `series` | f | most | — | 7.1 |
 | `shape` | f\|s | scatter | `circle` | 8.6 |
 | `shareX` / `shareY` | b | facets | `true` | 7.6 |
-| `size` | f\|n | scatter, bubble | `8` | 8.6 |
+| `size` | f\|n\|s | scatter, bubble; `:::mdv-page` | `8`; `pdf.pageSize` | 8.6, 28.4 |
 | `sort` | e\|f\|l | many | varies | 8.2 |
 | `src` | s | all | — | 6.4 |
 | `stack` | e | bar, area | varies | 8.2, 8.4 |
@@ -3306,6 +3360,7 @@ Type key: `f` field · `f[]` field or field list · `n` number · `s` string ·
 | MDV5101 | warning | Complex-script shaping unsupported at this level |
 | MDV5110 | error | PDF/UA export requires an accessible description |
 | MDV5120 | warning | Chart scaled below 60 % to fit the page — rotated to landscape |
+| MDV5121 | warning | `break=avoid` content is taller than one page and was split |
 
 ---
 
@@ -3475,6 +3530,7 @@ extract.
 :::
 
 :::mdv-page{break=before}
+:::
 
 ## Appendix — data
 

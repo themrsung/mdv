@@ -348,10 +348,7 @@ describe('pathData emits commands directly (SPEC 20: no d-string parser)', () =>
 
   it('emits arc flags as bare 0/1, the only spelling the grammar accepts', () => {
     expect(
-      pathData(
-        [{ c: 'A', rx: 1, ry: 2, rotate: 30, largeArc: false, sweep: true, x: 3, y: 4 }],
-        3,
-      ),
+      pathData([{ c: 'A', rx: 1, ry: 2, rotate: 30, largeArc: false, sweep: true, x: 3, y: 4 }], 3),
     ).toBe('A1 2 30 0 1 3 4');
   });
 

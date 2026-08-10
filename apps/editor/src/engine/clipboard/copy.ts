@@ -17,11 +17,24 @@ import type { Block, ListItem, Run, TableCell, TableRow } from '../model.js';
 import type { IdFactory } from '../ids.js';
 import { createIdFactory } from '../ids.js';
 import type { Point, Selection } from '../selection.js';
-import { cellRect, containerPath, orderedPoints, resolveContainer, toAbsolute } from '../selection.js';
+import {
+  cellRect,
+  containerPath,
+  orderedPoints,
+  resolveContainer,
+  toAbsolute,
+} from '../selection.js';
 import type { MdvDocument } from '../model.js';
 import { findBlock } from '../tree.js';
 import { sliceRuns, runsLength } from '../inline.js';
-import { codeBlock, heading, paragraph, table as tableBlock, tableCell, tableRow } from '../builders.js';
+import {
+  codeBlock,
+  heading,
+  paragraph,
+  table as tableBlock,
+  tableCell,
+  tableRow,
+} from '../builders.js';
 import { blocksBetween } from '../commands/shared.js';
 import { extractRect } from '../table.js';
 import { write, writeBlocks } from '../io/write.js';
@@ -96,11 +109,7 @@ export function fragmentOf(
  * because trimming them would be a no-op; {@link fragmentOf} is what turns the
  * result into a standalone value.
  */
-function selectedBlocks(
-  doc: MdvDocument,
-  selection: Selection,
-  ids: IdFactory,
-): readonly Block[] {
+function selectedBlocks(doc: MdvDocument, selection: Selection, ids: IdFactory): readonly Block[] {
   if (selection.kind === 'node') {
     const block = findBlock(doc, selection.blockId)?.block;
     return block ? [block] : [];
@@ -113,7 +122,12 @@ function selectedBlocks(
     const grid = extractRect(block, rect);
     if (grid.length === 0) return [];
     const align = block.align.slice(rect.left, rect.right + 1);
-    const rows = grid.map((row) => tableRow(ids, row.map((runs) => tableCell(ids, runs))));
+    const rows = grid.map((row) =>
+      tableRow(
+        ids,
+        row.map((runs) => tableCell(ids, runs)),
+      ),
+    );
     return [tableBlock(ids, align, rows)];
   }
 
@@ -142,7 +156,9 @@ function sliceOne(doc: MdvDocument, start: Point, end: Point, ids: IdFactory): r
 
   if (container.storage === 'text' && block.kind === 'code') {
     const text = block.text.slice(from, to);
-    return from === 0 && to === block.text.length ? [block] : [codeBlock(ids, text, block.info, block.fence)];
+    return from === 0 && to === block.text.length
+      ? [block]
+      : [codeBlock(ids, text, block.info, block.fence)];
   }
 
   const whole = from === 0 && to === runsLength(container.runs);
@@ -189,7 +205,9 @@ function headOf(doc: MdvDocument, point: Point, ids: IdFactory): readonly Block[
   if (to === 0) return [];
 
   if (container.storage === 'text' && block.kind === 'code') {
-    return to === block.text.length ? [block] : [codeBlock(ids, block.text.slice(0, to), block.info, block.fence)];
+    return to === block.text.length
+      ? [block]
+      : [codeBlock(ids, block.text.slice(0, to), block.info, block.fence)];
   }
   const length = runsLength(container.runs);
   if (to >= length) return [block];

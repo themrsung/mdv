@@ -187,7 +187,9 @@ describe('pasting from Google Docs', () => {
   });
 
   it('loses no characters to the span soup', () => {
-    expect(visible(fromHtml(GOOGLE_DOCS))).toBe('Plain sentence with a bold word and an italic one.');
+    expect(visible(fromHtml(GOOGLE_DOCS))).toBe(
+      'Plain sentence with a bold word and an italic one.',
+    );
   });
 
   it('unwraps the docs-internal-guid wrapper rather than making a block of it', () => {
@@ -299,13 +301,15 @@ describe('pasting from a web page', () => {
     expect(sourceFromHtml('<p><b style="font-weight:normal">not bold</b></p>')).toBe('not bold\n');
     expect(sourceFromHtml('<p><span style="font-weight:700">bold</span></p>')).toBe('**bold**\n');
     expect(sourceFromHtml('<p><span style="font-style:italic">it</span></p>')).toBe('*it*\n');
-    expect(sourceFromHtml('<p><span style="text-decoration:line-through">gone</span></p>')).toBe('~~gone~~\n');
+    expect(sourceFromHtml('<p><span style="text-decoration:line-through">gone</span></p>')).toBe(
+      '~~gone~~\n',
+    );
   });
 
   it('recognises a monospace font as code', () => {
-    expect(sourceFromHtml('<p><span style="font-family:Consolas, monospace">x = 1</span></p>')).toBe(
-      '`x = 1`\n',
-    );
+    expect(
+      sourceFromHtml('<p><span style="font-family:Consolas, monospace">x = 1</span></p>'),
+    ).toBe('`x = 1`\n');
   });
 
   it('ends a paragraph at <br> rather than inventing a hard break', () => {
@@ -403,7 +407,10 @@ describe('nothing executable survives a paste', () => {
 describe('pasted tables are always rectangular', () => {
   const fixtures: readonly (readonly [string, string])[] = [
     ['ragged rows', '<table><tr><td>a</td><td>b</td><td>c</td></tr><tr><td>1</td></tr></table>'],
-    ['colspan', '<table><tr><td colspan="3">wide</td></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>'],
+    [
+      'colspan',
+      '<table><tr><td colspan="3">wide</td></tr><tr><td>1</td><td>2</td><td>3</td></tr></table>',
+    ],
     [
       'rowspan',
       '<table><tr><td rowspan="2">tall</td><td>a</td></tr><tr><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>',
@@ -412,7 +419,10 @@ describe('pasted tables are always rectangular', () => {
       'thead and tbody',
       '<table><thead><tr><th>H1</th><th>H2</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>',
     ],
-    ['nested markup in cells', '<table><tr><td><p><b>x</b></p><p>y</p></td><td><ul><li>z</li></ul></td></tr></table>'],
+    [
+      'nested markup in cells',
+      '<table><tr><td><p><b>x</b></p><p>y</p></td><td><ul><li>z</li></ul></td></tr></table>',
+    ],
   ];
 
   for (const [name, html] of fixtures) {
@@ -462,7 +472,9 @@ describe('pasted tables are always rectangular', () => {
   });
 
   it('uses the first row as the header when nothing is marked', () => {
-    const table = fromHtml('<table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>')[0];
+    const table = fromHtml(
+      '<table><tr><td>a</td><td>b</td></tr><tr><td>1</td><td>2</td></tr></table>',
+    )[0];
     if (table?.kind !== 'table') throw new Error('expected a table');
     expect(tableText(table)[0]).toEqual(['a', 'b']);
     expect(table.rows).toHaveLength(2);
@@ -779,7 +791,10 @@ describe('copying', () => {
 /* -------------------------------------------------------------------------- */
 
 describe('reading a DataTransfer', () => {
-  function transfer(data: Record<string, string>, extra: Partial<DataTransferLike> = {}): DataTransferLike {
+  function transfer(
+    data: Record<string, string>,
+    extra: Partial<DataTransferLike> = {},
+  ): DataTransferLike {
     return {
       types: Object.keys(data),
       getData: (type) => data[type] ?? '',
@@ -808,34 +823,60 @@ describe('reading a DataTransfer', () => {
   });
 
   it('finds an image in files', () => {
-    const file = { type: 'image/png', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
+    const file = {
+      type: 'image/png',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
     const payload = readClipboardPayload(transfer({}, { files: [file] }));
     expect(payload.images).toHaveLength(1);
   });
 
   it('finds an image in items when files is empty', () => {
-    const file = { type: 'image/png', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
+    const file = {
+      type: 'image/png',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
     const payload = readClipboardPayload(
-      transfer({}, { files: [], items: [{ kind: 'file', type: 'image/png', getAsFile: () => file }] }),
+      transfer(
+        {},
+        { files: [], items: [{ kind: 'file', type: 'image/png', getAsFile: () => file }] },
+      ),
     );
     expect(payload.images).toHaveLength(1);
   });
 
   it('does not report the same image twice when both are populated', () => {
-    const file = { type: 'image/png', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
+    const file = {
+      type: 'image/png',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
     const payload = readClipboardPayload(
-      transfer({}, { files: [file], items: [{ kind: 'file', type: 'image/png', getAsFile: () => file }] }),
+      transfer(
+        {},
+        { files: [file], items: [{ kind: 'file', type: 'image/png', getAsFile: () => file }] },
+      ),
     );
     expect(payload.images).toHaveLength(1);
   });
 
   it('ignores non-image files', () => {
-    const file = { type: 'application/pdf', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
+    const file = {
+      type: 'application/pdf',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
     expect(imagesFrom(transfer({}, { files: [file] }))).toEqual([]);
   });
 
   it('recognises an image-only paste', () => {
-    const file = { type: 'image/png', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
+    const file = {
+      type: 'image/png',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
     expect(isImageOnly({ images: [file] })).toBe(true);
     expect(isImageOnly({ images: [file], text: 'caption' })).toBe(false);
     expect(isImageOnly({ images: [] })).toBe(false);
@@ -844,8 +885,14 @@ describe('reading a DataTransfer', () => {
   it('treats the HTML wrapper Chrome adds around a copied image as image-only', () => {
     // Chrome puts `<img src="...">` in text/html next to the real blob. Treating
     // that as content would insert the image twice, once as a remote link.
-    const file = { type: 'image/png', size: 4, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) };
-    expect(isImageOnly({ images: [file], html: '<img src="https://example.com/a.png">' })).toBe(true);
+    const file = {
+      type: 'image/png',
+      size: 4,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)),
+    };
+    expect(isImageOnly({ images: [file], html: '<img src="https://example.com/a.png">' })).toBe(
+      true,
+    );
   });
 });
 
@@ -858,7 +905,8 @@ describe('no visible character is lost by any fixture', () => {
     google_docs: GOOGLE_DOCS,
     word_list: WORD_LIST,
     nested: '<div><div><p>a<span>b<em>c</em></span>d</p></div></div>',
-    table: '<table><tr><td>1</td><td colspan=2>2</td></tr><tr><td>a</td><td>b</td><td>c</td></tr></table>',
+    table:
+      '<table><tr><td>1</td><td colspan=2>2</td></tr><tr><td>a</td><td>b</td><td>c</td></tr></table>',
     mixed: '<h1>H</h1><p>p</p><ul><li>l1<ul><li>l2</li></ul></li></ul><pre><code>code</code></pre>',
     entities: '<p>&lt;kept&gt;&nbsp;&amp;&nbsp;&quot;quoted&quot;</p>',
   };
@@ -869,6 +917,8 @@ describe('no visible character is lost by any fixture', () => {
       const text = visible(blocks);
       // Every non-space character of the source text must appear in the output.
       const expected = textFromHtml(html).replace(/[\s\u00a0]+/gu, '');
+      // The engine's own soft marker (U+0001) is stripped here on purpose.
+      // eslint-disable-next-line no-control-regex
       const actual = text.replace(/[\s\u00a0\u0001]+/gu, '');
       for (const character of new Set(expected)) {
         if (character === '·' || character === 'o') continue; // Word bullet glyphs

@@ -240,12 +240,7 @@ export function readFlow(text: string, start: number, path: string, sink: RangeS
   return { value: typePlainScalar(text.slice(i, trimmed)), end, ok: true };
 }
 
-function readFlowSequence(
-  text: string,
-  start: number,
-  path: string,
-  sink: RangeSink,
-): FlowRead {
+function readFlowSequence(text: string, start: number, path: string, sink: RangeSink): FlowRead {
   const items: AttrValue[] = [];
   let i = start + 1;
   let ok = true;

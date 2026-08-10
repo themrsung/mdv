@@ -168,7 +168,11 @@ export const fallbackSegmenter: GraphemeSegmenter = (text) => {
       joins = true; // emoji ZWJ sequence continues
     } else if (linkerPending && isIndicConsonant(code)) {
       joins = true; // GB9c: consonant + virama + consonant is one conjunct
-    } else if (isRegionalIndicator(code) && isRegionalIndicator(previous) && regionalRun % 2 === 1) {
+    } else if (
+      isRegionalIndicator(code) &&
+      isRegionalIndicator(previous) &&
+      regionalRun % 2 === 1
+    ) {
       joins = true;
     } else if (hangulJoins(previous, code)) {
       joins = true;

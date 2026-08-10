@@ -95,11 +95,12 @@ export const DIVERGING_MID: Readonly<Record<ColorScheme, ColorString>> = Object.
 });
 
 /** The default diverging arms (SPEC 11.3): blue ↔ red, taken from the categorical slots. */
-export const DIVERGING_ENDS: Readonly<Record<ColorScheme, { low: ColorString; high: ColorString }>> =
-  Object.freeze({
-    light: Object.freeze({ low: '#2a78d6', high: '#e34948' }),
-    dark: Object.freeze({ low: '#3987e5', high: '#e66767' }),
-  });
+export const DIVERGING_ENDS: Readonly<
+  Record<ColorScheme, { low: ColorString; high: ColorString }>
+> = Object.freeze({
+  light: Object.freeze({ low: '#2a78d6', high: '#e34948' }),
+  dark: Object.freeze({ low: '#3987e5', high: '#e66767' }),
+});
 
 /** Steps per arm in a generated diverging ramp. Equal counts per arm (SPEC 11.3). */
 export const DIVERGING_STEPS_PER_ARM = 6;

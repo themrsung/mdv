@@ -258,7 +258,10 @@ function transformFor(type: ScaleType, options: ContinuousScaleOptions): Transfo
  * maps every input to the midpoint of the range instead of dividing by zero. That
  * is the difference between a flat line and a scene full of `NaN`.
  */
-export function createContinuousScale(type: ScaleType, options: ContinuousScaleOptions): MutableScale {
+export function createContinuousScale(
+  type: ScaleType,
+  options: ContinuousScaleOptions,
+): MutableScale {
   const transform = transformFor(type, options);
   const d0 = finite(options.domain[0], 0);
   const d1 = finite(options.domain[1], d0);

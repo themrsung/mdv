@@ -101,7 +101,10 @@ function recorder(): {
   };
 }
 
-const ingested = (warnings: readonly IngestWarning[], over: Partial<IngestedImage> = {}): IngestedImage => ({
+const ingested = (
+  warnings: readonly IngestWarning[],
+  over: Partial<IngestedImage> = {},
+): IngestedImage => ({
   src: 'data:image/png;base64,AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIII',
   alt: 'A photo',
   width: 1024,

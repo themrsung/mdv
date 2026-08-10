@@ -78,7 +78,10 @@ export function browserImageEnvironment(): ImageEnvironment {
     async decode(source) {
       const create = globalOf<(blob: unknown) => Promise<ImageBitmapLike>>('createImageBitmap');
       if (!create) {
-        throw new EngineError('ENV_UNAVAILABLE', 'createImageBitmap is not available in this environment');
+        throw new EngineError(
+          'ENV_UNAVAILABLE',
+          'createImageBitmap is not available in this environment',
+        );
       }
       let bitmap: ImageBitmapLike;
       try {
@@ -106,7 +109,11 @@ export function browserImageEnvironment(): ImageEnvironment {
       context.drawImage(image.source as CanvasImageSourceLike, 0, 0, width, height);
       const blob = await canvasToBlob(canvas, mimeType, quality);
       const bytes = new Uint8Array(await blob.arrayBuffer());
-      return { mimeType: blob.type || mimeType, base64: bytesToBase64(bytes), byteLength: bytes.byteLength };
+      return {
+        mimeType: blob.type || mimeType,
+        base64: bytesToBase64(bytes),
+        byteLength: bytes.byteLength,
+      };
     },
 
     toBase64: (bytes) => bytesToBase64(bytes),
@@ -146,7 +153,13 @@ interface BlobLike {
 }
 
 interface Context2DLike {
-  drawImage(image: CanvasImageSourceLike, x: number, y: number, width: number, height: number): void;
+  drawImage(
+    image: CanvasImageSourceLike,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): void;
 }
 
 interface CanvasLike {
@@ -178,7 +191,11 @@ function createCanvas(width: number, height: number): CanvasLike {
   return canvas;
 }
 
-async function canvasToBlob(canvas: CanvasLike, mimeType: string, quality: number): Promise<BlobLike> {
+async function canvasToBlob(
+  canvas: CanvasLike,
+  mimeType: string,
+  quality: number,
+): Promise<BlobLike> {
   if (canvas.convertToBlob) return canvas.convertToBlob({ type: mimeType, quality });
   const toBlob = canvas.toBlob;
   if (toBlob) {

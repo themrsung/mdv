@@ -148,7 +148,12 @@ export function resolveMargins(
   margin:
     | string
     | number
-    | { top?: string | number; right?: string | number; bottom?: string | number; left?: string | number }
+    | {
+        top?: string | number;
+        right?: string | number;
+        bottom?: string | number;
+        left?: string | number;
+      }
     | undefined,
 ): Margins {
   if (margin === undefined) {

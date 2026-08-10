@@ -29,7 +29,13 @@ import {
 import type { DecodedImage, EncodedImage, ImageEnvironment, ImageSource } from '../image/index.js';
 
 /** A blob-shaped source with deterministic bytes. */
-function sourceOf(type: string, width: number, height: number, name?: string, size?: number): ImageSource {
+function sourceOf(
+  type: string,
+  width: number,
+  height: number,
+  name?: string,
+  size?: number,
+): ImageSource {
   const bytes = new Uint8Array(size ?? width * height);
   for (let i = 0; i < bytes.length; i += 1) bytes[i] = i % 256;
   const base: ImageSource = {
@@ -58,7 +64,10 @@ interface Fake extends ImageEnvironment {
   closed(): boolean;
 }
 
-function fakeEnvironment(dimensions: { width: number; height: number }, options: FakeOptions = {}): Fake {
+function fakeEnvironment(
+  dimensions: { width: number; height: number },
+  options: FakeOptions = {},
+): Fake {
   const supported = new Set(options.supported ?? ['image/png', 'image/webp']);
   const bytesPerPixel = options.bytesPerPixel ?? 1;
   const calls: { width: number; height: number; mimeType: string; quality: number }[] = [];
@@ -247,7 +256,10 @@ describe('format selection', () => {
   });
 
   it('keeps JPEG a JPEG when WebP is unavailable', async () => {
-    const env = fakeEnvironment({ width: 100, height: 100 }, { supported: ['image/png', 'image/jpeg'] });
+    const env = fakeEnvironment(
+      { width: 100, height: 100 },
+      { supported: ['image/png', 'image/jpeg'] },
+    );
     const result = await ingestImage(sourceOf('image/jpeg', 10, 10), env, { passthrough: false });
     expect(result.mimeType).toBe('image/jpeg');
   });
@@ -261,9 +273,9 @@ describe('format selection', () => {
 
     expect(result.mimeType).toBe('image/png');
     expect(result.warnings.map((warning) => warning.code)).toContain('format-fallback');
-    expect(result.warnings.find((warning) => warning.code === 'format-fallback')?.message).toContain(
-      'image/avif',
-    );
+    expect(
+      result.warnings.find((warning) => warning.code === 'format-fallback')?.message,
+    ).toContain('image/avif');
   });
 
   it('respects an explicitly requested type that is supported', async () => {
@@ -281,7 +293,10 @@ describe('format selection', () => {
     await ingestImage(sourceOf('image/jpeg', 10, 10), env, { quality: 0.4, passthrough: false });
     await ingestImage(sourceOf('image/jpeg', 10, 10), env, { quality: 9, passthrough: false });
     await ingestImage(sourceOf('image/jpeg', 10, 10), env, { quality: -3, passthrough: false });
-    await ingestImage(sourceOf('image/jpeg', 10, 10), env, { quality: Number.NaN, passthrough: false });
+    await ingestImage(sourceOf('image/jpeg', 10, 10), env, {
+      quality: Number.NaN,
+      passthrough: false,
+    });
 
     expect(env.calls.map((call) => call.quality)).toEqual([0.4, 1, 0, 0.82]);
   });
@@ -418,14 +433,18 @@ describe('size warnings', () => {
     });
 
     expect(first.warnings).toEqual(second.warnings);
-    expect(first.warnings[0]?.message).toMatch(/^the embedded image is [\d.]+ (B|KiB|MiB), above the/u);
+    expect(first.warnings[0]?.message).toMatch(
+      /^the embedded image is [\d.]+ (B|KiB|MiB), above the/u,
+    );
   });
 });
 
 describe('failures', () => {
   it('rejects a file that is not an image at all', async () => {
     const env = fakeEnvironment({ width: 10, height: 10 });
-    await expect(ingestImage(sourceOf('application/pdf', 10, 10), env)).rejects.toThrow(EngineError);
+    await expect(ingestImage(sourceOf('application/pdf', 10, 10), env)).rejects.toThrow(
+      EngineError,
+    );
     await expect(ingestImage(sourceOf('application/pdf', 10, 10), env)).rejects.toMatchObject({
       code: 'IMAGE_DECODE_FAILED',
     });

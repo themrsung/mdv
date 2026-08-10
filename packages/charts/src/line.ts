@@ -20,7 +20,12 @@ import type {
   ResolvedBlock,
   Table,
 } from '@mdv/core';
-import { LINE_CHANNELS, describeLineArea, encodeLineArea, layoutLineArea } from './internal/line-area.js';
+import {
+  LINE_CHANNELS,
+  describeLineArea,
+  encodeLineArea,
+  layoutLineArea,
+} from './internal/line-area.js';
 import {
   bindField,
   channelList,
@@ -60,7 +65,11 @@ export const lineChart: ChartType<LineMark> = {
   describe(input: DescribeInput<LineMark>): string {
     const xChannel = firstChannel(input.block.encoding, 'x');
     const xColumn = findColumn(input.table, xChannel?.field)?.column;
-    return describeLineArea('Line chart', input.encoded, xColumn === undefined ? undefined : humaniseColumn(xColumn));
+    return describeLineArea(
+      'Line chart',
+      input.encoded,
+      xColumn === undefined ? undefined : humaniseColumn(xColumn),
+    );
   },
 };
 
@@ -70,7 +79,11 @@ export const lineChart: ChartType<LineMark> = {
  * Only what a JSON Schema cannot express: channel/field-type compatibility and
  * the wide-vs-long exclusivity rule.
  */
-export function validateLineLike(block: ResolvedBlock, table: Table, typeName: string): Diagnostic[] {
+export function validateLineLike(
+  block: ResolvedBlock,
+  table: Table,
+  typeName: string,
+): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
   const xChannel = firstChannel(block.encoding, 'x');
   const yChannels = channelList(block.encoding, 'y');
@@ -79,7 +92,12 @@ export function validateLineLike(block: ResolvedBlock, table: Table, typeName: s
     diagnostics.push(missingChannel(block, 'x', 'the ordered domain the series runs along'));
   } else if (findColumn(table, xChannel.field) === undefined && table.fields.length > 0) {
     diagnostics.push(
-      blockDiagnostic('MDV3000', block, 'encode', `\`x\` names \`${xChannel.field}\`, which is not a column`),
+      blockDiagnostic(
+        'MDV3000',
+        block,
+        'encode',
+        `\`x\` names \`${xChannel.field}\`, which is not a column`,
+      ),
     );
   }
 
@@ -87,7 +105,10 @@ export function validateLineLike(block: ResolvedBlock, table: Table, typeName: s
     diagnostics.push(missingChannel(block, 'y', 'the measure the line traces'));
   }
 
-  if (isChannelList(block.encoding, 'y') && firstChannel(block.encoding, 'series')?.field !== undefined) {
+  if (
+    isChannelList(block.encoding, 'y') &&
+    firstChannel(block.encoding, 'series')?.field !== undefined
+  ) {
     diagnostics.push(
       blockDiagnostic(
         'MDV3010',
@@ -104,7 +125,11 @@ export function validateLineLike(block: ResolvedBlock, table: Table, typeName: s
     if (bound === undefined) continue;
     if (!isQuantitative(bound.column.type) && bound.column.type !== 'unknown') {
       diagnostics.push(
-        incompatibleField(block, 'y', bound.column.name, bound.column.type, ['number', 'integer', 'duration']),
+        incompatibleField(block, 'y', bound.column.name, bound.column.type, [
+          'number',
+          'integer',
+          'duration',
+        ]),
       );
     }
   }

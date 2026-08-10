@@ -89,7 +89,20 @@ describe('toReactElements', () => {
     walk(toReactElements(kitchenSink(), create) as Rec, (n) => tags.push(n.type));
     // Every node kind of SPEC 20 reaches React, not just the ones with a
     // one-to-one SVG mapping.
-    for (const tag of ['svg', 'title', 'desc', 'defs', 'g', 'rect', 'line', 'path', 'circle', 'text', 'image', 'use']) {
+    for (const tag of [
+      'svg',
+      'title',
+      'desc',
+      'defs',
+      'g',
+      'rect',
+      'line',
+      'path',
+      'circle',
+      'text',
+      'image',
+      'use',
+    ]) {
       expect(tags).toContain(tag);
     }
   });
@@ -120,7 +133,10 @@ describe('toReactElements', () => {
 
   it('passes text as a child string, never as innerHTML', () => {
     const { create } = recorder();
-    const tree = toReactElements(scene({ root: { kind: 'group', children: [TEXT] } }), create) as Rec;
+    const tree = toReactElements(
+      scene({ root: { kind: 'group', children: [TEXT] } }),
+      create,
+    ) as Rec;
     let text: Rec | undefined;
     walk(tree, (n) => {
       if (n.type === 'text') text = n;

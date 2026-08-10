@@ -176,7 +176,9 @@ export function annotationNodes(
             stroke: chromeStroke(theme, annotation.dashed),
           });
           if (annotation.label !== undefined) {
-            nodes.push(annotationLabel(annotation.label, x, top - 2, 'middle', font, inkPaint, ctx));
+            nodes.push(
+              annotationLabel(annotation.label, x, top - 2, 'middle', font, inkPaint, ctx),
+            );
           }
         }
         break;
@@ -196,7 +198,15 @@ export function annotationNodes(
           });
           if (annotation.label !== undefined) {
             nodes.push(
-              annotationLabel(annotation.label, (xExtent[0] + xExtent[1]) / 2, top - 2, 'middle', font, inkPaint, ctx),
+              annotationLabel(
+                annotation.label,
+                (xExtent[0] + xExtent[1]) / 2,
+                top - 2,
+                'middle',
+                font,
+                inkPaint,
+                ctx,
+              ),
             );
           }
         } else if (yExtent !== undefined) {
@@ -210,7 +220,9 @@ export function annotationNodes(
             fill: solid(theme.tokens.border, 0.18),
           });
           if (annotation.label !== undefined) {
-            nodes.push(annotationLabel(annotation.label, right, yExtent[0] - 2, 'end', font, inkPaint, ctx));
+            nodes.push(
+              annotationLabel(annotation.label, right, yExtent[0] - 2, 'end', font, inkPaint, ctx),
+            );
           }
         }
         break;
@@ -234,7 +246,17 @@ export function annotationNodes(
           },
         });
         if (annotation.label !== undefined) {
-          nodes.push(annotationLabel(annotation.label, x, y - theme.marks.marker.minDiameter, 'middle', font, inkPaint, ctx));
+          nodes.push(
+            annotationLabel(
+              annotation.label,
+              x,
+              y - theme.marks.marker.minDiameter,
+              'middle',
+              font,
+              inkPaint,
+              ctx,
+            ),
+          );
         }
         break;
       }

@@ -79,12 +79,7 @@ const CORPUS: Record<string, string> = {
     '',
   ].join('\n'),
 
-  'tilde fence holding backticks': [
-    '~~~mdv bar title="a `b` c"',
-    'x: 1',
-    '~~~',
-    '',
-  ].join('\n'),
+  'tilde fence holding backticks': ['~~~mdv bar title="a `b` c"', 'x: 1', '~~~', ''].join('\n'),
 
   directives: [
     ':::mdv-grid{cols=3 gap=16}',
@@ -109,7 +104,9 @@ const CORPUS: Record<string, string> = {
 
   'block inside a list': ['- item', '', '  ```mdv bar', '  x: a', '  ```', ''].join('\n'),
 
-  'block inside a block quote': ['> ```mdv bar', '> x: a', '> ---', '> a|b', '> ```', ''].join('\n'),
+  'block inside a block quote': ['> ```mdv bar', '> x: a', '> ---', '> a|b', '> ```', ''].join(
+    '\n',
+  ),
 
   'malformed block': ['```mdv', '\tbad: [1,', 'stray line', '```', ''].join('\n'),
 };
@@ -178,15 +175,26 @@ describe('SPEC 24.3 — determinism', () => {
 describe('SPEC 19 — canonical form', () => {
   it('sorts keys, reduces position to offsets and rounds floats', () => {
     const json = canonicalAst({
-      position: { start: { line: 1, column: 1, offset: 3 }, end: { line: 1, column: 4, offset: 9 } },
+      position: {
+        start: { line: 1, column: 1, offset: 3 },
+        end: { line: 1, column: 4, offset: 9 },
+      },
       b: 1,
       a: 1 / 3,
       type: 'x',
     });
     expect(json).toBe(
-      ['{', '  "a": 0.333333,', '  "b": 1,', '  "position": [', '    3,', '    9', '  ],', '  "type": "x"', '}'].join(
-        '\n',
-      ),
+      [
+        '{',
+        '  "a": 0.333333,',
+        '  "b": 1,',
+        '  "position": [',
+        '    3,',
+        '    9',
+        '  ],',
+        '  "type": "x"',
+        '}',
+      ].join('\n'),
     );
   });
 });

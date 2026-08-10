@@ -58,7 +58,11 @@ const SALES_CSV = 'region,revenue\neast,100\nwest,200\neast,50\n';
  * An inline dataset. `format` is pinned so the tests read a fixed diagnostic
  * list; auto-detection has its own test below, and emits `MDV2101` (info).
  */
-const inline = (id: string, raw: string, extra: Partial<DatasetDeclaration> = {}): DatasetDeclaration => ({
+const inline = (
+  id: string,
+  raw: string,
+  extra: Partial<DatasetDeclaration> = {},
+): DatasetDeclaration => ({
   id,
   origin: 'block',
   raw,
@@ -240,7 +244,10 @@ describe('the graph (SPEC 6.3)', () => {
   });
 
   it('lists dependencies from `from` and from `join`', () => {
-    expect(dependenciesOf(node('c', '@a', [{ join: { with: '@b', on: 'k' } }]))).toEqual(['a', 'b']);
+    expect(dependenciesOf(node('c', '@a', [{ join: { with: '@b', on: 'k' } }]))).toEqual([
+      'a',
+      'b',
+    ]);
     expect(dependenciesOf(node('a'))).toEqual([]);
   });
 
@@ -485,7 +492,9 @@ describe('the registry (SPEC 6.3)', () => {
     expect(tableKey('a', undefined, [{ limit: 1 }])).not.toBe(
       tableKey('a', undefined, [{ limit: 2 }]),
     );
-    expect(tableKey('a', ['x', 'y'], [{ limit: 1 }])).toBe(tableKey('a', ['x', 'y'], [{ limit: 1 }]));
+    expect(tableKey('a', ['x', 'y'], [{ limit: 1 }])).toBe(
+      tableKey('a', ['x', 'y'], [{ limit: 1 }]),
+    );
   });
 
   it('looks a reference up for a join', () => {
@@ -523,7 +532,13 @@ describe('resolving a block’s data (SPEC 6.7 memoisation)', () => {
   it('returns the dataset table and a ref that keys it', () => {
     const prepared = prepare([inline('sales', SALES_CSV)]);
     const diag = collector();
-    const result = resolveTableRef({ reference: '@sales' }, prepared.registry, prepared.cache, options(), diag);
+    const result = resolveTableRef(
+      { reference: '@sales' },
+      prepared.registry,
+      prepared.cache,
+      options(),
+      diag,
+    );
     expect(result.state).toBe('ready');
     expect(result.ref).toEqual({ datasetId: 'sales', key: 'sales||' });
     expect(result.table.rows).toHaveLength(3);
@@ -572,7 +587,13 @@ describe('resolving a block’s data (SPEC 6.7 memoisation)', () => {
   it('reports MDV2142 for an unresolved reference and hands back an empty table', () => {
     const prepared = prepare([inline('sales', SALES_CSV)]);
     const diag = collector();
-    const result = resolveTableRef({ reference: '@nope' }, prepared.registry, prepared.cache, options(), diag);
+    const result = resolveTableRef(
+      { reference: '@nope' },
+      prepared.registry,
+      prepared.cache,
+      options(),
+      diag,
+    );
     expect(diag.diagnostics.map((d) => d.code)).toEqual(['MDV2142']);
     expect(diag.diagnostics[0]?.detail).toContain('@sales');
     expect(result.state).toBe('failed');
@@ -583,7 +604,13 @@ describe('resolving a block’s data (SPEC 6.7 memoisation)', () => {
   it('reports MDV2142 for a reference that is not one', () => {
     const prepared = prepare([]);
     const diag = collector();
-    const result = resolveTableRef({ reference: 'sales' }, prepared.registry, prepared.cache, options(), diag);
+    const result = resolveTableRef(
+      { reference: 'sales' },
+      prepared.registry,
+      prepared.cache,
+      options(),
+      diag,
+    );
     expect(diag.diagnostics.map((d) => d.code)).toEqual(['MDV2142']);
     expect(diag.diagnostics[0]?.detail).toContain('data: "@sales"');
     expect(result.state).toBe('failed');
@@ -606,7 +633,13 @@ describe('resolving a block’s data (SPEC 6.7 memoisation)', () => {
   it('passes an unready dataset’s state through for the placeholder', () => {
     const prepared = prepare([{ id: 'remote', origin: 'block', src: './x.csv' }]);
     const diag = collector();
-    const result = resolveTableRef({ reference: '@remote' }, prepared.registry, prepared.cache, options(), diag);
+    const result = resolveTableRef(
+      { reference: '@remote' },
+      prepared.registry,
+      prepared.cache,
+      options(),
+      diag,
+    );
     expect(result.state).toBe('blocked');
     expect(result.reason).toBe('MDV4002');
     expect(result.table.rows).toHaveLength(0);

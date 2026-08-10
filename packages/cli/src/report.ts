@@ -200,7 +200,9 @@ export function formatSarif(files: readonly FileDiagnostics[], toolVersion: stri
     version: '2.1.0',
     runs: [
       {
-        tool: { driver: { name: 'mdv', informationUri: 'https://mdv.dev', version: toolVersion, rules } },
+        tool: {
+          driver: { name: 'mdv', informationUri: 'https://mdv.dev', version: toolVersion, rules },
+        },
         results,
       },
     ],

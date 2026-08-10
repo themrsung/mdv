@@ -84,7 +84,8 @@ function viewportTransform(
 /** Build one readout row: a swatch stroke, the value, then the series name. */
 function readoutRowElement(doc: Document, row: ReadoutRow): HTMLElement {
   const li = doc.createElement('div');
-  li.className = row.emphasis === true ? 'mdv-readout-row mdv-readout-row-emphasis' : 'mdv-readout-row';
+  li.className =
+    row.emphasis === true ? 'mdv-readout-row mdv-readout-row-emphasis' : 'mdv-readout-row';
 
   if (row.swatch !== undefined) {
     const swatch = doc.createElement('span');
@@ -149,7 +150,8 @@ export function attachInteraction(
   const priorPosition = container.style.getPropertyValue('position');
   if (doc.defaultView !== null) {
     const computed = doc.defaultView.getComputedStyle(container).position;
-    if (computed === 'static' || computed === '') container.style.setProperty('position', 'relative');
+    if (computed === 'static' || computed === '')
+      container.style.setProperty('position', 'relative');
   }
 
   const tooltip = doc.createElement('div');
@@ -376,10 +378,13 @@ export function attachInteraction(
 }
 
 /** `getBBox` throws in a detached tree and does not exist in jsdom. */
-function safeBBox(element: Element | null): { x: number; y: number; w: number; h: number } | undefined {
+function safeBBox(
+  element: Element | null,
+): { x: number; y: number; w: number; h: number } | undefined {
   if (element === null) return undefined;
-  const fn = (element as { getBBox?: () => { x: number; y: number; width: number; height: number } })
-    .getBBox;
+  const fn = (
+    element as { getBBox?: () => { x: number; y: number; width: number; height: number } }
+  ).getBBox;
   if (typeof fn !== 'function') return undefined;
   try {
     const b = fn.call(element);

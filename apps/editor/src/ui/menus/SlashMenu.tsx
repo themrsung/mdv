@@ -86,7 +86,10 @@ export function SlashMenu(props: SlashMenuProps): ReactElement | null {
     <div className="mdv-slash" style={style} role="presentation">
       {items.length === 0 ? (
         <p className="mdv-slash__empty">
-          No block matches “{query}”. <button type="button" className="mdv-linkbtn" onClick={onDismiss}>Dismiss</button>
+          No block matches “{query}”.{' '}
+          <button type="button" className="mdv-linkbtn" onClick={onDismiss}>
+            Dismiss
+          </button>
         </p>
       ) : (
         <ul className="mdv-slash__list" role="listbox" aria-label="Insert block" ref={listRef}>

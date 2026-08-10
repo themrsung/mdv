@@ -112,7 +112,13 @@ export {
 /* -- Grapheme segmentation ------------------------------------------------ */
 
 export type { GraphemeSegmenter } from './grapheme.js';
-export { defaultSegmenter, fallbackSegmenter, graphemeLength, nextBoundary, previousBoundary } from './grapheme.js';
+export {
+  defaultSegmenter,
+  fallbackSegmenter,
+  graphemeLength,
+  nextBoundary,
+  previousBoundary,
+} from './grapheme.js';
 
 /* -- Tree navigation ------------------------------------------------------ */
 
@@ -211,7 +217,14 @@ export {
 
 /* -- State, commands, history, store -------------------------------------- */
 
-export type { Command, CommandLabel, CommandResult, EditContext, EditorState, Transaction } from './state.js';
+export type {
+  Command,
+  CommandLabel,
+  CommandResult,
+  EditContext,
+  EditorState,
+  Transaction,
+} from './state.js';
 export { applyCommand, createContext, createState, sequence, withSelection } from './state.js';
 
 /** Every editing operation, as a command factory. */

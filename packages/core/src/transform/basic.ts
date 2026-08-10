@@ -16,13 +16,7 @@ import {
   type EvalContext,
 } from '../expr/index.js';
 import { compareValues, stableSort } from './order.js';
-import {
-  fieldIndex,
-  toCell,
-  typeOfValues,
-  uniqueName,
-  type TransformContext,
-} from './context.js';
+import { fieldIndex, toCell, typeOfValues, uniqueName, type TransformContext } from './context.js';
 
 /** Build the evaluation context a compiled expression needs from a transform context. */
 function evalContext(ctx: TransformContext, fail: (message: string) => void): EvalContext {

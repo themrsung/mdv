@@ -120,9 +120,7 @@ export function drawSceneOnPage(
   // `newXObject` picks a key the page is not already using; `asString()`
   // includes the leading solidus, so it is already an operand.
   const name = page.node.newXObject('MdvScene', form);
-  page.node.addContentStream(
-    context.register(context.stream(`q\n${name.asString()} Do\nQ`)),
-  );
+  page.node.addContentStream(context.register(context.stream(`q\n${name.asString()} Do\nQ`)));
 
   const report = ctx.onDiagnostic;
   if (report === undefined) return;

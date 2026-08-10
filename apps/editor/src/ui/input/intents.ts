@@ -203,7 +203,10 @@ function isSpace(codePoint: number): boolean {
 }
 
 /** The code point ending at `offset`, and where it starts. */
-function before(text: string, offset: number): { readonly codePoint: number; readonly start: number } | null {
+function before(
+  text: string,
+  offset: number,
+): { readonly codePoint: number; readonly start: number } | null {
   if (offset <= 0) return null;
   const code = text.charCodeAt(offset - 1);
   if (code >= 0xdc00 && code <= 0xdfff && offset >= 2) {
@@ -216,7 +219,10 @@ function before(text: string, offset: number): { readonly codePoint: number; rea
 }
 
 /** The code point starting at `offset`, and where it ends. */
-function after(text: string, offset: number): { readonly codePoint: number; readonly end: number } | null {
+function after(
+  text: string,
+  offset: number,
+): { readonly codePoint: number; readonly end: number } | null {
   if (offset >= text.length) return null;
   const codePoint = text.codePointAt(offset);
   if (codePoint === undefined) return null;
@@ -226,10 +232,18 @@ function after(text: string, offset: number): { readonly codePoint: number; read
 /** Offset of the start of the word before `offset`. */
 export function wordStartBefore(text: string, offset: number): number {
   let at = Math.max(0, Math.min(offset, text.length));
-  for (let step = before(text, at); step !== null && isSpace(step.codePoint); step = before(text, at)) {
+  for (
+    let step = before(text, at);
+    step !== null && isSpace(step.codePoint);
+    step = before(text, at)
+  ) {
     at = step.start;
   }
-  for (let step = before(text, at); step !== null && isWordChar(step.codePoint); step = before(text, at)) {
+  for (
+    let step = before(text, at);
+    step !== null && isWordChar(step.codePoint);
+    step = before(text, at)
+  ) {
     at = step.start;
   }
   // A caret against punctuation eats exactly that one character, so the
@@ -244,10 +258,18 @@ export function wordStartBefore(text: string, offset: number): number {
 /** Offset of the end of the word after `offset`. */
 export function wordEndAfter(text: string, offset: number): number {
   let at = Math.max(0, Math.min(offset, text.length));
-  for (let step = after(text, at); step !== null && isSpace(step.codePoint); step = after(text, at)) {
+  for (
+    let step = after(text, at);
+    step !== null && isSpace(step.codePoint);
+    step = after(text, at)
+  ) {
     at = step.end;
   }
-  for (let step = after(text, at); step !== null && isWordChar(step.codePoint); step = after(text, at)) {
+  for (
+    let step = after(text, at);
+    step !== null && isWordChar(step.codePoint);
+    step = after(text, at)
+  ) {
     at = step.end;
   }
   if (at === Math.max(0, Math.min(offset, text.length))) {

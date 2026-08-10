@@ -110,9 +110,7 @@ export async function fmtCommand(
   const scanned = `${files.length} file${files.length === 1 ? '' : 's'}`;
   if (flags.check === true) {
     term.status(
-      changed === 0
-        ? `${scanned}, all formatted`
-        : `${scanned}, ${changed} would be reformatted`,
+      changed === 0 ? `${scanned}, all formatted` : `${scanned}, ${changed} would be reformatted`,
     );
     return changed === 0 ? EXIT_CODES.ok : EXIT_CODES.diagnostics;
   }

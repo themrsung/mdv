@@ -53,7 +53,11 @@ export function tableFocus(doc: MdvDocument, selection: Selection): TableFocus |
   const block = findBlock(doc, selection.anchor.blockId)?.block;
   if (block?.kind !== 'table') return undefined;
   const cell = clampRef(block, { row: path[0] ?? 0, col: path[1] ?? 0 });
-  return { table: block, cell, rect: { top: cell.row, left: cell.col, bottom: cell.row, right: cell.col } };
+  return {
+    table: block,
+    cell,
+    rect: { top: cell.row, left: cell.col, bottom: cell.row, right: cell.col },
+  };
 }
 
 /** Put the caret at the start of a cell. */
@@ -78,8 +82,15 @@ export function insertRowAbove(): Command {
     if (!focus) return null;
     const at = Math.max(1, focus.rect.top);
     const next = insertRowAt(focus.table, ctx.ids, at);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: at, col: focus.cell.col }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: at, col: focus.cell.col }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -90,8 +101,15 @@ export function insertRowBelow(): Command {
     if (!focus) return null;
     const at = focus.rect.bottom + 1;
     const next = insertRowAt(focus.table, ctx.ids, at);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: Math.max(1, at), col: focus.cell.col }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: Math.max(1, at), col: focus.cell.col }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -106,7 +124,9 @@ export function deleteRows(): Command {
     }
     const target = clampRef(next, { row: focus.rect.top, col: focus.cell.col });
     const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, target));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -117,8 +137,15 @@ export function insertColumnLeft(): Command {
     if (!focus) return null;
     const at = focus.rect.left;
     const next = insertColumnAt(focus.table, ctx.ids, at);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: focus.cell.row, col: at }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: focus.cell.row, col: at }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -129,8 +156,15 @@ export function insertColumnRight(): Command {
     if (!focus) return null;
     const at = focus.rect.right + 1;
     const next = insertColumnAt(focus.table, ctx.ids, at);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: focus.cell.row, col: at }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: focus.cell.row, col: at }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -145,7 +179,9 @@ export function deleteColumns(): Command {
     }
     const target = clampRef(next, { row: focus.cell.row, col: focus.rect.left });
     const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, target));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -158,8 +194,15 @@ export function moveRow(delta: number): Command {
     const to = from + Math.trunc(delta);
     if (from < 1 || to < 1 || to >= focus.table.rows.length) return null;
     const next = moveRowTo(focus.table, from, to);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: to, col: focus.cell.col }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: to, col: focus.cell.col }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -172,8 +215,15 @@ export function moveColumn(delta: number): Command {
     const to = from + Math.trunc(delta);
     if (to < 0 || to >= columnCount(focus.table)) return null;
     const next = moveColumnTo(focus.table, from, to);
-    const result = commit(state.doc, focus.table, next, caretInCell(focus.table.id, { row: focus.cell.row, col: to }));
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    const result = commit(
+      state.doc,
+      focus.table,
+      next,
+      caretInCell(focus.table.id, { row: focus.cell.row, col: to }),
+    );
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 
@@ -187,7 +237,9 @@ export function setColumnAlignment(align: ColumnAlign): Command {
       next = setAlign(next, col, align);
     }
     const result = commit(state.doc, focus.table, next, state.selection);
-    return result === null ? null : { state: { ...result, pendingMarks: null }, label: 'table edit' };
+    return result === null
+      ? null
+      : { state: { ...result, pendingMarks: null }, label: 'table edit' };
   };
 }
 

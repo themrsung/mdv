@@ -240,7 +240,8 @@ describe('the validator is deterministic', () => {
     const kinds = v.findings.map((f) => f.check);
     const firstPair = kinds.findIndex((k) => k === 'normal-vision' || k === 'adjacent-cvd');
     const lastSlot = kinds.reduce(
-      (acc, k, i) => (k === 'chroma-floor' || k === 'lightness-band' || k === 'surface-contrast' ? i : acc),
+      (acc, k, i) =>
+        k === 'chroma-floor' || k === 'lightness-band' || k === 'surface-contrast' ? i : acc,
       -1,
     );
     expect(lastSlot).toBeLessThan(firstPair);

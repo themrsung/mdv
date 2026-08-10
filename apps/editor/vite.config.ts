@@ -34,7 +34,7 @@ const alias = WORKSPACE_PACKAGES.flatMap((pkg) => [
   },
 ]);
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: '/',
   plugins: [react()],
   resolve: { alias },
@@ -44,7 +44,10 @@ export default defineConfig({
     emptyOutDir: true,
     // A fully static bundle: no SSR, no server entry, no API routes.
     ssr: false,
-    sourcemap: true,
+    // Maps are for the machine that built the bundle. Because the aliases above
+    // resolve to workspace *source*, a published map is the whole repository —
+    // so the hosted build ships without them, and every other mode keeps them.
+    sourcemap: mode !== 'production',
     target: 'es2022',
   },
-});
+}));

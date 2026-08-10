@@ -21,7 +21,7 @@
  * not offer the operations that would break it.
  */
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import type { CellRect, ColumnAlign, TableBlock } from '../../engine/index.js';
 import { columnCount, commands } from '../../engine/index.js';
@@ -63,7 +63,8 @@ function HandleMenu({ axis, index, table, onClose }: HandleMenuProps): ReactElem
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent): void => {
-      if (reference.current !== null && !reference.current.contains(event.target as Node)) onClose();
+      if (reference.current !== null && !reference.current.contains(event.target as Node))
+        onClose();
     };
     const onKey = (event: KeyboardEvent): void => {
       if (event.key === 'Escape') {
@@ -98,17 +99,33 @@ function HandleMenu({ axis, index, table, onClose }: HandleMenuProps): ReactElem
 
   return (
     <div className="mdv-menu mdv-menu--handle" role="menu" ref={reference}>
-      <div className="mdv-menu__label">{isRow ? `Row ${String(index)}` : `Column ${String(index + 1)}`}</div>
+      <div className="mdv-menu__label">
+        {isRow ? `Row ${String(index)}` : `Column ${String(index + 1)}`}
+      </div>
 
       {isRow ? (
         <>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.insertRowAbove()))} disabled={isHeader}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.insertRowAbove()))}
+            disabled={isHeader}
+          >
             Insert row above
           </button>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.insertRowBelow()))}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.insertRowBelow()))}
+          >
             Insert row below
           </button>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.moveRow(-1)))} disabled={isHeader || index <= 1}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.moveRow(-1)))}
+            disabled={isHeader || index <= 1}
+          >
             Move up
           </button>
           <button
@@ -148,13 +165,26 @@ function HandleMenu({ axis, index, table, onClose }: HandleMenuProps): ReactElem
               </button>
             ))}
           </div>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.insertColumnLeft()))}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.insertColumnLeft()))}
+          >
             Insert column left
           </button>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.insertColumnRight()))}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.insertColumnRight()))}
+          >
             Insert column right
           </button>
-          <button type="button" role="menuitem" onClick={act(() => void run(commands.moveColumn(-1)))} disabled={index === 0}>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={act(() => void run(commands.moveColumn(-1)))}
+            disabled={index === 0}
+          >
             Move left
           </button>
           <button
@@ -189,13 +219,130 @@ interface OpenMenu {
   readonly index: number;
 }
 
+/**
+ * Handle registration.
+ *
+ * The strips are siblings of the `<table>`, not part of it, so CSS has nothing
+ * to say about how tall a row is or how wide a column is: those are decided by
+ * the table layout algorithm from content the strips never see. Measuring is
+ * the only honest answer. A handle that is merely *near* its row is worse than
+ * no handle at all, because clicking it selects a line the user did not point
+ * at.
+ *
+ * `corner` is how far the column strip must be indented for its first cell to
+ * start where column 0 starts, and `lead` is the matching indent down the row
+ * strip. Both are measured against the first *cell* rather than the table box,
+ * which absorbs the half-pixel that `border-collapse` puts outside the rows
+ * without hard-coding a border width the theme is free to change.
+ */
+interface HandleMetrics {
+  readonly rows: readonly number[];
+  readonly cols: readonly number[];
+  readonly corner: number;
+  readonly lead: number;
+}
+
+const NO_METRICS: HandleMetrics = { rows: [], cols: [], corner: 0, lead: 0 };
+
+/**
+ * A measured size, pinned along one axis.
+ *
+ * The `min-*` twin is not redundant: the stylesheet gives every handle cell a
+ * 12px floor so that an unmeasured strip is still clickable, and that floor
+ * would silently win over a genuinely smaller measurement and push everything
+ * below it out of registration. When we have measured, the measurement is the
+ * whole truth. Before the first layout effect there is nothing to say, and the
+ * stylesheet keeps the strip usable.
+ */
+function sizeOf(
+  value: number | undefined,
+  axis: 'width' | 'height',
+): React.CSSProperties | undefined {
+  if (value === undefined) return undefined;
+  return axis === 'width' ? { width: value, minWidth: value } : { height: value, minHeight: value };
+}
+
+function sameLine(a: readonly number[], b: readonly number[]): boolean {
+  // Sub-pixel churn is not worth a re-render; a quarter pixel is invisible.
+  return (
+    a.length === b.length && a.every((value, index) => Math.abs(value - (b[index] ?? 0)) < 0.25)
+  );
+}
+
+function sameMetrics(a: HandleMetrics, b: HandleMetrics): boolean {
+  return (
+    Math.abs(a.corner - b.corner) < 0.25 &&
+    Math.abs(a.lead - b.lead) < 0.25 &&
+    sameLine(a.rows, b.rows) &&
+    sameLine(a.cols, b.cols)
+  );
+}
+
+/**
+ * Keeps the handle strips in registration with the table.
+ *
+ * Re-runs whenever the shape changes, so newly inserted rows and columns get
+ * observed too. Writing the measurements back cannot change the table's own
+ * geometry — the strips live outside it and are sized, never sizing — so the
+ * observer cannot drive itself in a loop; `sameMetrics` stops the state churn
+ * regardless.
+ */
+function useHandleMetrics(
+  tableRef: React.RefObject<HTMLTableElement | null>,
+  rowStripRef: React.RefObject<HTMLDivElement | null>,
+  rowCount: number,
+  columns: number,
+): HandleMetrics {
+  const [metrics, setMetrics] = useState<HandleMetrics>(NO_METRICS);
+
+  useLayoutEffect(() => {
+    const table = tableRef.current;
+    if (table === null) return;
+
+    const measure = (): void => {
+      const rows = Array.from(table.rows, (row) => row.getBoundingClientRect().height);
+      const header = table.rows.item(0);
+      const cols =
+        header === null
+          ? []
+          : Array.from(header.cells, (cell) => cell.getBoundingClientRect().width);
+      const strip = rowStripRef.current;
+      const origin =
+        header?.cells.item(0)?.getBoundingClientRect() ?? table.getBoundingClientRect();
+      const corner = strip === null ? 0 : origin.left - strip.getBoundingClientRect().left;
+      const lead = origin.top - table.getBoundingClientRect().top;
+      const next: HandleMetrics = { rows, cols, corner, lead };
+      setMetrics((current) => (sameMetrics(current, next) ? current : next));
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(table);
+    // A row can change height, or a column its share of the width, without the
+    // table's own box moving at all. Watch the parts, not just the whole.
+    for (const row of Array.from(table.rows)) observer.observe(row);
+    const header = table.rows.item(0);
+    if (header !== null) for (const cell of Array.from(header.cells)) observer.observe(cell);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [tableRef, rowStripRef, rowCount, columns]);
+
+  return metrics;
+}
+
 function TableViewImpl({ block }: { readonly block: TableBlock }): ReactElement {
   const { select, doc } = useEditorApi();
   const surface = useSurface();
   const [menu, setMenu] = useState<OpenMenu | null>(null);
   const dragAnchor = useRef<{ row: number; col: number } | null>(null);
+  const tableRef = useRef<HTMLTableElement | null>(null);
+  const rowStripRef = useRef<HTMLDivElement | null>(null);
 
   const columns = columnCount(block);
+  const metrics = useHandleMetrics(tableRef, rowStripRef, block.rows.length, columns);
   const rect = surface.cellSelection?.tableId === block.id ? surface.cellSelection.rect : null;
   const active = surface.activeBlockId === block.id;
   const closeMenu = useCallback(() => {
@@ -274,9 +421,18 @@ function TableViewImpl({ block }: { readonly block: TableBlock }): ReactElement 
   return (
     <div className={`mdv-table-wrap${active || rect !== null ? ' is-active' : ''}`}>
       <div className="mdv-table-handles mdv-table-handles--columns" aria-hidden={false}>
-        <span className="mdv-table-corner" />
+        <span
+          className="mdv-table-corner"
+          style={
+            metrics.corner > 0 ? { width: metrics.corner, minWidth: metrics.corner } : undefined
+          }
+        />
         {Array.from({ length: columns }, (_, index) => (
-          <span className="mdv-table-handle-cell" key={`col-${String(index)}`}>
+          <span
+            className="mdv-table-handle-cell"
+            key={`col-${String(index)}`}
+            style={sizeOf(metrics.cols[index], 'width')}
+          >
             <button
               type="button"
               className={`mdv-handle${rect !== null && rect.left <= index && index <= rect.right ? ' is-active' : ''}`}
@@ -303,13 +459,23 @@ function TableViewImpl({ block }: { readonly block: TableBlock }): ReactElement 
       </div>
 
       <div className="mdv-table-body">
-        <div className="mdv-table-handles mdv-table-handles--rows">
+        <div
+          className="mdv-table-handles mdv-table-handles--rows"
+          ref={rowStripRef}
+          style={metrics.lead > 0 ? { paddingTop: metrics.lead } : undefined}
+        >
           {block.rows.map((row, rowIndex) => (
-            <span className="mdv-table-handle-cell" key={row.id}>
+            <span
+              className="mdv-table-handle-cell"
+              key={row.id}
+              style={sizeOf(metrics.rows[rowIndex], 'height')}
+            >
               <button
                 type="button"
                 className={`mdv-handle${rect !== null && rect.top <= rowIndex && rowIndex <= rect.bottom ? ' is-active' : ''}`}
-                aria-label={rowIndex === 0 ? 'Header row options' : `Row ${String(rowIndex)} options`}
+                aria-label={
+                  rowIndex === 0 ? 'Header row options' : `Row ${String(rowIndex)} options`
+                }
                 aria-haspopup="menu"
                 aria-expanded={menu?.axis === 'row' && menu.index === rowIndex}
                 onClick={(event) => {
@@ -331,7 +497,7 @@ function TableViewImpl({ block }: { readonly block: TableBlock }): ReactElement 
           ))}
         </div>
 
-        <table className="mdv-table">
+        <table className="mdv-table" ref={tableRef}>
           <thead>
             <tr>
               {(block.rows[0]?.cells ?? []).map((cell, colIndex) => (
@@ -388,7 +554,9 @@ function TableViewImpl({ block }: { readonly block: TableBlock }): ReactElement 
   );
 }
 
-function alignStyle(align: ColumnAlign | undefined): { textAlign: 'left' | 'center' | 'right' } | undefined {
+function alignStyle(
+  align: ColumnAlign | undefined,
+): { textAlign: 'left' | 'center' | 'right' } | undefined {
   switch (align) {
     case 'left':
       return { textAlign: 'left' };

@@ -21,7 +21,14 @@ import { barChart } from '../src/bar.js';
 import { lineChart } from '../src/line.js';
 import { scatterChart } from '../src/scatter.js';
 import { parseAnnotations } from '../src/internal/annotations.js';
-import { makeTable, makeTheme, nodesOfKind, nonFiniteNumbers, quarters, runChart } from './harness.js';
+import {
+  makeTable,
+  makeTheme,
+  nodesOfKind,
+  nonFiniteNumbers,
+  quarters,
+  runChart,
+} from './harness.js';
 
 const QUARTERLY = { x: { field: 'quarter' }, y: { field: 'revenue' } };
 
@@ -41,9 +48,12 @@ function numericXY() {
 }
 
 function annotationsOf(nodes: readonly SceneNode[]) {
-  return [...nodesOfKind(nodes, 'line'), ...nodesOfKind(nodes, 'rect'), ...nodesOfKind(nodes, 'circle'), ...nodesOfKind(nodes, 'text')].filter(
-    (node) => node.cls?.startsWith('mdv-annotation') === true,
-  );
+  return [
+    ...nodesOfKind(nodes, 'line'),
+    ...nodesOfKind(nodes, 'rect'),
+    ...nodesOfKind(nodes, 'circle'),
+    ...nodesOfKind(nodes, 'text'),
+  ].filter((node) => node.cls?.startsWith('mdv-annotation') === true);
 }
 
 describe('annotations: parsing (SPEC 8.14)', () => {
@@ -64,12 +74,16 @@ describe('annotations: parsing (SPEC 8.14)', () => {
   });
 
   it('folds an unrecognised type to a line rather than dropping the annotation', () => {
-    expect(parseAnnotations({ annotations: [{ type: 'arrow', y: 10 }] } as never)[0]?.kind).toBe('line');
+    expect(parseAnnotations({ annotations: [{ type: 'arrow', y: 10 }] } as never)[0]?.kind).toBe(
+      'line',
+    );
   });
 
   it('drops an entry that names no position at all', () => {
     // There is nowhere to put it; keeping it would mean inventing a location.
-    expect(parseAnnotations({ annotations: [{ type: 'line', label: 'Target' }] } as never)).toEqual([]);
+    expect(parseAnnotations({ annotations: [{ type: 'line', label: 'Target' }] } as never)).toEqual(
+      [],
+    );
   });
 
   it('drops junk entries without taking the rest with them (SPEC 14.1)', () => {
@@ -90,7 +104,12 @@ describe('annotations: parsing (SPEC 8.14)', () => {
 
   it('reads the text anchor, defaulting to middle', () => {
     const parsed = parseAnnotations({
-      annotations: [{ y: 1, anchor: 'start' }, { y: 2, anchor: 'end' }, { y: 3, anchor: 'sideways' }, { y: 4 }],
+      annotations: [
+        { y: 1, anchor: 'start' },
+        { y: 2, anchor: 'end' },
+        { y: 3, anchor: 'sideways' },
+        { y: 4 },
+      ],
     } as never);
     expect(parsed.map((a) => a.anchor)).toEqual(['start', 'end', 'middle', 'middle']);
   });
@@ -103,12 +122,16 @@ describe('annotations: the ink rule (SPEC 8.14)', () => {
   });
 
   it('draws the rule in the border token, never in a series colour', () => {
-    const rule = nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const rule = nodesOfKind(run.laid.nodes, 'line').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect(rule?.stroke?.paint).toEqual({ kind: 'solid', color: '#d4d4d4' });
   });
 
   it('sets the label in the secondary text token', () => {
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect(label?.fill).toEqual({ kind: 'solid', color: '#4a4a4a' });
   });
 
@@ -116,11 +139,14 @@ describe('annotations: the ink rule (SPEC 8.14)', () => {
     const slots = new Set<string>(makeTheme().categorical);
     for (const node of annotationsOf(run.laid.nodes)) {
       const paints = [
-        node.kind === 'text' || node.kind === 'rect' || node.kind === 'circle' ? node.fill : undefined,
+        node.kind === 'text' || node.kind === 'rect' || node.kind === 'circle'
+          ? node.fill
+          : undefined,
         'stroke' in node ? node.stroke?.paint : undefined,
       ];
       for (const paint of paints) {
-        if (paint !== undefined && paint.kind === 'solid') expect(slots.has(paint.color)).toBe(false);
+        if (paint !== undefined && paint.kind === 'solid')
+          expect(slots.has(paint.color)).toBe(false);
       }
     }
   });
@@ -137,7 +163,9 @@ describe('annotations: line', () => {
       encoding: QUARTERLY,
       attrs: { annotations: [{ type: 'line', y: 200 }] },
     });
-    const rule = nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const rule = nodesOfKind(run.laid.nodes, 'line').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     // Domain [100, 400] over 200 px puts 200 two-thirds of the way up.
     expect({ x1: rule?.x1, x2: rule?.x2, y1: rule?.y1, y2: rule?.y2 }).toEqual({
       x1: 0,
@@ -152,7 +180,9 @@ describe('annotations: line', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'line', x: 10 }] },
     });
-    const rule = nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const rule = nodesOfKind(run.laid.nodes, 'line').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ x1: rule?.x1, x2: rule?.x2, y1: rule?.y1, y2: rule?.y2 }).toEqual({
       x1: 200,
       x2: 200,
@@ -166,7 +196,9 @@ describe('annotations: line', () => {
       encoding: QUARTERLY,
       attrs: { annotations: [{ type: 'line', x: 'Q2' }] },
     });
-    const rule = nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const rule = nodesOfKind(run.laid.nodes, 'line').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect(rule?.x1).toBeGreaterThan(0);
     expect(rule?.x1).toBe(rule?.x2);
   });
@@ -181,7 +213,9 @@ describe('annotations: line', () => {
       attrs: { annotations: [{ type: 'line', y: 200 }] },
     });
     const strokeOf = (run: typeof dashed) =>
-      nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true)?.stroke;
+      nodesOfKind(run.laid.nodes, 'line').find(
+        (node) => node.cls?.includes('mdv-annotation') === true,
+      )?.stroke;
     expect(strokeOf(dashed)?.dash?.length).toBeGreaterThan(0);
     expect(strokeOf(solidRun)?.dash).toBeUndefined();
   });
@@ -191,8 +225,14 @@ describe('annotations: line', () => {
       encoding: QUARTERLY,
       attrs: { annotations: [{ type: 'line', y: 200, label: 'Target' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
-    expect({ x: label?.x, y: label?.y, anchor: label?.anchor }).toEqual({ x: 400, y: 129.3333, anchor: 'end' });
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
+    expect({ x: label?.x, y: label?.y, anchor: label?.anchor }).toEqual({
+      x: 400,
+      y: 129.3333,
+      anchor: 'end',
+    });
     expect(label?.text).toBe('Target');
   });
 
@@ -211,8 +251,15 @@ describe('annotations: band', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'band', x: [5, 15], label: 'Outage' }] },
     });
-    const band = nodesOfKind(run.laid.nodes, 'rect').find((node) => node.cls?.includes('mdv-annotation') === true);
-    expect({ x: band?.x, y: band?.y, w: band?.w, h: band?.h }).toEqual({ x: 100, y: 0, w: 200, h: 200 });
+    const band = nodesOfKind(run.laid.nodes, 'rect').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
+    expect({ x: band?.x, y: band?.y, w: band?.w, h: band?.h }).toEqual({
+      x: 100,
+      y: 0,
+      w: 200,
+      h: 200,
+    });
   });
 
   it('shades a horizontal band when the extent is on y', () => {
@@ -220,8 +267,15 @@ describe('annotations: band', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'band', y: [50, 150] }] },
     });
-    const band = nodesOfKind(run.laid.nodes, 'rect').find((node) => node.cls?.includes('mdv-annotation') === true);
-    expect({ x: band?.x, y: band?.y, w: band?.w, h: band?.h }).toEqual({ x: 0, y: 50, w: 400, h: 100 });
+    const band = nodesOfKind(run.laid.nodes, 'rect').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
+    expect({ x: band?.x, y: band?.y, w: band?.w, h: band?.h }).toEqual({
+      x: 0,
+      y: 50,
+      w: 400,
+      h: 100,
+    });
   });
 
   it('accepts an extent written backwards, rather than drawing a negative box', () => {
@@ -229,7 +283,9 @@ describe('annotations: band', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'band', x: [15, 5] }] },
     });
-    const band = nodesOfKind(run.laid.nodes, 'rect').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const band = nodesOfKind(run.laid.nodes, 'rect').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ x: band?.x, w: band?.w }).toEqual({ x: 100, w: 200 });
   });
 
@@ -246,7 +302,9 @@ describe('annotations: band', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'band', x: [5, 15], label: 'Outage' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ x: label?.x, anchor: label?.anchor }).toEqual({ x: 200, anchor: 'middle' });
   });
 });
@@ -257,7 +315,9 @@ describe('annotations: point and text', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'point', x: 10, y: 100, label: 'Launch' }] },
     });
-    const dot = nodesOfKind(run.laid.nodes, 'circle').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const dot = nodesOfKind(run.laid.nodes, 'circle').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ cx: dot?.cx, cy: dot?.cy, r: dot?.r }).toEqual({ cx: 200, cy: 100, r: 4 });
     expect(dot?.fill).toEqual({ kind: 'solid', color: '#ffffff' });
     expect(dot?.stroke?.paint).toEqual({ kind: 'solid', color: '#4a4a4a' });
@@ -268,7 +328,9 @@ describe('annotations: point and text', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'point', x: 10, y: 100, label: 'Launch' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ x: label?.x, y: label?.y }).toEqual({ x: 200, y: 92 });
   });
 
@@ -285,7 +347,9 @@ describe('annotations: point and text', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'text', x: 10, y: 100, text: 'Peak', anchor: 'start' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect({ x: label?.x, y: label?.y, anchor: label?.anchor, text: label?.text }).toEqual({
       x: 200,
       y: 100,
@@ -299,7 +363,9 @@ describe('annotations: point and text', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'text', x: 10, y: 100, label: 'Peak' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect(label?.text).toBe('Peak');
   });
 
@@ -316,7 +382,9 @@ describe('annotations: point and text', () => {
       encoding: { x: { field: 'spend' }, y: { field: 'revenue' } },
       attrs: { annotations: [{ type: 'text', x: 10, y: 100, text: 'Peak' }] },
     });
-    const label = nodesOfKind(run.laid.nodes, 'text').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const label = nodesOfKind(run.laid.nodes, 'text').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     expect(label?.width).toBe(26.52); // 4 × 11.05 × 0.6
   });
 });
@@ -357,7 +425,9 @@ describe('annotations: available on every cartesian type', () => {
       encoding: QUARTERLY,
       attrs: { orientation: 'horizontal', annotations: [{ type: 'line', x: 200 }] },
     });
-    const rule = nodesOfKind(run.laid.nodes, 'line').find((node) => node.cls?.includes('mdv-annotation') === true);
+    const rule = nodesOfKind(run.laid.nodes, 'line').find(
+      (node) => node.cls?.includes('mdv-annotation') === true,
+    );
     // With the axes swapped, the value 200 is an *x* position and the rule is vertical.
     expect(rule?.x1).toBe(rule?.x2);
     expect(rule?.y1).not.toBe(rule?.y2);
@@ -366,8 +436,12 @@ describe('annotations: available on every cartesian type', () => {
   it('draws annotations over the marks, never under them', () => {
     const run = runChart(lineChart, quarters(), { encoding: QUARTERLY, attrs });
     const nodes = run.laid.nodes;
-    const lastMark = nodes.map((node) => node.cls?.startsWith('mdv-mark') === true).lastIndexOf(true);
-    const firstAnnotation = nodes.findIndex((node) => node.cls?.startsWith('mdv-annotation') === true);
+    const lastMark = nodes
+      .map((node) => node.cls?.startsWith('mdv-mark') === true)
+      .lastIndexOf(true);
+    const firstAnnotation = nodes.findIndex(
+      (node) => node.cls?.startsWith('mdv-annotation') === true,
+    );
     expect(firstAnnotation).toBeGreaterThan(lastMark);
   });
 });
@@ -389,10 +463,20 @@ describe('annotations: degenerate input', () => {
   });
 
   it('emits no NaN over an empty chart', () => {
-    const run = runChart(lineChart, makeTable([['quarter', 'string'], ['revenue', 'number']], []), {
-      encoding: QUARTERLY,
-      attrs: { annotations: [{ type: 'line', y: 100, label: 'Target' }] },
-    });
+    const run = runChart(
+      lineChart,
+      makeTable(
+        [
+          ['quarter', 'string'],
+          ['revenue', 'number'],
+        ],
+        [],
+      ),
+      {
+        encoding: QUARTERLY,
+        attrs: { annotations: [{ type: 'line', y: 100, label: 'Target' }] },
+      },
+    );
     expect(nonFiniteNumbers(run.laid)).toEqual([]);
   });
 

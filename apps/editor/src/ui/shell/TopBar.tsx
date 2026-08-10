@@ -32,7 +32,11 @@ const VIEWS: readonly { readonly id: ViewMode; readonly label: string }[] = [
   { id: 'source', label: 'Source' },
 ];
 
-const THEMES: readonly { readonly id: ThemeChoice; readonly label: string; readonly glyph: string }[] = [
+const THEMES: readonly {
+  readonly id: ThemeChoice;
+  readonly label: string;
+  readonly glyph: string;
+}[] = [
   { id: 'light', label: 'Light', glyph: '☀' },
   { id: 'system', label: 'Follow system', glyph: '◐' },
   { id: 'dark', label: 'Dark', glyph: '☾' },
@@ -61,7 +65,12 @@ export function TopBar(props: TopBarProps): ReactElement {
         <button type="button" className="mdv-btn" onClick={props.onNew}>
           New
         </button>
-        <button type="button" className="mdv-btn" onClick={props.onOpen} title={`Open (${shortcutLabel(mod, { key: 'o' })})`}>
+        <button
+          type="button"
+          className="mdv-btn"
+          onClick={props.onOpen}
+          title={`Open (${shortcutLabel(mod, { key: 'o' })})`}
+        >
           Open…
         </button>
         <button

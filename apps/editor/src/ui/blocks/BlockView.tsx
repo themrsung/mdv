@@ -16,6 +16,7 @@ import { useViewPrefs } from '../state/view-prefs.js';
 import { useSurface } from '../surface/surface-context.js';
 import { Editable } from './Editable.js';
 import { ImageView } from './ImageView.js';
+import { readPageBreak, type PageBreakView } from './page-break.js';
 import { TableView } from './TableView.js';
 import { VisualBlockEditor } from '../visual/VisualBlockEditor.js';
 
@@ -38,7 +39,8 @@ function BlockViewImpl({ block }: { readonly block: Block }): ReactElement {
       // Controls inside the block's own inspector keep their click.
       if (
         target instanceof HTMLElement &&
-        target.closest('input, textarea, button, select, label, a, [contenteditable="true"]') !== null
+        target.closest('input, textarea, button, select, label, a, [contenteditable="true"]') !==
+          null
       ) {
         return;
       }
@@ -93,7 +95,16 @@ function BlockBody({
 
   switch (block.kind) {
     case 'paragraph':
-      return <Editable key={editableKey} tag="p" blockId={block.id} path={[]} runs={block.runs} className="mdv-p" />;
+      return (
+        <Editable
+          key={editableKey}
+          tag="p"
+          blockId={block.id}
+          path={[]}
+          runs={block.runs}
+          className="mdv-p"
+        />
+      );
 
     case 'heading':
       return (
@@ -185,13 +196,47 @@ function BlockBody({
     case 'thematicBreak':
       return <hr className="mdv-hr" />;
 
-    case 'raw':
+    case 'raw': {
+      // A page break is a container the editor keeps verbatim, but it is the one
+      // container an author needs to *see* rather than read (SPEC 28.4).
+      const page = readPageBreak(block.text);
+      if (page) return <PageRule view={page} />;
       return (
-        <pre className="mdv-rawblock" title="Source the editor did not recognise; kept byte for byte.">
+        <pre
+          className="mdv-rawblock"
+          title="Source the editor did not recognise; kept byte for byte."
+        >
           {block.text}
         </pre>
       );
+    }
   }
+}
+
+/**
+ * The page rule: a labelled line where the page ends, or a labelled frame around
+ * content that must stay together. Neither has any counterpart on a rendered
+ * page — this is editor furniture, and `@mdv/react` deliberately draws nothing.
+ */
+function PageRule({ view }: { readonly view: PageBreakView }): ReactElement {
+  const className = [
+    'mdv-pagerule',
+    view.wrapping ? 'mdv-pagerule--wrap' : '',
+    view.edge === null ? '' : `mdv-pagerule--${view.edge}`,
+  ]
+    .filter((part) => part !== '')
+    .join(' ');
+
+  // No `role`/`aria-label` here: the block wrapper is already the labelled
+  // group (see `atomicLabel`), and naming the same thing twice reads it twice.
+  return (
+    <div className={className}>
+      <span className="mdv-pagerule__label" aria-hidden="true">
+        {view.label}
+      </span>
+      {view.wrapping ? <pre className="mdv-pagerule__body">{view.body}</pre> : null}
+    </div>
+  );
 }
 
 function atomicLabel(block: Block): string {
@@ -202,8 +247,10 @@ function atomicLabel(block: Block): string {
       return `MDV ${block.blockType === '' ? 'visual' : block.blockType} block`;
     case 'thematicBreak':
       return 'Thematic break';
-    case 'raw':
-      return 'Unrecognised source block';
+    case 'raw': {
+      const page = readPageBreak(block.text);
+      return page === null ? 'Unrecognised source block' : page.label;
+    }
     default:
       return 'Block';
   }

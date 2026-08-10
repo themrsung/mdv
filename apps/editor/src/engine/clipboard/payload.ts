@@ -114,7 +114,8 @@ export function isImageOnly(payload: ClipboardPayload): boolean {
 function toArray<T>(value: ArrayLike<T> | Iterable<T> | undefined | null): readonly T[] {
   if (value === undefined || value === null) return [];
   if (Array.isArray(value)) return value as readonly T[];
-  if (typeof (value as Iterable<T>)[Symbol.iterator] === 'function') return [...(value as Iterable<T>)];
+  if (typeof (value as Iterable<T>)[Symbol.iterator] === 'function')
+    return [...(value as Iterable<T>)];
   const arrayLike = value as ArrayLike<T>;
   const out: T[] = [];
   for (let index = 0; index < arrayLike.length; index += 1) {

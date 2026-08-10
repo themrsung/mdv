@@ -34,10 +34,13 @@ function smallDocument() {
     bulletList(['North', 'South', 'East']),
     code('const answer = 42;', 'ts'),
     quote('Numbers are only as good as the questions behind them.'),
-    table(['Region', 'Revenue'], [
-      ['North', '120'],
-      ['South', '90'],
-    ]),
+    table(
+      ['Region', 'Revenue'],
+      [
+        ['North', '120'],
+        ['South', '90'],
+      ],
+    ),
   ]);
 }
 
@@ -148,7 +151,6 @@ describe('embedSource (SPEC 28.9)', () => {
 
   it('round-trips the exact source bytes', async () => {
     const { PDFDocument, PDFArray, PDFDict, PDFName, PDFRawStream } = await import('pdf-lib');
-    const { inflateSync } = await import('node:zlib');
     const bytes = await exportPdf(smallDocument(), exportContext({ source }), {
       embedSource: true,
       compress: false,
@@ -162,10 +164,31 @@ describe('embedSource (SPEC 28.9)', () => {
     const ef = spec.lookup(PDFName.of('EF'), PDFDict);
     const stream = ef.lookup(PDFName.of('F'));
     if (!(stream instanceof PDFRawStream)) throw new Error('embedded file is not a stream');
-    // `/EmbeddedFile` streams are always deflated by `pdf-lib`, whatever
-    // `compress` says about the page contents.
-    const decoded = inflateSync(Buffer.from(stream.contents));
-    expect(decoded.toString('utf8')).toBe(source);
+    // `compress: false` means *every* stream, the attachment included: the
+    // source is then literally there in the file, no inflate required.
+    expect(stream.dict.has(PDFName.of('Filter'))).toBe(false);
+    expect(Buffer.from(stream.contents).toString('utf8')).toBe(source);
+  });
+
+  it('deflates the attachment when compression is on', async () => {
+    const { PDFDocument, PDFArray, PDFDict, PDFName, PDFRawStream } = await import('pdf-lib');
+    const { inflateSync } = await import('node:zlib');
+    const bytes = await exportPdf(smallDocument(), exportContext({ source }), {
+      embedSource: true,
+      compress: true,
+    });
+    const reloaded = await PDFDocument.load(bytes, { updateMetadata: false });
+    const list = reloaded.catalog
+      .lookup(PDFName.of('Names'), PDFDict)
+      .lookup(PDFName.of('EmbeddedFiles'), PDFDict)
+      .lookup(PDFName.of('Names'), PDFArray);
+    const stream = list
+      .lookup(1, PDFDict)
+      .lookup(PDFName.of('EF'), PDFDict)
+      .lookup(PDFName.of('F'));
+    if (!(stream instanceof PDFRawStream)) throw new Error('embedded file is not a stream');
+    expect(stream.dict.lookup(PDFName.of('Filter'))).toBe(PDFName.of('FlateDecode'));
+    expect(inflateSync(Buffer.from(stream.contents)).toString('utf8')).toBe(source);
   });
 
   it('does not attach anything when `embedSource` is off', async () => {

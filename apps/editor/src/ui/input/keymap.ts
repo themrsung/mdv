@@ -92,17 +92,50 @@ const BINDINGS: readonly Binding[] = [
   { combo: { key: 'k' }, action: { kind: 'link' } },
 
   // Block types. Digits and Alt: `code`, per the note at the top of the file.
-  { combo: { code: 'Digit0', label: '0', alt: true }, action: { kind: 'blockType', spec: { kind: 'paragraph' } } },
-  { combo: { code: 'Digit1', label: '1', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 1 } } },
-  { combo: { code: 'Digit2', label: '2', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 2 } } },
-  { combo: { code: 'Digit3', label: '3', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 3 } } },
-  { combo: { code: 'Digit4', label: '4', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 4 } } },
-  { combo: { code: 'Digit5', label: '5', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 5 } } },
-  { combo: { code: 'Digit6', label: '6', alt: true }, action: { kind: 'blockType', spec: { kind: 'heading', level: 6 } } },
-  { combo: { code: 'KeyC', label: 'C', alt: true }, action: { kind: 'blockType', spec: { kind: 'code' } } },
-  { combo: { code: 'Digit7', label: '7', shift: true }, action: { kind: 'blockType', spec: { kind: 'orderedList' } } },
-  { combo: { code: 'Digit8', label: '8', shift: true }, action: { kind: 'blockType', spec: { kind: 'bulletList' } } },
-  { combo: { code: 'Digit9', label: '9', shift: true }, action: { kind: 'blockType', spec: { kind: 'quote' } } },
+  {
+    combo: { code: 'Digit0', label: '0', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'paragraph' } },
+  },
+  {
+    combo: { code: 'Digit1', label: '1', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 1 } },
+  },
+  {
+    combo: { code: 'Digit2', label: '2', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 2 } },
+  },
+  {
+    combo: { code: 'Digit3', label: '3', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 3 } },
+  },
+  {
+    combo: { code: 'Digit4', label: '4', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 4 } },
+  },
+  {
+    combo: { code: 'Digit5', label: '5', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 5 } },
+  },
+  {
+    combo: { code: 'Digit6', label: '6', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'heading', level: 6 } },
+  },
+  {
+    combo: { code: 'KeyC', label: 'C', alt: true },
+    action: { kind: 'blockType', spec: { kind: 'code' } },
+  },
+  {
+    combo: { code: 'Digit7', label: '7', shift: true },
+    action: { kind: 'blockType', spec: { kind: 'orderedList' } },
+  },
+  {
+    combo: { code: 'Digit8', label: '8', shift: true },
+    action: { kind: 'blockType', spec: { kind: 'bulletList' } },
+  },
+  {
+    combo: { code: 'Digit9', label: '9', shift: true },
+    action: { kind: 'blockType', spec: { kind: 'quote' } },
+  },
 
   // History. `Ctrl+Y` is the Windows spelling of redo and costs nothing to keep.
   { combo: { key: 'z' }, action: { kind: 'undo' } },
@@ -176,7 +209,7 @@ export function shortcutLabel(mod: ModKey, combo: Combo): string {
   const printable = glyph ?? (name.length === 1 ? name.toUpperCase() : name);
 
   if (mod === 'meta') {
-    return `${combo.alt ?? false ? '⌥' : ''}${combo.shift ?? false ? '⇧' : ''}⌘${printable}`;
+    return `${(combo.alt ?? false) ? '⌥' : ''}${(combo.shift ?? false) ? '⇧' : ''}⌘${printable}`;
   }
   const parts = ['Ctrl'];
   if (combo.alt ?? false) parts.push('Alt');

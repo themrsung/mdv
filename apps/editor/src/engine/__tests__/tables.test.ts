@@ -309,7 +309,9 @@ describe('the algebra directly', () => {
 
   it('tableFromGrid produces the alignment list the grid implies', () => {
     const ids = createIdFactory('m');
-    const table = tableFromGrid(ids, [[[textRun(ids(), 'a')], [textRun(ids(), 'b')], [textRun(ids(), 'c')]]]);
+    const table = tableFromGrid(ids, [
+      [[textRun(ids(), 'a')], [textRun(ids(), 'b')], [textRun(ids(), 'c')]],
+    ]);
     expect(table.align).toEqual(['none', 'none', 'none']);
     expectRectangular(table);
   });

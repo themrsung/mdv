@@ -90,9 +90,7 @@ export function parse(source: string, options: ParseOptions = {}): MdvDocument {
       message: 'The document could not be parsed',
       detail: error instanceof Error ? error.message : String(error),
     });
-    children = [
-      { type: 'mdvError', diagnostic, raw: text.slice(bodyStart), position: range },
-    ];
+    children = [{ type: 'mdvError', diagnostic, raw: text.slice(bodyStart), position: range }];
   }
 
   const document: MdvDocument = {

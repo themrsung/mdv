@@ -52,7 +52,10 @@ const SERIF_HINTS = ['serif', 'times', 'georgia', 'garamond', 'cambria', 'book']
  */
 export function classifyFamily(family: string): GenericFamily {
   for (const rawName of family.split(',')) {
-    const nameText = rawName.trim().replace(/^["']|["']$/g, '').toLowerCase();
+    const nameText = rawName
+      .trim()
+      .replace(/^["']|["']$/g, '')
+      .toLowerCase();
     if (nameText === '') continue;
     if (MONO_HINTS.some((h) => nameText.includes(h))) return 'mono';
     // `sans-serif` contains `serif`, so it must be tested first.

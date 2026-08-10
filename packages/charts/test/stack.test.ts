@@ -19,7 +19,11 @@ import { describe, expect, it } from 'vitest';
 import { isStacked, stackColumn, stackExtent } from '../src/internal/stack.js';
 
 /** `[y0, y1, defined]` triples, which read more clearly than object literals. */
-function shape(values: readonly (number | null)[], mode: Parameters<typeof stackColumn>[1], baseline?: number) {
+function shape(
+  values: readonly (number | null)[],
+  mode: Parameters<typeof stackColumn>[1],
+  baseline?: number,
+) {
   return stackColumn(values, mode, baseline).map((s) => [s.y0, s.y1, s.defined] as const);
 }
 

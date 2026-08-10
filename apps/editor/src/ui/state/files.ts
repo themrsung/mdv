@@ -201,5 +201,9 @@ function openViaInput(): Promise<OpenedFile | null> {
 }
 
 function isAbort(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && (error as { name?: unknown }).name === 'AbortError';
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { name?: unknown }).name === 'AbortError'
+  );
 }

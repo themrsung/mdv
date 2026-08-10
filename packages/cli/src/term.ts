@@ -36,7 +36,9 @@ export interface Term {
 }
 
 function wrap(code: string, reset: string, on: boolean): (text: string) => string {
-  return on ? (text: string): string => `${ESC}${code}${text}${ESC}${reset}` : (text: string): string => text;
+  return on
+    ? (text: string): string => `${ESC}${code}${text}${ESC}${reset}`
+    : (text: string): string => text;
 }
 
 /** Decide colour and bind the streams. */

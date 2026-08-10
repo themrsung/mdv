@@ -243,7 +243,8 @@ export function arcToCubics(from: { x: number; y: number }, arc: ArcCommand): Cu
   const sign = arc.largeArc === arc.sweep ? -1 : 1;
   const numerator = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p;
   const denominator = rx * rx * y1p * y1p + ry * ry * x1p * x1p;
-  const coefficient = denominator === 0 ? 0 : sign * Math.sqrt(Math.max(0, numerator / denominator));
+  const coefficient =
+    denominator === 0 ? 0 : sign * Math.sqrt(Math.max(0, numerator / denominator));
   const cxp = (coefficient * (rx * y1p)) / ry;
   const cyp = (coefficient * -(ry * x1p)) / rx;
 

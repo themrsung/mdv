@@ -48,7 +48,7 @@ import { caret, point } from '../selection.js';
 import type { EditorState, Transaction } from '../state.js';
 import { createState } from '../state.js';
 import { document } from '../builders.js';
-import { blockAt, caretAt, editorFor, firstOfKind, flatBlocks, rangeIn, textOf } from './helpers.js';
+import { blockAt, caretAt, editorFor, flatBlocks, rangeIn, textOf } from './helpers.js';
 
 describe('coalescing a run of typing', () => {
   it('collapses consecutive characters into one step', () => {
@@ -302,7 +302,8 @@ describe('every command is exactly reversible', () => {
     editor.undo();
 
     const restored = editor.getSelection();
-    if (restored.kind !== 'text' || before.kind !== 'text') throw new Error('expected text selections');
+    if (restored.kind !== 'text' || before.kind !== 'text')
+      throw new Error('expected text selections');
     expect(restored.anchor.blockId).toBe(before.anchor.blockId);
     expect(restored.focus.offset).toBe(before.focus.offset);
 
@@ -412,7 +413,11 @@ describe('a long session', () => {
 
 describe('the history stack itself', () => {
   /** A transaction that changes nothing but carries the given key and label. */
-  function fakeTransaction(key: string | null, before: EditorState, after: EditorState): Transaction {
+  function fakeTransaction(
+    key: string | null,
+    before: EditorState,
+    after: EditorState,
+  ): Transaction {
     return {
       label: 'typing',
       before,

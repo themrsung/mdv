@@ -27,7 +27,8 @@ describe('the catalogue', () => {
 
   it('produces commands eagerly enough to be inspected, but not shared', () => {
     const bullet = SLASH_ITEMS.find((item) => item.id === 'bullet');
-    if (bullet === undefined || bullet.effect.kind !== 'commands') throw new Error('no bullet item');
+    if (bullet === undefined || bullet.effect.kind !== 'commands')
+      throw new Error('no bullet item');
     const first = bullet.effect.run();
     const second = bullet.effect.run();
     expect(first.length).toBeGreaterThan(0);

@@ -30,11 +30,11 @@ import { createEditor, insertText, toggleMark } from './engine/index.js';
 
 const editor = createEditor({ text: '# Title\n\nSome text\n' });
 
-editor.dispatch(insertText('!'));      // returns the Transaction, or null
+editor.dispatch(insertText('!')); // returns the Transaction, or null
 editor.dispatch(toggleMark({ type: 'strong' }));
 editor.undo();
 
-editor.toText();                        // back to `.mdv` source
+editor.toText(); // back to `.mdv` source
 const off = editor.subscribe(() => render(editor.getSnapshot()));
 ```
 
@@ -44,20 +44,20 @@ may fall through to the browser default.
 
 ## Layout
 
-| Path | What lives there |
-| --- | --- |
-| `model.ts` | The document model: plain, immutable, `structuredClone`-able nodes. |
-| `ids.ts`, `tree.ts`, `builders.ts` | Id allocation, tree navigation/edits, node constructors. |
-| `inline.ts`, `grapheme.ts` | Runs and marks; grapheme-cluster segmentation for caret motion. |
-| `selection.ts` | Points, text/node/cell selections, normalisation, absolute↔path offsets. |
-| `table.ts` | Rectangular cell selections and the ragged-table invariant. |
-| `state.ts`, `history.ts`, `editor.ts` | State, coalescing undo stacks, the `Editor` facade. |
-| `mapping.ts` | Where did this position go? Commands record splices/moves/drops; mapping answers. |
-| `commands/` | Text, marks, structure, lists, tables, insertion — all `Command`s. |
-| `io/` | `read()` and `write()` for `.mdv`, attribute notation, escaping. |
-| `clipboard/` | Copy/paste across three flavours plus hostile-HTML normalisation. |
-| `image/` | Blob → resized, re-encoded `data:` URI, through an injected codec. |
-| `errors.ts` | `EngineError` with a stable `EngineErrorCode`. |
+| Path                                  | What lives there                                                                  |
+| ------------------------------------- | --------------------------------------------------------------------------------- |
+| `model.ts`                            | The document model: plain, immutable, `structuredClone`-able nodes.               |
+| `ids.ts`, `tree.ts`, `builders.ts`    | Id allocation, tree navigation/edits, node constructors.                          |
+| `inline.ts`, `grapheme.ts`            | Runs and marks; grapheme-cluster segmentation for caret motion.                   |
+| `selection.ts`                        | Points, text/node/cell selections, normalisation, absolute↔path offsets.          |
+| `table.ts`                            | Rectangular cell selections and the ragged-table invariant.                       |
+| `state.ts`, `history.ts`, `editor.ts` | State, coalescing undo stacks, the `Editor` facade.                               |
+| `mapping.ts`                          | Where did this position go? Commands record splices/moves/drops; mapping answers. |
+| `commands/`                           | Text, marks, structure, lists, tables, insertion — all `Command`s.                |
+| `io/`                                 | `read()` and `write()` for `.mdv`, attribute notation, escaping.                  |
+| `clipboard/`                          | Copy/paste across three flavours plus hostile-HTML normalisation.                 |
+| `image/`                              | Blob → resized, re-encoded `data:` URI, through an injected codec.                |
+| `errors.ts`                           | `EngineError` with a stable `EngineErrorCode`.                                    |
 
 ## Concepts worth knowing before using it
 
@@ -67,7 +67,7 @@ content, not its source. In `# A long heading`, offsets `2..6` are `long`; the
 
 **Copy produces three flavours.** `text/x-mdv` is the document's own source, so
 a copy between two `.mdv` documents is exact — visual blocks, attribute quoting,
-raw blocks and all. `text/plain` is *also* the source, which is the useful thing
+raw blocks and all. `text/plain` is _also_ the source, which is the useful thing
 to paste into a terminal or a commit message. `text/html` is semantic HTML for
 everyone else. Paste prefers them in that order; paste-without-formatting takes
 the plain text and inserts it literally, escaping anything that would otherwise
@@ -79,7 +79,7 @@ through an `ImageEnvironment` you supply (`browserImageEnvironment` is provided
 for the browser); the engine never performs network I/O.
 
 **Selection mapping is explicit.** Commands describe their edits to a
-`MappingBuilder`, so splitting a paragraph sends the caret's tail into the *new*
+`MappingBuilder`, so splitting a paragraph sends the caret's tail into the _new_
 block instead of clamping it to the end of the old one.
 
 ## Tests and typecheck

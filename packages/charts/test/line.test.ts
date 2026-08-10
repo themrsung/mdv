@@ -115,12 +115,22 @@ describe('line: point markers', () => {
   });
 
   it('never shrinks a marker below the 8 px floor even when asked to', () => {
-    const run = runChart(lineChart, quarters(), { encoding: XY, attrs: { points: 'all', pointSize: 2 } });
-    for (const dot of nodesOfKind(run.laid.nodes, 'circle')) expect(dot.r).toBeGreaterThanOrEqual(4);
+    const run = runChart(lineChart, quarters(), {
+      encoding: XY,
+      attrs: { points: 'all', pointSize: 2 },
+    });
+    for (const dot of nodesOfKind(run.laid.nodes, 'circle'))
+      expect(dot.r).toBeGreaterThanOrEqual(4);
   });
 
   it('paints a single-point series as a visible dot rather than nothing', () => {
-    const table = makeTable([['quarter', 'category'], ['revenue', 'number']], [['Q1', 5]]);
+    const table = makeTable(
+      [
+        ['quarter', 'category'],
+        ['revenue', 'number'],
+      ],
+      [['Q1', 5]],
+    );
     const run = runChart(lineChart, table, { encoding: XY });
     const line = paths(run.laid.nodes)[0];
     // A zero-length segment under a round cap paints as a dot.
@@ -159,7 +169,15 @@ describe('line: curves', () => {
   });
 
   it('produces finite geometry for every curve kind', () => {
-    for (const curve of ['linear', 'monotone', 'natural', 'basis', 'step', 'stepBefore', 'stepAfter']) {
+    for (const curve of [
+      'linear',
+      'monotone',
+      'natural',
+      'basis',
+      'step',
+      'stepBefore',
+      'stepAfter',
+    ]) {
       const run = runChart(lineChart, quarters(), { encoding: XY, attrs: { curve } });
       expect(nonFiniteNumbers(run.laid), curve).toEqual([]);
     }
@@ -214,7 +232,9 @@ describe('line: missing data (SPEC 6.5)', () => {
 });
 
 describe('line: multiple series', () => {
-  const run = runChart(lineChart, twoSeries(), { encoding: { ...XY, series: { field: 'region' } } });
+  const run = runChart(lineChart, twoSeries(), {
+    encoding: { ...XY, series: { field: 'region' } },
+  });
 
   it('draws one path per series and does not stack them', () => {
     expect(paths(run.laid.nodes)).toHaveLength(2);
@@ -273,7 +293,9 @@ describe('line: temporal x', () => {
         [new Date(Date.UTC(2024, 0, 3)), 15],
       ],
     );
-    const run = runChart(lineChart, table, { encoding: { x: { field: 'day' }, y: { field: 'visits' } } });
+    const run = runChart(lineChart, table, {
+      encoding: { x: { field: 'day' }, y: { field: 'visits' } },
+    });
     expect(run.encoded.scales.x?.type).toBe('time');
     const xs = paths(run.laid.nodes)[0]?.d.map((c) => (c.c === 'M' || c.c === 'L' ? c.x : -1));
     expect(xs).toEqual([0, 200, 400]);
@@ -294,7 +316,11 @@ describe('line: degenerate input', () => {
       { x: 0, y: 0, width: 1600, height: 2 },
       { x: 0, y: 0, width: 0, height: 0 },
     ]) {
-      const run = runChart(lineChart, quarters(), { encoding: XY, attrs: { points: 'all' }, frame });
+      const run = runChart(lineChart, quarters(), {
+        encoding: XY,
+        attrs: { points: 'all' },
+        frame,
+      });
       expect(nonFiniteNumbers(run.laid)).toEqual([]);
     }
   });

@@ -109,7 +109,15 @@ export {
 } from './color/oklab.js';
 export type { Oklab, Oklch } from './color/oklab.js';
 
-export { clamp01, decodeGamma, encodeGamma, formatHex, inGamut, over, parseColor } from './color/rgb.js';
+export {
+  clamp01,
+  decodeGamma,
+  encodeGamma,
+  formatHex,
+  inGamut,
+  over,
+  parseColor,
+} from './color/rgb.js';
 export type { Rgb } from './color/rgb.js';
 
 export { NAMED_COLORS } from './color/named.js';

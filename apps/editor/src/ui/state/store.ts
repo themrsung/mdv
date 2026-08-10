@@ -52,10 +52,7 @@ export function useEditorApi(): EditorApi {
 
 /** Subscribe to the engine and build the API object. */
 export function useEditorStore(editor: Editor): EditorApi {
-  const subscribe = useCallback(
-    (listener: () => void) => editor.subscribe(listener),
-    [editor],
-  );
+  const subscribe = useCallback((listener: () => void) => editor.subscribe(listener), [editor]);
   const snapshot: EditorSnapshot = useSyncExternalStore(
     subscribe,
     () => editor.getSnapshot(),

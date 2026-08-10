@@ -131,8 +131,7 @@ export function buildVisualBlock(
     if (headerType === null && info.typeRange !== null) attrsPosition['type'] = info.typeRange;
   } else {
     bag.add('MDV1201', root.range(openOffset + fenceIndent, openOffset + openText.length), {
-      detail:
-        'Write the type in the info string (```mdv bar) or as `type: bar` in the header.',
+      detail: 'Write the type in the info string (```mdv bar) or as `type: bar` in the header.',
     });
   }
 

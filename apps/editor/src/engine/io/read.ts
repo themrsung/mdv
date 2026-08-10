@@ -66,6 +66,7 @@ export function normalizeSource(text: string): string {
   let out = text;
   if (out.charCodeAt(0) === 0xfeff) out = out.slice(1);
   out = out.replace(/\r\n?/g, '\n');
+  // eslint-disable-next-line no-control-regex -- NUL is the character replaced
   out = out.replace(/\u0000/g, '\uFFFD');
   return out;
 }
@@ -201,7 +202,10 @@ function parseFence(scanner: Scanner, ids: IdFactory, match: RegExpExecArray): B
   void closed;
 
   const text = body.join('\n');
-  const fenceStyle = { style: character === '~' ? ('tilde' as const) : ('backtick' as const), length: marker.length };
+  const fenceStyle = {
+    style: character === '~' ? ('tilde' as const) : ('backtick' as const),
+    length: marker.length,
+  };
   const visual = parseVisualInfo(info);
   if (visual) {
     const split = splitVisualBody(text);
@@ -319,8 +323,9 @@ function tokenizeInfo(text: string): readonly InfoToken[] {
 /**
  * A `:::name` container directive. Captured verbatim through its matching close
  * so nothing inside is reinterpreted. When no close exists the opening line
- * alone becomes the raw block, which keeps the rest of the document editable
- * (SPEC Appendix E contains exactly this case: `:::mdv-page{break=before}`).
+ * alone becomes the raw block, which keeps the rest of the document editable —
+ * the parser instead runs the container to the end of its parent, but swallowing
+ * every following block into one uneditable lump is the wrong answer in an editor.
  */
 function parseDirective(scanner: Scanner, ids: IdFactory, marker: string): Block {
   const start = scanner.index;
@@ -332,7 +337,11 @@ function parseDirective(scanner: Scanner, ids: IdFactory, marker: string): Block
   while (index < scanner.lines.length) {
     const line = scanner.lines[index] ?? '';
     if (fenceMarker !== null) {
-      if (new RegExp(`^ {0,3}${fenceMarker[0] === '~' ? '~' : '`'}{${fenceMarker.length},}[ \\t]*$`).test(line)) {
+      if (
+        new RegExp(
+          `^ {0,3}${fenceMarker[0] === '~' ? '~' : '`'}{${fenceMarker.length},}[ \\t]*$`,
+        ).test(line)
+      ) {
         fenceMarker = null;
       }
       index += 1;
@@ -507,7 +516,8 @@ function parseList(scanner: Scanner, ids: IdFactory): Block | null {
       if (next.trim() === '') {
         // Peek: a blank line ends the item unless indented content follows.
         let probe = scanner.index;
-        while (probe < scanner.lines.length && (scanner.lines[probe] ?? '').trim() === '') probe += 1;
+        while (probe < scanner.lines.length && (scanner.lines[probe] ?? '').trim() === '')
+          probe += 1;
         const following = scanner.lines[probe];
         if (following === undefined) break;
         const nextItem = matchItem(following);
@@ -791,7 +801,13 @@ export function parseInline(text: string, ids: IdFactory): readonly Run[] {
     // span or a link would extend that mark over the following characters, and
     // merging into a delimiter run would destroy the text when the run is later
     // truncated to zero length.
-    if (raw === null && last && last.raw === null && last.marks.length === 0 && last.delimiter !== true) {
+    if (
+      raw === null &&
+      last &&
+      last.raw === null &&
+      last.marks.length === 0 &&
+      last.delimiter !== true
+    ) {
       last.text += value;
       return;
     }
@@ -926,10 +942,14 @@ export function parseInline(text: string, ids: IdFactory): readonly Run[] {
       const afterWhitespace = isWhitespaceChar(after);
       const beforePunctuation = before !== undefined && PUNCTUATION.test(before);
       const afterPunctuation = after !== undefined && PUNCTUATION.test(after);
-      const leftFlanking = !afterWhitespace && (!afterPunctuation || beforeWhitespace || beforePunctuation);
-      const rightFlanking = !beforeWhitespace && (!beforePunctuation || afterWhitespace || afterPunctuation);
-      const canOpen = character === '_' ? leftFlanking && (!rightFlanking || beforePunctuation) : leftFlanking;
-      const canClose = character === '_' ? rightFlanking && (!leftFlanking || afterPunctuation) : rightFlanking;
+      const leftFlanking =
+        !afterWhitespace && (!afterPunctuation || beforeWhitespace || beforePunctuation);
+      const rightFlanking =
+        !beforeWhitespace && (!beforePunctuation || afterWhitespace || afterPunctuation);
+      const canOpen =
+        character === '_' ? leftFlanking && (!rightFlanking || beforePunctuation) : leftFlanking;
+      const canClose =
+        character === '_' ? rightFlanking && (!leftFlanking || afterPunctuation) : rightFlanking;
 
       if (character === '~' && length !== 2) {
         pushText(character.repeat(length));
@@ -972,7 +992,12 @@ function parseCodeSpan(text: string, start: number): { content: string; end: num
       continue;
     }
     let content = text.slice(start + fence, found);
-    if (content.length >= 2 && content.startsWith(' ') && content.endsWith(' ') && content.trim() !== '') {
+    if (
+      content.length >= 2 &&
+      content.startsWith(' ') &&
+      content.endsWith(' ') &&
+      content.trim() !== ''
+    ) {
       content = content.slice(1, -1);
     }
     return { content: content.replace(/\n/g, ' '), end: found + fence };
@@ -1107,7 +1132,13 @@ function resolveDelimiters(pieces: Piece[], delimiters: Delimiter[]): void {
     let openerIndex = closerIndex - 1;
     while (openerIndex >= 0 && closer.length > 0) {
       const opener = delimiters[openerIndex];
-      if (!opener || !opener.active || !opener.canOpen || opener.length === 0 || opener.character !== closer.character) {
+      if (
+        !opener ||
+        !opener.active ||
+        !opener.canOpen ||
+        opener.length === 0 ||
+        opener.character !== closer.character
+      ) {
         openerIndex -= 1;
         continue;
       }

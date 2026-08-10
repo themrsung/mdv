@@ -130,7 +130,10 @@ export function gamutMap(c: Oklch): Rgb {
 }
 
 /** Euclidean OKLab distance ×100 — the unit every SPEC 16.4 threshold is quoted in. */
-export function deltaEOklabRgb(x: Pick<Rgb, 'r' | 'g' | 'b'>, y: Pick<Rgb, 'r' | 'g' | 'b'>): number {
+export function deltaEOklabRgb(
+  x: Pick<Rgb, 'r' | 'g' | 'b'>,
+  y: Pick<Rgb, 'r' | 'g' | 'b'>,
+): number {
   const p = rgbToOklab(x);
   const q = rgbToOklab(y);
   return Math.hypot(p.L - q.L, p.a - q.a, p.b - q.b) * 100;

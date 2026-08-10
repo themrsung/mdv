@@ -184,7 +184,9 @@ export async function loadConfigFile(io: CliIo, path: string, term: Term): Promi
   }
 
   if (!isRecord(value)) {
-    throw usageError(`Config ${shown} must be an object, got ${value === null ? 'null' : typeof value}`);
+    throw usageError(
+      `Config ${shown} must be an object, got ${value === null ? 'null' : typeof value}`,
+    );
   }
 
   const out: Record<string, unknown> = {};

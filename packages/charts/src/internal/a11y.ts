@@ -12,7 +12,15 @@
  * tools can prompt for a better one. No chart type writes an `A11yTree`.
  */
 
-import type { A11yColumn, A11yTable, BlockAttrs, Column, DataType, Table, TableViewAttr } from '@mdv/core';
+import type {
+  A11yColumn,
+  A11yTable,
+  BlockAttrs,
+  Column,
+  DataType,
+  Table,
+  TableViewAttr,
+} from '@mdv/core';
 import { channelFormat, cell, humaniseColumn, isQuantitative } from './table.js';
 import { formatValue } from './format.js';
 import { compareNumbers } from './num.js';
@@ -62,7 +70,9 @@ export function buildA11yTable(
   };
   for (let row = 0; row < table.rows.length; row += 1) {
     view.rows.push(
-      used.map((entry) => formatValue(cell(table, row, entry.index), entry.format ?? entry.column.format)),
+      used.map((entry) =>
+        formatValue(cell(table, row, entry.index), entry.format ?? entry.column.format),
+      ),
     );
   }
   return view;
@@ -103,7 +113,9 @@ export interface DescriptionParts {
  */
 export function composeDescription(parts: DescriptionParts): string {
   const sentences: string[] = [`${parts.chartKind}.`];
-  const subject = [parts.subject, parts.scope].filter((s): s is string => s !== undefined && s !== '').join(', ');
+  const subject = [parts.subject, parts.scope]
+    .filter((s): s is string => s !== undefined && s !== '')
+    .join(', ');
   if (subject !== '') sentences.push(`${subject}.`);
   if (parts.range !== undefined && parts.range !== '') sentences.push(`${parts.range}.`);
   if (parts.extreme !== undefined && parts.extreme !== '') sentences.push(`${parts.extreme}.`);
@@ -111,7 +123,10 @@ export function composeDescription(parts: DescriptionParts): string {
 }
 
 /** "Revenue by quarter" from the measure and category titles. */
-export function subjectPhrase(measure: string | undefined, by: string | undefined): string | undefined {
+export function subjectPhrase(
+  measure: string | undefined,
+  by: string | undefined,
+): string | undefined {
   if (measure === undefined || measure === '') return undefined;
   if (by === undefined || by === '') return measure;
   return `${measure} by ${by.toLowerCase()}`;

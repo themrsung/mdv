@@ -120,8 +120,7 @@ export interface RenderInput {
   lang?: string | undefined;
   /** Resolve an `image` href to bytes; backends never fetch (SPEC 20). */
   resolveImage?:
-    | ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined)
-    | undefined;
+    ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined) | undefined;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -319,10 +318,7 @@ class Renderer {
 
   // ── primitives ─────────────────────────────────────────────────────────────
 
-  #drawRect(
-    build: PageBuild,
-    d: Extract<Drawable, { kind: 'rect' }>,
-  ): void {
+  #drawRect(build: PageBuild, d: Extract<Drawable, { kind: 'rect' }>): void {
     if (d.widthPt <= 0 || d.heightPt <= 0) return;
     const height = build.page.heightPt;
     const y = height - (d.yPt + d.heightPt);
@@ -369,9 +365,7 @@ class Renderer {
         pageHeightPt: build.page.heightPt,
       },
       policy: this.#policy,
-      ...(this.#input.resolveImage === undefined
-        ? {}
-        : { resolveImage: this.#input.resolveImage }),
+      ...(this.#input.resolveImage === undefined ? {} : { resolveImage: this.#input.resolveImage }),
     });
     build.ops.push(...result.ops);
     for (const cp of result.missingCodePoints) this.#missing.add(cp);
@@ -514,7 +508,12 @@ class Renderer {
       const values = this.#runningValues(page, lastNumber);
       const header = options.header;
       if (header !== undefined && (options.headerOnFirstPage || page.index > 0)) {
-        this.#drawRunning(build, header, Math.max(0, page.margins.topPt - this.#style.runningGapPt), values);
+        this.#drawRunning(
+          build,
+          header,
+          Math.max(0, page.margins.topPt - this.#style.runningGapPt),
+          values,
+        );
       }
       const footer = options.footer;
       if (footer !== undefined) {
@@ -622,7 +621,9 @@ class Renderer {
   #reportFonts(): void {
     if (this.#missing.size > 0) {
       const codes = [...this.#missing].sort((a, b) => a - b);
-      const shown = codes.slice(0, 16).map((c) => `U+${c.toString(16).toUpperCase().padStart(4, '0')}`);
+      const shown = codes
+        .slice(0, 16)
+        .map((c) => `U+${c.toString(16).toUpperCase().padStart(4, '0')}`);
       this.#diagnostics.push(
         renderDiagnostic('MDV5100', {
           detail:

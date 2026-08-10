@@ -267,9 +267,7 @@ function writeTable(block: TableBlock, options: WriteOptions): string {
 
 function writeList(block: ListBlock, options: WriteOptions): string {
   const rendered = block.items.map((item, index) => {
-    const marker = block.ordered
-      ? `${block.start + index}${block.delimiter} `
-      : `${block.bullet} `;
+    const marker = block.ordered ? `${block.start + index}${block.delimiter} ` : `${block.bullet} `;
     const task = item.checked === null ? '' : item.checked ? '[x] ' : '[ ] ';
     const indent = ' '.repeat(marker.length);
 
@@ -280,7 +278,11 @@ function writeList(block: ListBlock, options: WriteOptions): string {
       if (!current) continue;
       const previous = blocks[i - 1];
       const glue =
-        i === 0 ? '' : block.tight && previous?.kind === 'paragraph' && current.kind === 'list' ? '\n' : '\n\n';
+        i === 0
+          ? ''
+          : block.tight && previous?.kind === 'paragraph' && current.kind === 'list'
+            ? '\n'
+            : '\n\n';
       pieces.push(glue + writeBlock(current, options));
     }
     const body = pieces.join('');

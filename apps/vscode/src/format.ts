@@ -62,10 +62,7 @@ class MdvFormatter implements vscode.DocumentFormattingEditProvider {
       );
       if (token.isCancellationRequested) return [];
       if (formatted === source) return [];
-      const whole = new vscode.Range(
-        document.positionAt(0),
-        document.positionAt(source.length),
-      );
+      const whole = new vscode.Range(document.positionAt(0), document.positionAt(source.length));
       return [vscode.TextEdit.replace(whole, formatted)];
     } catch (error) {
       // A formatter that mangles a file is far worse than one that declines.

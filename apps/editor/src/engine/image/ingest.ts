@@ -101,7 +101,13 @@ const DEFAULTS = {
 } as const;
 
 /** Types we are willing to keep byte-for-byte rather than re-encode. */
-const PASSTHROUGH_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif']);
+const PASSTHROUGH_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+]);
 
 /** Types that must never be rasterised: doing so would be strictly destructive. */
 const VECTOR_TYPES = new Set(['image/svg+xml']);
@@ -213,9 +219,19 @@ export async function ingestImage(
 
     // Re-encoding is supposed to save space. When it did not — a flat PNG turned
     // into a larger JPEG, say — keep the original, as long as it still fits.
-    if (allowPassthrough && !scaled && PASSTHROUGH_TYPES.has(source.type) && source.size > 0 && source.size < encoded.byteLength) {
+    if (
+      allowPassthrough &&
+      !scaled &&
+      PASSTHROUGH_TYPES.has(source.type) &&
+      source.size > 0 &&
+      source.size < encoded.byteLength
+    ) {
       const bytes = new Uint8Array(await source.arrayBuffer());
-      encoded = { mimeType: source.type, base64: env.toBase64(bytes), byteLength: bytes.byteLength };
+      encoded = {
+        mimeType: source.type,
+        base64: env.toBase64(bytes),
+        byteLength: bytes.byteLength,
+      };
       pushLarge(warnings, encoded.byteLength, warnBytes);
       return {
         src: dataUri(encoded.mimeType, encoded.base64),
@@ -297,7 +313,11 @@ export function parseDataUri(
   const mimeType = match[1] ?? '';
   const base64 = match[2] ?? '';
   const padding = base64.endsWith('==') ? 2 : base64.endsWith('=') ? 1 : 0;
-  return { mimeType, base64, byteLength: Math.max(0, Math.floor((base64.length * 3) / 4) - padding) };
+  return {
+    mimeType,
+    base64,
+    byteLength: Math.max(0, Math.floor((base64.length * 3) / 4) - padding),
+  };
 }
 
 /** True when `src` embeds its bytes rather than pointing at them. */
@@ -315,7 +335,9 @@ async function encodeAs(
   const type = env.supports(mimeType) ? mimeType : 'image/png';
   const encoded = await env.encode(image, target.width, target.height, type, quality);
   if (encoded.base64 === '') {
-    throw new EngineError('IMAGE_DECODE_FAILED', 'the image encoded to zero bytes', { mimeType: type });
+    throw new EngineError('IMAGE_DECODE_FAILED', 'the image encoded to zero bytes', {
+      mimeType: type,
+    });
   }
   return encoded;
 }

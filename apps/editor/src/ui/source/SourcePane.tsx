@@ -90,8 +90,8 @@ export function SourcePane({ text, editable, onToggleEditable }: SourcePaneProps
 
       {editable ? (
         <p className="mdv-source__hint">
-          Applied on blur, or with {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl+'}Enter. Re-reading the
-          source rebuilds the document, which clears the undo history.
+          Applied on blur, or with {navigator.platform.includes('Mac') ? '⌘' : 'Ctrl+'}Enter.
+          Re-reading the source rebuilds the document, which clears the undo history.
         </p>
       ) : null}
     </section>

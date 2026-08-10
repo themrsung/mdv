@@ -20,7 +20,13 @@ export {
 } from './shared.js';
 export type { EditOutcome } from './shared.js';
 
-export { clearSelection, deleteBackward, deleteForward, insertText, setContainerText } from './text.js';
+export {
+  clearSelection,
+  deleteBackward,
+  deleteForward,
+  insertText,
+  setContainerText,
+} from './text.js';
 
 export {
   deleteBlocks,

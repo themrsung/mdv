@@ -74,11 +74,12 @@ export const CHROMA_FLOOR = 0.1;
  * windows below bracket the spec's own selected palettes (light 0.433…0.764,
  * dark 0.529…0.670) with roughly one band-step of margin on each side.
  */
-export const LIGHTNESS_BAND: Readonly<Record<ColorScheme, { readonly min: number; readonly max: number }>> =
-  Object.freeze({
-    light: Object.freeze({ min: 0.4, max: 0.8 }),
-    dark: Object.freeze({ min: 0.5, max: 0.85 }),
-  });
+export const LIGHTNESS_BAND: Readonly<
+  Record<ColorScheme, { readonly min: number; readonly max: number }>
+> = Object.freeze({
+  light: Object.freeze({ min: 0.4, max: 0.8 }),
+  dark: Object.freeze({ min: 0.5, max: 0.85 }),
+});
 
 /**
  * The dichromacies the separation gate is computed over.
@@ -157,11 +158,13 @@ export function validatePalette(
 ): PaletteValidation {
   // Historically this argument was a bare `allPairs` boolean; accept both so a
   // caller written against the older shape keeps working.
-  const opts: PaletteValidationOptions = typeof options === 'boolean' ? { allPairs: options } : options;
+  const opts: PaletteValidationOptions =
+    typeof options === 'boolean' ? { allPairs: options } : options;
   const allPairs = opts.allPairs ?? false;
-  const types = opts.includeTritanopia === true
-    ? ([...GATED_CVD_TYPES, 'tritanopia'] as const satisfies readonly CvdType[])
-    : GATED_CVD_TYPES;
+  const types =
+    opts.includeTritanopia === true
+      ? ([...GATED_CVD_TYPES, 'tritanopia'] as const satisfies readonly CvdType[])
+      : GATED_CVD_TYPES;
 
   const surfaceRgb = parseColor(surface);
   // Every slot is judged as the eye receives it: composited onto the surface.
@@ -293,9 +296,10 @@ export function paletteSeparation(
 ): { worstNormal: number; worstCvd: number } {
   const surfaceRgb = parseColor(surface);
   const slots = palette.map((c) => over(parseColor(c), surfaceRgb));
-  const types = options.includeTritanopia === true
-    ? ([...GATED_CVD_TYPES, 'tritanopia'] as const satisfies readonly CvdType[])
-    : GATED_CVD_TYPES;
+  const types =
+    options.includeTritanopia === true
+      ? ([...GATED_CVD_TYPES, 'tritanopia'] as const satisfies readonly CvdType[])
+      : GATED_CVD_TYPES;
   let worstNormal = Number.POSITIVE_INFINITY;
   let worstCvd = Number.POSITIVE_INFINITY;
   for (let i = 0; i < slots.length; i += 1) {

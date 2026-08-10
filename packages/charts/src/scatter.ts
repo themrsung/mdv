@@ -40,11 +40,27 @@ import type { PointShape } from './internal/types.js';
 import { POINT_SHAPES } from './internal/types.js';
 import { annotationNodes, parseAnnotations } from './internal/annotations.js';
 import { axisSpecFor, isDegenerateFrame, makeAxis, rangeToFrame } from './internal/cartesian.js';
-import { blockDiagnostic, incompatibleField, missingChannel, unknownEnum } from './internal/diagnostics.js';
-import { buildA11yTable, composeDescription, countPhrase, presentationOf, viewColumn } from './internal/a11y.js';
+import {
+  blockDiagnostic,
+  incompatibleField,
+  missingChannel,
+  unknownEnum,
+} from './internal/diagnostics.js';
+import {
+  buildA11yTable,
+  composeDescription,
+  countPhrase,
+  presentationOf,
+  viewColumn,
+} from './internal/a11y.js';
 import { buildLegend, buildSeries } from './internal/series.js';
 import { clamp, compareNumbers, isFiniteNumber, safeDiv } from './internal/num.js';
-import { createContinuousScale, createPointScale, createTimeScale, toNumeric } from './internal/scale.js';
+import {
+  createContinuousScale,
+  createPointScale,
+  createTimeScale,
+  toNumeric,
+} from './internal/scale.js';
 import { enumAttr, numberAttr } from './internal/attrs.js';
 import { extentOf, resolveDomain, resolveScaleType } from './internal/domain.js';
 import { formatNumber } from './internal/format.js';
@@ -127,7 +143,13 @@ const CHANNELS: readonly ChannelSpec[] = [
     defaultScale: 'linear',
     doc: 'The first measure, or a temporal domain.',
   },
-  { name: 'y', required: true, accepts: ['number', 'integer', 'duration'], defaultScale: 'linear', doc: 'The second measure.' },
+  {
+    name: 'y',
+    required: true,
+    accepts: ['number', 'integer', 'duration'],
+    defaultScale: 'linear',
+    doc: 'The second measure.',
+  },
   {
     name: 'series',
     required: false,
@@ -143,9 +165,27 @@ const CHANNELS: readonly ChannelSpec[] = [
     defaultScale: 'sqrt',
     doc: 'Bubble magnitude. Area-proportional, never radius-proportional.',
   },
-  { name: 'shape', required: false, accepts: ['string', 'category'], constant: true, defaultScale: 'ordinal', doc: 'Point shape; a secondary encoding for CVD.' },
-  { name: 'label', required: false, accepts: ['string', 'number', 'integer', 'category'], doc: 'Direct labels.' },
-  { name: 'tooltip', required: false, accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'], list: true, doc: 'Extra readout fields.' },
+  {
+    name: 'shape',
+    required: false,
+    accepts: ['string', 'category'],
+    constant: true,
+    defaultScale: 'ordinal',
+    doc: 'Point shape; a secondary encoding for CVD.',
+  },
+  {
+    name: 'label',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category'],
+    doc: 'Direct labels.',
+  },
+  {
+    name: 'tooltip',
+    required: false,
+    accepts: ['string', 'number', 'integer', 'category', 'date', 'datetime'],
+    list: true,
+    doc: 'Extra readout fields.',
+  },
 ];
 
 /** Build `scatter` or `bubble`. */
@@ -167,7 +207,11 @@ function createScatterType(name: 'scatter' | 'bubble'): ChartType<PointMark> {
         const binding = firstChannel(block.encoding, channel);
         if (binding?.field === undefined) {
           diagnostics.push(
-            missingChannel(block, channel, channel === 'x' ? 'the first measure' : 'the second measure'),
+            missingChannel(
+              block,
+              channel,
+              channel === 'x' ? 'the first measure' : 'the second measure',
+            ),
           );
           continue;
         }
@@ -185,10 +229,21 @@ function createScatterType(name: 'scatter' | 'bubble'): ChartType<PointMark> {
           }
           continue;
         }
-        const acceptable = channel === 'x' ? isQuantitative(bound.column.type) || isTemporal(bound.column.type) : isQuantitative(bound.column.type);
-        if (!acceptable && bound.column.type !== 'unknown' && bound.column.type !== 'string' && bound.column.type !== 'category') {
+        const acceptable =
+          channel === 'x'
+            ? isQuantitative(bound.column.type) || isTemporal(bound.column.type)
+            : isQuantitative(bound.column.type);
+        if (
+          !acceptable &&
+          bound.column.type !== 'unknown' &&
+          bound.column.type !== 'string' &&
+          bound.column.type !== 'category'
+        ) {
           diagnostics.push(
-            incompatibleField(block, channel, bound.column.name, bound.column.type, ['number', 'integer']),
+            incompatibleField(block, channel, bound.column.name, bound.column.type, [
+              'number',
+              'integer',
+            ]),
           );
         }
       }
@@ -199,7 +254,11 @@ function createScatterType(name: 'scatter' | 'bubble'): ChartType<PointMark> {
         const size = firstChannel(block.encoding, 'size');
         if (size?.field === undefined) {
           diagnostics.push(
-            missingChannel(block, 'size', 'the magnitude each bubble\'s *area* encodes; `bubble` requires a field here'),
+            missingChannel(
+              block,
+              'size',
+              "the magnitude each bubble's *area* encodes; `bubble` requires a field here",
+            ),
           );
         }
       }
@@ -216,13 +275,15 @@ function createScatterType(name: 'scatter' | 'bubble'): ChartType<PointMark> {
 
     describe(input: DescribeInput<PointMark>): string {
       const { encoded, table, block } = input;
-      if (encoded.marks.length === 0) return `${name === 'bubble' ? 'Bubble' : 'Scatter'} chart with no data.`;
+      if (encoded.marks.length === 0)
+        return `${name === 'bubble' ? 'Bubble' : 'Scatter'} chart with no data.`;
       const xColumn = findColumn(table, firstChannel(block.encoding, 'x')?.field)?.column;
       const yColumn = findColumn(table, firstChannel(block.encoding, 'y')?.field)?.column;
       const yScale = encoded.scales.y;
       const values = encoded.marks.map((mark) => mark.y);
       const extent = extentOf(values);
-      const format = (value: number): string => (yScale === undefined ? formatNumber(value) : yScale.format(value));
+      const format = (value: number): string =>
+        yScale === undefined ? formatNumber(value) : yScale.format(value);
       const seriesCount = encoded.series.filter((series) => series.id !== '').length;
       const scope = [countPhrase(encoded.marks.length, 'point')];
       if (seriesCount > 1) scope.push(countPhrase(seriesCount, 'series', 'series'));
@@ -231,9 +292,13 @@ function createScatterType(name: 'scatter' | 'bubble'): ChartType<PointMark> {
         chartKind: `${name === 'bubble' ? 'Bubble' : 'Scatter'} chart`,
         ...(xColumn === undefined || yColumn === undefined
           ? {}
-          : { subject: `${humaniseColumn(yColumn)} against ${humaniseColumn(xColumn).toLowerCase()}` }),
+          : {
+              subject: `${humaniseColumn(yColumn)} against ${humaniseColumn(xColumn).toLowerCase()}`,
+            }),
         scope: scope.join(', '),
-        ...(extent === undefined ? {} : { range: `Values range from ${format(extent[0])} to ${format(extent[1])}` }),
+        ...(extent === undefined
+          ? {}
+          : { range: `Values range from ${format(extent[0])} to ${format(extent[1])}` }),
       });
     },
   };
@@ -251,9 +316,10 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
   const sizeBound = bindField(table, sizeChannel);
   const shapeBound = bindField(table, shapeChannel);
 
-  const report = (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
-    input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
-  };
+  const report =
+    (attribute: string, allowed: readonly string[], fallback: string) => (given: string) => {
+      input.diagnostic(unknownEnum(block, attribute, given, allowed, fallback));
+    };
   const opacity = numberAttr(attrs, 'opacity', 0.85, 0, 1);
   const jitter = numberAttr(attrs, 'jitter', 0, 0, 100);
   const trend = enumAttr(attrs, 'trend', TREND_KINDS, 'none', report('trend', TREND_KINDS, 'none'));
@@ -297,7 +363,8 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
   const seriesColumn = findColumn(table, seriesChannel?.field);
   const xFormat = channelFormat(xChannel, xBound.column);
   const yFormat = channelFormat(yChannel, yBound.column);
-  const sizeFormat = sizeBound === undefined ? undefined : channelFormat(sizeChannel, sizeBound.column);
+  const sizeFormat =
+    sizeBound === undefined ? undefined : channelFormat(sizeChannel, sizeBound.column);
 
   const byId = new Map<string, SeriesDescriptor>();
   for (const descriptor of descriptors) byId.set(descriptor.id, descriptor);
@@ -349,7 +416,10 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
     }
     if (descriptor === undefined) continue;
 
-    const sizeValue = sizeBound === undefined ? undefined : (cellNumber(cell(table, row, sizeBound.index)) ?? undefined);
+    const sizeValue =
+      sizeBound === undefined
+        ? undefined
+        : (cellNumber(cell(table, row, sizeBound.index)) ?? undefined);
     if (sizeValue !== undefined) sizeValues.push(sizeValue);
 
     const shape: PointShape =
@@ -365,7 +435,14 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
       rows.push(readout(humaniseColumn(sizeBound.column), formatNumber(sizeValue, sizeFormat)));
     }
 
-    const mark: PointMark = { mark: 'point', seriesId: descriptor.id, datum: row, x: xValue, y: yValue, shape };
+    const mark: PointMark = {
+      mark: 'point',
+      seriesId: descriptor.id,
+      datum: row,
+      x: xValue,
+      y: yValue,
+      shape,
+    };
     if (sizeValue !== undefined) mark.size = sizeValue;
     marks.push(mark);
     points.push({
@@ -387,15 +464,23 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
           domain: temporalDomain(xNumeric),
           ...(xFormat === undefined ? {} : { format: xFormat }),
         })
-      : createContinuousScale(resolveScaleType(xChannel, 'linear') === 'log' ? 'log' : resolveScaleType(xChannel, 'linear'), {
-          domain: resolveDomain({
-            data: extentOf(xNumeric),
-            zeroByDefault: false,
-            ...(xChannel?.scale === undefined ? {} : { spec: xChannel.scale }),
-          }).domain,
-          ...(xFormat === undefined ? {} : { format: xFormat }),
-        })
-    : createPointScale({ domain: xCategories, ...(xFormat === undefined ? {} : { format: xFormat }) });
+      : createContinuousScale(
+          resolveScaleType(xChannel, 'linear') === 'log'
+            ? 'log'
+            : resolveScaleType(xChannel, 'linear'),
+          {
+            domain: resolveDomain({
+              data: extentOf(xNumeric),
+              zeroByDefault: false,
+              ...(xChannel?.scale === undefined ? {} : { spec: xChannel.scale }),
+            }).domain,
+            ...(xFormat === undefined ? {} : { format: xFormat }),
+          },
+        )
+    : createPointScale({
+        domain: xCategories,
+        ...(xFormat === undefined ? {} : { format: xFormat }),
+      });
 
   const yScaleType = resolveScaleType(yChannel, 'linear');
   const yScale = createContinuousScale(yScaleType === 'log' ? 'log' : yScaleType, {
@@ -464,7 +549,8 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
         .map((point) => ({ x: toNumeric(point.x) ?? Number.NaN, y: point.y }))
         .filter((point) => Number.isFinite(point.x));
       const fitted = trend === 'linear' ? fitLinear(seriesPoints) : fitLoess(seriesPoints);
-      if (fitted.length >= 2) trends.push({ seriesId: descriptor.id, color: descriptor.color, points: fitted });
+      if (fitted.length >= 2)
+        trends.push({ seriesId: descriptor.id, color: descriptor.color, points: fitted });
     }
   }
 
@@ -478,7 +564,10 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
   const result: ScatterEncodeResult = {
     marks,
     series: descriptors,
-    scales: sizeScale === undefined ? { x: xScale, y: yScale } : { x: xScale, y: yScale, size: sizeScale },
+    scales:
+      sizeScale === undefined
+        ? { x: xScale, y: yScale }
+        : { x: xScale, y: yScale, size: sizeScale },
     axes,
     a11yTable: buildA11yTable(
       table,
@@ -502,14 +591,23 @@ function encodeScatter(input: EncodeInput, name: 'scatter' | 'bubble'): EncodeRe
   if (legend !== undefined) result.legend = legend;
   if (name === 'bubble' && sizeScale === undefined) {
     input.diagnostic(
-      blockDiagnostic('MDV3000', block, 'encode', '`bubble` has no usable `size` field; every point is drawn at the base size'),
+      blockDiagnostic(
+        'MDV3000',
+        block,
+        'encode',
+        '`bubble` has no usable `size` field; every point is drawn at the base size',
+      ),
     );
   }
   return result;
 }
 
 /** Shared layout. */
-function layoutScatter(encoded: EncodeResult<PointMark>, frame: Rect, ctx: LayoutContext): ChartLayoutResult {
+function layoutScatter(
+  encoded: EncodeResult<PointMark>,
+  frame: Rect,
+  ctx: LayoutContext,
+): ChartLayoutResult {
   const plan = planOf<PointMark, ScatterPlan>(encoded, DEFAULT_PLAN);
   const nodes: SceneNode[] = [];
   const hits: ChartHitRegion[] = [];
@@ -517,7 +615,8 @@ function layoutScatter(encoded: EncodeResult<PointMark>, frame: Rect, ctx: Layou
   const xScale = encoded.scales.x;
   const yScale = encoded.scales.y;
   const sizeScale = encoded.scales.size;
-  if (xScale === undefined || yScale === undefined || isDegenerateFrame(frame)) return { nodes, hits };
+  if (xScale === undefined || yScale === undefined || isDegenerateFrame(frame))
+    return { nodes, hits };
   rangeToFrame(frame, xScale, yScale);
 
   const theme = ctx.theme;
@@ -619,7 +718,8 @@ function formatCell(value: ScaleInput, format: string | undefined): string {
 function temporalDomain(values: readonly number[]): readonly [Date, Date] {
   const extent = extentOf(values);
   if (extent === undefined) return [new Date(0), new Date(86_400_000)];
-  if (extent[0] === extent[1]) return [new Date(extent[0] - 43_200_000), new Date(extent[1] + 43_200_000)];
+  if (extent[0] === extent[1])
+    return [new Date(extent[0] - 43_200_000), new Date(extent[1] + 43_200_000)];
   return [new Date(extent[0]), new Date(extent[1])];
 }
 
@@ -680,7 +780,11 @@ function fitLinear(points: readonly { x: number; y: number }[]): { x: number; y:
 }
 
 /** Locally weighted linear regression with a tricube kernel. */
-function fitLoess(points: readonly { x: number; y: number }[], bandwidth = 0.5, steps = 24): { x: number; y: number }[] {
+function fitLoess(
+  points: readonly { x: number; y: number }[],
+  bandwidth = 0.5,
+  steps = 24,
+): { x: number; y: number }[] {
   const n = points.length;
   if (n < 3) return fitLinear(points);
   const sorted = [...points].sort((a, b) => compareNumbers(a.x, b.x));
@@ -712,7 +816,9 @@ function fitLoess(points: readonly { x: number; y: number }[], bandwidth = 0.5, 
     }
     const denominator = sw * swxx - swx * swx;
     const y =
-      denominator === 0 ? safeDiv(swy, sw, Number.NaN) : (swxx * swy - swx * swxy + (sw * swxy - swx * swy) * x) / denominator;
+      denominator === 0
+        ? safeDiv(swy, sw, Number.NaN)
+        : (swxx * swy - swx * swxy + (sw * swxy - swx * swy) * x) / denominator;
     if (Number.isFinite(y)) out.push({ x, y });
   }
   return out;
@@ -725,7 +831,7 @@ function seedFrom(id: string): number {
     hash ^= id.charCodeAt(i);
     hash = Math.imul(hash, 16777619);
   }
-  return (hash >>> 0) || 1;
+  return hash >>> 0 || 1;
 }
 
 /** Mulberry32: a small, fast, fully deterministic PRNG. */

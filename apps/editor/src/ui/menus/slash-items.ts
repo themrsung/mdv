@@ -31,15 +31,15 @@ function fromCommands(...factories: readonly (() => Command)[]): SlashEffect {
 }
 
 /** A starter body for a visual block, so the preview has something to show. */
-const STARTER_BAR = [
-  'title: Revenue by quarter',
-  'x: quarter',
-  'y: revenue',
-].join('\n');
+const STARTER_BAR = ['title: Revenue by quarter', 'x: quarter', 'y: revenue'].join('\n');
 
-const STARTER_DATA = ['quarter | revenue', 'Q1      |    1240', 'Q2      |    1516', 'Q3      |    1402', 'Q4      |    1893'].join(
-  '\n',
-);
+const STARTER_DATA = [
+  'quarter | revenue',
+  'Q1      |    1240',
+  'Q2      |    1516',
+  'Q3      |    1402',
+  'Q4      |    1893',
+].join('\n');
 
 export const SLASH_ITEMS: readonly SlashItem[] = [
   {

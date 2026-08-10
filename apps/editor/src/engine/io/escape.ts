@@ -67,9 +67,7 @@ export function escapeInline(text: string, context: EscapeContext): string {
         out += `\\${character}`;
         break;
       case '_':
-        out += isAlphanumeric(text[index - 1]) && isAlphanumeric(text[index + 1])
-          ? '_'
-          : '\\_';
+        out += isAlphanumeric(text[index - 1]) && isAlphanumeric(text[index + 1]) ? '_' : '\\_';
         break;
       case '~':
         out += text[index + 1] === '~' || text[index - 1] === '~' ? '\\~' : '~';

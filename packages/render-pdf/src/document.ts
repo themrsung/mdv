@@ -94,8 +94,7 @@ export interface PdfExportContext {
   sourceName?: string | undefined;
   /** Resolve an `image` href to bytes. Backends never fetch (SPEC 20). */
   resolveImage?:
-    | ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined)
-    | undefined;
+    ((href: string) => { format: 'png' | 'jpg'; bytes: Uint8Array } | undefined) | undefined;
 }
 
 /**
@@ -232,6 +231,7 @@ function withLinkAppendix(flow: FlowDocument, title: string): FlowDocument {
     quoteDepth: 0,
     keepWithNext: true,
     group: undefined,
+    keep: undefined,
     anchor: APPENDIX_ANCHOR,
   };
   const items: FlowItem[] = [...flow.items, heading];
@@ -250,6 +250,7 @@ function withLinkAppendix(flow: FlowDocument, title: string): FlowDocument {
       quoteDepth: 0,
       keepWithNext: false,
       group: undefined,
+      keep: undefined,
       anchor: undefined,
     };
     items.push(entry);
@@ -261,12 +262,19 @@ function withLinkAppendix(flow: FlowDocument, title: string): FlowDocument {
 // Metadata
 // ─────────────────────────────────────────────────────────────────────────────
 
-function frontMatterString(doc: ResolvedDocument, key: 'title' | 'subtitle' | 'author' | 'date' | 'lang'): string {
+function frontMatterString(
+  doc: ResolvedDocument,
+  key: 'title' | 'subtitle' | 'author' | 'date' | 'lang',
+): string {
   const value = doc.frontmatter?.[key];
   return typeof value === 'string' ? value : '';
 }
 
-function documentMeta(doc: ResolvedDocument, options: ResolvedPdfOptions, theme: Theme): DocumentMeta {
+function documentMeta(
+  doc: ResolvedDocument,
+  options: ResolvedPdfOptions,
+  theme: Theme,
+): DocumentMeta {
   const lang = frontMatterString(doc, 'lang');
   return {
     title: options.title ?? frontMatterString(doc, 'title'),
@@ -372,7 +380,13 @@ export function buildPdf(
 
   if (options.toc !== undefined) {
     const { depth, title, pageBreakAfter } = options.toc;
-    let entries = tocEntries(pagination.outline, pagination.pages, depth, options.numbering.style, 0);
+    let entries = tocEntries(
+      pagination.outline,
+      pagination.pages,
+      depth,
+      options.numbering.style,
+      0,
+    );
     for (let round = 0; round < TOC_ROUNDS; round += 1) {
       pagination = paginate({ ...base, toc: { title, entries, pageBreakAfter } });
       const next = tocEntries(

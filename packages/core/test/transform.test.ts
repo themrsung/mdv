@@ -24,7 +24,11 @@ function context(overrides: Partial<TransformContext> = {}): TransformContext {
 }
 
 /** A table from a header list and row tuples; types are inferred loosely. */
-function table(names: readonly string[], rows: readonly Value[][], types?: readonly DataType[]): Table {
+function table(
+  names: readonly string[],
+  rows: readonly Value[][],
+  types?: readonly DataType[],
+): Table {
   const fields: Column[] = names.map((name, i) => ({ name, type: types?.[i] ?? 'unknown' }));
   return { fields, rows: rows.map((row) => [...row]) };
 }
@@ -184,10 +188,18 @@ describe('derive', () => {
 describe('sort', () => {
   it('sorts ascending, descending, and by several keys', () => {
     expect(column(run(SALES, [{ sort: 'revenue' }]).out, 'revenue')).toEqual([
-      50, 100, 150, 200, null,
+      50,
+      100,
+      150,
+      200,
+      null,
     ]);
     expect(column(run(SALES, [{ sort: '-revenue' }]).out, 'revenue')).toEqual([
-      200, 150, 100, 50, null,
+      200,
+      150,
+      100,
+      50,
+      null,
     ]);
     const multi = run(SALES, [{ sort: ['region', '-revenue'] }]).out;
     expect(column(multi, 'region')).toEqual(['east', 'east', 'east', 'west', 'west']);
@@ -311,12 +323,15 @@ describe('aggregate', () => {
   });
 
   it('computes every aggregator', () => {
-    const input = table(['g', 'v'], [
-      ['a', 1],
-      ['a', 2],
-      ['a', 3],
-      ['a', 4],
-    ]);
+    const input = table(
+      ['g', 'v'],
+      [
+        ['a', 1],
+        ['a', 2],
+        ['a', 3],
+        ['a', 4],
+      ],
+    );
     const { out } = run(input, [
       {
         aggregate: {
@@ -344,11 +359,14 @@ describe('aggregate', () => {
   });
 
   it('ignores nulls and produces null for an all-null group', () => {
-    const input = table(['g', 'v'], [
-      ['a', null],
-      ['a', null],
-      ['b', 2],
-    ]);
+    const input = table(
+      ['g', 'v'],
+      [
+        ['a', null],
+        ['a', null],
+        ['b', 2],
+      ],
+    );
     const { out } = run(input, [{ aggregate: { group: ['g'], sum: ['v'], count: true } }]);
     expect(column(out, 'v')).toEqual([null, 2]);
     expect(column(out, 'count')).toEqual([2, 1]);
@@ -372,11 +390,14 @@ describe('aggregate', () => {
   });
 
   it('reports MDV2502 once per non-numeric field', () => {
-    const input = table(['g', 'v'], [
-      ['a', 'x'],
-      ['a', 'y'],
-      ['a', 3],
-    ]);
+    const input = table(
+      ['g', 'v'],
+      [
+        ['a', 'x'],
+        ['a', 'y'],
+        ['a', 3],
+      ],
+    );
     const { out, codes } = run(input, [{ aggregate: { group: ['g'], sum: ['v'] } }]);
     expect(codes).toEqual(['MDV2502']);
     expect(column(out, 'v')).toEqual([3]);
@@ -409,10 +430,7 @@ describe('aggregate', () => {
   });
 
   it('computes percentiles', () => {
-    const input = table(
-      ['v'],
-      [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]],
-    );
+    const input = table(['v'], [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]]);
     const { out } = run(input, [{ aggregate: { p50: { median: 'v' }, p90: { top: 'v' } } }]);
     expect(column(out, 'median')).toEqual([5.5]);
     expect(column(out, 'top')[0]).toBeCloseTo(9.1, 12);
@@ -466,9 +484,9 @@ describe('pivot and unpivot', () => {
 
   it('reports MDV2111 for unknown pivot fields', () => {
     expect(run(SALES, [{ pivot: { key: 'nope', value: 'revenue' } }]).codes).toEqual(['MDV2111']);
-    expect(run(SALES, [{ pivot: { key: 'month', value: 'revenue', group: 'nope' } }]).codes).toEqual(
-      ['MDV2111'],
-    );
+    expect(
+      run(SALES, [{ pivot: { key: 'month', value: 'revenue', group: 'nope' } }]).codes,
+    ).toEqual(['MDV2111']);
   });
 
   it('unpivots wide to long with default key and value names', () => {
@@ -505,9 +523,9 @@ describe('pivot and unpivot', () => {
     expect(run(SALES, [{ pivot: { key: 'month' } } as unknown as TransformStep]).codes).toEqual([
       'MDV2501',
     ]);
-    expect(run(SALES, [{ unpivot: { fields: 'revenue' } } as unknown as TransformStep]).codes).toEqual(
-      ['MDV2501'],
-    );
+    expect(
+      run(SALES, [{ unpivot: { fields: 'revenue' } } as unknown as TransformStep]).codes,
+    ).toEqual(['MDV2501']);
   });
 });
 
@@ -640,7 +658,9 @@ describe('window', () => {
 
   it('reports a size below 1 with MDV2501 and uses 1', () => {
     const input = table(['v'], [[1], [2]]);
-    const { out, codes } = run(input, [{ window: { op: 'sum', field: 'v', size: 0, output: 'w' } }]);
+    const { out, codes } = run(input, [
+      { window: { op: 'sum', field: 'v', size: 0, output: 'w' } },
+    ]);
     expect(codes).toEqual(['MDV2501']);
     expect(column(out, 'w')).toEqual([1, 2]);
   });
@@ -650,9 +670,8 @@ describe('window', () => {
       run(series, [{ window: { op: 'sum', field: 'nope', size: 1, output: 'w' } }]).codes,
     ).toEqual(['MDV2111']);
     expect(
-      run(series, [
-        { window: { op: 'sum', field: 'v', size: 1, output: 'w', partition: 'nope' } },
-      ]).codes,
+      run(series, [{ window: { op: 'sum', field: 'v', size: 1, output: 'w', partition: 'nope' } }])
+        .codes,
     ).toEqual(['MDV2111']);
   });
 
@@ -724,14 +743,8 @@ describe('join', () => {
   });
 
   it('disambiguates a colliding right-hand field name', () => {
-    const right = table(
-      ['region', 'units'],
-      [['east', 9]],
-    );
-    const left = table(
-      ['region', 'units'],
-      [['east', 1]],
-    );
+    const right = table(['region', 'units'], [['east', 9]]);
+    const left = table(['region', 'units'], [['east', 1]]);
     const { out } = run(left, [{ join: { with: '@r', on: 'region' } }], {
       lookup: (reference) => (reference === '@r' ? right : undefined),
     });
@@ -785,11 +798,14 @@ describe('resource limits (SPEC 13.6)', () => {
 
   it('truncates on the cell budget with MDV4031', () => {
     const limits = { ...effectiveLimits(), maxCellsPerTable: 4 };
-    const input = table(['a', 'b'], [
-      [1, 1],
-      [2, 2],
-      [3, 3],
-    ]);
+    const input = table(
+      ['a', 'b'],
+      [
+        [1, 1],
+        [2, 2],
+        [3, 3],
+      ],
+    );
     const { out, codes } = run(input, [{ sort: 'a' }], { limits });
     expect(codes).toEqual(['MDV4031']);
     expect(out.rows).toHaveLength(2);
@@ -820,10 +836,10 @@ describe('pipelineKey (SPEC 6.7 memoisation)', () => {
     // Deliberately explicit `undefined` — models a JS/JSON caller. Cast is required
     // under exactOptionalPropertyTypes; the tolerance being asserted is a runtime one.
     expect(
-      pipelineKey([{ bin: { field: 'v', step: 1, output: undefined } } as unknown as TransformStep]),
-    ).toBe(
-      pipelineKey([{ bin: { field: 'v', step: 1 } }]),
-    );
+      pipelineKey([
+        { bin: { field: 'v', step: 1, output: undefined } } as unknown as TransformStep,
+      ]),
+    ).toBe(pipelineKey([{ bin: { field: 'v', step: 1 } }]));
   });
 });
 

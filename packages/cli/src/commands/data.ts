@@ -12,7 +12,7 @@
  */
 
 import type { GlobalFlags } from '../args.js';
-import { EXIT_CODES, usageError } from '../exit.js';
+import { usageError } from '../exit.js';
 import type { CliIo } from '../io.js';
 import { loadDocument, outcomeFor, singleInput } from '../pipeline.js';
 import { selectBlock } from '../scene.js';

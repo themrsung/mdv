@@ -10,7 +10,12 @@ import { describe, expect, it } from 'vitest';
 
 import type { AttrMap, MdvBlock } from '@mdv/parser';
 
-import { cascadeAttrs, encodingFromAttrs, isChannelName, mergeAttrs } from '../src/pipeline/cascade.js';
+import {
+  cascadeAttrs,
+  encodingFromAttrs,
+  isChannelName,
+  mergeAttrs,
+} from '../src/pipeline/cascade.js';
 
 /** The parts of an `MdvBlock` the cascade reads. */
 function block(attrs: AttrMap): MdvBlock {
@@ -93,7 +98,9 @@ describe('encodingFromAttrs', () => {
 
   it('passes an object channel through, including scale shorthand', () => {
     const encoding = encodingFromAttrs(
-      { y: { field: 'revenue', title: 'USD', aggregate: 'sum', scale: 'log', axis: false } } as never,
+      {
+        y: { field: 'revenue', title: 'USD', aggregate: 'sum', scale: 'log', axis: false },
+      } as never,
       columns,
     );
     expect(encoding.y).toEqual({

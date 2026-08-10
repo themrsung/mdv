@@ -180,8 +180,7 @@ export function subSourceFromLine(root: SourceIndex, startLine: number): SubSour
 /** Translate an offset in {@link SubSource.text} to an absolute root offset. */
 export function mapOffset(sub: SubSource, subOffset: number): number {
   if (sub.identity) return subOffset;
-  const clamped =
-    subOffset < 0 ? 0 : subOffset > sub.text.length ? sub.text.length : subOffset;
+  const clamped = subOffset < 0 ? 0 : subOffset > sub.text.length ? sub.text.length : subOffset;
   const line = sub.index.lineIndexAt(clamped);
   const column = clamped - sub.index.lineStart(line);
   const base = sub.absStart[line];

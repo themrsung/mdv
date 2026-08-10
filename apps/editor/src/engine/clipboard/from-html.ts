@@ -26,15 +26,7 @@
 
 import { textRun, rawRun, normalizeRuns, runsText } from '../inline.js';
 import type { IdFactory } from '../ids.js';
-import type {
-  Block,
-  ColumnAlign,
-  ListItem,
-  Mark,
-  Run,
-  TableCell,
-  TableRow,
-} from '../model.js';
+import type { Block, ColumnAlign, ListItem, Mark, Run, TableCell, TableRow } from '../model.js';
 import {
   blockquote,
   bulletList,
@@ -55,25 +47,93 @@ import type { HtmlElement, HtmlNode } from './html.js';
 import { classList, nodesText, parseHtml, parseStyle, textContent } from './html.js';
 
 /** Elements that contribute nothing and whose contents are noise. */
-const DROPPED = new Set(['style', 'script', 'head', 'meta', 'link', 'title', 'noscript', 'o:p', 'v:shapetype', 'v:shape', 'w:sdt', 'colgroup', 'col', 'caption']);
+const DROPPED = new Set([
+  'style',
+  'script',
+  'head',
+  'meta',
+  'link',
+  'title',
+  'noscript',
+  'o:p',
+  'v:shapetype',
+  'v:shape',
+  'w:sdt',
+  'colgroup',
+  'col',
+  'caption',
+]);
 
 /** Elements that are pure containers: unwrap them and keep going. */
 const TRANSPARENT = new Set([
-  'html', 'body', 'div', 'section', 'article', 'main', 'header', 'footer',
-  'nav', 'aside', 'figure', 'form', 'fieldset', 'center', 'address', 'dl',
-  'details', 'summary', 'template', 'font-face', 'picture',
+  'html',
+  'body',
+  'div',
+  'section',
+  'article',
+  'main',
+  'header',
+  'footer',
+  'nav',
+  'aside',
+  'figure',
+  'form',
+  'fieldset',
+  'center',
+  'address',
+  'dl',
+  'details',
+  'summary',
+  'template',
+  'font-face',
+  'picture',
 ]);
 
 /** Elements that only carry inline marks. */
 const INLINE = new Set([
-  'a', 'b', 'strong', 'i', 'em', 'u', 's', 'del', 'strike', 'ins', 'code',
-  'tt', 'kbd', 'samp', 'var', 'dfn', 'cite', 'q', 'abbr', 'span', 'font',
-  'mark', 'small', 'big', 'sub', 'sup', 'label', 'time', 'bdi', 'bdo', 'ruby',
-  'rt', 'rp', 'wbr', 'nobr', 'acronym', 'data', 'output',
+  'a',
+  'b',
+  'strong',
+  'i',
+  'em',
+  'u',
+  's',
+  'del',
+  'strike',
+  'ins',
+  'code',
+  'tt',
+  'kbd',
+  'samp',
+  'var',
+  'dfn',
+  'cite',
+  'q',
+  'abbr',
+  'span',
+  'font',
+  'mark',
+  'small',
+  'big',
+  'sub',
+  'sup',
+  'label',
+  'time',
+  'bdi',
+  'bdo',
+  'ruby',
+  'rt',
+  'rp',
+  'wbr',
+  'nobr',
+  'acronym',
+  'data',
+  'output',
 ]);
 
 /** Font families that mean "this is code". */
-const MONOSPACE = /\b(monospace|courier|consolas|menlo|monaco|inconsolata|source code|roboto mono|ui-monospace|sf mono)\b/i;
+const MONOSPACE =
+  /\b(monospace|courier|consolas|menlo|monaco|inconsolata|source code|roboto mono|ui-monospace|sf mono)\b/i;
 
 /** Parse a `text/html` clipboard payload into blocks. */
 export function blocksFromHtml(html: string, ids: IdFactory): readonly Block[] {
@@ -100,7 +160,11 @@ function unwrapFragment(nodes: readonly HtmlNode[]): readonly HtmlNode[] {
     if (meaningful.length !== 1) return current;
     const only = meaningful[0];
     if (!only || only.kind !== 'element') return current;
-    if (only.name === 'html' || only.name === 'body' || (only.name === 'b' && only.attrs['id']?.startsWith('docs-internal-guid'))) {
+    if (
+      only.name === 'html' ||
+      only.name === 'body' ||
+      (only.name === 'b' && only.attrs['id']?.startsWith('docs-internal-guid'))
+    ) {
       current = only.children;
       continue;
     }
@@ -213,12 +277,16 @@ function marksFor(element: HtmlElement, inherited: readonly Mark[]): readonly Ma
   if (name === 'i' || name === 'em' || name === 'cite' || name === 'dfn' || name === 'var') {
     marks = addMark(marks, { type: 'emphasis' });
   }
-  if (name === 's' || name === 'del' || name === 'strike') marks = addMark(marks, { type: 'strikethrough' });
-  if (name === 'code' || name === 'tt' || name === 'kbd' || name === 'samp') marks = addMark(marks, { type: 'code' });
+  if (name === 's' || name === 'del' || name === 'strike')
+    marks = addMark(marks, { type: 'strikethrough' });
+  if (name === 'code' || name === 'tt' || name === 'kbd' || name === 'samp')
+    marks = addMark(marks, { type: 'code' });
 
   const weight = style['font-weight'];
   if (weight !== undefined) {
-    marks = isBoldWeight(weight) ? addMark(marks, { type: 'strong' }) : withoutType(marks, 'strong');
+    marks = isBoldWeight(weight)
+      ? addMark(marks, { type: 'strong' })
+      : withoutType(marks, 'strong');
   }
 
   const fontStyle = style['font-style'];
@@ -240,7 +308,11 @@ function marksFor(element: HtmlElement, inherited: readonly Mark[]): readonly Ma
     const href = safeUrl(element.attrs['href']);
     if (href !== undefined) {
       const title = element.attrs['title'];
-      marks = addMark(marks, { type: 'link', href, title: title !== undefined && title !== '' ? title : null });
+      marks = addMark(marks, {
+        type: 'link',
+        href,
+        title: title !== undefined && title !== '' ? title : null,
+      });
     }
   }
 
@@ -267,6 +339,7 @@ export function safeUrl(raw: string | undefined): string | undefined {
   const url = raw.trim();
   if (url === '') return undefined;
   // Strip control characters that hide a scheme from a naive prefix check.
+  // eslint-disable-next-line no-control-regex -- C0 controls are the attack
   const probe = url.replace(/[\u0000-\u0020]/g, '').toLowerCase();
   if (probe.startsWith('javascript:') || probe.startsWith('vbscript:')) return undefined;
   if (probe.startsWith('data:') && !probe.startsWith('data:image/')) return undefined;
@@ -277,7 +350,12 @@ export function safeUrl(raw: string | undefined): string | undefined {
 /* The walk                                                                    */
 /* -------------------------------------------------------------------------- */
 
-function convertNodes(nodes: readonly HtmlNode[], marks: readonly Mark[], sink: Sink, ids: IdFactory): void {
+function convertNodes(
+  nodes: readonly HtmlNode[],
+  marks: readonly Mark[],
+  sink: Sink,
+  ids: IdFactory,
+): void {
   const grouped = groupWordLists(nodes);
   for (let index = 0; index < grouped.length; index += 1) {
     const node = grouped[index];
@@ -337,9 +415,20 @@ function convertNode(node: HtmlNode, marks: readonly Mark[], sink: Sink, ids: Id
     return;
   }
 
-  if (name === 'p' || name === 'dt' || name === 'dd' || name === 'figcaption' || name === 'blockquote' ||
-      name === 'pre' || name === 'ul' || name === 'ol' || name === 'menu' || name === 'table' ||
-      /^h[1-6]$/.test(name) || name === 'li') {
+  if (
+    name === 'p' ||
+    name === 'dt' ||
+    name === 'dd' ||
+    name === 'figcaption' ||
+    name === 'blockquote' ||
+    name === 'pre' ||
+    name === 'ul' ||
+    name === 'ol' ||
+    name === 'menu' ||
+    name === 'table' ||
+    /^h[1-6]$/.test(name) ||
+    name === 'li'
+  ) {
     flush(sink, ids);
     for (const block of convertBlock(node, marks, ids)) sink.blocks.push(block);
     return;
@@ -349,7 +438,11 @@ function convertNode(node: HtmlNode, marks: readonly Mark[], sink: Sink, ids: Id
   convertNodes(node.children, marks, sink, ids);
 }
 
-function convertBlock(element: HtmlElement, marks: readonly Mark[], ids: IdFactory): readonly Block[] {
+function convertBlock(
+  element: HtmlElement,
+  marks: readonly Mark[],
+  ids: IdFactory,
+): readonly Block[] {
   const name = element.name;
 
   if (name === 'pre') return [preBlock(element, ids)];
@@ -418,7 +511,8 @@ function dimension(element: HtmlElement, key: 'width' | 'height'): number | null
  */
 function preBlock(element: HtmlElement, ids: IdFactory): Block {
   const source = element.attrs['data-mdv-source'];
-  if (source !== undefined && source !== '') return rawBlock(ids, source.replace(/\r\n?/g, '\n').replace(/\n+$/, ''));
+  if (source !== undefined && source !== '')
+    return rawBlock(ids, source.replace(/\r\n?/g, '\n').replace(/\n+$/, ''));
   if (element.attrs['data-mdv-raw'] !== undefined) {
     return rawBlock(ids, textContent(element).replace(/\r\n?/g, '\n').replace(/\n+$/, ''));
   }
@@ -451,7 +545,11 @@ function findChild(element: HtmlElement, name: string): HtmlElement | undefined 
 /* Lists                                                                       */
 /* -------------------------------------------------------------------------- */
 
-function convertList(element: HtmlElement, marks: readonly Mark[], ids: IdFactory): Block | undefined {
+function convertList(
+  element: HtmlElement,
+  marks: readonly Mark[],
+  ids: IdFactory,
+): Block | undefined {
   const items: ListItem[] = [];
   let tight = true;
 
@@ -464,9 +562,7 @@ function convertList(element: HtmlElement, marks: readonly Mark[], ids: IdFactor
       if (!nested) continue;
       const previous = items.pop();
       items.push(
-        previous
-          ? { ...previous, blocks: [...previous.blocks, nested] }
-          : listItem(ids, [nested]),
+        previous ? { ...previous, blocks: [...previous.blocks, nested] } : listItem(ids, [nested]),
       );
       continue;
     }
@@ -487,7 +583,10 @@ function convertList(element: HtmlElement, marks: readonly Mark[], ids: IdFactor
 
   if (element.name === 'ol') {
     const start = Number.parseInt(element.attrs['start'] ?? '1', 10);
-    return orderedList(ids, items, { start: Number.isFinite(start) && start >= 0 ? start : 1, tight });
+    return orderedList(ids, items, {
+      start: Number.isFinite(start) && start >= 0 ? start : 1,
+      tight,
+    });
   }
   return bulletList(ids, items, { tight });
 }
@@ -587,7 +686,12 @@ function groupWordLists(nodes: readonly HtmlNode[]): readonly HtmlNode[] {
 }
 
 /** Build one list level from `items[from, to)`, recursing for deeper levels. */
-function buildWordList(items: readonly WordItem[], from: number, to: number, level: number): HtmlElement {
+function buildWordList(
+  items: readonly WordItem[],
+  from: number,
+  to: number,
+  level: number,
+): HtmlElement {
   const children: HtmlNode[] = [];
   let ordered = false;
   let index = from;
@@ -637,7 +741,11 @@ interface RawCell {
  * row of `<th>`, that row is moved to the top, otherwise the first row is used
  * as-is. No row is ever invented and no content is ever dropped.
  */
-function convertTable(element: HtmlElement, marks: readonly Mark[], ids: IdFactory): Block | undefined {
+function convertTable(
+  element: HtmlElement,
+  marks: readonly Mark[],
+  ids: IdFactory,
+): Block | undefined {
   const rows: RawCell[][] = [];
   let headerIndex = -1;
 
@@ -725,10 +833,15 @@ function alignmentsOf(cells: readonly RawCell[], width: number): readonly Column
   const out: ColumnAlign[] = [];
   let column = 0;
   for (const cell of cells) {
-    const value = (cell.element.attrs['align'] ?? parseStyle(cell.element.attrs['style'])['text-align'] ?? '')
+    const value = (
+      cell.element.attrs['align'] ??
+      parseStyle(cell.element.attrs['style'])['text-align'] ??
+      ''
+    )
       .trim()
       .toLowerCase();
-    const align: ColumnAlign = value === 'left' || value === 'center' || value === 'right' ? value : 'none';
+    const align: ColumnAlign =
+      value === 'left' || value === 'center' || value === 'right' ? value : 'none';
     for (let i = 0; i < cell.colspan && column < width; i += 1) {
       out.push(align);
       column += 1;

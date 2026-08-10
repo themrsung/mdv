@@ -61,7 +61,13 @@ export function at(doc: MdvDocument, blockId: NodeId, offset: number): Point {
 }
 
 /** A point `offset` characters into a table cell. */
-export function inCell(doc: MdvDocument, tableId: NodeId, row: number, col: number, offset = 0): Point {
+export function inCell(
+  doc: MdvDocument,
+  tableId: NodeId,
+  row: number,
+  col: number,
+  offset = 0,
+): Point {
   const container = requireContainer(doc, { blockId: tableId, path: [row, col, 0], offset: 0 });
   return fromAbsolute(container, offset);
 }
@@ -104,5 +110,7 @@ export function textOf(block: Block): string {
 /** The plain text of every cell, row-major, for table assertions. */
 export function tableText(block: Block): readonly (readonly string[])[] {
   if (block.kind !== 'table') throw new Error(`expected a table, got ${block.kind}`);
-  return block.rows.map((row) => row.cells.map((cell) => cell.runs.map((run) => run.text).join('')));
+  return block.rows.map((row) =>
+    row.cells.map((cell) => cell.runs.map((run) => run.text).join('')),
+  );
 }

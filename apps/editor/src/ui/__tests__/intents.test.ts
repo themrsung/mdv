@@ -22,7 +22,11 @@ function event(partial: Partial<InputEventLike> & { readonly inputType: string }
   return { data: null, cancelable: true, transferText: null, ...partial };
 }
 
-function intent(inputType: string, extra: Partial<InputEventLike> = {}, inCode = false): EditorIntent {
+function intent(
+  inputType: string,
+  extra: Partial<InputEventLike> = {},
+  inCode = false,
+): EditorIntent {
   return intentForInput(event({ inputType, ...extra }), inCode);
 }
 
@@ -106,7 +110,12 @@ describe('intentForInput', () => {
   });
 
   it('cancels everything except a reconcile', () => {
-    for (const inputType of ['insertText', 'deleteContentBackward', 'insertFromPaste', 'formatBold']) {
+    for (const inputType of [
+      'insertText',
+      'deleteContentBackward',
+      'insertFromPaste',
+      'formatBold',
+    ]) {
       expect(shouldPreventDefault(intent(inputType, { data: 'x' }))).toBe(true);
     }
   });

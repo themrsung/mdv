@@ -18,7 +18,7 @@ import { toSvgString } from '@mdv/render-svg';
 import type { A11yTable, ResolvedBlock, Scene } from '@mdv/core';
 
 import type { GlobalFlags } from '../args.js';
-import { EXIT_CODES, usageError } from '../exit.js';
+import { usageError } from '../exit.js';
 import { displayPath, writeTextFile } from '../io.js';
 import type { CliIo } from '../io.js';
 import { loadDocument, outcomeFor, singleInput } from '../pipeline.js';

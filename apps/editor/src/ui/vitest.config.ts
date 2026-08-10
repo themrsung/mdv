@@ -30,8 +30,14 @@ const WORKSPACE_PACKAGES = [
 ] as const;
 
 const alias = WORKSPACE_PACKAGES.flatMap((pkg) => [
-  { find: new RegExp(`^@mdv/${pkg}/(.*)$`), replacement: resolve(repoRoot, `packages/${pkg}/src/$1`) },
-  { find: new RegExp(`^@mdv/${pkg}$`), replacement: resolve(repoRoot, `packages/${pkg}/src/index.ts`) },
+  {
+    find: new RegExp(`^@mdv/${pkg}/(.*)$`),
+    replacement: resolve(repoRoot, `packages/${pkg}/src/$1`),
+  },
+  {
+    find: new RegExp(`^@mdv/${pkg}$`),
+    replacement: resolve(repoRoot, `packages/${pkg}/src/index.ts`),
+  },
 ]);
 
 export default defineConfig({

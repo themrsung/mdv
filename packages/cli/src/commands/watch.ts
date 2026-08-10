@@ -17,7 +17,6 @@
 
 import { watch } from 'node:fs';
 
-import type { GlobalFlags } from '../args.js';
 import { CliError, EXIT_CODES, errorText, usageError } from '../exit.js';
 import { absolute, displayPath } from '../io.js';
 import type { CliIo } from '../io.js';
@@ -97,7 +96,9 @@ export async function watchCommand(
         timer = setTimeout(drain, DEBOUNCE_MS);
       });
     } catch (error) {
-      term.problem(`${term.red('error')} cannot watch ${displayPath(io, abs)}: ${errorText(error)}`);
+      term.problem(
+        `${term.red('error')} cannot watch ${displayPath(io, abs)}: ${errorText(error)}`,
+      );
       resolveWatch();
       return;
     }

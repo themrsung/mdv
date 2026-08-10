@@ -44,7 +44,9 @@ export function stackColumn(
 
   if (mode === 'none') {
     return values.map((value) =>
-      isFiniteNumber(value) ? { y0: base, y1: value, defined: true } : { y0: base, y1: base, defined: false },
+      isFiniteNumber(value)
+        ? { y0: base, y1: value, defined: true }
+        : { y0: base, y1: base, defined: false },
     );
   }
 
@@ -122,7 +124,9 @@ function stackPercent(values: readonly (number | null)[]): StackSegment[] {
 }
 
 /** The outer extent a set of stacked columns occupies, for domain computation. */
-export function stackExtent(columns: readonly (readonly StackSegment[])[]): [number, number] | undefined {
+export function stackExtent(
+  columns: readonly (readonly StackSegment[])[],
+): [number, number] | undefined {
   let lo: number | undefined;
   let hi: number | undefined;
   for (const column of columns) {

@@ -15,7 +15,12 @@ import { finite } from './num.js';
 import { px } from './geometry.js';
 
 /** Build a readout row. The swatch is a short line stroke, never a filled box. */
-export function readout(label: string, value: string, series?: SeriesDescriptor, emphasis = false): ReadoutRow {
+export function readout(
+  label: string,
+  value: string,
+  series?: SeriesDescriptor,
+  emphasis = false,
+): ReadoutRow {
   const row: ReadoutRow = { label, value };
   if (series !== undefined) row.swatch = series.color;
   if (emphasis) row.emphasis = true;

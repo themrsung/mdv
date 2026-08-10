@@ -7,7 +7,14 @@
  * it parks the mark in {@link EditorState.pendingMarks} for the next keystroke.
  */
 
-import { commonMarks, hasMarkType, mapMarks, runsLength, withMark, withoutMark } from '../inline.js';
+import {
+  commonMarks,
+  hasMarkType,
+  mapMarks,
+  runsLength,
+  withMark,
+  withoutMark,
+} from '../inline.js';
 import { MappingBuilder, mapSelection } from '../mapping.js';
 import type { Mark, MarkType, MdvDocument } from '../model.js';
 import type { Command } from '../state.js';
@@ -53,7 +60,12 @@ export function selectedSpans(doc: MdvDocument, selection: Selection): readonly 
     for (const ref of refsInRect(rect)) {
       const cell = table.rows[ref.row]?.cells[ref.col];
       if (!cell) continue;
-      out.push({ blockId: table.id, path: [ref.row, ref.col], start: 0, end: runsLength(cell.runs) });
+      out.push({
+        blockId: table.id,
+        path: [ref.row, ref.col],
+        start: 0,
+        end: runsLength(cell.runs),
+      });
     }
     return out;
   }
@@ -85,7 +97,12 @@ export function selectedSpans(doc: MdvDocument, selection: Selection): readonly 
       for (let row = 0; row < block.rows.length; row += 1) {
         const cells = block.rows[row]?.cells ?? [];
         for (let col = 0; col < cells.length; col += 1) {
-          out.push({ blockId: block.id, path: [row, col], start: 0, end: runsLength(cells[col]?.runs ?? []) });
+          out.push({
+            blockId: block.id,
+            path: [row, col],
+            start: 0,
+            end: runsLength(cells[col]?.runs ?? []),
+          });
         }
       }
       continue;
@@ -114,7 +131,11 @@ export function isMarkActive(doc: MdvDocument, selection: Selection, type: MarkT
 }
 
 /** The marks a toolbar should show as active for the current selection. */
-export function activeMarks(doc: MdvDocument, selection: Selection, pending: readonly Mark[] | null): readonly Mark[] {
+export function activeMarks(
+  doc: MdvDocument,
+  selection: Selection,
+  pending: readonly Mark[] | null,
+): readonly Mark[] {
   if (pending) return pending;
   const spans = selectedSpans(doc, selection);
   if (spans.length === 0) {
@@ -132,7 +153,10 @@ export function activeMarks(doc: MdvDocument, selection: Selection, pending: rea
     });
     if (!container) continue;
     const marks = commonMarks(container.runs, span.start, span.end);
-    result = result === null ? marks : result.filter((mark) => marks.some((other) => other.type === mark.type));
+    result =
+      result === null
+        ? marks
+        : result.filter((mark) => marks.some((other) => other.type === mark.type));
   }
   return result ?? [];
 }
@@ -161,7 +185,10 @@ export function toggleMark(mark: Mark | MarkType): Command {
       };
     }
 
-    const active = value.type === 'link' && value.href !== '' ? false : isMarkActive(state.doc, state.selection, value.type);
+    const active =
+      value.type === 'link' && value.href !== ''
+        ? false
+        : isMarkActive(state.doc, state.selection, value.type);
     const update = active
       ? (marks: readonly Mark[]): readonly Mark[] => withoutMark(marks, value.type)
       : (marks: readonly Mark[]): readonly Mark[] => withMark(marks, value);
@@ -199,7 +226,11 @@ export function clearMarks(): Command {
       const probe = { blockId: span.blockId, path: [...span.path, 0], offset: 0 };
       const container = resolveContainer(doc, probe);
       if (!container) continue;
-      doc = writeContainer(doc, container, mapMarks(container.runs, span.start, span.end, () => [], ctx.ids));
+      doc = writeContainer(
+        doc,
+        container,
+        mapMarks(container.runs, span.start, span.end, () => [], ctx.ids),
+      );
     }
     if (doc === state.doc) return null;
     const mapPoint = new MappingBuilder(state.doc).build(doc);

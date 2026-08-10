@@ -71,6 +71,24 @@ describe('no global selectors (SPEC 22.4)', () => {
   });
 });
 
+describe('the page-break marker (SPEC 28.4)', () => {
+  it('has no visuals on screen', () => {
+    // Everything outside `@media print` that mentions the marker.
+    const screen = reactStylesheet()
+      .split('@media')[0]
+      ?.match(/\.mdv-root \.mdv-page-break[^{]*\{[^}]*\}/g);
+    expect(screen).toEqual(['.mdv-root .mdv-page-break{display:block}']);
+  });
+
+  it('maps to CSS fragmentation when printed, so print agrees with the PDF', () => {
+    const print = /@media print\{(.*?\})\}/.exec(reactStylesheet())?.[1] ?? '';
+    expect(print).toContain('[data-mdv-break=before]');
+    expect(print).toContain('break-before:page');
+    expect(print).toContain('break-after:page');
+    expect(print).toContain('break-inside:avoid');
+  });
+});
+
 describe('the class-name table', () => {
   it('names every class the sheet styles', () => {
     const css = reactStylesheet();
