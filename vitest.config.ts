@@ -19,6 +19,7 @@ const WORKSPACE_PACKAGES = [
   'themes',
   'react',
   'cli',
+  'lsp',
 ] as const;
 
 /**

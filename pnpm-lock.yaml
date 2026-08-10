@@ -141,6 +141,8 @@ importers:
         specifier: workspace:*
         version: link:../spec
 
+  packages/lsp: {}
+
   packages/parser:
     dependencies:
       '@mdv/spec':

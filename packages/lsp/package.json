@@ -1,0 +1,26 @@
+{
+  "name": "@mdv/lsp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MDV language server (SPEC 29.4): a thin adapter between LSP and @mdv/core.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

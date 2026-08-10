@@ -47,7 +47,9 @@
       "@mdv/react": ["packages/react/src/index.ts"],
       "@mdv/react/*": ["packages/react/src/*"],
       "@mdv/cli": ["packages/cli/src/index.ts"],
-      "@mdv/cli/*": ["packages/cli/src/*"]
+      "@mdv/cli/*": ["packages/cli/src/*"],
+      "@mdv/lsp": ["packages/lsp/src/index.ts"],
+      "@mdv/lsp/*": ["packages/lsp/src/*"]
     }
   }
 }
