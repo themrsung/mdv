@@ -19,6 +19,7 @@
  * | `security.allowExternal` | pipeline — enables `src:` fetching |
  * | `security.allowedOrigins` | pipeline — the fetch allowlist |
  * | `export.pdf.pageSize` | `commands/exports.ts` |
+ * | `export.pdf.embedSource` | `commands/exports.ts` — attaches the `.mdv` source to the PDF (SPEC 28.9) |
  * | `export.defaultDirectory` | `commands/exports.ts` |
  * | `completion.columnNames` | `completion.ts` — offers data-aware column completions |
  * | `codeLens.enable` | `codelens.ts` |

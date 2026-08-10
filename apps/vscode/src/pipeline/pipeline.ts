@@ -37,35 +37,42 @@
  * `mdv-{blockIndex}-{counter}` scheme seeded from the block index — so the same
  * document produces byte-identical SVG on two machines (SPEC 24.3).
  *
- * ## Why the assembly is here and not in `@mdv/core`
+ * ## Why the assembly is here and not one call to `@mdv/core`
  *
- * See the header of `cascade.ts`: `@mdv/core`'s `resolve()` is a stub in this
- * tree, so the extension composes the finished parts (`resolveDocumentDataSync`,
- * `makeLayoutContext`, `layoutBlock`) itself. Everything below the
- * {@link PipelineResult} boundary is replaceable in one file.
+ * Not for want of a facade: `resolve()` is implemented, and `pipeline/pdf.ts`
+ * calls it — an export wants the whole document once, so the facade is exactly
+ * right there. A preview wants the opposite. It re-runs on every keystroke and
+ * must reuse the layout of the blocks that did not change, which means driving
+ * the stages by hand (`resolveDocumentDataSync`, `makeLayoutContext`,
+ * `layoutBlock`) and memoising between them. Core exports those stages for this
+ * reason, and they are the same functions `resolve()` calls — one
+ * implementation, two schedules. Everything below the {@link PipelineResult}
+ * boundary is replaceable in one file.
  */
 
 import type { Diagnostic, MdvBlock, MdvDocument } from '@mdv/parser';
 import { parse } from '@mdv/parser';
-import type { ChartType, DatasetNode, ResolvedBlock, Scene, Table, Theme } from '@mdv/core';
+import type {
+  ChartType,
+  DatasetNode,
+  DocumentData,
+  ResolveDataOptions,
+  ResolvedBlock,
+  Scene,
+  Table,
+  Theme,
+} from '@mdv/core';
 import {
   applyStrict,
   compareDiagnostics,
   createDiagnostic,
+  dataOptionsFrom,
   layoutBlock,
   makeLayoutContext,
-} from '@mdv/core';
-// `resolve.ts` is the one part of core the package root does not re-export; the
-// deep path is a `tsconfig.base.json` alias, not a published subpath.
-// CONTRACT: packages/core/src/index.ts should `export * from './resolve.js'`.
-import {
-  dataOptionsFrom,
   resolveDocumentData,
   resolveDocumentDataSync,
   visualBlocks,
-  type DocumentData,
-  type ResolveDataOptions,
-} from '@mdv/core/resolve.js';
+} from '@mdv/core';
 
 import { toSvgString } from '@mdv/render-svg';
 
