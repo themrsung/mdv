@@ -32,12 +32,14 @@ import {
 
 export { buildGraph, describeCycle, dependenciesOf, type DatasetGraph } from './graph.js';
 export {
+  DATASET_BLOCK,
   declareDatasets,
   readDeclaration,
   readFields,
   readPipeline,
   type DatasetDeclaration,
 } from './declare.js';
+export { locateDatasets, type DatasetSite } from './locate.js';
 export {
   prepareDatasets,
   transformContext,

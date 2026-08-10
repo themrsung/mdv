@@ -36,6 +36,7 @@ import { effectiveLimits } from './data/limits.js';
 import type { SectionOptions } from './data/parse-section.js';
 import { parseIso8601, type TimeZoneSpec } from './data/temporal.js';
 import {
+  DATASET_BLOCK,
   declareDatasets,
   inlineDatasetId,
   isReference,
@@ -50,6 +51,7 @@ import {
 } from './dataset/index.js';
 import type { Capabilities, MdvConfig } from './types/config.js';
 import type { DataRegistry, DatasetNode, TransformPipeline } from './types/data.js';
+import { visualBlocks } from './walk.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Options
@@ -147,9 +149,6 @@ export interface CollectedData {
    */
   sectionOptions: Record<string, SectionOptions>;
 }
-
-/** Block types that declare data instead of drawing it (SPEC 6.3). */
-const DATASET_BLOCK = 'dataset';
 
 /**
  * Walk the AST for everything data-related.
@@ -298,21 +297,6 @@ function blockRequest(
 function sectionOf(block: MdvBlock): string | undefined {
   const data = block.raw.data;
   return data === '' ? undefined : data;
-}
-
-/** Every `mdvBlock` in the tree, in document order. */
-export function visualBlocks(doc: MdvDocument): MdvBlock[] {
-  const out: MdvBlock[] = [];
-  const walk = (nodes: readonly unknown[]): void => {
-    for (const node of nodes) {
-      if (typeof node !== 'object' || node === null) continue;
-      const typed = node as { type?: string; children?: readonly unknown[] };
-      if (typed.type === 'mdvBlock') out.push(node as MdvBlock);
-      if (Array.isArray(typed.children)) walk(typed.children);
-    }
-  };
-  walk(doc.children);
-  return out;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -558,3 +542,6 @@ export function emptyDocumentData(): DocumentData {
 
 /** The empty table every failed block falls back to (SPEC 14.1 principle 2). */
 export { emptyTable };
+
+/** Re-exported for the deep-import path `@mdv/core/resolve.js` (SPEC 17.2). */
+export { visualBlocks };

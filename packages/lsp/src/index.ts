@@ -21,6 +21,8 @@ export { codeActions, type CodeActionSettings } from './features/code-actions.js
 
 export { completion, type CompletionSettings } from './features/completion.js';
 
+export { definition, type DefinitionSettings } from './features/definition.js';
+
 export {
   VALIDATE_DEBOUNCE_MS,
   diagnostics,

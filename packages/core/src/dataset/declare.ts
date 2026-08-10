@@ -23,6 +23,16 @@ import type {
 } from '../types/data.js';
 import { DATASET_ID_PATTERN, isUsableId } from './reference.js';
 
+/**
+ * The block type that declares data instead of drawing it (SPEC 6.3).
+ *
+ * Named here rather than at each use so that "is this block a declaration?" has
+ * one answer: resolve asks it to route a block to {@link readDeclaration}, and
+ * a tool that locates declarations has to route the same way or it will report
+ * a dataset the document does not have.
+ */
+export const DATASET_BLOCK = 'dataset';
+
 /** A dataset as declared, before anything has been parsed or fetched. */
 export interface DatasetDeclaration {
   id: string;
