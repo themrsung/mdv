@@ -18,6 +18,13 @@ export { DocumentStore, TextDocument, type DocumentEvent } from './documents.js'
 export { toLspDiagnostic, toLspDiagnostics, toLspRange } from './convert.js';
 
 export {
+  CLOSED_VALUES,
+  COMMON_ATTRS,
+  completion,
+  type CompletionSettings,
+} from './features/completion.js';
+
+export {
   VALIDATE_DEBOUNCE_MS,
   diagnostics,
   type Cancel,
