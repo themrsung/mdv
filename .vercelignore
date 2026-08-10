@@ -1,0 +1,9 @@
+# The hosted build runs `pnpm --filter @mdv/editor build` from the repo root, so
+# only inputs to that build need to travel. Everything below is either produced
+# on the builder or never read by it.
+**/dist
+**/coverage
+**/*.tsbuildinfo
+.vercel
+apps/vscode/out
+apps/vscode/*.vsix

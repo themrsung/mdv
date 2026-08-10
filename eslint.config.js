@@ -8,6 +8,8 @@ export default tseslint.config(
       '**/dist/**',
       '**/out/**',
       '**/coverage/**',
+      // Build Output API v3 payload: a copy of `apps/editor/dist`, minified.
+      '**/.vercel/**',
       '**/*.d.ts',
       'packages/spec/tests/**',
     ],
@@ -59,6 +61,11 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    // Repo tooling runs in Node and reports to a terminal, not to a document.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
   },
   {
     files: ['**/*.test.ts', '**/*.test.tsx'],

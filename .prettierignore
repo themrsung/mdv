@@ -2,8 +2,9 @@ node_modules
 dist
 out
 coverage
+.vercel
 pnpm-lock.yaml
+
 SPEC.md
 packages/spec/tests
-
 CONTRACTS.md
