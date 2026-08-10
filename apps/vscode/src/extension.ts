@@ -43,6 +43,7 @@ import { registerFormatter } from './format.js';
 import { registerCodeLens } from './codelens.js';
 import { registerCompletion } from './completion.js';
 import { registerReader } from './reader.js';
+import { WorkspaceThemeFiles, setActiveThemeFiles } from './themefiles.js';
 import { createMarkdownItExtension, type MarkdownItLike } from './markdownit.js';
 import { editorKind } from './preview/panel.js';
 
@@ -67,6 +68,11 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
   const pipelines = new PipelineStore();
   const previews = new PreviewManager(context.extensionUri, settings, pipelines);
 
+  // SPEC 11.6: `theme:` may name a file. Constructing the store reads nothing —
+  // the first read is triggered by the first block that names a file.
+  const themeFiles = new WorkspaceThemeFiles();
+  setActiveThemeFiles(themeFiles);
+
   // The LSP swap point. Replacing this one line with a `LanguageClient`-backed
   // service is the whole of adopting SPEC 29.4.
   const diagnostics: DiagnosticService = new InProcessDiagnosticService(settings, pipelines);
@@ -76,6 +82,8 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
     pipelines,
     previews,
     diagnostics,
+    themeFiles,
+    new vscode.Disposable(() => setActiveThemeFiles(undefined)),
     registerCommands({ extension: context, settings, pipelines, previews, diagnostics, host }),
     registerFormatter(settings),
     registerCodeLens(settings, pipelines),
@@ -100,6 +108,15 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
       safe('color theme change', () => {
         pipelines.invalidateAll();
         diagnostics.revalidateAll();
+      }),
+    ),
+    // A theme file landed, changed, or became readable when trust was granted.
+    // The store has already bumped its revision, so the blocks that name the
+    // file miss their cache; the ones that don't still hit it.
+    themeFiles.onDidChange(
+      safe('theme file change', () => {
+        diagnostics.revalidateAll();
+        previews.refreshAll();
       }),
     ),
   );

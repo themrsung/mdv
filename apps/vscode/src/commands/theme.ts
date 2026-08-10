@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import { getBuiltinTheme, validatePalette, BUILTIN_THEME_NAMES } from '@mdv/themes';
+import { auditTheme, getBuiltinTheme, BUILTIN_THEME_NAMES } from '@mdv/themes';
 import type { BuiltinThemeName } from '@mdv/themes';
 import { createLogChannel } from '../channel.js';
 import { log } from '../log.js';
@@ -39,15 +39,14 @@ export async function validateTheme(): Promise<void> {
     const theme = getBuiltinTheme(name);
     // Validated against *this* theme's own surface, which is SPEC 11.2 rule 5:
     // a substituted palette is re-checked, never reasoned about.
-    const validation = validatePalette(theme.categorical, theme.tokens.surface, theme.scheme, {
-      allPairs: true,
-    });
+    const audit = auditTheme(theme);
+    const findings = [...audit.gate.findings, ...audit.scatter];
     log(
-      `theme "${name}" (${theme.scheme}): ${validation.passed ? 'PASS' : 'FAIL'} — ` +
-        `${String(validation.findings.length)} finding(s), ` +
-        `${String(validation.reliefRequiredSlots.length)} slot(s) need secondary encoding`,
+      `theme "${name}" (${theme.scheme}): ${audit.passed ? 'PASS' : 'FAIL'} — ` +
+        `${String(findings.length)} finding(s), ` +
+        `${String(audit.gate.reliefRequiredSlots.length)} slot(s) need secondary encoding`,
     );
-    for (const finding of validation.findings) {
+    for (const finding of findings) {
       log(
         `  [${finding.level}] ${finding.check} slots[${finding.slots.join(',')}] ` +
           `measured ${String(finding.measured)} vs ${String(finding.threshold)}: ${finding.message}`,

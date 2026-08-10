@@ -103,6 +103,36 @@ ${cspSource} 'nonce-…'; script-src 'nonce-…'` — no remote content of any k
   is logged and leaves the last good picture on screen. There is no `await` in
   this extension whose rejection can reach the host unhandled.
 
+### Theme files (SPEC 11.6)
+
+A block's `theme:` is a built-in name (`default`, `dark`, `high-contrast`,
+`print`) or a path to a `.json`, `.jsonc`, `.yaml` or `.yml` file, resolved
+relative to the document. `themeFileFormat()` in `@mdv/themes` picks the reader
+from the extension, so a `corporate.yaml` mistaken for a name is reported as an
+unknown theme rather than as a YAML syntax error. `.jsonc` means what it means
+in VS Code — comments and trailing commas are read, and the same file named
+`.json` is refused with a message naming the two extensions that would take it.
+
+Reads go through `vscode.workspace.fs` — the virtual filesystem, so themes work
+the same in `vscode-vfs:` and remote workspaces — behind a synchronous seam,
+because layout cannot suspend. `ThemeFiles` in `src/pipeline/themefile.ts`
+answers `pending` for a URI it has not read yet, starts the read, and bumps a
+revision when the text lands; the revision is part of every block's memo key, so
+the next run resolves the theme and re-renders just the blocks that name it.
+`pending` is not a diagnostic — a block shows the preview theme for one frame
+instead of flashing an error into the Problems panel on every first paint.
+
+One store lives in the extension host, shared by every open document: ten
+documents naming `../brand/theme.yaml` cost one read and one palette
+validation, keyed by URI **and** colour scheme so light and dark resolutions of
+the same file coexist. A non-recursive `FileSystemWatcher` per file invalidates
+on change, and granting workspace trust mid-session drops every cached refusal.
+
+Untrusted workspaces read nothing (`MDV4002`); a file that is missing, cannot be
+parsed, or is not a usable theme reports `MDV1502` and degrades to the preview
+theme. A palette that loads but fails validation is a warning (`MDV3080`), never
+a silent substitution — SPEC 11.2 rule 4.
+
 ### Diagnostics (SPEC 29.4, in-process)
 
 Diagnostics are computed by calling `@mdv/core` directly and published to a
@@ -165,7 +195,7 @@ rule blanks the entire preview.
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Language server**   | SPEC 29.4's `@mdv/lsp` is **not implemented** (milestone M7). Diagnostics, completion, code lenses and formatting are in-process; hover, code actions, symbols, folding, rename, inlay hints and semantic tokens are absent. `mdv.trace.server` currently controls the verbosity of the in-process engine's log. |
 | **PNG export**        | `mdv.export.png` reports that it is unavailable: rasterising needs a canvas backend (`@mdv/render-canvas`, SPEC 23.2) that does not exist here. `mdv.exportBlock` therefore writes SVG.                                                                                                                          |
-| **Theme files**       | A block naming a theme file (`theme: ./corporate.yaml`) degrades to the preview theme and reports the name it could not load; only the four built-ins resolve.                                                                                                                                                   |
+| **Remote themes**     | `theme: https://…` is never fetched. `mdv.security.allowExternal` gates it as external data, and even with the setting on the reader is `vscode.workspace.fs`, which speaks to the workspace, not the network. Such a block reports `MDV4002` and renders on the preview theme.                                  |
 | **Integration tests** | See below.                                                                                                                                                                                                                                                                                                       |
 
 ## Testing
@@ -184,10 +214,12 @@ verified is:
 - the whole package type-checks under `strict` with `exactOptionalPropertyTypes`
   and `noUncheckedIndexedAccess`;
 - all three esbuild bundles build;
-- 75 unit tests covering the pipeline and its incrementality (asserting the
+- 102 unit tests covering the pipeline and its incrementality (asserting the
   exact `PipelineStats` for a re-render, an edit to one chart, and an edit to a
-  shared dataset), the attribute cascade and encoding lift, theme selection, the
-  markdown-it plugin, and the manifest and static assets — activation events,
+  shared dataset), the attribute cascade and encoding lift, theme selection and
+  theme-file loading (URI resolution, the read cache, and the invalidation that
+  a file watcher drives), the markdown-it plugin, and the manifest and static
+  assets — activation events,
   every menu/keybinding command being declared, the seventeen settings, asset
   existence, icon safety, grammar `#include` resolution and regex validity, and
   every snippet expanding into a document the parser accepts.

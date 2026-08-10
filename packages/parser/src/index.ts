@@ -23,6 +23,15 @@ export type { FormatOptions, ParseOptions } from './options.js';
 export { canonicalAst, canonicalValue, type CanonicalOptions } from './canonical.js';
 
 /**
+ * The YAML reader front matter uses, exposed for the one other thing in the
+ * pipeline that is YAML and is *not* part of a document: a theme file
+ * (SPEC 11.6). A host reads that file itself — it knows the filesystem, this
+ * package does not — but it must read it in the same dialect, or a theme would
+ * mean one thing in a `---` block and another in `theme: corporate.yaml`.
+ */
+export { parseYamlValue, type YamlSyntaxError, type YamlValueResult } from './internal/yaml.js';
+
+/**
  * Parse MDV source into an {@link MdvDocument} (SPEC 21).
  *
  * Stage 1 of the pipeline (SPEC 18). Position-accurate: every node carries a

@@ -14,7 +14,8 @@
 
 import { SPEC_VERSION } from '@mdv/spec';
 import { isMap, isScalar, isSeq, parseDocument } from 'yaml';
-import type { AttrMap, AttrValue, FrontMatter, Range } from '../types.js';
+import { describeYamlError, firstLine, isAttrMap, toAttrValue } from './yaml.js';
+import type { AttrMap, FrontMatter, Range } from '../types.js';
 import type { DiagnosticBag } from './diagnostics.js';
 import type { SourceIndex } from './source.js';
 
@@ -108,7 +109,7 @@ export function parseFrontMatter(
     }
   } catch (error) {
     // `yaml` throws only for non-YAML failures, but parse must never propagate.
-    bag.add('MDV1300', range, { detail: describe(error) });
+    bag.add('MDV1300', range, { detail: describeYamlError(error) });
   }
 
   const frontmatter = buildFrontMatter(attrs, positions, range, root);
@@ -292,38 +293,4 @@ function record(
   const range = (node as { range?: [number, number, number] } | null)?.range;
   if (range === undefined || range === null) return;
   out[path] = root.range(base + range[0], base + range[1]);
-}
-
-function toAttrValue(value: unknown): AttrValue {
-  if (value === null || value === undefined) return null;
-  if (typeof value === 'string' || typeof value === 'boolean') return value;
-  if (typeof value === 'number') return Number.isFinite(value) ? value : String(value);
-  if (typeof value === 'bigint') return value.toString();
-  if (value instanceof Date) return value.toISOString();
-  if (Array.isArray(value)) return value.map((entry) => toAttrValue(entry));
-  if (value instanceof Map) {
-    const out: AttrMap = {};
-    for (const [key, entry] of value.entries()) out[String(key)] = toAttrValue(entry);
-    return out;
-  }
-  if (typeof value === 'object') {
-    const out: AttrMap = {};
-    for (const [key, entry] of Object.entries(value)) out[key] = toAttrValue(entry);
-    return out;
-  }
-  return String(value);
-}
-
-function isAttrMap(value: AttrValue | undefined): value is AttrMap {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function firstLine(message: string): string {
-  const index = message.indexOf('\n');
-  return index === -1 ? message : message.slice(0, index);
-}
-
-function describe(error: unknown): string {
-  if (error instanceof Error) return firstLine(error.message);
-  return 'The front matter could not be parsed as YAML.';
 }

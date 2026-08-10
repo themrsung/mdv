@@ -14,6 +14,7 @@ import type { PipelineInputs, PipelineResult, RenderedBlock } from '../pipeline/
 import { themeNameFor } from '../pipeline/index.js';
 import type { SettingsStore } from '../settings.js';
 import { editorKind } from '../preview/panel.js';
+import { activeThemeFiles } from '../themefiles.js';
 
 /** Build the pipeline inputs a command should use for `document`. */
 export function inputsFor(
@@ -31,6 +32,9 @@ export function inputsFor(
     strict: current.validate.strict,
     allowExternal: current.security.allowExternal,
     allowedOrigins: current.security.allowedOrigins,
+    // A block's `theme:` can name a file (SPEC 11.6); resolving it needs the
+    // host's reader, which only exists inside a running extension host.
+    themeFiles: activeThemeFiles(),
   };
 }
 

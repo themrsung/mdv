@@ -24,6 +24,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@mdv/core": "workspace:*"
+    "@mdv/core": "workspace:*",
+    "@mdv/parser": "workspace:*"
   }
 }

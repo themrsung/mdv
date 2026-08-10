@@ -3,27 +3,28 @@
  *
  * ```text
  * mdv validate-theme brand.json
- * mdv validate-theme brand.json --scheme dark
+ * mdv validate-theme brand.yaml --scheme dark
  * ```
  *
  * Runs the **executable** palette validator over a theme's categorical palette:
  * the lightness band, the chroma floor, adjacent-pair separation under simulated
- * colour-vision deficiency, and contrast against the theme's own surface. A
- * `fail` finding is `MDV3080` and exits 1; a contrast warning is the relief rule
- * of SPEC 11.2 and is reported, not fatal.
+ * colour-vision deficiency, and contrast against the theme's own surface, plus
+ * the all-pairs check over the first three slots that SPEC 11.2 rule 3 asks for.
+ * A `fail` finding is `MDV3080` and exits 1; a contrast warning is the relief
+ * rule of SPEC 11.2 and is reported, not fatal.
  *
  * A named built-in validates too (`mdv validate-theme default`), which is the
  * check SPEC 16.4 requires an implementation to run over its own themes.
  */
 
-import { getBuiltinTheme, isBuiltinThemeName, resolveTheme, validatePalette } from '@mdv/themes';
-import type { ColorScheme, Theme } from '@mdv/core';
+import { auditTheme, getBuiltinTheme, isBuiltinThemeName } from '@mdv/themes';
+import type { ColorScheme, PaletteFinding, Theme } from '@mdv/core';
 
 import type { GlobalFlags } from '../args.js';
 import { EXIT_CODES, usageError } from '../exit.js';
 import { displayPath, exists } from '../io.js';
 import type { CliIo } from '../io.js';
-import { readThemeOverride } from '../pipeline.js';
+import { readThemeFile } from '../pipeline.js';
 import { createTerm } from '../term.js';
 
 /** Flags `mdv validate-theme` accepts on top of the global ones. */
@@ -40,10 +41,7 @@ export async function validateThemeCommand(
   const term = createTerm(io, flags);
   const target = files[0];
   if (target === undefined) {
-    throw usageError(
-      'validate-theme: no theme given',
-      'Usage: mdv validate-theme <file.json|name>',
-    );
+    throw usageError('validate-theme: no theme given', 'Usage: mdv validate-theme <file|name>');
   }
 
   const schemeFlag = flags.scheme;
@@ -55,7 +53,9 @@ export async function validateThemeCommand(
   let theme: Theme;
   let label: string;
   if (await exists(io, target)) {
-    theme = resolveTheme(await readThemeOverride(io, target), scheme);
+    // The findings below are the same MDV3080 the reader warns about, printed
+    // in full — so the reader's own summary is left out of this one command.
+    theme = (await readThemeFile(io, target, scheme)).theme;
     label = displayPath(io, target);
   } else if (isBuiltinThemeName(target)) {
     theme = getBuiltinTheme(target);
@@ -63,35 +63,38 @@ export async function validateThemeCommand(
   } else {
     throw usageError(
       `No theme \`${target}\``,
-      'Give a path to a theme JSON file, or a built-in name: default, dark, print, high-contrast.',
+      'Give a path to a theme file (.json, .jsonc, .yaml, .yml), or a built-in name: ' +
+        'default, dark, print, high-contrast.',
     );
   }
 
-  const validation = validatePalette(theme.categorical, theme.tokens.surface, theme.scheme, {
-    allPairs: true,
-  });
+  const audit = auditTheme(theme);
+  const { gate } = audit;
 
   term.line(
     `${term.bold(label)} — ${theme.categorical.length} slot${theme.categorical.length === 1 ? '' : 's'}, ${theme.scheme} scheme, surface ${theme.tokens.surface}`,
   );
 
-  for (const finding of validation.findings) {
+  const print = (finding: PaletteFinding): void => {
     const tag = finding.level === 'fail' ? term.red('fail') : term.yellow('warn');
     const slots = finding.slots.map((slot) => `#${slot}`).join(' vs ');
     term.line(
       `  ${tag} ${term.dim(finding.check)} ${slots}: ${finding.message} ` +
         `${term.dim(`(measured ${finding.measured.toFixed(2)}, threshold ${finding.threshold.toFixed(2)})`)}`,
     );
-  }
+  };
 
-  if (validation.reliefRequiredSlots.length > 0) {
+  for (const finding of gate.findings) print(finding);
+  for (const finding of audit.scatter) print(finding);
+
+  if (gate.reliefRequiredSlots.length > 0) {
     term.line(
-      `  ${term.yellow('relief')} slots ${validation.reliefRequiredSlots.map((s) => `#${s}`).join(', ')} ` +
+      `  ${term.yellow('relief')} slots ${gate.reliefRequiredSlots.map((s) => `#${s}`).join(', ')} ` +
         'need visible direct labels or the table view (SPEC 11.2 rule 4)',
     );
   }
 
-  if (validation.passed) {
+  if (audit.passed) {
     term.line(term.green('PASS'));
     return EXIT_CODES.ok;
   }

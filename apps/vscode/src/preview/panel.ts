@@ -25,6 +25,7 @@ import { logError, safe, warn } from '../log.js';
 import type { SettingsStore } from '../settings.js';
 import type { PipelineStore } from '../documents.js';
 import { themeNameFor, type EditorKind, type RenderedBlock } from '../pipeline/index.js';
+import { activeThemeFiles } from '../themefiles.js';
 import { getPreviewHtml } from './html.js';
 import type { BlockPayload, HostMessage, WebviewMessage } from './protocol.js';
 
@@ -335,6 +336,7 @@ export class PreviewPanel implements vscode.Disposable {
         strict: settings.validate.strict,
         allowExternal: settings.security.allowExternal,
         allowedOrigins: settings.security.allowedOrigins,
+        themeFiles: activeThemeFiles(),
       });
       if (this.#disposed) return;
 

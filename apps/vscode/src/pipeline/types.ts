@@ -11,6 +11,7 @@
 import type { Diagnostic } from '@mdv/parser';
 import type { Table } from '@mdv/core';
 import type { BuiltinName } from './theme.js';
+import type { ThemeFiles } from './themefile.js';
 
 /** Everything the pipeline needs from the host, per run. */
 export interface PipelineInputs {
@@ -29,6 +30,12 @@ export interface PipelineInputs {
   readonly allowExternal: boolean;
   /** `mdv.security.allowedOrigins`. */
   readonly allowedOrigins: readonly string[];
+  /**
+   * The workspace's theme-file cache (SPEC 11.6), for a block whose `theme:`
+   * names a file. Absent ⇒ only the four built-ins resolve, which is what the
+   * markdown-it integration and the unit tests get.
+   */
+  readonly themeFiles?: ThemeFiles | undefined;
 }
 
 /** One visual block, rendered. */

@@ -13,7 +13,7 @@ import { readFile as readFileRaw } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 import { builtinChartTypes } from '@mdv/charts';
-import { getBuiltinTheme, listBuiltinThemes, resolveTheme } from '@mdv/themes';
+import { getBuiltinTheme, listBuiltinThemes, themeFileFormat, themeFromText } from '@mdv/themes';
 import { parse, resolve as resolveDocument } from '@mdv/core';
 import type {
   Capabilities,
@@ -24,7 +24,6 @@ import type {
   MdvPlugin,
   ResolvedDocument,
   Theme,
-  ThemeOverride,
 } from '@mdv/core';
 import type { Diagnostic, MdvDocument } from '@mdv/parser';
 
@@ -213,32 +212,52 @@ export async function loadConfigFile(io: CliIo, path: string, term: Term): Promi
 }
 
 /**
- * Resolve `--theme`: a built-in name, or a path to a theme override file
- * (SPEC 11.6).
+ * Resolve `--theme`: a built-in name, or a path to a theme file (SPEC 11.6).
+ *
+ * The extension decides which it is, and `themeFileFormat` owns that decision
+ * so the CLI, the extension and the editor all draw the line in one place. A
+ * setting with no theme-file extension is a name, and is passed through for
+ * `resolve` to look up — including a bad one, so the "unknown theme" message
+ * comes from the resolver that knows the registry.
  */
 export async function loadThemeSetting(
   io: CliIo,
   setting: string,
   scheme: ColorScheme,
+  term?: Term,
 ): Promise<string | Theme> {
-  if (!/\.(json|jsonc)$/i.test(setting)) return setting;
-  const override = await readThemeOverride(io, setting);
-  return resolveTheme(override, scheme);
+  const format = themeFileFormat(setting);
+  if (format === undefined) return setting;
+  return (await readThemeFile(io, setting, scheme, term)).theme;
 }
 
-/** Read and shallow-check a theme override file. */
-export async function readThemeOverride(io: CliIo, path: string): Promise<ThemeOverride> {
+/**
+ * Read, parse, shape-check and resolve a theme file.
+ *
+ * Every rejection is the author's to fix, so all of them are reported at once
+ * and the exit code is `usage`, not an internal error. `MDV3080` palette
+ * warnings are printed when there is a terminal to print them to: a theme that
+ * fails the validator still renders (SPEC 11.6), it just renders badly.
+ */
+export async function readThemeFile(
+  io: CliIo,
+  path: string,
+  scheme: ColorScheme,
+  term?: Term,
+): Promise<{ theme: Theme; warnings: readonly string[] }> {
   const text = await readTextFile(io, path);
-  let value: unknown;
-  try {
-    value = JSON.parse(text);
-  } catch (error) {
-    throw usageError(`Cannot parse theme ${displayPath(io, path)}: ${errorText(error)}`);
+  const result = themeFromText(text, scheme, themeFileFormat(path) ?? 'json');
+  const display = displayPath(io, path);
+  if (result.theme === undefined) {
+    throw usageError(
+      `Cannot read theme ${display}`,
+      result.errors.map((error) => `  ${error}`).join('\n'),
+    );
   }
-  if (!isRecord(value)) {
-    throw usageError(`Theme ${displayPath(io, path)} must be an object`);
+  for (const warning of result.warnings) {
+    term?.problem(`${term.yellow('warn')} ${display}: ${warning} ${term.dim('(MDV3080)')}`);
   }
-  return value as ThemeOverride;
+  return { theme: result.theme, warnings: result.warnings };
 }
 
 /** The plugin that carries the built-in chart types and themes into core. */
@@ -278,7 +297,7 @@ export async function buildConfig(
   if (flags.buildTime !== undefined) config.buildTime = new Date(flags.buildTime);
   if (flags.theme !== undefined) {
     const scheme: ColorScheme = base.colorScheme === 'dark' ? 'dark' : 'light';
-    config.theme = await loadThemeSetting(io, flags.theme, scheme);
+    config.theme = await loadThemeSetting(io, flags.theme, scheme, term);
   }
 
   const security = { ...(base.security ?? {}) };

@@ -101,3 +101,79 @@ describe('dispatch', () => {
     expect(/\[/.test(ws.io.all)).toBe(false);
   });
 });
+
+describe('theme files (SPEC 11.6)', () => {
+  const BRAND = {
+    extends: 'default',
+    categorical: ['#2563eb', '#f97316', '#059669', '#7c3aed'],
+  };
+
+  it('validates a YAML theme file, not only JSON', async () => {
+    await ws.write(
+      'brand.yaml',
+      `extends: default\ncategorical:\n${BRAND.categorical.map((c) => `  - "${c}"`).join('\n')}\n`,
+    );
+    expect(await run(['validate-theme', 'brand.yaml'], ws.io)).toBe(EXIT_CODES.ok);
+    expect(ws.io.out).toContain('4 slots');
+    expect(ws.io.out).toContain('PASS');
+  });
+
+  it('reads the same theme from .json, .jsonc, .yaml and .yml', async () => {
+    const text = JSON.stringify(BRAND);
+    const outputs: string[] = [];
+    for (const name of ['brand.json', 'brand.jsonc', 'brand.yaml', 'brand.yml']) {
+      const each = await workspace();
+      await each.write(name, text); // JSON is valid YAML, so one text does for all four.
+      expect(await run(['validate-theme', name], each.io), name).toBe(EXIT_CODES.ok);
+      outputs.push(each.io.out.replace(name, '<theme>'));
+      await each.cleanup();
+    }
+    expect(new Set(outputs).size).toBe(1);
+  });
+
+  it('reports every problem in a theme file at once, and exits 2', async () => {
+    await ws.write('bad.json', '{"extends":3,"scheme":"sepia","categorical":{}}');
+    expect(await run(['validate-theme', 'bad.json'], ws.io)).toBe(EXIT_CODES.usage);
+    expect(ws.io.err).toContain('Cannot read theme');
+    expect(ws.io.err).toContain('theme.extends');
+    expect(ws.io.err).toContain('theme.scheme');
+    expect(ws.io.err).toContain('theme.categorical');
+  });
+
+  const COMMENTED = '{\n  // brand blue\n  "categorical": ["#2563eb"],\n}';
+
+  it('tells an author who commented a .json file where the comment may go', async () => {
+    await ws.write('bad.json', COMMENTED);
+    expect(await run(['validate-theme', 'bad.json'], ws.io)).toBe(EXIT_CODES.usage);
+    expect(ws.io.err).toContain('JSON has no comments');
+    expect(ws.io.err).toContain('.jsonc');
+    expect(ws.io.err).toContain('.yaml');
+  });
+
+  it('reads that same file when it is named .jsonc', async () => {
+    // The advice above has to be true, or it sends the author in a circle.
+    await ws.write('good.jsonc', COMMENTED);
+    expect(await run(['validate-theme', 'good.jsonc'], ws.io)).toBe(EXIT_CODES.ok);
+    expect(ws.io.out).toContain('1 slot');
+  });
+
+  it('renders with --theme pointing at a file, and warns about a bad palette', async () => {
+    await ws.write('doc.mdv', SIMPLE_DOCUMENT);
+    await ws.write('flat.yaml', 'categorical:\n  - "#2a78d6"\n  - "#2c7ad8"\n');
+    // `-o -` for the SVG backend: the point is that the file's palette reaches
+    // the drawing, not only the validator.
+    expect(await run(['render', 'doc.mdv', '--theme', 'flat.yaml', '-o', '-'], ws.io)).toBe(
+      EXIT_CODES.ok,
+    );
+    expect(ws.io.err).toContain('MDV3080');
+    expect(ws.io.out).toContain('<svg');
+    expect(ws.io.out).toContain('#2a78d6');
+  });
+
+  it('treats a bare word as a theme name, not as a file', async () => {
+    await ws.write('doc.mdv', SIMPLE_DOCUMENT);
+    expect(await run(['render', 'doc.mdv', '--theme', 'dark'], ws.io)).toBe(EXIT_CODES.ok);
+    expect(await run(['validate-theme', 'high-contrast'], ws.io)).toBe(EXIT_CODES.ok);
+    expect(ws.io.out).toContain('built-in theme `high-contrast`');
+  });
+});

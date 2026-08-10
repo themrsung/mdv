@@ -30,6 +30,8 @@ export {
 export type { BuiltinThemeName } from './builtin.js';
 
 export {
+  ALL_PAIRS_SLOT_CAP,
+  auditTheme,
   paletteDiagnosticMessages,
   reliefRequired,
   resolveBase,
@@ -37,9 +39,13 @@ export {
   revalidate,
   themeByName,
 } from './resolve.js';
+export type { ThemeAudit } from './resolve.js';
 
 export { resolveColorScheme, themeNameForScheme } from './scheme.js';
 export type { ColorSchemeInputs } from './scheme.js';
+
+export { themeFileFormat, themeFromText, themeFromValue } from './themefile.js';
+export type { ThemeFileFormat, ThemeFileResult } from './themefile.js';
 
 // ── Palettes ─────────────────────────────────────────────────────────────────
 export {

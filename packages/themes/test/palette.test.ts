@@ -16,12 +16,14 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  ALL_PAIRS_SLOT_CAP,
   CATEGORICAL_DARK,
   CATEGORICAL_LIGHT,
   CVD_TARGET_DELTA_E,
   NORMAL_VISION_DELTA_E,
   SCHEME_SURFACE,
   STATUS_PALETTE,
+  auditTheme,
   contrastRatio,
   listBuiltinThemes,
   paletteSeparation,
@@ -283,5 +285,60 @@ describe('the derived themes are derived, not hand-written', () => {
   it('leaves slots that already clear the target untouched', () => {
     // Violet is 8.3:1 on light; no lift should move it.
     expect(byName('print').categorical[6]).toBe(CATEGORICAL_LIGHT[6]);
+  });
+});
+
+describe('auditTheme is the check SPEC 16.4 asks an implementation to run', () => {
+  const byName = (n: string): Theme => {
+    const t = listBuiltinThemes().find((x) => x.name === n);
+    if (t === undefined) throw new Error(`no theme ${n}`);
+    return t;
+  };
+
+  it('passes every built-in — the whole point of the requirement', () => {
+    for (const theme of listBuiltinThemes()) {
+      const audit = auditTheme(theme);
+      expect(
+        audit.gate.findings.filter((f) => f.level === 'fail').map((f) => f.message),
+        theme.name,
+      ).toEqual([]);
+      expect(audit.scatter.filter((f) => f.level === 'fail').map((f) => f.message)).toEqual([]);
+      expect(audit.passed, theme.name).toBe(true);
+    }
+  });
+
+  it('caps the all-pairs question at three slots (SPEC 11.2 rule 3, SPEC 8.6)', () => {
+    // The eight-slot light palette is *designed* not to survive all-pairs: two
+    // of its slots collapse under CVD, which is why scatter is capped at three
+    // series rather than the palette being called broken.
+    const whole = validatePalette(CATEGORICAL_LIGHT, SCHEME_SURFACE.light, 'light', {
+      allPairs: true,
+    });
+    expect(whole.passed).toBe(false);
+    expect(ALL_PAIRS_SLOT_CAP).toBe(3);
+    expect(auditTheme(byName('default')).passed).toBe(true);
+  });
+
+  it('still fails a palette whose first three slots collapse pairwise', () => {
+    // Slots 0 and 2 are not adjacent, so only the capped all-pairs pass sees
+    // them: two blues either side of an orange.
+    const audit = auditTheme({
+      ...byName('default'),
+      categorical: ['#2a78d6', '#eb6834', '#2c7ad8', '#059669'],
+    });
+    expect(audit.gate.passed).toBe(true);
+    expect(audit.scatter.map((f) => [f.check, f.slots])).toContainEqual(['normal-vision', [0, 2]]);
+    expect(audit.passed).toBe(false);
+  });
+
+  it('does not repeat a pair the gate already reported', () => {
+    const audit = auditTheme({
+      ...byName('default'),
+      categorical: ['#2a78d6', '#2c7ad8', '#059669'],
+    });
+    const adjacent = audit.gate.findings.filter((f) => f.slots.length === 2);
+    expect(adjacent.length).toBeGreaterThan(0);
+    expect(audit.scatter).toEqual([]);
+    expect(audit.passed).toBe(false);
   });
 });

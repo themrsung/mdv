@@ -22,6 +22,7 @@ import {
   labelOnFill,
   listBuiltinThemes,
   ordinalBounds,
+  paletteDiagnosticMessages,
   parseColor,
   resolveColorScheme,
   resolveTheme,
@@ -29,10 +30,13 @@ import {
   sequentialTexture,
   texturePaint,
   themeByName,
+  themeFileFormat,
+  themeFromText,
+  themeFromValue,
   toOklch,
   toneOnTone,
 } from '../src/index.js';
-import type { ThemeOverride } from '../src/index.js';
+import type { PaletteValidation, ThemeOverride } from '../src/index.js';
 
 describe('SPEC 11.1 — theme tokens', () => {
   it('ships the light table verbatim', () => {
@@ -275,6 +279,239 @@ describe('SPEC 11.6 — custom themes', () => {
   it('is deterministic', () => {
     const o: ThemeOverride = { categorical: ['#2563eb', '#f97316', '#059669'] };
     expect(resolveTheme(o, 'light')).toEqual(resolveTheme(o, 'light'));
+  });
+});
+
+describe('SPEC 11.6 — reading a theme file', () => {
+  /** Every rejection message, joined, so a test can assert on one string. */
+  const why = (value: unknown): string => themeFromValue(value, 'light').errors.join('\n');
+
+  it('accepts the spec’s example as untyped data and resolves it', () => {
+    const result = themeFromValue(
+      {
+        extends: 'default',
+        tokens: { surface: '#ffffff', 'text-primary': '#111827' },
+        categorical: ['#2563eb', '#f97316', '#059669'],
+        sequential: { hue: '#2563eb', steps: 13 },
+        diverging: { low: '#2563eb', high: '#dc2626', mid: '#f3f4f6' },
+        font: { family: 'Inter, system-ui, sans-serif', size: 13 },
+      },
+      'light',
+    );
+    expect(result.errors).toEqual([]);
+    expect(result.theme).toEqual(
+      resolveTheme(
+        {
+          extends: 'default',
+          tokens: { surface: '#ffffff', 'text-primary': '#111827' },
+          categorical: ['#2563eb', '#f97316', '#059669'],
+          sequential: { hue: '#2563eb', steps: 13 },
+          diverging: { low: '#2563eb', high: '#dc2626', mid: '#f3f4f6' },
+          font: { family: 'Inter, system-ui, sans-serif', size: 13 },
+        },
+        'light',
+      ),
+    );
+  });
+
+  it('resolves against the scheme in force when the file does not say', () => {
+    expect(themeFromValue({ font: { size: 13 } }, 'dark').theme?.scheme).toBe('dark');
+    expect(themeFromValue({ font: { size: 13 } }, 'light').theme?.scheme).toBe('light');
+    // …and the file wins when it does say.
+    expect(themeFromValue({ extends: 'dark' }, 'light').theme?.scheme).toBe('dark');
+  });
+
+  it('reports a failing palette as warnings and still returns the theme', () => {
+    // SPEC 11.6 asks for MDV3080 warnings, not for a refusal: swapping in a
+    // different palette would silently redraw the author's chart.
+    const result = themeFromValue({ categorical: ['#2a78d6', '#2c7ad8'] }, 'light');
+    expect(result.errors).toEqual([]);
+    expect(result.theme).toBeDefined();
+    expect(result.validation?.passed).toBe(false);
+    expect(result.warnings.length).toBeGreaterThan(0);
+    // Every warning is one of the validator's own messages, unedited.
+    const all = paletteDiagnosticMessages(result.validation as PaletteValidation);
+    for (const warning of result.warnings) expect(all).toContain(warning);
+  });
+
+  it('warns about failures only — not about the base palette’s relief rule', () => {
+    // `default`'s own palette carries three `warn`-level relief findings. A file
+    // whose only line is a new surface must not be blamed for them.
+    const result = themeFromValue({ tokens: { surface: '#ffffff' } }, 'light');
+    expect(result.validation?.passed).toBe(true);
+    expect(result.validation?.findings.length).toBeGreaterThan(0);
+    expect(result.warnings).toEqual([]);
+    // The obligation is still reachable, per slot, for the host to apply.
+    expect(result.validation?.reliefRequiredSlots.length).toBeGreaterThan(0);
+  });
+
+  it('rejects a file that is not a mapping', () => {
+    expect(why(null)).toMatch(/must be a mapping.*not null/);
+    expect(why([1, 2])).toMatch(/not a list/);
+    expect(why('./other.yaml')).toMatch(/not the string "\.\/other\.yaml"/);
+    expect(why(7)).toMatch(/not the number 7/);
+  });
+
+  it('rejects a file that sets nothing — it is the wrong file, not an empty theme', () => {
+    expect(why({})).toMatch(/at least one of/);
+    // A comment-only YAML file parses to null, which is the same mistake.
+    expect(why(null)).not.toBe('');
+  });
+
+  it('names the key and the type it wanted for every malformed field', () => {
+    expect(why({ extends: 3 })).toMatch(/theme\.extends must be a string/);
+    expect(why({ scheme: 'sepia' })).toMatch(/theme\.scheme must be "light" or "dark"/);
+    expect(why({ tokens: [] })).toMatch(/theme\.tokens must be a mapping/);
+    expect(why({ tokens: { surface: 3 } })).toMatch(/theme\.tokens\.surface must be a colour/);
+    expect(why({ tokens: { srface: '#fff' } })).toMatch(
+      /theme\.tokens\.srface is not a colour role/,
+    );
+    expect(why({ categorical: {} })).toMatch(/theme\.categorical must be a list/);
+    expect(why({ categorical: ['#fff', 3] })).toMatch(/theme\.categorical\[1\]/);
+    expect(why({ sequential: {} })).toMatch(/theme\.sequential\.hue is required/);
+    expect(why({ sequential: { hue: '#2563eb', steps: '13' } })).toMatch(
+      /theme\.sequential\.steps must be a number/,
+    );
+    expect(why({ diverging: { low: '#2563eb' } })).toMatch(/both `low` and `high`/);
+    expect(why({ font: { size: 0 } })).toMatch(/theme\.font\.size must be a positive number/);
+    expect(why({ metrics: { gap: -1 } })).toMatch(/theme\.metrics\.gap must be a non-negative/);
+  });
+
+  it('reports every problem in the file, not just the first', () => {
+    const result = themeFromValue({ extends: 3, scheme: 'sepia', categorical: {} }, 'light');
+    expect(result.errors).toHaveLength(3);
+    expect(result.theme).toBeUndefined();
+  });
+
+  it('passes `resolveTheme`’s own refusals through unedited', () => {
+    // Shape-valid, meaning-invalid: the message must still name the key.
+    expect(why({ extends: 'nope' })).toMatch(/Unknown theme/);
+    expect(why({ tokens: { surface: 'chartrouse' } })).toMatch(/tokens\.surface/);
+    expect(why({ categorical: [] })).toMatch(/at least one slot/);
+    expect(why({ sequential: { hue: '#2a78d6', steps: 1 } })).toMatch(/at least 2/);
+  });
+
+  it('never throws, whatever it is handed', () => {
+    const hostile: unknown[] = [
+      undefined,
+      Number.NaN,
+      () => 1,
+      Object.create(null),
+      { tokens: Object.create(null) },
+      { categorical: new Array<string>(3) },
+      { metrics: { gap: Number.POSITIVE_INFINITY } },
+      { font: { size: Number.NaN } },
+      { __proto__: { categorical: ['#fff'] } },
+      JSON.parse('{"tokens":{"__proto__":"#fff"}}'),
+    ];
+    for (const value of hostile) {
+      expect(() => themeFromValue(value, 'light')).not.toThrow();
+      const result = themeFromValue(value, 'light');
+      // The contract: errors is non-empty exactly when there is no theme.
+      expect(result.errors.length === 0).toBe(result.theme !== undefined);
+    }
+  });
+
+  it('is deterministic', () => {
+    const value = { categorical: ['#2563eb', '#f97316', '#059669'] };
+    expect(themeFromValue(value, 'light')).toEqual(themeFromValue(value, 'light'));
+  });
+});
+
+describe('SPEC 11.6 — a theme file’s text', () => {
+  it('tells a path from a built-in name by its extension', () => {
+    expect(themeFileFormat('corporate.json')).toBe('json');
+    expect(themeFileFormat('./themes/Corporate.JSONC')).toBe('jsonc');
+    expect(themeFileFormat('corporate.yaml')).toBe('yaml');
+    expect(themeFileFormat('/abs/corporate.yml')).toBe('yaml');
+    // A built-in name is not a path, and neither is something that only looks
+    // like one — the caller falls back to a name lookup and says so if it fails.
+    for (const name of ['dark', 'high-contrast', 'default', 'theme.txt', 'v1.0']) {
+      expect(themeFileFormat(name), name).toBeUndefined();
+    }
+  });
+
+  it('reads the same theme from JSON and from YAML', () => {
+    const json = themeFromText(
+      '{"extends":"dark","categorical":["#2563eb","#f97316","#059669"]}',
+      'light',
+      'json',
+    );
+    const yaml = themeFromText(
+      'extends: dark\ncategorical:\n  - "#2563eb"\n  - "#f97316"\n  - "#059669"\n',
+      'light',
+      'yaml',
+    );
+    expect(json.errors).toEqual([]);
+    expect(json.theme).toEqual(yaml.theme);
+  });
+
+  it('takes `#rrggbb` as a colour in YAML, not as a comment', () => {
+    // Unquoted `#2563eb` *is* a comment in YAML, and an author who writes it
+    // that way gets an empty value rather than a colour. The message has to be
+    // about the key, not about the parser.
+    const quoted = themeFromText('tokens:\n  surface: "#101010"\n', 'light', 'yaml');
+    expect(quoted.theme?.tokens.surface).toBe('#101010');
+    const bare = themeFromText('tokens:\n  surface: #101010\n', 'light', 'yaml');
+    expect(bare.theme).toBeUndefined();
+    expect(bare.errors.join('\n')).toMatch(/tokens\.surface must be a colour string/);
+  });
+
+  it('locates a YAML syntax error by line and column', () => {
+    const result = themeFromText('extends: default\ntokens:\n  surface: "#fff\n', 'light', 'yaml');
+    expect(result.theme).toBeUndefined();
+    // Line 4, not line 3: an unterminated quote is reported where it ran out,
+    // which is the end of the file. Still a place to put a cursor.
+    expect(result.errors[0]).toMatch(/^YAML syntax error at line 4, column 1: /);
+    expect(result.errors[0]).toMatch(/quote/i);
+  });
+
+  it('refuses a comment in JSON, and says where to put one instead', () => {
+    const jsonc = '{\n  // brand blue\n  "categorical": ["#2563eb"]\n}';
+    const result = themeFromText(jsonc, 'light', 'json');
+    expect(result.theme).toBeUndefined();
+    expect(result.errors[0]).toMatch(/^JSON syntax error: /);
+    expect(result.errors[0]).toMatch(/JSON has no comments/);
+    // Why JSON is read by `JSON.parse` and not by the YAML superset: YAML takes
+    // the same text without complaint, folds `// brand blue` into the key next
+    // to it, and loses the palette. The author is told they set nothing — and
+    // is left staring at a file that plainly sets something.
+    expect(themeFromText(jsonc, 'light', 'yaml').errors.join('\n')).toMatch(
+      /must set at least one of/,
+    );
+  });
+
+  it('does not mistake a URL in a string for a comment', () => {
+    const result = themeFromText('{"font":{"family":"see https://x.test/f"},}', 'light', 'json');
+    expect(result.errors[0]).toMatch(/^JSON syntax error: /);
+    expect(result.errors[0]).not.toMatch(/JSON has no comments/);
+  });
+
+  it('rejects an empty file in either format', () => {
+    expect(themeFromText('', 'light', 'json').errors).toHaveLength(1);
+    // YAML reads an empty document as null, which is not a mapping.
+    expect(themeFromText('\n# nothing here\n', 'light', 'yaml').errors.join('\n')).toMatch(
+      /must be a mapping/,
+    );
+  });
+
+  it('never throws, whatever the bytes are', () => {
+    const hostile = [
+      '  ',
+      '['.repeat(500),
+      'a: &x [*x]\n',
+      '{"categorical":',
+      '﻿{"extends":"dark"}',
+      '- '.repeat(5000),
+    ];
+    for (const text of hostile) {
+      for (const format of ['json', 'yaml'] as const) {
+        const label = `${format}:${text.slice(0, 12)}`;
+        expect(() => themeFromText(text, 'light', format), label).not.toThrow();
+        const result = themeFromText(text, 'light', format);
+        expect(result.errors.length === 0, label).toBe(result.theme !== undefined);
+      }
+    }
   });
 });
 

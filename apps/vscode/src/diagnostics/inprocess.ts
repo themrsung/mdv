@@ -23,6 +23,7 @@ import type { SettingsStore } from '../settings.js';
 import type { PipelineStore } from '../documents.js';
 import { isPreviewable } from '../documents.js';
 import { themeNameFor, type EditorKind } from '../pipeline/index.js';
+import { activeThemeFiles } from '../themefiles.js';
 import { toVsDiagnostics } from './convert.js';
 import type { DiagnosticEngineKind, DiagnosticService } from './service.js';
 
@@ -152,6 +153,7 @@ export class InProcessDiagnosticService implements DiagnosticService {
         strict: settings.validate.strict,
         allowExternal: settings.security.allowExternal,
         allowedOrigins: settings.security.allowedOrigins,
+        themeFiles: activeThemeFiles(),
       });
 
       if (this.#disposed) return;

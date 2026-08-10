@@ -19,6 +19,7 @@ import { MdvConfigError } from '@mdv/core';
 import type {
   ColorScheme,
   ColorString,
+  PaletteFinding,
   PaletteValidation,
   Theme,
   ThemeColorRole,
@@ -234,4 +235,59 @@ export function reliefRequired(validation: PaletteValidation): boolean {
  */
 export function revalidate(theme: Theme, allPairs = false): PaletteValidation {
   return validatePalette(theme.categorical, theme.tokens.surface, theme.scheme, { allPairs });
+}
+
+/**
+ * How many slots the all-pairs gate is applied to (SPEC 11.2 rule 3).
+ *
+ * Not a tuning knob: eight distinguishable hues that also separate pairwise
+ * under red–green CVD do not exist at any ordering, which is why SPEC 8.6 caps
+ * scatter, bubble and choropleth at three series rather than asking for a
+ * better palette.
+ */
+export const ALL_PAIRS_SLOT_CAP = 3;
+
+/** What {@link auditTheme} found. */
+export interface ThemeAudit {
+  /** The SPEC 16.4 gate: every slot, and every *adjacent* pair. */
+  readonly gate: PaletteValidation;
+  /**
+   * The extra pairs SPEC 11.2 rule 3 asks about — non-adjacent pairs among the
+   * first {@link ALL_PAIRS_SLOT_CAP} slots. Empty for a palette that clears it,
+   * which the built-ins do.
+   */
+  readonly scatter: readonly PaletteFinding[];
+  /** `false` when either part has a `fail` — the answer `MDV3080` reports. */
+  readonly passed: boolean;
+}
+
+/**
+ * Audit a whole theme the way SPEC 16.4 asks an implementation to audit its own.
+ *
+ * Two questions, because the spec asks two. The gate is per-slot and
+ * adjacent-pair over the entire palette; the second is all-pairs over the first
+ * three slots only, which is the guarantee SPEC 8.6's cap rests on. Running
+ * all-pairs over all eight instead — the obvious "stricter is safer" reading —
+ * fails the spec's own palette and every built-in with it, so it is not a
+ * stricter version of this check but a different and wrong one.
+ */
+export function auditTheme(theme: Theme): ThemeAudit {
+  const gate = revalidate(theme);
+  const capped = validatePalette(
+    theme.categorical.slice(0, ALL_PAIRS_SLOT_CAP),
+    theme.tokens.surface,
+    theme.scheme,
+    { allPairs: true },
+  );
+  // Only the pairs the gate did not already ask about: everything else in
+  // `capped` is a duplicate of a finding the caller is about to print.
+  const scatter = capped.findings.filter(
+    (finding) =>
+      finding.slots.length === 2 && (finding.slots[1] ?? 0) - (finding.slots[0] ?? 0) > 1,
+  );
+  return {
+    gate,
+    scatter,
+    passed: gate.passed && scatter.every((finding) => finding.level !== 'fail'),
+  };
 }

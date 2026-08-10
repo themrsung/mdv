@@ -239,6 +239,9 @@ importers:
       '@mdv/core':
         specifier: workspace:*
         version: link:../core
+      '@mdv/parser':
+        specifier: workspace:*
+        version: link:../parser
 
 packages:
 

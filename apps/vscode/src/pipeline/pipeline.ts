@@ -212,6 +212,13 @@ function blockKey(
     inputs.theme,
     inputs.level,
     inputs.strict ? 1 : 0,
+    // A block's `theme:` may name a file (SPEC 11.6), and the loaded theme is an
+    // input to layout like any other. The revision is deliberately coarse — it
+    // counts *any* theme-file change, so saving one file re-lays-out every block
+    // in the document. Keying per block on the file it actually named would need
+    // the cascade to have run, which is the very work this key exists to skip;
+    // a whole-document relayout on a theme-file save is the cheaper mistake.
+    inputs.themeFiles?.revision ?? -1,
   ].join('\u0001');
 }
 
@@ -516,14 +523,25 @@ export class DocumentPipeline {
       });
       const attrRecord = attrs as Record<string, unknown>;
 
-      const { theme, unknown } = themeForBlock(previewTheme, stringAttr(attrRecord, 'theme'));
-      if (unknown !== undefined) {
+      // A `theme:` that names a file can only be loaded when the host granted a
+      // reader; without one `themeForBlock` degrades to the preview theme and
+      // says so, which is what the markdown-it integration gets (SPEC 11.6).
+      const { theme, problems } = themeForBlock(
+        previewTheme,
+        stringAttr(attrRecord, 'theme'),
+        inputs.themeFiles === undefined
+          ? undefined
+          : {
+              files: inputs.themeFiles,
+              baseUri: inputs.uri,
+              allowExternal: inputs.allowExternal,
+            },
+      );
+      for (const problem of problems) {
         collected.push(
-          createDiagnostic('MDV1502', {
-            message: `Theme ${JSON.stringify(unknown)} is not a built-in and cannot be loaded in the preview`,
-            detail:
-              'The preview resolves built-in themes only (default, dark, high-contrast, print). ' +
-              'A theme file needs the filesystem capability, which the preview does not grant.',
+          createDiagnostic(problem.code, {
+            message: problem.message,
+            ...(problem.detail === undefined ? {} : { detail: problem.detail }),
             range,
             source: 'render',
           }),
