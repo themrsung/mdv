@@ -15,6 +15,16 @@
 
 export { DocumentStore, TextDocument, type DocumentEvent } from './documents.js';
 
+export { toLspDiagnostic, toLspDiagnostics, toLspRange } from './convert.js';
+
+export {
+  VALIDATE_DEBOUNCE_MS,
+  diagnostics,
+  type Cancel,
+  type DiagnosticsOptions,
+  type Schedule,
+} from './features/diagnostics.js';
+
 export {
   MessageConnection,
   NEVER_CANCELLED,

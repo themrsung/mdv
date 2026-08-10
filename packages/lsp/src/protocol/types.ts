@@ -153,6 +153,53 @@ export interface PublishDiagnosticsParams {
   readonly diagnostics: readonly Diagnostic[];
 }
 
+/**
+ * What `diagnosticProvider` promises (3.17's pull diagnostics).
+ *
+ * Both flags are statements about MDV rather than about effort.
+ * `interFileDependencies: false`: a document's diagnostics come from its own
+ * text and the configuration in force, never from another open file, so the
+ * client may re-ask for one document alone. `workspaceDiagnostics: false`: the
+ * server validates what the editor has open; walking a repository is `mdv lint`,
+ * and a language server that opened every file to squiggle it would be a
+ * surprise rather than a feature.
+ */
+export interface DiagnosticOptions {
+  readonly identifier?: string;
+  readonly interFileDependencies: boolean;
+  readonly workspaceDiagnostics: boolean;
+}
+
+export interface DocumentDiagnosticParams {
+  readonly textDocument: TextDocumentIdentifier;
+  readonly identifier?: string;
+  /** The `resultId` of the last report the client got for this document. */
+  readonly previousResultId?: string;
+}
+
+export const DocumentDiagnosticReportKind = {
+  full: 'full',
+  unchanged: 'unchanged',
+} as const;
+
+export type DocumentDiagnosticReportKindValue =
+  (typeof DocumentDiagnosticReportKind)[keyof typeof DocumentDiagnosticReportKind];
+
+export interface FullDocumentDiagnosticReport {
+  readonly kind: 'full';
+  readonly resultId?: string;
+  readonly items: readonly Diagnostic[];
+}
+
+/** "Nothing has changed since `resultId`" — the client keeps what it has. */
+export interface UnchangedDocumentDiagnosticReport {
+  readonly kind: 'unchanged';
+  readonly resultId: string;
+}
+
+export type DocumentDiagnosticReport =
+  FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Completion
 // ─────────────────────────────────────────────────────────────────────────────
@@ -464,10 +511,16 @@ export interface ClientCapabilities {
       };
     };
     readonly hover?: { readonly contentFormat?: readonly MarkupKindValue[] };
+    /** Present when the client pulls diagnostics instead of being pushed them. */
+    readonly diagnostic?: {
+      readonly dynamicRegistration?: boolean;
+      readonly relatedDocumentSupport?: boolean;
+    };
   };
   readonly workspace?: {
     readonly configuration?: boolean;
     readonly workspaceFolders?: boolean;
+    readonly diagnostics?: { readonly refreshSupport?: boolean };
   };
   readonly general?: {
     readonly positionEncodings?: readonly string[];
@@ -534,6 +587,7 @@ export interface ServerCapabilities {
   readonly foldingRangeProvider?: boolean;
   readonly inlayHintProvider?: boolean;
   readonly semanticTokensProvider?: SemanticTokensOptions;
+  readonly diagnosticProvider?: DiagnosticOptions;
   readonly workspace?: {
     readonly workspaceFolders?: {
       readonly supported: boolean;

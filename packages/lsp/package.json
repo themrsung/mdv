@@ -18,6 +18,10 @@
   "files": [
     "dist"
   ],
+  "dependencies": {
+    "@mdv/core": "workspace:*",
+    "@mdv/parser": "workspace:*"
+  },
   "scripts": {
     "build": "tsc -b tsconfig.json",
     "clean": "rm -rf dist *.tsbuildinfo",
