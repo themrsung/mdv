@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "MDV specification artefacts: error-code table, JSON Schemas, conformance fixtures. No runtime logic.",
+  "description": "MDV specification artefacts: error-code table, function and step signatures, JSON Schemas, conformance fixtures. No runtime logic.",
   "license": "MIT",
   "sideEffects": false,
   "main": "./dist/src/index.js",
@@ -14,12 +14,14 @@
       "default": "./dist/src/index.js"
     },
     "./errors.json": "./errors.json",
+    "./signatures.json": "./signatures.json",
     "./schemas/*": "./schemas/*",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "errors.json",
+    "signatures.json",
     "schemas",
     "tests"
   ],

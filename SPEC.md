@@ -791,6 +791,20 @@ transform:
 | `rename` | map old → new | |
 | `select` | field list | Projection, preserving the listed order. |
 
+The steps whose parameter is a mapping take these keys, in this order. A `?`
+marks a key that may be omitted; every other key is required, and a step that
+leaves one out is `MDV2501`.
+
+| Step | Keys |
+|---|---|
+| `aggregate` | `group?`, then one or more of `sum`, `mean`, `median`, `min`, `max`, `count`, `first`, `last`, `stddev`, `p<n>` |
+| `limit` | `n`, `offset?` — or a bare integer |
+| `pivot` | `key`, `value`, `group?` |
+| `unpivot` | `fields`, `key?`, `value?` |
+| `bin` | `field`, `step?`, `count?`, `output?` |
+| `window` | `op`, `field`, `size`, `output`, `partition?` |
+| `join` | `with`, `on`, `how?` |
+
 Transforms are evaluated once per resolved dataset and memoised by
 (dataset identity, transform pipeline) so N charts over one dataset cost one
 evaluation.
@@ -829,18 +843,109 @@ everything else is left-associative.
 Only these identifiers may be called. There is no member access (`a.b`), no
 indexing on arbitrary objects, no `this`, and no way to reach a host object.
 
-| Group | Functions |
-|---|---|
-| Math | `abs ceil floor round trunc sign sqrt cbrt exp log log10 log2 pow min max clamp` |
-| Stats (aggregate context only) | `sum mean median mode stddev variance count countDistinct p25 p50 p75 p90 p95 p99` |
-| String | `lower upper trim len startsWith endsWith contains replace split substr concat pad` |
-| Temporal | `year quarter month week day hour minute second dayOfWeek dateAdd dateDiff dateTrunc now` |
-| Logic | `if coalesce isNull isNumber isString toNumber toString toDate` |
-| Formatting | `format` (value, format-spec) |
+Every signature below is normative. The parameter names are the ones a tool
+shows the author, and the arity is the one `MDV2200` is measured against:
+`p?` marks an optional parameter, and `p…` a variadic tail that takes
+one or more arguments *or* a single list.
 
-`now()` returns the document's build time — the `buildTime` config value, or the
-process start time — never a per-call clock read, so a document renders
-identically twice in a row.
+**Math.** Every argument is a number; null propagates, and a result that is not
+finite is null.
+
+| Signature | Result |
+|---|---|
+| `abs(x)` | Absolute value. |
+| `ceil(x)` | Smallest integer ≥ `x`. |
+| `floor(x)` | Largest integer ≤ `x`. |
+| `round(x)` | Nearest integer, halves away from zero. |
+| `trunc(x)` | Integer part, toward zero. |
+| `sign(x)` | `-1`, `0`, or `1`. |
+| `sqrt(x)` | Square root. |
+| `cbrt(x)` | Cube root. |
+| `exp(x)` | e raised to `x`. |
+| `log(x)` | Natural logarithm. |
+| `log10(x)` | Base-10 logarithm. |
+| `log2(x)` | Base-2 logarithm. |
+| `pow(base, exponent)` | `base ** exponent`. |
+| `min(value…)` | Smallest argument. Nulls are skipped, never smallest. |
+| `max(value…)` | Largest argument. Nulls are skipped, never largest. |
+| `clamp(value, low, high)` | `value` confined to `[low, high]`. |
+
+**Stats**, legal only in an aggregate context, where a field reference yields a
+whole column. Non-numeric and null members are skipped, and an empty sample is
+null.
+
+| Signature | Result |
+|---|---|
+| `sum(value…)` | Total. |
+| `mean(value…)` | Arithmetic mean. |
+| `median(value…)` | Same as `p50`. |
+| `mode(value…)` | Most frequent value; ties go to the one seen first. |
+| `stddev(value…)` | Square root of `variance`. |
+| `variance(value…)` | Sample variance (n − 1). Fewer than two values is null. |
+| `count(value…)` | How many values are not null. |
+| `countDistinct(value…)` | How many distinct non-null values. |
+| `p25(value…)` `p50(value…)` `p75(value…)` `p90(value…)` `p95(value…)` `p99(value…)` | Linearly interpolated percentile — the definition d3 and NumPy agree on. |
+
+`count` here is the MDVX function. The `count`, `first` and `last` of the
+`aggregate` step (6.7) are step aggregators, not callable identifiers.
+
+**String.** Positions and lengths count Unicode code points, not UTF-16 units.
+
+| Signature | Result |
+|---|---|
+| `lower(text)` | Lowercased. |
+| `upper(text)` | Uppercased. |
+| `trim(text)` | Whitespace removed from both ends. |
+| `len(value)` | Length of a string, or of a list. |
+| `startsWith(text, prefix)` | Boolean. |
+| `endsWith(text, suffix)` | Boolean. |
+| `contains(text, substring)` | Boolean. |
+| `replace(text, from, to)` | Every occurrence of the literal `from`. Never a pattern (13.6). |
+| `split(text, separator)` | List of parts; an empty separator splits into characters. |
+| `substr(text, start, length?)` | From `start`, negative counting from the end; to the end when `length` is omitted. |
+| `concat(text…)` | Strings joined; a null argument contributes nothing. |
+| `pad(text, width, fill?)` | Padded to `width` with `fill` (default a space). A negative `width` pads on the right. |
+
+**Temporal.** Each part is read in the document timezone (6.6), never the host's.
+
+| Signature | Result |
+|---|---|
+| `year(date)` | Calendar year. |
+| `quarter(date)` | `1`–`4`. |
+| `month(date)` | `1`–`12`. |
+| `week(date)` | ISO 8601 week number. |
+| `day(date)` | Day of the month. |
+| `hour(date)` | `0`–`23`. |
+| `minute(date)` | `0`–`59`. |
+| `second(date)` | `0`–`59`. |
+| `dayOfWeek(date)` | `0` Sunday through `6` Saturday. |
+| `dateAdd(date, unit, amount)` | `date` shifted by a whole number of `unit`. |
+| `dateDiff(unit, start, end)` | Whole `unit` from `start` to `end`. |
+| `dateTrunc(unit, date)` | `date` floored to the start of its `unit`. |
+| `now()` | The document's build time. |
+
+`unit` ∈ `millisecond, second, minute, hour, day, week, month, quarter, year`.
+`now()` is the `buildTime` config value, or the process start time — never a
+per-call clock read, so a document renders identically twice in a row.
+
+**Logic.**
+
+| Signature | Result |
+|---|---|
+| `if(condition, then, else)` | Both branches are evaluated; MDVX has no side effects. |
+| `coalesce(value…)` | First argument that is not null. |
+| `isNull(value)` | Boolean. |
+| `isNumber(value)` | Boolean. |
+| `isString(value)` | Boolean. |
+| `toNumber(value)` | Parsed number, or null. An explicit conversion, so 6.8.3 does not apply. |
+| `toString(value)` | The document's default rendering of `value`; a list is null. |
+| `toDate(text)` | Parsed ISO 8601 instant, or null. No engine-defined fallback. |
+
+**Formatting.**
+
+| Signature | Result |
+|---|---|
+| `format(value, spec?)` | `value` rendered by 6.9; the document's default format when `spec` is omitted. |
 
 ### 6.8.3 Semantics and limits
 

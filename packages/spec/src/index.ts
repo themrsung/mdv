@@ -2,8 +2,9 @@
  * `@mdv/spec` — the normative artefacts of the MDV specification.
  *
  * Contains the error-code table (SPEC Appendix C), the JSON Schemas
- * (SPEC Appendix D, in `schemas/`), and the conformance fixture corpus
- * (SPEC 16.2, in `tests/`). No rendering logic ever lives here.
+ * (SPEC Appendix D, in `schemas/`), the function and step signatures
+ * (SPEC 6.7 and 6.8.2), and the conformance fixture corpus (SPEC 16.2, in
+ * `tests/`). No rendering logic ever lives here.
  */
 
 export {
@@ -21,7 +22,19 @@ export type { ErrorCode } from './errors.js';
 
 export { BLOCK_SCHEMA, CLOSED_VALUES, COMMON_ATTRS, attrDoc, attrSchema } from './schemas.js';
 
+export {
+  FUNCTION_SIGNATURES,
+  SIGNATURE_TABLE,
+  STEP_SIGNATURES,
+  arityOf,
+  lookupSignature,
+  lookupStepSignature,
+  renderSignature,
+  renderStepSignature,
+} from './signatures.js';
+
 export type {
+  Arity,
   AttrDoc,
   BlockSchema,
   ConformanceLevel,
@@ -31,7 +44,13 @@ export type {
   ErrorTable,
   FixtureCategory,
   FixtureMeta,
+  FunctionSignature,
   SchemaNode,
+  SignatureGroup,
+  SignatureParam,
+  SignatureTable,
+  StepKey,
+  StepSignature,
 } from './types.js';
 
 /** The spec revision these artefacts were generated from. */

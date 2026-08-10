@@ -11,6 +11,7 @@
  * bad step degrades the chart instead of deleting it.
  */
 
+import { STEP_SIGNATURES } from '@mdv/spec';
 import type {
   AggregateStep,
   BinStep,
@@ -46,21 +47,17 @@ export type { TransformContext } from './context.js';
 export { cloneTable, typeOfValues } from './context.js';
 export { compareValues, groupKey, stableSort, tupleKey } from './order.js';
 
-/** The step names SPEC 6.7 defines. Anything else is `MDV2500`. */
-const STEP_NAMES: readonly string[] = [
-  'filter',
-  'derive',
-  'aggregate',
-  'sort',
-  'limit',
-  'pivot',
-  'unpivot',
-  'bin',
-  'window',
-  'join',
-  'rename',
-  'select',
-];
+/**
+ * The step names SPEC 6.7 defines, in table order. Anything else is `MDV2500`.
+ *
+ * Read from `@mdv/spec` rather than spelled again here: the same list has to be
+ * known by anything that describes a pipeline without running one — the LSP's
+ * completion and signature help, a CLI that explains a step — and a second copy
+ * is a copy that goes stale. `dispatch` below still switches on the names
+ * literally; `test/signatures.test.ts` is what holds the two together, by
+ * running every named step and refusing the `MDV2500` a missing case would give.
+ */
+const STEP_NAMES: readonly string[] = STEP_SIGNATURES.map((step) => step.name);
 
 /**
  * Apply one pipeline to one table.
