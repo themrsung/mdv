@@ -5,8 +5,9 @@
  * write beside the source file unless a path is chosen." All three hold here.
  *
  * File I/O goes through `vscode.workspace.fs`, never `node:fs`: the same code
- * then works in `vscode.dev`, where there is no Node (SPEC 29.1). The only
- * genuinely Node-gated export is PDF.
+ * then works in `vscode.dev`, where there is no Node (SPEC 29.1). No export
+ * here is Node-gated — `@mdv/render-pdf` draws the PDF itself, so not even that
+ * one needs a desktop host.
  *
  * ## What is implemented, and what is not
  *
@@ -14,21 +15,19 @@
  * |---|---|
  * | `mdv.export.svg` | **Implemented.** One `.svg` per visual block, from the same scene the preview draws. |
  * | `mdv.export.html` | **Implemented.** One self-contained file: the charts plus `@mdv/render-svg`'s stylesheet, no scripts, no remote references. |
+ * | `mdv.export.pdf` | **Implemented** via `@mdv/render-pdf` (SPEC 28): the same `Scene` as the screen, standard-14 fonts, deterministic bytes, the `.mdv` source attached unless `mdv.export.pdf.embedSource` is off. The `mdv.export.pdf.*` settings are defaults — a document's own `pdf:` front matter outranks them, so an export matches the CLI's. |
  * | `mdv.exportBlock` | **Implemented** for SVG. |
  * | `mdv.export.png` | **Not implemented.** Rasterising a scene needs a canvas backend (`@mdv/render-canvas`, SPEC 23.2), which is not in this tree. The command says so rather than writing a broken file. |
- * | `mdv.export.pdf` | **Not implemented.** `@mdv/render-pdf`'s `exportPdf` is a stub in this tree. Same treatment. |
  *
- * The two unimplemented ones are registered anyway, and are *hidden* from the
- * palette by a `when` clause where the reason is the host (SPEC 29.8's rule) and
- * *reported* where the reason is a missing package — a command that silently did
- * nothing would be worse than either.
+ * The one unimplemented command is registered anyway and *reports* the missing
+ * package — a command that silently did nothing would be worse.
  */
 
 import * as vscode from 'vscode';
 import { log } from '../log.js';
 import type { CommandContext } from './context.js';
-import { blockAtLine, runFor } from './blocks.js';
-import type { RenderedBlock } from '../pipeline/index.js';
+import { blockAtLine, inputsFor, runFor } from './blocks.js';
+import { renderPdf, type RenderedBlock } from '../pipeline/index.js';
 
 /** The directory exports default to: `mdv.export.defaultDirectory`, else beside the source. */
 function defaultDirectory(source: vscode.Uri, configured: string): vscode.Uri {
@@ -233,21 +232,54 @@ export async function exportPng(): Promise<void> {
 }
 
 /**
- * PDF export.
+ * PDF export (SPEC 28).
  *
- * Honest failure: `@mdv/render-pdf`'s `exportPdf` is a stub in this tree, and
- * SPEC 28.1 requires the PDF to be drawn from the *same* `Scene` as the screen —
- * so there is no correct shortcut (printing the HTML through a headless browser
- * would produce a different drawing, which is precisely what SPEC 28.1 forbids).
+ * The bytes come from `@mdv/render-pdf`, which draws the *same* `Scene` the
+ * preview draws (SPEC 28.1) — no headless browser, which would produce a
+ * different drawing. The write is `vscode.workspace.fs` like every other export
+ * here, so this works in `vscode.dev` too: `pdf-lib` is a bundled dependency
+ * and reaches for nothing under `node:`.
  */
-export async function exportPdf(): Promise<void> {
-  const choice = await vscode.window.showWarningMessage(
-    'MDV: PDF export is not available in this build — @mdv/render-pdf (SPEC 28) is not implemented yet.',
-    'Export HTML instead',
+export async function exportPdf(ctx: CommandContext): Promise<void> {
+  const editor = requireEditor();
+  if (editor === undefined) return;
+  const document = editor.document;
+  const { pdfPageSize, pdfEmbedSource } = ctx.settings.current.exportSettings;
+
+  const output = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: 'MDV: exporting PDF',
+      cancellable: true,
+    },
+    async (_progress, token) => {
+      const rendered = await renderPdf(inputsFor(document, ctx.settings), {
+        pageSize: pdfPageSize,
+        embedSource: pdfEmbedSource,
+        sourceName: document.uri.path.split('/').pop() ?? 'document.mdv',
+      });
+      // One long await; the only honest cancellation point is after it, before
+      // anything reaches the disk.
+      return token.isCancellationRequested ? undefined : rendered;
+    },
   );
-  if (choice === 'Export HTML instead') {
-    await vscode.commands.executeCommand('mdv.export.html');
+  if (output === undefined) return;
+
+  const directory = defaultDirectory(
+    document.uri,
+    ctx.settings.current.exportSettings.defaultDirectory,
+  );
+  const target = vscode.Uri.joinPath(directory, `${baseName(document.uri)}.pdf`);
+  await vscode.workspace.fs.writeFile(target, output.bytes);
+
+  const errors = output.diagnostics.filter((d) => d.severity === 'error').length;
+  for (const diagnostic of output.diagnostics) {
+    log(`export.pdf: ${diagnostic.severity}: ${diagnostic.message}`);
   }
+  const trouble = errors > 0 ? ` (${String(errors)} block(s) exported as error cards)` : '';
+  void vscode.window.showInformationMessage(
+    `MDV: wrote ${target.path.split('/').pop() ?? ''} — ${String(output.blockCount)} block(s)${trouble}`,
+  );
 }
 
 function requireEditor(): vscode.TextEditor | undefined {

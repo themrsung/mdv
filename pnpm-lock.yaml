@@ -81,6 +81,9 @@ importers:
       '@mdv/parser':
         specifier: workspace:*
         version: link:../../packages/parser
+      '@mdv/render-pdf':
+        specifier: workspace:*
+        version: link:../../packages/render-pdf
       '@mdv/render-svg':
         specifier: workspace:*
         version: link:../../packages/render-svg

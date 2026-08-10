@@ -91,7 +91,7 @@ export function registerCommands(ctx: CommandContext): vscode.Disposable {
     ),
     vscode.commands.registerCommand(
       COMMANDS.exportPdf,
-      safeCommand('Export to PDF', () => exportPdf()),
+      safeCommand('Export to PDF', () => exportPdf(ctx)),
     ),
     vscode.commands.registerCommand(
       COMMANDS.exportBlock,

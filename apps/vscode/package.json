@@ -40,8 +40,8 @@
       ]
     },
     "virtualWorkspaces": {
-      "supported": "limited",
-      "description": "Everything but PDF export works over a virtual filesystem; PDF export needs a real one."
+      "supported": true,
+      "description": "MDV parses, validates, previews and exports over a virtual filesystem; no command here needs a real one."
     }
   },
   "contributes": {
@@ -208,7 +208,7 @@
         },
         {
           "command": "mdv.export.pdf",
-          "when": "editorLangId == mdv && mdv.hostHasNode"
+          "when": "editorLangId == mdv"
         },
         {
           "command": "mdv.export.png",
@@ -393,6 +393,12 @@
           "scope": "resource",
           "description": "Page size for PDF export."
         },
+        "mdv.export.pdf.embedSource": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Attach the .mdv source to an exported PDF, so the file round-trips back into an editable document."
+        },
         "mdv.export.defaultDirectory": {
           "type": "string",
           "default": "",
@@ -451,6 +457,7 @@
     "@mdv/charts": "workspace:*",
     "@mdv/core": "workspace:*",
     "@mdv/parser": "workspace:*",
+    "@mdv/render-pdf": "workspace:*",
     "@mdv/render-svg": "workspace:*",
     "@mdv/themes": "workspace:*"
   },

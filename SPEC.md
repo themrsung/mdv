@@ -3099,6 +3099,7 @@ beside the source file unless a path is chosen.
 "mdv.security.allowExternal": false,
 "mdv.security.allowedOrigins": [],
 "mdv.export.pdf.pageSize": "A4",
+"mdv.export.pdf.embedSource": true,   // attach the .mdv, so the PDF round-trips (SPEC 28.9)
 "mdv.export.defaultDirectory": "",
 "mdv.completion.columnNames": true,
 "mdv.codeLens.enable": true,

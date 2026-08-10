@@ -47,15 +47,7 @@
 
 import type { Diagnostic, MdvBlock, MdvDocument } from '@mdv/parser';
 import { parse } from '@mdv/parser';
-import type {
-  Capabilities,
-  ChartType,
-  DatasetNode,
-  ResolvedBlock,
-  Scene,
-  Table,
-  Theme,
-} from '@mdv/core';
+import type { ChartType, DatasetNode, ResolvedBlock, Scene, Table, Theme } from '@mdv/core';
 import {
   applyStrict,
   compareDiagnostics,
@@ -77,6 +69,7 @@ import {
 
 import { toSvgString } from '@mdv/render-svg';
 
+import { capabilitiesFor } from './capabilities.js';
 import { cascadeAttrs, encodingFromAttrs } from './cascade.js';
 import { chartRegistry } from './registry.js';
 import { builtinTheme, themeForBlock } from './theme.js';
@@ -110,45 +103,6 @@ interface BlockCacheEntry {
 interface DataCacheEntry {
   readonly key: string;
   readonly data: DocumentData;
-}
-
-/**
- * A network capability for the extension host.
- *
- * Only ever constructed when `mdv.security.allowExternal` is on **and** the
- * workspace is trusted; `@mdv/core` refuses a `src:` outright when the
- * capability is absent, which is the default (SPEC 25.2, `MDV4002`).
- */
-function nodeFetchCapability(): Capabilities['fetch'] | undefined {
-  const globalFetch = (globalThis as { fetch?: typeof fetch }).fetch;
-  if (typeof globalFetch !== 'function') return undefined;
-  return async (url, init) => {
-    const controller = new AbortController();
-    const timeout =
-      init.timeoutMs !== undefined && init.timeoutMs > 0
-        ? setTimeout(() => {
-            controller.abort();
-          }, init.timeoutMs)
-        : undefined;
-    try {
-      const response = await globalFetch(url, {
-        method: 'GET',
-        ...(init.headers !== undefined ? { headers: { ...init.headers } } : {}),
-        redirect: 'follow',
-        signal: controller.signal,
-      });
-      const buffer = await response.arrayBuffer();
-      const contentType = response.headers.get('content-type');
-      return {
-        status: response.status,
-        url: response.url === '' ? url : response.url,
-        body: new Uint8Array(buffer),
-        ...(contentType !== null ? { contentType } : {}),
-      };
-    } finally {
-      if (timeout !== undefined) clearTimeout(timeout);
-    }
-  };
 }
 
 /** A stable, order-independent key for the options that feed the data stage. */
@@ -510,12 +464,7 @@ export class DocumentPipeline {
       },
       document,
     );
-    const capabilities: Capabilities = {};
-    if (inputs.allowExternal) {
-      const fetchCapability = nodeFetchCapability();
-      if (fetchCapability !== undefined) capabilities.fetch = fetchCapability;
-    }
-    return { ...base, capabilities, baseUri: inputs.uri };
+    return { ...base, capabilities: capabilitiesFor(inputs.allowExternal), baseUri: inputs.uri };
   }
 
   /**

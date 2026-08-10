@@ -7,6 +7,7 @@
  */
 
 export { DocumentPipeline } from './pipeline.js';
+export { renderPdf, type PdfOutput, type PdfRequest } from './pdf.js';
 export { chartRegistry, registeredTypes } from './registry.js';
 export { builtinTheme, themeNameFor, type BuiltinName, type EditorKind } from './theme.js';
 export type {

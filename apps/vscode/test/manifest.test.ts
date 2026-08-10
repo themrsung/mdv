@@ -87,6 +87,7 @@ const SPEC_SETTINGS = [
   'mdv.security.allowExternal',
   'mdv.security.allowedOrigins',
   'mdv.export.pdf.pageSize',
+  'mdv.export.pdf.embedSource',
   'mdv.export.defaultDirectory',
   'mdv.completion.columnNames',
   'mdv.codeLens.enable',
@@ -154,12 +155,18 @@ describe('package.json: commands and menus', () => {
 
   it('hides the exports that need a Node host behind the host context key', () => {
     const palette = contributes.menus['commandPalette'] ?? [];
-    for (const id of ['mdv.export.pdf', 'mdv.export.png']) {
+    // Only PNG is left: it needs a canvas backend (SPEC 23.2), which is the one
+    // export in this tree that cannot run in a browser host.
+    for (const id of ['mdv.export.png']) {
       const entry = palette.find((e) => e.command === id);
       expect(entry?.when).toContain('mdv.hostHasNode');
     }
-    // …and the ones that are pure string manipulation are not.
-    expect(palette.find((e) => e.command === 'mdv.export.svg')?.when).not.toContain('hostHasNode');
+    // …and the ones that draw with `@mdv/*` alone are not. PDF belongs here now
+    // that `@mdv/render-pdf` writes the bytes itself (SPEC 28.1) — no headless
+    // browser, no `node:`, so it works in `vscode.dev` like the rest.
+    for (const id of ['mdv.export.svg', 'mdv.export.html', 'mdv.export.pdf']) {
+      expect(palette.find((e) => e.command === id)?.when).not.toContain('hostHasNode');
+    }
   });
 
   it('gives both preview keybindings a mac chord and an editor guard', () => {

@@ -87,7 +87,7 @@ export const DEFAULT_SETTINGS: MdvSettings = {
   validate: { enable: true, level: 2, strict: false },
   format: { enable: true, attributeOrder: 'canonical' },
   security: { allowExternal: false, allowedOrigins: [], trusted: true },
-  exportSettings: { pdfPageSize: 'A4', defaultDirectory: '' },
+  exportSettings: { pdfPageSize: 'A4', pdfEmbedSource: true, defaultDirectory: '' },
   completion: { columnNames: true },
   codeLens: { enable: true },
   trace: 'off',

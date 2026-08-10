@@ -2,17 +2,21 @@
  * Host capability gating (SPEC 29.1, 29.8).
  *
  * The extension runs in two places: the desktop host, where Node is available,
- * and `vscode.dev`, where it is not. SPEC 29.8 requires the Node-only features
- * (PDF export, writing beside the source file) to be **hidden** by a `when`
- * clause rather than to fail when invoked, so the same context keys that gate
- * the commands in `package.json` are set here, once, at activation.
+ * and `vscode.dev`, where it is not. SPEC 29.8 requires a Node-only feature to
+ * be **hidden** by a `when` clause rather than to fail when invoked, so the
+ * context keys that gate the commands in `package.json` are set here, once, at
+ * activation.
+ *
+ * The list of those features is currently short: PDF export was the obvious
+ * candidate and turned out not to need Node at all, because `@mdv/render-pdf`
+ * writes the file format itself and `pdf-lib` is bundled with the extension.
  */
 
 import * as vscode from 'vscode';
 
 /** What this host can actually do. */
 export interface HostCapabilities {
-  /** `false` in a browser host: no `fs`, no `pdf-lib`, no child processes. */
+  /** `false` in a browser host: no `node:` builtins, no child processes. */
   readonly node: boolean;
   /** Whether the workspace is trusted; gates `mdv.security.*` (SPEC 29.6). */
   readonly trusted: boolean;

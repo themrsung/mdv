@@ -78,6 +78,8 @@ export interface MdvSettings {
   };
   readonly exportSettings: {
     readonly pdfPageSize: string;
+    /** Attach the `.mdv` source to an exported PDF (SPEC 28.9). */
+    readonly pdfEmbedSource: boolean;
     readonly defaultDirectory: string;
   };
   readonly completion: { readonly columnNames: boolean };
@@ -179,6 +181,7 @@ export function readSettings(scope?: vscode.ConfigurationScope): MdvSettings {
         ['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid'] as const,
         'A4',
       ),
+      pdfEmbedSource: bool(config.get('export.pdf.embedSource'), true),
       defaultDirectory:
         typeof config.get('export.defaultDirectory') === 'string'
           ? (config.get<string>('export.defaultDirectory') ?? '')
