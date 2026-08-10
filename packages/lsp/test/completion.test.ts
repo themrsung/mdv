@@ -12,15 +12,14 @@
  * plugin installed. What the stubs are asked for is what completion reads:
  * channel names, what each channel accepts, and the per-type defaults.
  *
- * The last test is the reason the two hand-written lists in `completion.ts` are
- * allowed to be hand-written: it reads `schemas/common/block.json` and fails the
- * moment the schema grows a key, or an enum member, that this server would then
- * quietly never offer.
+ * The key and value sets come from `@mdv/spec`, which reads the schema itself,
+ * so a key the schema grows cannot be one this server quietly never offers. The
+ * tests below name them rather than repeating them.
  */
 
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CLOSED_VALUES, COMMON_ATTRS, completion } from '../src/features/completion.js';
+import { CLOSED_VALUES, COMMON_ATTRS } from '@mdv/spec';
+import { completion } from '../src/features/completion.js';
 import { ErrorCodes } from '../src/protocol/jsonrpc.js';
 import { CompletionItemKind, MarkupKind } from '../src/protocol/types.js';
 import { createServer } from '../src/server.js';
@@ -440,50 +439,5 @@ describe('the configuration', () => {
     expect(items).toEqual([]);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain('Completion has no registry');
-  });
-});
-
-/**
- * The drift test.
- *
- * `@mdv/spec` ships the schemas as files rather than exports, so the two lists
- * in `completion.ts` are typed out by hand. This reads the file they were typed
- * out of: the keys, in schema order, and — for every property whose value comes
- * from an enum, or from a boolean, which is an enum of two — the members, taking
- * the property's own `oneOf`/`anyOf` branches as alternatives. A schema that
- * grows `legend: overlay` fails here rather than silently never being offered.
- */
-describe('schemas/common/block.json', () => {
-  interface Branch {
-    readonly enum?: readonly unknown[];
-    readonly type?: string;
-    readonly oneOf?: readonly Branch[];
-    readonly anyOf?: readonly Branch[];
-  }
-
-  const schema = JSON.parse(
-    readFileSync(new URL('../../spec/schemas/common/block.json', import.meta.url), 'utf8'),
-  ) as { readonly properties: Readonly<Record<string, Branch>> };
-
-  function closedValues(property: Branch): string[] {
-    const values: string[] = [];
-    for (const branch of [property, ...(property.oneOf ?? []), ...(property.anyOf ?? [])]) {
-      for (const member of branch.enum ?? []) values.push(String(member));
-      if (branch.type === 'boolean') values.push('true', 'false');
-    }
-    return values;
-  }
-
-  it('names every key the server offers, in the order it offers them', () => {
-    expect(Object.keys(schema.properties)).toEqual([...COMMON_ATTRS]);
-  });
-
-  it('names every value the server offers from a closed set', () => {
-    const closed: Record<string, string[]> = {};
-    for (const [key, property] of Object.entries(schema.properties)) {
-      const values = closedValues(property);
-      if (values.length > 0) closed[key] = values;
-    }
-    expect(closed).toEqual(CLOSED_VALUES);
   });
 });

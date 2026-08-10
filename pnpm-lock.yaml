@@ -149,6 +149,9 @@ importers:
       '@mdv/parser':
         specifier: workspace:*
         version: link:../parser
+      '@mdv/spec':
+        specifier: workspace:*
+        version: link:../spec
 
   packages/parser:
     dependencies:

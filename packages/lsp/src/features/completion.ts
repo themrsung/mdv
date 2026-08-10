@@ -17,20 +17,17 @@
  * renderer, so a plugin's chart type completes the moment it is configured and
  * a host that configures none is offered none.
  *
- * Two lists are written down rather than derived, because the value that would
- * derive them is not published at runtime:
- *
- *   - {@link COMMON_ATTRS} and {@link CLOSED_VALUES} come from
- *     `schemas/common/block.json` (SPEC Appendix D). `@mdv/spec` ships the
- *     schemas as files, not as exports, so `completion.test.ts` reads the file
- *     and fails when these drift from it. That test is the reason it is safe to
- *     type them out here.
- *   - per-type values are taken from `ChartType.defaults`, which names one value
- *     per key rather than the whole enum. The enums live in the per-type schemas
- *     (`stack: none | normal | percent | center`), which are likewise unreadable
- *     from here; when `@mdv/spec` publishes them this file should read them and
- *     offer the set instead of the default. Until then a suggestion the runtime
- *     can vouch for beats one this file invented.
+ * Nothing common is written down here either. `COMMON_ATTRS` and
+ * `CLOSED_VALUES` are read from `@mdv/spec`, which publishes
+ * `schemas/common/block.json` (SPEC Appendix D) as values rather than as a file
+ * on disk, so a key the schema grows is offered without anyone editing this
+ * server. Per-type values are the one thing still taken from
+ * `ChartType.defaults`, which names one value per key rather than the whole
+ * enum: those enums live in the per-type schemas
+ * (`stack: none | normal | percent | center`), which Appendix D does not
+ * publish yet. When it does, this file should offer the set instead of the
+ * default; until then a suggestion the runtime can vouch for beats one this
+ * file invented.
  *
  * The one honest limitation: a partially typed key is completed against the
  * block's *type as it currently parses*. Type a block type wrong and the keys
@@ -41,6 +38,7 @@
 import { registryFromPlugins, resolveSync } from '@mdv/core';
 import type { ChartType, ChartTypeRegistry, MdvConfig, ResolvedBlock, Table } from '@mdv/core';
 import { parse } from '@mdv/parser';
+import { CLOSED_VALUES, COMMON_ATTRS } from '@mdv/spec';
 
 import type { TextDocument } from '../documents.js';
 import { throwIfCancelled } from '../protocol/connection.js';
@@ -56,58 +54,6 @@ import type {
   ServerCapabilities,
 } from '../protocol/types.js';
 import type { Feature, ServerContext } from '../server.js';
-
-/**
- * Every key `schemas/common/block.json` allows on any block, in schema order.
- * Kept in step with the schema by the drift test in `completion.test.ts`.
- */
-export const COMMON_ATTRS: readonly string[] = [
-  'type',
-  'title',
-  'subtitle',
-  'caption',
-  'desc',
-  'id',
-  'data',
-  'src',
-  'integrity',
-  'format',
-  'fields',
-  'transform',
-  'width',
-  'height',
-  'aspect',
-  'padding',
-  'theme',
-  'palette',
-  'legend',
-  'tooltip',
-  'animate',
-  'class',
-  'fallback',
-  'table',
-  'row',
-  'column',
-  'columns',
-  'shareX',
-  'shareY',
-  'facetHeight',
-  'axis',
-];
-
-/**
- * The common keys whose value comes from a closed set — an enum in the schema,
- * or a plain boolean, which is an enum of two. Also drift-tested.
- */
-export const CLOSED_VALUES: Readonly<Record<string, readonly string[]>> = {
-  format: ['auto', 'table', 'csv', 'tsv', 'json', 'ndjson', 'columns', 'matrix'],
-  legend: ['auto', 'top', 'right', 'bottom', 'left', 'inline', 'false'],
-  tooltip: ['true', 'false'],
-  animate: ['true', 'false'],
-  table: ['details', 'visible', 'hidden', 'none'],
-  shareX: ['true', 'false'],
-  shareY: ['true', 'false'],
-};
 
 /** The two facet keys take a column name like a channel does (SPEC 11). */
 const FACET_CHANNELS: readonly string[] = ['row', 'column'];

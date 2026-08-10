@@ -20,7 +20,8 @@
   ],
   "dependencies": {
     "@mdv/core": "workspace:*",
-    "@mdv/parser": "workspace:*"
+    "@mdv/parser": "workspace:*",
+    "@mdv/spec": "workspace:*"
   },
   "scripts": {
     "build": "tsc -b tsconfig.json",
