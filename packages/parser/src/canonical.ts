@@ -69,6 +69,28 @@ export function canonicalValue(value: unknown, positions = true): unknown {
   return out;
 }
 
+/**
+ * Whether two trees describe the same document (SPEC 27).
+ *
+ * The question every formatter has to answer before it writes: "is this still
+ * the same document?" SPEC 27 says canonical formatting "MUST NOT change the
+ * resolved AST", and this is that comparison — the canonical form of SPEC 19
+ * with positions dropped, because moving text is exactly what a formatter is
+ * *for*. Everything else must survive: node types, order, values, the verbatim
+ * header and data sections of a visual block, the parse diagnostics.
+ *
+ * Both callers of this are refusals rather than assertions. `mdv fmt` and the
+ * language server compare before they write, and decline to touch a file whose
+ * formatting would lose something, so a bug in `toMarkdown` costs the author a
+ * message rather than their document.
+ */
+export function sameDocument(a: unknown, b: unknown): boolean {
+  return (
+    canonicalAst(a, { positions: false, indent: 0 }) ===
+    canonicalAst(b, { positions: false, indent: 0 })
+  );
+}
+
 /** `position` collapses to `[startOffset, endOffset]` (SPEC 19). */
 function canonicalPosition(value: unknown): unknown {
   const position = value as

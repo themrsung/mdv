@@ -20,7 +20,7 @@ import type { MdvContent, MdvDocument } from './types.js';
 
 export * from './types.js';
 export type { FormatOptions, ParseOptions } from './options.js';
-export { canonicalAst, canonicalValue, type CanonicalOptions } from './canonical.js';
+export { canonicalAst, canonicalValue, sameDocument, type CanonicalOptions } from './canonical.js';
 
 /**
  * The YAML reader front matter uses, exposed for the one other thing in the

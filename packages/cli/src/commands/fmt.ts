@@ -13,7 +13,7 @@
  */
 
 import { parse, toMarkdown } from '@mdv/core';
-import type { MdvDocument } from '@mdv/parser';
+import { sameDocument } from '@mdv/parser';
 
 import type { GlobalFlags } from '../args.js';
 import { EXIT_CODES, usageError } from '../exit.js';
@@ -24,44 +24,6 @@ import { createTerm } from '../term.js';
 /** Flags `mdv fmt` accepts on top of the global ones. */
 export interface FmtFlags extends GlobalFlags {
   check?: boolean;
-}
-
-/**
- * The canonical AST comparison key.
- *
- * `canonicalAst` (SPEC 19) is the parser's own answer to "are these the same
- * document?", but it is not part of the package's public surface, so this uses a
- * structural key over the node types and their content: enough to catch a
- * formatter that dropped a block or reordered a list, which is the failure this
- * guard exists for.
- */
-function shape(doc: MdvDocument): string {
-  const parts: string[] = [];
-  const walk = (node: unknown): void => {
-    if (node === null || typeof node !== 'object') return;
-    const record = node as Record<string, unknown>;
-    const type = record['type'];
-    if (typeof type === 'string') parts.push(`<${type}`);
-    const value = record['value'];
-    if (typeof value === 'string') parts.push(`=${value}`);
-    // A visual block has no children: its content is the verbatim header and
-    // data sections, and those are exactly what a formatter could damage.
-    const blockType = record['blockType'];
-    if (typeof blockType === 'string') parts.push(`:${blockType}`);
-    const raw = record['raw'];
-    if (raw !== null && typeof raw === 'object') {
-      const sections = raw as Record<string, unknown>;
-      for (const key of ['header', 'data'] as const) {
-        const section = sections[key];
-        if (typeof section === 'string') parts.push(`|${section}`);
-      }
-    }
-    const children = record['children'];
-    if (Array.isArray(children)) for (const child of children) walk(child);
-    parts.push('>');
-  };
-  walk(doc);
-  return parts.join('\u0001');
 }
 
 /** `mdv fmt` — canonical formatting; `--check` writes nothing. */
@@ -88,7 +50,7 @@ export async function fmtCommand(
 
     if (formatted === source) continue;
 
-    if (shape(parse(formatted)) !== shape(doc)) {
+    if (!sameDocument(parse(formatted), doc)) {
       // SPEC 27: `mdv fmt` MUST NOT change the resolved AST. Refusing to write is
       // the only safe response — a formatter that eats a block must not do it in
       // place.

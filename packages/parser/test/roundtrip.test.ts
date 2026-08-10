@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { canonicalAst, parse, toMarkdown } from '@mdv/parser';
+import { canonicalAst, parse, sameDocument, toMarkdown } from '@mdv/parser';
 
 const appendixE = readFileSync(
   fileURLToPath(new URL('./fixtures/appendix-e.mdv', import.meta.url)),
@@ -328,5 +328,53 @@ describe('SPEC 14.1 — malformed input is data, not an exception', () => {
     const raw = (block as { raw: { header: string } }).raw.header;
     expect(raw).toBe('? complex\n&anchor\nstray | row\n');
     expect(document.diagnostics.length).toBeGreaterThan(0);
+  });
+});
+
+/**
+ * The comparison `mdv fmt` and the language server run before they write. It is
+ * the round-trip property above, packaged: a formatter is allowed to move text
+ * and nothing else.
+ */
+describe('SPEC 27 — sameDocument', () => {
+  it.each(Object.keys(CORPUS))('holds across a format of %s', (name) => {
+    const source = CORPUS[name] as string;
+    const document = parse(source);
+    expect(sameDocument(parse(toMarkdown(document)), document)).toBe(true);
+  });
+
+  it('ignores where in the file things are', () => {
+    // Same document, laid out differently: the formatter's whole job.
+    const loose = parse('#    Title\n\n\n*   one\n*   two\n');
+    const tight = parse('# Title\n\n- one\n- two\n');
+    expect(sameDocument(loose, tight)).toBe(true);
+    // ...which is only interesting because the positions really do differ.
+    expect(canonicalAst(loose)).not.toBe(canonicalAst(tight));
+  });
+
+  it('notices a lost block', () => {
+    const document = parse('# Title\n\ntext\n');
+    const shortened = { ...document, children: document.children.slice(0, 1) };
+    expect(sameDocument(shortened, document)).toBe(false);
+  });
+
+  it('notices reordering', () => {
+    const document = parse('one\n\ntwo\n');
+    const reversed = { ...document, children: [...document.children].reverse() };
+    expect(reversed.children).toHaveLength(2);
+    expect(sameDocument(reversed, document)).toBe(false);
+  });
+
+  it('notices a changed block body, which has no children to compare', () => {
+    const before = parse('```mdv bar\ntitle: A\n---\nq | v\nQ1 | 1\n```\n');
+    const after = parse('```mdv bar\ntitle: A\n---\nq | v\nQ1 | 2\n```\n');
+    expect(sameDocument(before, after)).toBe(false);
+  });
+
+  it('notices a diagnostic appearing', () => {
+    const clean = parse('```mdv bar\ntitle: A\n```\n');
+    const broken = parse('```mdv bar\n\tbad: [1,\n```\n');
+    expect(broken.diagnostics.length).toBeGreaterThan(0);
+    expect(sameDocument(clean, broken)).toBe(false);
   });
 });

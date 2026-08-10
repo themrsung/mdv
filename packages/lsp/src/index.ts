@@ -25,6 +25,10 @@ export {
   type Schedule,
 } from './features/diagnostics.js';
 
+export { formatting, type FormatterOptions } from './features/formatting.js';
+
+export { MAX_DIFF_LINES, editsWithin, splitLines, textEdits, type LineEdit } from './edits.js';
+
 export {
   MessageConnection,
   NEVER_CANCELLED,
