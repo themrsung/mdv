@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "//": "rootDir is the package root, not src/, because src/errors.ts imports ../errors.json — the canonical Appendix C table lives at the package root per SPEC Appendix F.1. Emitted entry point is therefore dist/src/index.js.",
+  "include": ["src/**/*.ts", "errors.json"],
+  "exclude": ["dist", "node_modules", "tests", "test"]
+}

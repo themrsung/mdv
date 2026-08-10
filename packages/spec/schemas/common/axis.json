@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/axis.json",
+  "title": "MDV axis specification",
+  "description": "SPEC 7.3. There is no second value axis (SPEC 7.3.1).",
+  "type": "object",
+  "properties": {
+    "title": { "oneOf": [{ "type": "string" }, { "const": false }] },
+    "grid": {
+      "type": "boolean",
+      "description": "Hairline, solid, never dashed (SPEC 11.4). Default y: true, x: false."
+    },
+    "ticks": {
+      "oneOf": [{ "const": "auto" }, { "type": "integer", "minimum": 0 }],
+      "default": "auto",
+      "description": "A count hint; the generator prefers round values."
+    },
+    "tickValues": { "type": "array", "items": { "type": ["number", "string"] } },
+    "format": { "$ref": "./format.json" },
+    "tickRotate": {
+      "type": "number",
+      "default": 0,
+      "description": "Degrees. Layout auto-rotates to -45 only on collision, and MUST NOT clip."
+    },
+    "position": { "enum": ["left", "right", "top", "bottom"] }
+  },
+  "patternProperties": { "^x-": true },
+  "unevaluatedProperties": false
+}

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+out/
+.vercel/
+*.vsix
+coverage/
+
+# TypeScript incremental / project-reference build state
+*.tsbuildinfo
+.tsbuildinfo/
+
+# editors & OS
+.DS_Store
+.idea/
+.vscode/settings.json
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

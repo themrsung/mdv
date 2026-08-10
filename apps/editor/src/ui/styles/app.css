@@ -1,0 +1,998 @@
+/*
+ * The editor's own stylesheet.
+ *
+ * Every colour, space and radius here comes from a token in
+ * `src/styles/tokens.css` — there is not one literal colour below. That is not
+ * tidiness: the tokens are SPEC 11.1's roles, and a chart rendered into the
+ * document by `@mdv/render-svg` picks its colours from the same set, so chrome
+ * and content stay one system in both themes and under `forced-colors`.
+ *
+ * Layout rules worth knowing before editing:
+ *
+ * - The app is a grid with a fixed header and one scrolling row, so the
+ *   toolbar cannot drift and the panes scroll independently.
+ * - Editable containers are `white-space: pre-wrap`. This is load-bearing, not
+ *   cosmetic: `../dom/offsets.ts` assumes every space the engine holds is a
+ *   space the layout keeps, and `normal` would collapse runs of them and put
+ *   every offset in the block out by the difference.
+ * - Nothing uses `::before`/`::after` to add *text* inside an editable
+ *   container. Generated content is not in the DOM's text nodes but some
+ *   browsers include it when reading a `Range`, which would corrupt the same
+ *   mapping. List markers and the like are drawn outside the editable host.
+ */
+
+@import '../../styles/tokens.css';
+
+/* -------------------------------------------------------------------------- */
+/* Reset and shell                                                            */
+/* -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--mdv-page);
+  color: var(--mdv-text-primary);
+  font-family: var(--mdv-font);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mdv-app {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mdv-panes {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 0;
+}
+
+.mdv-app--split .mdv-panes {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mdv-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.mdv-pane--document {
+  background: var(--mdv-page);
+  padding: var(--mdv-space-6) var(--mdv-space-5) 40vh;
+}
+
+.mdv-pane--source {
+  background: var(--mdv-chrome-sunken);
+  border-left: var(--mdv-hairline) solid var(--mdv-border);
+}
+
+.mdv-app--source .mdv-pane--source {
+  border-left: 0;
+}
+
+/* Visually hidden, still read aloud. */
+.mdv-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Buttons and controls                                                       */
+/* -------------------------------------------------------------------------- */
+
+.mdv-btn,
+.mdv-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mdv-space-1);
+  min-height: 28px;
+  padding: 0 var(--mdv-space-3);
+  border: var(--mdv-hairline) solid transparent;
+  border-radius: var(--mdv-radius);
+  background: transparent;
+  color: var(--mdv-text-primary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.mdv-tool {
+  min-width: 30px;
+  padding: 0 var(--mdv-space-2);
+}
+
+.mdv-btn:hover,
+.mdv-tool:hover,
+.mdv-linkbtn:hover {
+  background: var(--mdv-hover);
+}
+
+.mdv-btn:active,
+.mdv-tool:active {
+  background: var(--mdv-active);
+}
+
+.mdv-btn[aria-pressed='true'],
+.mdv-tool[aria-pressed='true'],
+.mdv-tool.is-active,
+.mdv-btn.is-active {
+  background: var(--mdv-accent-soft);
+  color: var(--mdv-accent);
+}
+
+.mdv-btn:disabled,
+.mdv-tool:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mdv-btn--primary {
+  background: var(--mdv-accent);
+  color: var(--mdv-accent-contrast);
+}
+
+.mdv-btn--primary:hover {
+  background: var(--mdv-accent);
+  filter: brightness(1.08);
+}
+
+.mdv-btn--danger {
+  color: var(--mdv-danger-text);
+}
+
+.mdv-btn--icon {
+  min-width: 28px;
+  padding: 0;
+}
+
+.mdv-linkbtn {
+  border: 0;
+  padding: 0 var(--mdv-space-1);
+  background: none;
+  color: var(--mdv-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+:where(button, input, textarea, [contenteditable]):focus-visible {
+  outline: var(--mdv-ring) solid var(--mdv-focus);
+  outline-offset: 1px;
+}
+
+.mdv-segmented,
+.mdv-tabs {
+  display: inline-flex;
+  padding: var(--mdv-gap);
+  gap: var(--mdv-gap);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-sunken);
+}
+
+.mdv-segmented button,
+.mdv-tabs button {
+  min-height: 24px;
+  padding: 0 var(--mdv-space-2);
+  border: 0;
+  border-radius: calc(var(--mdv-radius) - 1px);
+  background: transparent;
+  color: var(--mdv-text-secondary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mdv-segmented button.is-active,
+.mdv-tabs button.is-active {
+  background: var(--mdv-chrome-raised);
+  color: var(--mdv-text-primary);
+  box-shadow: 0 1px 1px var(--mdv-border);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Top bar                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.mdv-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-4);
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border-bottom: var(--mdv-hairline) solid var(--mdv-border);
+  background: var(--mdv-chrome);
+}
+
+.mdv-topbar__identity {
+  display: flex;
+  align-items: baseline;
+  gap: var(--mdv-space-3);
+  min-width: 0;
+}
+
+.mdv-wordmark {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--mdv-text-muted);
+}
+
+.mdv-topbar__file {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdv-dot {
+  margin-left: var(--mdv-space-1);
+  color: var(--mdv-accent);
+}
+
+.mdv-topbar__actions,
+.mdv-topbar__view {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+}
+
+.mdv-topbar__view {
+  margin-left: auto;
+}
+
+.mdv-spacer {
+  flex: 1;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Toolbar                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.mdv-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mdv-space-1);
+  padding: var(--mdv-space-1) var(--mdv-space-3);
+  border-bottom: var(--mdv-hairline) solid var(--mdv-border);
+  background: var(--mdv-chrome-raised);
+}
+
+.mdv-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-gap);
+}
+
+.mdv-toolbar__group + .mdv-toolbar__group {
+  margin-left: var(--mdv-space-2);
+  padding-left: var(--mdv-space-2);
+  border-left: var(--mdv-hairline) solid var(--mdv-border);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Banner and notices                                                         */
+/* -------------------------------------------------------------------------- */
+
+.mdv-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-3);
+  padding: var(--mdv-space-2) var(--mdv-space-4);
+  border-bottom: var(--mdv-hairline) solid var(--mdv-border);
+  background: var(--mdv-accent-soft);
+  font-size: 13px;
+}
+
+.mdv-banner__actions {
+  display: flex;
+  gap: var(--mdv-space-2);
+  margin-left: auto;
+}
+
+.mdv-notices {
+  position: fixed;
+  right: var(--mdv-space-4);
+  bottom: var(--mdv-space-4);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mdv-space-2);
+  max-width: 24rem;
+}
+
+.mdv-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mdv-space-3);
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border: var(--mdv-hairline) solid var(--mdv-border);
+  border-left-width: 3px;
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-raised);
+  box-shadow: var(--mdv-shadow);
+  font-size: 13px;
+}
+
+.mdv-notice--info {
+  border-left-color: var(--mdv-accent);
+}
+.mdv-notice--warning {
+  border-left-color: var(--mdv-warning-text);
+}
+.mdv-notice--error {
+  border-left-color: var(--mdv-danger-text);
+}
+
+.mdv-notice__close {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--mdv-text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The document surface                                                       */
+/* -------------------------------------------------------------------------- */
+
+.mdv-surface {
+  max-width: var(--mdv-measure);
+  margin: 0 auto;
+}
+
+/* Every editable container. See the note at the top about `pre-wrap`. */
+.mdv-container,
+.mdv-p,
+.mdv-h,
+.mdv-li__content,
+.mdv-cell__text,
+.mdv-pre code {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  outline: none;
+}
+
+.mdv-surface > * + * {
+  margin-top: var(--mdv-space-4);
+}
+
+.mdv-p {
+  margin: 0;
+}
+
+.mdv-h {
+  margin: var(--mdv-space-6) 0 var(--mdv-space-2);
+  line-height: 1.25;
+  font-weight: 650;
+  text-wrap: balance;
+}
+
+.mdv-h[data-mdv-kind='heading-1'] {
+  font-size: 2rem;
+}
+.mdv-h[data-mdv-kind='heading-2'] {
+  font-size: 1.5rem;
+}
+.mdv-h[data-mdv-kind='heading-3'] {
+  font-size: 1.25rem;
+}
+.mdv-h[data-mdv-kind='heading-4'],
+.mdv-h[data-mdv-kind='heading-5'],
+.mdv-h[data-mdv-kind='heading-6'] {
+  font-size: 1.05rem;
+}
+
+.mdv-quote {
+  margin: 0;
+  padding-left: var(--mdv-space-4);
+  border-left: 3px solid var(--mdv-grid);
+  color: var(--mdv-text-secondary);
+}
+
+.mdv-ul,
+.mdv-ol {
+  margin: 0;
+  padding-left: var(--mdv-space-6);
+}
+
+.mdv-li {
+  margin: var(--mdv-space-1) 0;
+}
+
+.mdv-li--task {
+  list-style: none;
+  margin-left: calc(-1 * var(--mdv-space-5));
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--mdv-space-2);
+  align-items: start;
+}
+
+.mdv-check {
+  margin-top: 0.35em;
+}
+
+.mdv-hr {
+  height: 0;
+  margin: var(--mdv-space-6) 0;
+  border: 0;
+  border-top: var(--mdv-hairline) solid var(--mdv-grid);
+}
+
+.mdv-pre {
+  position: relative;
+  margin: 0;
+  padding: var(--mdv-space-3) var(--mdv-space-4);
+  border: var(--mdv-hairline) solid var(--mdv-border);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-sunken);
+  font-family: var(--mdv-font-mono);
+  font-size: 13px;
+  overflow-x: auto;
+}
+
+.mdv-pre__info {
+  position: absolute;
+  top: var(--mdv-space-1);
+  right: var(--mdv-space-2);
+  color: var(--mdv-text-muted);
+  font-size: 11px;
+  user-select: none;
+}
+
+.mdv-code-inline,
+.mdv-code {
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  background: var(--mdv-chrome-sunken);
+  font-family: var(--mdv-font-mono);
+  font-size: 0.9em;
+}
+
+.mdv-link {
+  color: var(--mdv-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: text;
+}
+
+.mdv-del {
+  text-decoration: line-through;
+  color: var(--mdv-text-secondary);
+}
+
+.mdv-rawblock {
+  padding: var(--mdv-space-3);
+  border: var(--mdv-hairline) dashed var(--mdv-axis);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-sunken);
+  font-family: var(--mdv-font-mono);
+  font-size: 12px;
+  color: var(--mdv-text-secondary);
+}
+
+.mdv-run--raw {
+  background: var(--mdv-accent-soft);
+  border-radius: 2px;
+}
+
+/* Selection: the browser's inside one block, ours across several. */
+.mdv-surface ::selection {
+  background: var(--mdv-selection);
+}
+
+.mdv-block.is-range-selected,
+.mdv-block.is-selected {
+  background: var(--mdv-selection);
+  border-radius: var(--mdv-radius);
+}
+
+.mdv-block.is-node-selected {
+  outline: var(--mdv-ring) solid var(--mdv-accent);
+  outline-offset: 2px;
+  border-radius: var(--mdv-radius);
+}
+
+.mdv-block.is-drop-after {
+  box-shadow: 0 2px 0 var(--mdv-accent);
+}
+
+.mdv-dropline {
+  height: 2px;
+  margin: var(--mdv-space-1) 0;
+  background: var(--mdv-accent);
+  border-radius: 1px;
+}
+
+/* An empty container still needs a caret-sized line box. */
+.mdv-filler {
+  user-select: none;
+}
+
+.mdv-pending {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+  padding: var(--mdv-space-3);
+  border: var(--mdv-hairline) dashed var(--mdv-axis);
+  border-radius: var(--mdv-radius);
+  color: var(--mdv-text-secondary);
+  font-size: 13px;
+}
+
+.mdv-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--mdv-axis);
+  border-top-color: var(--mdv-accent);
+  border-radius: 50%;
+  animation: mdv-spin 0.7s linear infinite;
+}
+
+@keyframes mdv-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdv-spinner {
+    animation-duration: 3s;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Tables                                                                     */
+/* -------------------------------------------------------------------------- */
+
+.mdv-table-wrap {
+  position: relative;
+  overflow-x: auto;
+}
+
+.mdv-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95em;
+}
+
+.mdv-table th,
+.mdv-table td,
+.mdv-cell {
+  padding: var(--mdv-space-1) var(--mdv-space-3);
+  border: var(--mdv-hairline) solid var(--mdv-grid);
+  text-align: left;
+  vertical-align: top;
+}
+
+.mdv-table th {
+  background: var(--mdv-chrome-sunken);
+  font-weight: 600;
+}
+
+.mdv-cell.is-selected {
+  background: var(--mdv-accent-soft);
+}
+
+.mdv-table-handles {
+  display: flex;
+  gap: var(--mdv-gap);
+}
+
+.mdv-table-handles--rows {
+  flex-direction: column;
+}
+
+.mdv-table-handle-cell,
+.mdv-handle,
+.mdv-table-corner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12px;
+  min-height: 12px;
+  border: 0;
+  background: var(--mdv-chrome-sunken);
+  color: var(--mdv-text-muted);
+  cursor: pointer;
+}
+
+.mdv-handle:hover,
+.mdv-table-handle-cell:hover {
+  background: var(--mdv-accent-soft);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Images and visual blocks                                                   */
+/* -------------------------------------------------------------------------- */
+
+.mdv-image__frame {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.mdv-image__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--mdv-radius);
+}
+
+.mdv-image--center {
+  text-align: center;
+}
+.mdv-image--right {
+  text-align: right;
+}
+
+.mdv-image__resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--mdv-accent);
+  border-radius: 2px;
+  cursor: nwse-resize;
+}
+
+.mdv-image__broken,
+.mdv-image__warn {
+  padding: var(--mdv-space-3);
+  border: var(--mdv-hairline) dashed var(--mdv-axis);
+  border-radius: var(--mdv-radius);
+  color: var(--mdv-warning-text);
+  font-size: 13px;
+}
+
+.mdv-visual {
+  border: var(--mdv-hairline) solid var(--mdv-border);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-surface);
+  overflow: hidden;
+}
+
+.mdv-visual__head {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border-bottom: var(--mdv-hairline) solid var(--mdv-border);
+  background: var(--mdv-chrome);
+  font-size: 12px;
+}
+
+.mdv-visual__badge,
+.mdv-badge,
+.mdv-kind {
+  padding: 1px var(--mdv-space-2);
+  border-radius: 999px;
+  background: var(--mdv-chrome-sunken);
+  color: var(--mdv-text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.mdv-visual__form,
+.mdv-visual__attrs {
+  display: grid;
+  gap: var(--mdv-space-2);
+  padding: var(--mdv-space-3);
+}
+
+.mdv-visual__data,
+.mdv-visual__source {
+  padding: var(--mdv-space-3);
+  border-top: var(--mdv-hairline) solid var(--mdv-border);
+}
+
+.mdv-visual__empty,
+.mdv-hint,
+.mdv-inspector__note,
+.mdv-menu__note,
+.mdv-slash__hint {
+  color: var(--mdv-text-muted);
+  font-size: 12px;
+}
+
+.mdv-preview {
+  display: grid;
+  place-items: center;
+  min-height: 6rem;
+  padding: var(--mdv-space-3);
+}
+
+.mdv-preview--unavailable,
+.mdv-preview__reason {
+  color: var(--mdv-text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.mdv-preview__title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Fields, dialogs, menus                                                     */
+/* -------------------------------------------------------------------------- */
+
+.mdv-field {
+  display: grid;
+  gap: var(--mdv-space-1);
+}
+
+.mdv-field--inline {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--mdv-space-2);
+}
+
+.mdv-field--group {
+  grid-template-columns: 1fr auto;
+}
+
+.mdv-field--narrow {
+  max-width: 8rem;
+}
+
+.mdv-field__label,
+.mdv-menu__label,
+.mdv-slash__label {
+  color: var(--mdv-text-secondary);
+  font-size: 12px;
+}
+
+.mdv-field__input,
+.mdv-textarea,
+.mdv-source__text {
+  width: 100%;
+  padding: var(--mdv-space-1) var(--mdv-space-2);
+  border: var(--mdv-hairline) solid var(--mdv-axis);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-raised);
+  color: var(--mdv-text-primary);
+  font: inherit;
+  font-size: 13px;
+}
+
+.mdv-textarea,
+.mdv-textarea--data {
+  min-height: 8rem;
+  font-family: var(--mdv-font-mono);
+  resize: vertical;
+}
+
+.mdv-dialog {
+  padding: 0;
+  border: var(--mdv-hairline) solid var(--mdv-border);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-raised);
+  color: var(--mdv-text-primary);
+  box-shadow: var(--mdv-shadow);
+  min-width: min(26rem, 92vw);
+}
+
+.mdv-dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.mdv-dialog form,
+.mdv-dialog > div {
+  display: grid;
+  gap: var(--mdv-space-3);
+  padding: var(--mdv-space-4);
+}
+
+.mdv-dialog__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mdv-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--mdv-space-2);
+}
+
+.mdv-menu,
+.mdv-slash {
+  position: absolute;
+  z-index: 50;
+  min-width: 14rem;
+  padding: var(--mdv-space-1);
+  border: var(--mdv-hairline) solid var(--mdv-border);
+  border-radius: var(--mdv-radius);
+  background: var(--mdv-chrome-raised);
+  box-shadow: var(--mdv-shadow);
+}
+
+.mdv-menu__group,
+.mdv-slash__group {
+  padding: var(--mdv-space-1) var(--mdv-space-2);
+  color: var(--mdv-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mdv-menu button,
+.mdv-slash__item {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+  width: 100%;
+  padding: var(--mdv-space-1) var(--mdv-space-2);
+  border: 0;
+  border-radius: calc(var(--mdv-radius) - 1px);
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mdv-menu button:hover,
+.mdv-slash__item:hover,
+.mdv-slash__item.is-active,
+.mdv-slash__item[aria-selected='true'] {
+  background: var(--mdv-accent-soft);
+}
+
+.mdv-menu__danger {
+  color: var(--mdv-danger-text);
+}
+
+.mdv-slash__list {
+  max-height: 18rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.mdv-slash__empty {
+  padding: var(--mdv-space-2);
+  color: var(--mdv-text-muted);
+  font-size: 13px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Source pane                                                                */
+/* -------------------------------------------------------------------------- */
+
+.mdv-source {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.mdv-source__head {
+  display: flex;
+  align-items: center;
+  gap: var(--mdv-space-2);
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border-bottom: var(--mdv-hairline) solid var(--mdv-border);
+  background: var(--mdv-chrome);
+}
+
+.mdv-source__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--mdv-text-secondary);
+}
+
+.mdv-source__meta,
+.mdv-source__hint {
+  margin-left: auto;
+  color: var(--mdv-text-muted);
+  font-size: 12px;
+}
+
+.mdv-source__text {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: var(--mdv-chrome-sunken);
+  font-family: var(--mdv-font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre;
+  resize: none;
+}
+
+.mdv-diagnostics {
+  padding: var(--mdv-space-2) var(--mdv-space-3);
+  border-top: var(--mdv-hairline) solid var(--mdv-border);
+  font-size: 12px;
+}
+
+.mdv-path,
+.mdv-attr__key {
+  font-family: var(--mdv-font-mono);
+  font-size: 12px;
+  color: var(--mdv-text-secondary);
+}
+
+.mdv-inspector__row,
+.mdv-attr {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) 1fr;
+  gap: var(--mdv-space-2);
+  align-items: center;
+}
+
+.mdv-attr--new {
+  opacity: 0.8;
+}
+
+.mdv-attr__complex {
+  font-family: var(--mdv-font-mono);
+  font-size: 12px;
+  color: var(--mdv-text-muted);
+}
+
+/* -------------------------------------------------------------------------- */
+/* While an IME is composing                                                  */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * The preedit is the browser's, not ours. Suppressing the block-level selection
+ * paint keeps our highlight from drawing over a candidate the user is choosing.
+ */
+.mdv-surface.is-composing .mdv-block.is-range-selected {
+  background: transparent;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Forced colours                                                             */
+/* -------------------------------------------------------------------------- */
+
+@media (forced-colors: active) {
+  .mdv-btn,
+  .mdv-tool,
+  .mdv-notice,
+  .mdv-dialog,
+  .mdv-menu,
+  .mdv-slash {
+    border-color: CanvasText;
+  }
+
+  .mdv-block.is-node-selected,
+  .mdv-slash__item.is-active {
+    outline: var(--mdv-ring) solid Highlight;
+  }
+}

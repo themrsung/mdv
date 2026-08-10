@@ -1,0 +1,59 @@
+{
+  "//": [
+    "Language configuration for `.mdv` (SPEC 29.2).",
+    "",
+    "An .mdv file is Markdown, so this mirrors VS Code's Markdown configuration",
+    "and adds the two things Markdown does not have: MDV attribute notation is",
+    "indentation-sensitive at exactly 2 spaces per level (SPEC 5.3.1), and `#` is",
+    "a comment inside a block header (SPEC 5.3.1) even though it is a heading in",
+    "prose. `lineComment` is set because the header is where an author actually",
+    "reaches for Ctrl+/; toggling it on a prose line produces a heading, which is",
+    "why the block-scoped `mdv-block` language below exists at all."
+  ],
+  "comments": {
+    "lineComment": "#",
+    "blockComment": ["<!--", "-->"]
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "\"", "close": "\"", "notIn": ["string"] },
+    { "open": "'", "close": "'", "notIn": ["string"] },
+    { "open": "```", "close": "```", "notIn": ["string"] }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["\"", "\""],
+    ["'", "'"],
+    ["`", "`"],
+    ["_", "_"],
+    ["*", "*"]
+  ],
+  "folding": {
+    "markers": {
+      "start": "^\\s*<!--\\s*#?region\\b.*-->",
+      "end": "^\\s*<!--\\s*#?endregion\\b.*-->"
+    }
+  },
+  "wordPattern": "(\\p{Alphabetic}|\\p{Number}|\\p{Nonspacing_Mark})(((\\p{Alphabetic}|\\p{Number}|\\p{Nonspacing_Mark})|[_'-])?(\\p{Alphabetic}|\\p{Number}|\\p{Nonspacing_Mark}))*",
+  "indentationRules": {
+    "//": "SPEC 5.3.1: exactly 2 spaces per level. A key ending in `:` opens a level; a block scalar introducer does too.",
+    "increaseIndentPattern": "^\\s*[A-Za-z_][A-Za-z0-9_-]*:\\s*(?:[|>][+-]?)?\\s*$",
+    "decreaseIndentPattern": "^\\s*(?:-{3}|\\.{3})\\s*$"
+  },
+  "onEnterRules": [
+    {
+      "//": "Continue a block-sequence item inside a header.",
+      "beforeText": "^(\\s*)-\\s+\\S",
+      "action": { "indent": "none", "appendText": "- " }
+    }
+  ]
+}

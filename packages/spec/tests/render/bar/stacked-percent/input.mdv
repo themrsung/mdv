@@ -1,0 +1,29 @@
+---
+mdv: "1.0"
+title: Stacked percent bar
+---
+
+# Share of revenue by region
+
+```mdv bar
+title: Share of revenue by region
+x: quarter
+y: revenue
+series: region
+stack: percent
+height: 400
+---
+quarter | region | revenue
+Q1      | APAC   |     482
+Q1      | EMEA   |     414
+Q1      | AMER   |     344
+Q2      | APAC   |     530
+Q2      | EMEA   |     441
+Q2      | AMER   |     360
+Q3      | APAC   |     498
+Q3      | EMEA   |     470
+Q3      | AMER   |     434
+Q4      | APAC   |     640
+Q4      | EMEA   |     602
+Q4      | AMER   |     651
+```

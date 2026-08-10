@@ -1,0 +1,5 @@
+{
+  "level": 2,
+  "tags": ["bar", "stack"],
+  "note": "The worked example from SPEC 16.2. Goldens are produced at milestone M3; until then this case carries only its source and metadata."
+}

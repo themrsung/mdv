@@ -1,0 +1,9 @@
+node_modules
+dist
+out
+coverage
+pnpm-lock.yaml
+SPEC.md
+packages/spec/tests
+
+CONTRACTS.md

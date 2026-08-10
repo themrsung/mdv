@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "lib": ["ES2022", "DOM"]
+  },
+  "//": "SPEC 17.3 invariant 1: @mdv/core never TOUCHES the DOM. The DOM lib is enabled for structural TYPES only — `HTMLElement` and `Blob` appear in the Mdv facade's signatures (SPEC 21) and are passed straight through to a renderer. Calling a DOM API from this package is a bug; eslint.config.js enforces that.",
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "test"],
+  "references": [{ "path": "../spec" }, { "path": "../parser" }]
+}

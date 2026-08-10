@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/format.json",
+  "title": "MDV format specifier",
+  "description": "SPEC 6.9. A d3-format-style number pattern (\",.0f\", \"$,.2f\", \".1%\") or a strftime-style date pattern (\"%b %Y\").",
+  "type": "string",
+  "minLength": 1
+}

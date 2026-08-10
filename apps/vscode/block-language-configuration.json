@@ -1,0 +1,35 @@
+{
+  "//": [
+    "Configuration for the embedded `mdv-block` language (SPEC 29.2's",
+    "`embeddedLanguages: { \"meta.embedded.block.mdv\": \"mdv-block\" }`).",
+    "",
+    "This is what makes the contribution mean something rather than name a",
+    "language that does not exist. Inside a block — in an .mdv file or in an",
+    "`mdv` fence in a .md file — Ctrl+/ inserts a `#` comment (SPEC 5.3.1) rather",
+    "than a Markdown heading, and the flow-collection brackets of SPEC 5.3.1",
+    "auto-close. Nothing here applies to the surrounding prose."
+  ],
+  "comments": {
+    "lineComment": "#"
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"]
+  ],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "\"", "close": "\"", "notIn": ["string", "comment"] },
+    { "open": "'", "close": "'", "notIn": ["string", "comment"] }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["\"", "\""],
+    ["'", "'"]
+  ],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*[A-Za-z_][A-Za-z0-9_-]*:\\s*(?:[|>][+-]?)?\\s*$",
+    "decreaseIndentPattern": "^\\s*-{3}\\s*$"
+  }
+}

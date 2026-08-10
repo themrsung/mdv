@@ -1,0 +1,38 @@
+{
+  "name": "@mdv/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MDV core: datasets, transforms, MDVX, scales, theme cascade, validation, encoding, layout to a scene graph. No DOM.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "default": "./dist/registry.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mdv/parser": "workspace:*",
+    "@mdv/spec": "workspace:*"
+  }
+}

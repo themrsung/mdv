@@ -1,0 +1,41 @@
+{
+  "name": "@mdv/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MDV command line: render, export, lint, fmt, watch, data, validate-theme, init.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mdv": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mdv/charts": "workspace:*",
+    "@mdv/core": "workspace:*",
+    "@mdv/parser": "workspace:*",
+    "@mdv/render-pdf": "workspace:*",
+    "@mdv/render-svg": "workspace:*",
+    "@mdv/spec": "workspace:*",
+    "@mdv/themes": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0"
+  }
+}

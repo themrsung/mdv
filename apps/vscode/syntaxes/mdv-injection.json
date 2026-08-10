@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "scopeName": "markdown.mdv.codeblock",
+  "//": [
+    "SPEC 29.2/29.7: inject MDV highlighting into fenced blocks whose info string",
+    "starts with `mdv`, inside ordinary Markdown documents.",
+    "",
+    "`injectionSelector` targets the fenced-code scope rather than the whole",
+    "Markdown scope, so this grammar is only consulted where it can possibly",
+    "match — a `.md` file with no mdv fence pays nothing for having the extension",
+    "installed.",
+    "",
+    "The block body is delegated to `text.html.markdown.mdv`'s own repository so",
+    "there is exactly one definition of the header/separator/data structure. A",
+    "second copy here would drift.",
+    "",
+    "`-text.html.markdown.mdv` is load-bearing. Scope selectors match by dotted",
+    "prefix, so a bare `text.html.markdown` selector would also match inside an",
+    ".mdv file — whose own grammar already handles the block — and the two would",
+    "compete for the same fence. Excluding our own scope keeps the injection to",
+    "the case it exists for: `mdv` fences inside ordinary `.md` files."
+  ],
+  "injectionSelector": "L:text.html.markdown -text.html.markdown.mdv -(meta.embedded | comment)",
+  "patterns": [{ "include": "#mdv-fence-backtick" }, { "include": "#mdv-fence-tilde" }],
+  "repository": {
+    "mdv-fence-backtick": {
+      "begin": "(^|\\G)([ ]{0,3})(`{3,})[ \\t]*(mdv)\\b([^`]*)$",
+      "beginCaptures": {
+        "3": { "name": "punctuation.definition.markdown" },
+        "4": { "name": "fenced_code.block.language.mdv entity.name.tag.mdv keyword.control.mdv" },
+        "5": {
+          "patterns": [{ "include": "text.html.markdown.mdv#info-string" }]
+        }
+      },
+      "end": "(^|\\G)([ ]{0,3})(\\3)[ \\t]*$",
+      "endCaptures": {
+        "3": { "name": "punctuation.definition.markdown" }
+      },
+      "name": "markup.fenced_code.block.markdown.mdv",
+      "contentName": "meta.embedded.block.mdv",
+      "patterns": [{ "include": "text.html.markdown.mdv#block-body" }]
+    },
+    "mdv-fence-tilde": {
+      "begin": "(^|\\G)([ ]{0,3})(~{3,})[ \\t]*(mdv)\\b(.*)$",
+      "beginCaptures": {
+        "3": { "name": "punctuation.definition.markdown" },
+        "4": { "name": "fenced_code.block.language.mdv entity.name.tag.mdv keyword.control.mdv" },
+        "5": {
+          "patterns": [{ "include": "text.html.markdown.mdv#info-string" }]
+        }
+      },
+      "end": "(^|\\G)([ ]{0,3})(\\3)[ \\t]*$",
+      "endCaptures": {
+        "3": { "name": "punctuation.definition.markdown" }
+      },
+      "name": "markup.fenced_code.block.markdown.mdv",
+      "contentName": "meta.embedded.block.mdv",
+      "patterns": [{ "include": "text.html.markdown.mdv#block-body" }]
+    }
+  }
+}

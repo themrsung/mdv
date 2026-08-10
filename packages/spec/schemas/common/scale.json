@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/scale.json",
+  "title": "MDV scale specification",
+  "description": "SPEC 7.2.",
+  "type": "object",
+  "properties": {
+    "type": {
+      "enum": [
+        "linear",
+        "log",
+        "sqrt",
+        "pow",
+        "symlog",
+        "time",
+        "band",
+        "point",
+        "ordinal",
+        "quantize",
+        "quantile",
+        "threshold"
+      ]
+    },
+    "base": { "type": "number", "exclusiveMinimum": 0, "default": 10 },
+    "exponent": { "type": "number" },
+    "constant": { "type": "number", "default": 1 },
+    "domain": {
+      "type": "array",
+      "description": "[min, max]; a null pins only one end.",
+      "items": { "type": ["number", "string", "null"] }
+    },
+    "range": { "type": "array", "items": { "type": ["number", "string"] } },
+    "zero": {
+      "type": "boolean",
+      "description": "Default true for bar/area, false for line/scatter. Setting false on bar/area emits MDV3021."
+    },
+    "nice": { "type": "boolean", "default": true },
+    "clamp": { "type": "boolean", "default": false },
+    "padding": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.2 },
+    "reverse": { "type": "boolean", "default": false }
+  },
+  "patternProperties": { "^x-": true },
+  "unevaluatedProperties": false
+}

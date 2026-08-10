@@ -1,0 +1,262 @@
+{
+  "//": [
+    "Snippets for the `mdv` language (SPEC 29.2 `snippets`).",
+    "",
+    "Every snippet writes the `---` separator explicitly, because SPEC 5.1's",
+    "determinism rule says a body with no separator is *entirely* a header. A",
+    "snippet that omitted it would teach the mistake the rule exists to make",
+    "impossible, and the author would get MDV1203 for their trouble.",
+    "",
+    "Attribute spellings here are the ones the chart types in @mdv/charts",
+    "actually read; the bodies are small but real, so a snippet expands into a",
+    "block that renders rather than into a skeleton that errors."
+  ],
+
+  "MDV bar chart": {
+    "prefix": ["mdvbar", "bar"],
+    "description": "A bar chart block (SPEC 8.2)",
+    "body": [
+      "```mdv bar",
+      "title: ${1:Revenue by quarter}",
+      "x: ${2:quarter}",
+      "y: ${3:revenue}",
+      "---",
+      "${2:quarter} | ${3:revenue}",
+      "Q1      | 1240",
+      "Q2      | 1516",
+      "Q3      | 1402",
+      "Q4      | 1893",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV grouped bar chart": {
+    "prefix": "mdvbargrouped",
+    "description": "A bar chart with several measures (SPEC 8.2)",
+    "body": [
+      "```mdv bar",
+      "title: ${1:Revenue and profit}",
+      "x: ${2:quarter}",
+      "y: [${3:revenue}, ${4:profit}]",
+      "stack: ${5|none,normal,percent|}",
+      "legend: ${6|top,right,bottom,left,none,auto|}",
+      "---",
+      "${2:quarter} | ${3:revenue} | ${4:profit}",
+      "Q1      |    1240 |    310",
+      "Q2      |    1516 |    402",
+      "Q3      |    1402 |    366",
+      "Q4      |    1893 |    551",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV line chart": {
+    "prefix": ["mdvline", "line"],
+    "description": "A line chart block (SPEC 8.3)",
+    "body": [
+      "```mdv line",
+      "title: ${1:Monthly active users}",
+      "x: ${2:month}",
+      "y: ${3:users}",
+      "curve: ${4|linear,monotone,natural,basis,step,stepBefore,stepAfter|}",
+      "---",
+      "${2:month} | ${3:users}",
+      "2026-01 | 1200",
+      "2026-02 | 1330",
+      "2026-03 | 1410",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV area chart": {
+    "prefix": ["mdvarea", "area"],
+    "description": "An area chart block (SPEC 8.4)",
+    "body": [
+      "```mdv area",
+      "title: ${1:Traffic by source}",
+      "x: ${2:week}",
+      "y: [${3:organic}, ${4:paid}]",
+      "stack: ${5|normal,none,percent|}",
+      "---",
+      "${2:week} | ${3:organic} | ${4:paid}",
+      "W1   |     820 |  310",
+      "W2   |     910 |  280",
+      "W3   |     870 |  350",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV pie chart": {
+    "prefix": ["mdvpie", "pie"],
+    "description": "A pie chart block (SPEC 8.5)",
+    "body": [
+      "```mdv pie",
+      "title: ${1:Revenue by region}",
+      "category: ${2:region}",
+      "value: ${3:revenue}",
+      "---",
+      "${2:region} | ${3:revenue}",
+      "APAC   | 4210",
+      "EMEA   | 3180",
+      "AMER   | 5120",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV donut chart": {
+    "prefix": "mdvdonut",
+    "description": "A donut chart block (SPEC 8.5)",
+    "body": [
+      "```mdv donut",
+      "title: ${1:Share of revenue}",
+      "category: ${2:region}",
+      "value: ${3:revenue}",
+      "innerRadius: ${4:0.6}",
+      "---",
+      "${2:region} | ${3:revenue}",
+      "APAC   | 4210",
+      "EMEA   | 3180",
+      "AMER   | 5120",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV scatter plot": {
+    "prefix": ["mdvscatter", "scatter"],
+    "description": "A scatter plot block (SPEC 8.6)",
+    "body": [
+      "```mdv scatter",
+      "title: ${1:Spend against conversions}",
+      "x: ${2:spend}",
+      "y: ${3:conversions}",
+      "series: ${4:channel}",
+      "---",
+      "${2:spend} | ${3:conversions} | ${4:channel}",
+      "120   | 14          | search",
+      "260   | 31          | search",
+      "180   | 12          | social",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV metric tile": {
+    "prefix": ["mdvmetric", "metric"],
+    "description": "A single-figure metric tile (SPEC 8.13)",
+    "body": [
+      "```mdv metric",
+      "label: ${1:Monthly recurring revenue}",
+      "value: ${2:1893000}",
+      "format: ${3:$,.0f}",
+      "delta: ${4:0.34}",
+      "---",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV enhanced table": {
+    "prefix": ["mdvtable", "table"],
+    "description": "An enhanced table block (SPEC 10)",
+    "body": [
+      "```mdv table",
+      "title: ${1:Regional performance}",
+      "columns:",
+      "  ${2:revenue}:",
+      "    format: \",.0f\"",
+      "    bar: true",
+      "sort: ${3:-revenue}",
+      "---",
+      "region | ${2:revenue}",
+      "APAC   | 4210",
+      "EMEA   | 3180",
+      "AMER   | 5120",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV dataset block": {
+    "prefix": ["mdvdataset", "dataset"],
+    "description": "A named dataset other blocks reference with @id (SPEC 6.3)",
+    "body": [
+      "```mdv dataset",
+      "id: ${1:sales}",
+      "format: ${2|csv,tsv,json,ndjson,inline|}",
+      "---",
+      "quarter,revenue",
+      "Q1,1240",
+      "Q4,1893",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV block referencing a dataset": {
+    "prefix": "mdvref",
+    "description": "A chart that reads a declared dataset (SPEC 6.3)",
+    "body": [
+      "```mdv ${1|bar,line,area,pie,scatter,table|}",
+      "title: ${2:Title}",
+      "data: \"@${3:sales}\"",
+      "x: ${4:quarter}",
+      "y: ${5:revenue}",
+      "```",
+      "$0"
+    ]
+  },
+
+  "MDV front matter": {
+    "prefix": "mdvfrontmatter",
+    "description": "Document front matter (SPEC 3.4)",
+    "body": [
+      "---",
+      "mdv: \"1.0\"",
+      "title: ${1:Document title}",
+      "lang: ${2:en}",
+      "theme: ${3|default,dark,print,high-contrast|}",
+      "defaults:",
+      "  height: ${4:320}",
+      "  legend: auto",
+      "---",
+      "$0"
+    ]
+  },
+
+  "MDV accessible description": {
+    "prefix": "mdvdesc",
+    "description": "A prose description of a chart (SPEC 12.2)",
+    "body": ["desc: >", "  ${1:What the chart shows, in one or two sentences.}", "$0"]
+  },
+
+  "MDV axis block": {
+    "prefix": "mdvaxis",
+    "description": "Axis configuration (SPEC 7.5)",
+    "body": [
+      "axis:",
+      "  ${1|x,y|}:",
+      "    title: ${2:Axis title}",
+      "    format: \"${3:,.0f}\"",
+      "    zero: ${4|true,false|}",
+      "$0"
+    ]
+  },
+
+  "MDV transform": {
+    "prefix": "mdvtransform",
+    "description": "A transform pipeline (SPEC 6.6)",
+    "body": [
+      "transform:",
+      "  - filter: ${1:revenue > 1000}",
+      "  - sort: ${2:-revenue}",
+      "  - limit: ${3:10}",
+      "$0"
+    ]
+  }
+}

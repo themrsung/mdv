@@ -1,0 +1,31 @@
+{
+  "name": "@mdv/spec",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MDV specification artefacts: error-code table, JSON Schemas, conformance fixtures. No runtime logic.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./errors.json": "./errors.json",
+    "./schemas/*": "./schemas/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "errors.json",
+    "schemas",
+    "tests"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

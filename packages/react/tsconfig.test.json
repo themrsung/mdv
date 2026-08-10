@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "//": [
+    "Typecheck this package's sources AND its tests, which the build tsconfig",
+    "excludes (tests are not part of `dist`). Non-emitting and non-composite, so",
+    "it resolves every `@mdv/*` import to SOURCE through `tsconfig.base.json`'s",
+    "paths rather than to a sibling package's stale `dist`.",
+    "Run: pnpm exec tsc --noEmit -p packages/react/tsconfig.test.json"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx"],
+  "exclude": ["dist", "node_modules"]
+}

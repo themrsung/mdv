@@ -1,0 +1,9 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+# pnpm refuses to run dependency install scripts unless they are listed here.
+# esbuild's postinstall places its platform binary, which apps/vscode's bundle
+# step invokes directly. Nothing else in the tree runs an install script.
+allowBuilds:
+  esbuild: true

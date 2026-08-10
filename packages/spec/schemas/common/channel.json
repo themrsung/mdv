@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/channel.json",
+  "title": "MDV channel binding",
+  "description": "SPEC 7.1. The bare form `y: revenue` is exactly `y: {field: revenue}`.",
+  "oneOf": [
+    {
+      "type": "string",
+      "description": "Shorthand for {field: <name>}. Bracket names that are not [A-Za-z_][A-Za-z0-9_]* (SPEC 6.1.2)."
+    },
+    {
+      "type": "object",
+      "properties": {
+        "field": { "type": "string" },
+        "value": {
+          "description": "A constant instead of a field binding (e.g. a fixed color or size).",
+          "type": ["string", "number", "boolean", "null"]
+        },
+        "title": {
+          "oneOf": [{ "type": "string" }, { "const": false }],
+          "description": "Axis/legend title; false suppresses it."
+        },
+        "format": { "$ref": "./format.json" },
+        "aggregate": {
+          "enum": ["sum", "mean", "median", "min", "max", "count", "first", "last", "stddev"]
+        },
+        "scale": { "$ref": "./scale.json" },
+        "axis": {
+          "oneOf": [{ "$ref": "./axis.json" }, { "const": false }]
+        },
+        "sort": {
+          "oneOf": [
+            { "enum": ["none", "asc", "desc"] },
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        }
+      },
+      "patternProperties": { "^x-": true },
+      "unevaluatedProperties": false
+    }
+  ]
+}

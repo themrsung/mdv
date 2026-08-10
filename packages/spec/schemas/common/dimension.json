@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/dimension.json",
+  "title": "MDV dimension",
+  "description": "SPEC 5.3.3. A bare number is device pixels; a string carries a CSS-like unit. A malformed value is MDV1221.",
+  "oneOf": [
+    { "type": "number", "minimum": 0 },
+    { "type": "string", "pattern": "^-?\\d+(\\.\\d+)?(px|%|rem|em|cm|mm|in|pt)$" }
+  ]
+}

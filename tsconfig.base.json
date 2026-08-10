@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "useUnknownInCatchVariables": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "skipLibCheck": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@mdv/spec": ["packages/spec/src/index.ts"],
+      "@mdv/spec/*": ["packages/spec/src/*"],
+      "@mdv/parser": ["packages/parser/src/index.ts"],
+      "@mdv/parser/*": ["packages/parser/src/*"],
+      "@mdv/core": ["packages/core/src/index.ts"],
+      "@mdv/core/*": ["packages/core/src/*"],
+      "@mdv/charts": ["packages/charts/src/index.ts"],
+      "@mdv/charts/*": ["packages/charts/src/*"],
+      "@mdv/render-svg": ["packages/render-svg/src/index.ts"],
+      "@mdv/render-svg/*": ["packages/render-svg/src/*"],
+      "@mdv/render-pdf": ["packages/render-pdf/src/index.ts"],
+      "@mdv/render-pdf/*": ["packages/render-pdf/src/*"],
+      "@mdv/themes": ["packages/themes/src/index.ts"],
+      "@mdv/themes/*": ["packages/themes/src/*"],
+      "@mdv/react": ["packages/react/src/index.ts"],
+      "@mdv/react/*": ["packages/react/src/*"],
+      "@mdv/cli": ["packages/cli/src/index.ts"],
+      "@mdv/cli/*": ["packages/cli/src/*"]
+    }
+  }
+}

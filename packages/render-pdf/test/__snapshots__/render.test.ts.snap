@@ -1,0 +1,215 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`operator trace (SPEC 28.10) > matches the recorded trace for a small document 1`] = `
+{
+  "pages": [
+    {
+      "height": 842,
+      "operations": [
+        {
+          "args": [],
+          "op": "q",
+        },
+        {
+          "args": [
+            "/H1",
+            "<</MCID 0>>",
+          ],
+          "op": "BDC",
+        },
+        {
+          "args": [],
+          "op": "BT",
+        },
+        {
+          "args": [
+            "/F0",
+            19.5,
+          ],
+          "op": "Tf",
+        },
+        {
+          "args": [
+            0.067,
+            0.078,
+            0.094,
+          ],
+          "op": "rg",
+        },
+        {
+          "args": [
+            1,
+            0,
+            0,
+            1,
+            51.024,
+            755.717,
+          ],
+          "op": "Tm",
+        },
+        {
+          "args": [
+            "(Title)",
+          ],
+          "op": "Tj",
+        },
+        {
+          "args": [],
+          "op": "ET",
+        },
+        {
+          "args": [],
+          "op": "EMC",
+        },
+        {
+          "args": [],
+          "op": "Q",
+        },
+        {
+          "args": [],
+          "op": "q",
+        },
+        {
+          "args": [
+            "/P",
+            "<</MCID 1>>",
+          ],
+          "op": "BDC",
+        },
+        {
+          "args": [],
+          "op": "BT",
+        },
+        {
+          "args": [
+            "/F1",
+            9.75,
+          ],
+          "op": "Tf",
+        },
+        {
+          "args": [
+            0.067,
+            0.078,
+            0.094,
+          ],
+          "op": "rg",
+        },
+        {
+          "args": [
+            1,
+            0,
+            0,
+            1,
+            51.024,
+            730.181,
+          ],
+          "op": "Tm",
+        },
+        {
+          "args": [
+            "(One )",
+          ],
+          "op": "Tj",
+        },
+        {
+          "args": [
+            "/F1",
+            9.75,
+          ],
+          "op": "Tf",
+        },
+        {
+          "args": [
+            0.067,
+            0.078,
+            0.094,
+          ],
+          "op": "rg",
+        },
+        {
+          "args": [
+            1,
+            0,
+            0,
+            1,
+            69.451,
+            730.181,
+          ],
+          "op": "Tm",
+        },
+        {
+          "args": [
+            "(short )",
+          ],
+          "op": "Tj",
+        },
+        {
+          "args": [
+            "/F1",
+            9.75,
+          ],
+          "op": "Tf",
+        },
+        {
+          "args": [
+            0.067,
+            0.078,
+            0.094,
+          ],
+          "op": "rg",
+        },
+        {
+          "args": [
+            1,
+            0,
+            0,
+            1,
+            91.125,
+            730.181,
+          ],
+          "op": "Tm",
+        },
+        {
+          "args": [
+            "(line.)",
+          ],
+          "op": "Tj",
+        },
+        {
+          "args": [],
+          "op": "ET",
+        },
+        {
+          "args": [],
+          "op": "EMC",
+        },
+        {
+          "args": [],
+          "op": "Q",
+        },
+      ],
+      "pageIndex": 0,
+      "resources": [
+        "F0",
+        "F1",
+      ],
+      "width": 595,
+    },
+  ],
+  "structure": [
+    {
+      "depth": 0,
+      "tag": "Document",
+    },
+    {
+      "depth": 1,
+      "tag": "H1",
+    },
+    {
+      "depth": 1,
+      "tag": "P",
+    },
+  ],
+}
+`;

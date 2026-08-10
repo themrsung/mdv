@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/common/block.json",
+  "title": "Attributes common to every MDV visual block",
+  "description": "SPEC 8.1. Per-type schemas `allOf`-reference this file and add their own channels.",
+  "type": "object",
+  "properties": {
+    "type": { "type": "string", "description": "Only when omitted from the info string." },
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "caption": { "type": "string" },
+    "desc": {
+      "type": "string",
+      "description": "The accessible description (SPEC 12.2). Generated when absent."
+    },
+    "id": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$" },
+    "data": {
+      "type": "string",
+      "pattern": "^@[A-Za-z_][A-Za-z0-9_-]*(\\[[^\\]]*\\])?$",
+      "description": "A dataset reference, optionally projected: \"@sales[date, revenue]\". Mutually exclusive with a data section and with src."
+    },
+    "src": { "type": "string", "description": "External source (SPEC 6.4). Disabled by default." },
+    "integrity": { "type": "string", "pattern": "^sha(256|384|512)-[A-Za-z0-9+/=]+$" },
+    "format": {
+      "enum": ["auto", "table", "csv", "tsv", "json", "ndjson", "columns", "matrix"],
+      "default": "auto"
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "enum": [
+              "number",
+              "integer",
+              "string",
+              "boolean",
+              "date",
+              "datetime",
+              "time",
+              "duration",
+              "category",
+              "unknown"
+            ]
+          },
+          "format": { "$ref": "./format.json" },
+          "parse": { "type": "string" },
+          "title": { "type": "string" }
+        },
+        "unevaluatedProperties": false
+      }
+    },
+    "transform": { "type": "array", "items": { "type": "object" } },
+    "width": { "$ref": "./dimension.json", "default": "100%" },
+    "height": { "$ref": "./dimension.json", "default": 300 },
+    "aspect": { "type": "number", "exclusiveMinimum": 0 },
+    "padding": {
+      "oneOf": [
+        { "$ref": "./dimension.json" },
+        {
+          "type": "object",
+          "properties": {
+            "top": { "$ref": "./dimension.json" },
+            "right": { "$ref": "./dimension.json" },
+            "bottom": { "$ref": "./dimension.json" },
+            "left": { "$ref": "./dimension.json" }
+          },
+          "unevaluatedProperties": false
+        }
+      ],
+      "default": { "top": 8, "right": 8, "bottom": 8, "left": 8 }
+    },
+    "theme": { "type": "string" },
+    "palette": {
+      "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }]
+    },
+    "legend": {
+      "oneOf": [
+        { "enum": ["auto", "top", "right", "bottom", "left", "inline", false] },
+        {
+          "type": "object",
+          "properties": {
+            "position": { "enum": ["auto", "top", "right", "bottom", "left", "inline"] },
+            "title": { "oneOf": [{ "type": "string" }, { "const": false }] },
+            "orient": { "enum": ["horizontal", "vertical"] },
+            "columns": { "type": "integer", "minimum": 1 },
+            "maxItems": { "type": "integer", "minimum": 1, "default": 12 }
+          },
+          "unevaluatedProperties": false
+        }
+      ],
+      "default": "auto"
+    },
+    "tooltip": {
+      "oneOf": [{ "type": "boolean" }, { "type": "array", "items": { "type": "string" } }],
+      "default": true
+    },
+    "animate": { "type": "boolean", "default": true },
+    "class": { "type": "string" },
+    "fallback": { "type": "string" },
+    "table": { "enum": ["details", "visible", "hidden", "none"], "default": "details" },
+    "row": { "$ref": "./channel.json" },
+    "column": { "$ref": "./channel.json" },
+    "columns": { "type": "integer", "minimum": 1 },
+    "shareX": { "type": "boolean", "default": true },
+    "shareY": { "type": "boolean", "default": true },
+    "facetHeight": { "$ref": "./dimension.json" },
+    "axis": {
+      "type": "object",
+      "properties": {
+        "x": { "oneOf": [{ "$ref": "./axis.json" }, { "const": false }] },
+        "y": { "oneOf": [{ "$ref": "./axis.json" }, { "const": false }] }
+      },
+      "unevaluatedProperties": false
+    }
+  },
+  "patternProperties": { "^x-": true },
+  "not": {
+    "required": ["data", "src"],
+    "$comment": "MDV1204: a block may not carry both an out-of-band source and another one."
+  }
+}

@@ -1,0 +1,367 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Markdown Visual",
+  "scopeName": "text.html.markdown.mdv",
+  "fileTypes": ["mdv"],
+  "//": [
+    "SPEC 29.7. An `.mdv` file is Markdown with two additions: YAML front matter",
+    "and the visual block. This grammar contributes exactly those two, then hands",
+    "everything else to VS Code's own Markdown grammar via `include` — so a",
+    "heading, a link, a GFM table and a fenced code block in an .mdv file",
+    "highlight identically to one in a .md file, and stay that way when the",
+    "Markdown grammar is updated.",
+    "",
+    "Ordering matters: the patterns below are tried in order, so the front matter",
+    "and the mdv fence must precede `text.html.markdown` or the generic fenced",
+    "code-block rule would swallow the block and we would lose the header/data",
+    "distinction."
+  ],
+  "patterns": [
+    { "include": "#frontmatter" },
+    { "include": "#mdv-block" },
+    { "include": "text.html.markdown" }
+  ],
+  "repository": {
+    "frontmatter": {
+      "//": "SPEC 3.4: starts at byte 0, terminated by `---` or `...` on its own line.",
+      "begin": "\\A(-{3})\\s*$",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.frontmatter.begin.mdv" }
+      },
+      "end": "^(-{3}|\\.{3})\\s*$",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.frontmatter.end.mdv" }
+      },
+      "name": "meta.embedded.block.frontmatter.mdv",
+      "contentName": "meta.embedded.block.yaml",
+      "patterns": [{ "include": "source.yaml" }]
+    },
+
+    "mdv-block": {
+      "//": [
+        "The visual block of SPEC 5.1. Backtick and tilde fences are separate",
+        "rules because a back-reference to the opening run is the only way to",
+        "require the closing fence to be at least as long, and mixing the two",
+        "characters in one pattern would let ``` close a ~~~ block."
+      ],
+      "patterns": [{ "include": "#mdv-block-backtick" }, { "include": "#mdv-block-tilde" }]
+    },
+
+    "mdv-block-backtick": {
+      "begin": "(^|\\G)([ ]{0,3})(`{3,})[ \\t]*(mdv)\\b([^`]*)$",
+      "beginCaptures": {
+        "3": { "name": "punctuation.definition.mdv.begin.markdown" },
+        "4": { "name": "entity.name.tag.mdv keyword.control.mdv" },
+        "5": { "patterns": [{ "include": "#info-string" }] }
+      },
+      "end": "(^|\\G)([ ]{0,3})(\\3)[ \\t]*$",
+      "endCaptures": {
+        "3": { "name": "punctuation.definition.mdv.end.markdown" }
+      },
+      "name": "markup.fenced_code.block.mdv",
+      "patterns": [{ "include": "#block-body" }]
+    },
+
+    "mdv-block-tilde": {
+      "begin": "(^|\\G)([ ]{0,3})(~{3,})[ \\t]*(mdv)\\b(.*)$",
+      "beginCaptures": {
+        "3": { "name": "punctuation.definition.mdv.begin.markdown" },
+        "4": { "name": "entity.name.tag.mdv keyword.control.mdv" },
+        "5": { "patterns": [{ "include": "#info-string" }] }
+      },
+      "end": "(^|\\G)([ ]{0,3})(\\3)[ \\t]*$",
+      "endCaptures": {
+        "3": { "name": "punctuation.definition.mdv.end.markdown" }
+      },
+      "name": "markup.fenced_code.block.mdv",
+      "patterns": [{ "include": "#block-body" }]
+    },
+
+    "info-string": {
+      "//": "SPEC 5.2: `mdv <block-type> [key=value …]`, the leading `mdv` already consumed.",
+      "patterns": [
+        {
+          "match": "\\G[ \\t]+([A-Za-z][A-Za-z0-9-]*)(?=[ \\t]|$)",
+          "captures": {
+            "1": { "name": "support.class.block-type.mdv" }
+          }
+        },
+        {
+          "match": "([A-Za-z][A-Za-z0-9_-]*)(=)(\"[^\"]*\"|'[^']*'|[^\\s'\"]+)",
+          "captures": {
+            "1": { "name": "entity.other.attribute-name.mdv" },
+            "2": { "name": "punctuation.separator.key-value.mdv" },
+            "3": { "name": "string.unquoted.info.mdv" }
+          }
+        }
+      ]
+    },
+
+    "block-body": {
+      "//": [
+        "SPEC 5.1's determinism rule: a body with no separator is entirely a",
+        "header. That is expressed structurally here — the header rule runs until",
+        "it sees a `---` line, and only then does the data rule take over. A block",
+        "with no separator therefore highlights end-to-end as attribute notation,",
+        "which is exactly the visual cue SPEC 29.7 asks for: forgetting the",
+        "separator makes the data *look* like attributes, immediately."
+      ],
+      "patterns": [{ "include": "#separator" }, { "include": "#header" }]
+    },
+
+    "separator": {
+      "//": "SPEC 29.7: \"The separator gets its own scope so it is visually obvious when it is missing.\"",
+      "begin": "^[ \\t]*(-{3})[ \\t]*$",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.separator.mdv punctuation.section.mdv" }
+      },
+      "end": "(?=^[ ]{0,3}(?:`{3,}|~{3,})[ \\t]*$)",
+      "contentName": "meta.embedded.block.mdv.data",
+      "patterns": [{ "include": "#data-section" }]
+    },
+
+    "header": {
+      "name": "meta.embedded.block.mdv.header",
+      "patterns": [{ "include": "#attr-notation" }]
+    },
+
+    "attr-notation": {
+      "//": "SPEC 5.3.1, the supported constructs and only those.",
+      "patterns": [
+        { "include": "#comment" },
+        { "include": "#sequence-item" },
+        { "include": "#mapping-entry" },
+        { "include": "#unsupported" }
+      ]
+    },
+
+    "comment": {
+      "//": "SPEC 5.3.1: a `#` beginning a line, or preceded by whitespace outside quotes.",
+      "match": "(?:^|[ \\t])(#.*)$",
+      "captures": {
+        "1": { "name": "comment.line.number-sign.mdv" }
+      }
+    },
+
+    "sequence-item": {
+      "match": "^[ \\t]*(-)(?=[ \\t]|$)",
+      "captures": {
+        "1": { "name": "punctuation.definition.sequence.mdv keyword.operator.mdv" }
+      }
+    },
+
+    "mapping-entry": {
+      "match": "^([ ]*)(?:(-)[ ]+)?([A-Za-z_][A-Za-z0-9_-]*)(:)(?=[ \\t]|$)([ \\t]*)(.*)$",
+      "captures": {
+        "2": { "name": "punctuation.definition.sequence.mdv keyword.operator.mdv" },
+        "3": { "name": "variable.other.key.mdv entity.other.attribute-name.mdv" },
+        "4": { "name": "punctuation.separator.key-value.mdv" },
+        "6": { "patterns": [{ "include": "#value" }] }
+      }
+    },
+
+    "value": {
+      "patterns": [
+        { "include": "#comment" },
+        { "include": "#block-scalar" },
+        { "include": "#reference" },
+        { "include": "#quoted" },
+        { "include": "#boolean" },
+        { "include": "#null" },
+        { "include": "#number" },
+        { "include": "#flow" },
+        { "include": "#theme-token" },
+        { "include": "#plain" }
+      ]
+    },
+
+    "block-scalar": {
+      "//": "SPEC 5.3.1 multiline scalars: literal `|` and folded `>`, with chomping.",
+      "match": "\\G([|>])([+-]?\\d*|\\d*[+-]?)[ \\t]*$",
+      "captures": {
+        "1": { "name": "keyword.control.flow.block-scalar.mdv" },
+        "2": { "name": "constant.numeric.chomping.mdv" }
+      }
+    },
+
+    "reference": {
+      "//": "SPEC 6.3: `data: \"@sales\"`, optionally with a projection `@sales[a, b]`.",
+      "match": "(\"|')?(@)([A-Za-z_][A-Za-z0-9_-]*)(\\[[^\\]]*\\])?\\1",
+      "captures": {
+        "2": { "name": "punctuation.definition.reference.mdv" },
+        "3": { "name": "variable.other.dataset.mdv support.variable.mdv" },
+        "4": { "name": "meta.projection.mdv string.regexp.mdv" }
+      }
+    },
+
+    "theme-token": {
+      "//": "SPEC 5.3.3: colors accept theme tokens, e.g. `\"@series-1\"`. Matched after #reference.",
+      "match": "(\"|')?(@)(series-\\d+|text-muted|[a-z][a-z0-9-]*)\\1",
+      "captures": {
+        "2": { "name": "punctuation.definition.reference.mdv" },
+        "3": { "name": "support.constant.theme-token.mdv" }
+      }
+    },
+
+    "quoted": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.mdv",
+          "begin": "\"",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.mdv" } },
+          "end": "\"",
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.mdv" } },
+          "patterns": [{ "name": "constant.character.escape.mdv", "match": "\\\\." }]
+        },
+        {
+          "name": "string.quoted.single.mdv",
+          "begin": "'",
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.mdv" } },
+          "end": "'",
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end.mdv" } },
+          "patterns": [{ "name": "constant.character.escape.mdv", "match": "''" }]
+        }
+      ]
+    },
+
+    "boolean": {
+      "//": "SPEC 5.3.1: ONLY these two spellings. `yes`/`no`/`on`/`off` are strings.",
+      "match": "\\G(?:true|false)(?=[ \\t,\\]}]*(?:#.*)?$)",
+      "name": "constant.language.boolean.mdv"
+    },
+
+    "null": {
+      "match": "\\G(?:null|~)(?=[ \\t,\\]}]*(?:#.*)?$)",
+      "name": "constant.language.null.mdv"
+    },
+
+    "number": {
+      "//": "SPEC 5.3.1: the JSON number grammar, and nothing else (no octal, no sexagesimal).",
+      "match": "\\G-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?(?=[ \\t,\\]}]*(?:#.*)?$)",
+      "name": "constant.numeric.mdv"
+    },
+
+    "flow": {
+      "patterns": [
+        {
+          "name": "meta.structure.sequence.mdv",
+          "begin": "\\[",
+          "beginCaptures": { "0": { "name": "punctuation.definition.sequence.begin.mdv" } },
+          "end": "\\]",
+          "endCaptures": { "0": { "name": "punctuation.definition.sequence.end.mdv" } },
+          "patterns": [
+            { "include": "#quoted" },
+            { "include": "#flow-scalar" },
+            { "name": "punctuation.separator.sequence.mdv", "match": "," }
+          ]
+        },
+        {
+          "name": "meta.structure.mapping.mdv",
+          "begin": "\\{",
+          "beginCaptures": { "0": { "name": "punctuation.definition.mapping.begin.mdv" } },
+          "end": "\\}",
+          "endCaptures": { "0": { "name": "punctuation.definition.mapping.end.mdv" } },
+          "patterns": [
+            {
+              "match": "([A-Za-z_][A-Za-z0-9_-]*)[ \\t]*(:)",
+              "captures": {
+                "1": { "name": "variable.other.key.mdv entity.other.attribute-name.mdv" },
+                "2": { "name": "punctuation.separator.key-value.mdv" }
+              }
+            },
+            { "include": "#quoted" },
+            { "include": "#flow-scalar" },
+            { "name": "punctuation.separator.mapping.mdv", "match": "," }
+          ]
+        }
+      ]
+    },
+
+    "flow-scalar": {
+      "patterns": [
+        {
+          "match": "-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?",
+          "name": "constant.numeric.mdv"
+        },
+        { "match": "\\b(?:true|false|null)\\b", "name": "constant.language.mdv" },
+        { "match": "[^,\\]}\\s][^,\\]}]*", "name": "string.unquoted.mdv" }
+      ]
+    },
+
+    "plain": {
+      "//": "SPEC 5.3.1: a plain scalar is trimmed and may contain spaces.",
+      "match": "\\G[^#\\n]+",
+      "name": "string.unquoted.plain.mdv"
+    },
+
+    "unsupported": {
+      "//": [
+        "SPEC 5.3.2. Anchors, aliases, tags, complex keys and directives are",
+        "errors (`MDV1211`), never a silent misparse — so the grammar marks them",
+        "invalid rather than letting them look like ordinary YAML that happens to",
+        "work. A tab in the header is `MDV1210` and gets the same treatment."
+      ],
+      "patterns": [
+        { "match": "(?<=^|[ \\t])[&*][A-Za-z0-9_-]+", "name": "invalid.illegal.anchor.mdv" },
+        { "match": "!!?[A-Za-z0-9_/.-]*", "name": "invalid.illegal.tag.mdv" },
+        { "match": "^[ \\t]*\\?(?=[ \\t])", "name": "invalid.illegal.complex-key.mdv" },
+        { "match": "^%[A-Za-z]+.*$", "name": "invalid.illegal.directive.mdv" },
+        { "match": "^[ ]*\\t+", "name": "invalid.illegal.tab.mdv" }
+      ]
+    },
+
+    "data-section": {
+      "//": [
+        "SPEC 29.7: \"the data section by its detected format — pipe tables get",
+        "column-aware scopes, JSON gets JSON scopes\". A TextMate grammar cannot",
+        "read the block's `format:` attribute, so detection is by shape, which is",
+        "the same evidence a reader's `format: auto` uses (SPEC 6.2): a leading",
+        "`{`/`[` is JSON, a line with unquoted pipes is a pipe table, otherwise",
+        "delimiter-separated text."
+      ],
+      "patterns": [
+        { "include": "#data-json" },
+        { "include": "#data-table-delimiter" },
+        { "include": "#data-table-row" }
+      ]
+    },
+
+    "data-json": {
+      "begin": "\\G[ \\t]*(?=[\\[{])",
+      "end": "(?=^[ ]{0,3}(?:`{3,}|~{3,})[ \\t]*$)",
+      "contentName": "meta.embedded.block.json",
+      "patterns": [{ "include": "source.json" }]
+    },
+
+    "data-table-delimiter": {
+      "match": "^[ \\t]*\\|?[ \\t]*:?-{2,}:?[ \\t]*(?:\\|[ \\t]*:?-{2,}:?[ \\t]*)*\\|?[ \\t]*$",
+      "name": "punctuation.separator.table.mdv markup.heading.table.mdv"
+    },
+
+    "data-table-row": {
+      "//": [
+        "Column-aware scoping without a parser: the first cell of a row is scoped",
+        "as the key column (it is the category axis in every cartesian type), the",
+        "rest as values, and a numeric cell gets the numeric scope so a stray",
+        "letter in a column of numbers is visible at a glance."
+      ],
+      "match": "^[ \\t]*([^|\\n]*?)[ \\t]*(\\|)(.*)$",
+      "captures": {
+        "1": { "name": "variable.parameter.column.mdv" },
+        "2": { "name": "punctuation.separator.table.mdv" },
+        "3": { "patterns": [{ "include": "#data-cells" }] }
+      }
+    },
+
+    "data-cells": {
+      "patterns": [
+        { "match": "\\|", "name": "punctuation.separator.table.mdv" },
+        {
+          "match": "[ \\t]*(-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)[ \\t]*(?=\\||$)",
+          "captures": { "1": { "name": "constant.numeric.mdv" } }
+        },
+        { "match": "[^|]+", "name": "string.unquoted.cell.mdv" }
+      ]
+    }
+  }
+}

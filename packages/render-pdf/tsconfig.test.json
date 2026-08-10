@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "//": [
+    "Typecheck this package's sources AND its tests, which the build tsconfig",
+    "excludes (tests are not part of `dist`). Non-emitting and non-composite, so",
+    "it never fights `tsconfig.json` over build info, and — because it has no",
+    "project references — `@mdv/*` resolves through tsconfig.base.json's paths to",
+    "SOURCE rather than to a sibling package's `dist`.",
+    "Run: pnpm exec tsc --noEmit -p packages/render-pdf/tsconfig.test.json"
+  ],
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    // `@mdv/core`'s facade references `HTMLElement` structurally, so the DOM lib
+    // must be visible even though nothing here touches the DOM.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}

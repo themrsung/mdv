@@ -1,0 +1,162 @@
+/*
+ * Design tokens.
+ *
+ * The colour roles are SPEC 11.1 verbatim, so the editor chrome and any chart
+ * rendered inside it read as one system. SPEC 11.7 requires both
+ * `prefers-color-scheme` and an explicit `[data-theme]` scope under a single
+ * stylesheet, so a viewer's toggle wins in both directions; that is exactly the
+ * three-block shape below.
+ *
+ * Nothing here is derived at runtime. The dark values are the specified dark
+ * steps, not an algorithmic inversion of the light ones (SPEC 11.1).
+ */
+
+:root {
+  /* -- SPEC 11.1 roles, light ------------------------------------------- */
+  --mdv-surface: #fcfcfb;
+  --mdv-page: #f9f9f7;
+  --mdv-text-primary: #0b0b0b;
+  --mdv-text-secondary: #52514e;
+  --mdv-text-muted: #898781;
+  --mdv-grid: #e1e0d9;
+  --mdv-axis: #c3c2b7;
+  --mdv-border: rgba(11, 11, 11, 0.1);
+  --mdv-success-text: #006300;
+
+  /* -- SPEC 11.2 categorical, light ------------------------------------- */
+  --mdv-series-1: #2a78d6;
+  --mdv-series-2: #eb6834;
+  --mdv-series-3: #1baf7a;
+  --mdv-series-4: #eda100;
+  --mdv-series-5: #e87ba4;
+  --mdv-series-6: #008300;
+  --mdv-series-7: #4a3aa7;
+  --mdv-series-8: #e34948;
+
+  /* -- SPEC 11.3.1 status palette (fixed, never themed) ------------------ */
+  --mdv-danger-text: #b3261e;
+  --mdv-warning-text: #8a5300;
+
+  /* -- SPEC 11.1 type and metric tokens ---------------------------------- */
+  --mdv-font: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mdv-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --mdv-radius: 4px;
+  --mdv-hairline: 1px;
+  --mdv-gap: 2px;
+  --mdv-ring: 2px;
+
+  /* -- Editor chrome, derived from the roles above ----------------------- */
+  --mdv-chrome: #f2f1ed;
+  --mdv-chrome-raised: #ffffff;
+  --mdv-chrome-sunken: #eceae4;
+  --mdv-hover: rgba(11, 11, 11, 0.05);
+  --mdv-active: rgba(11, 11, 11, 0.09);
+  --mdv-accent: #2a78d6;
+  --mdv-accent-contrast: #ffffff;
+  --mdv-accent-soft: rgba(42, 120, 214, 0.14);
+  --mdv-selection: rgba(42, 120, 214, 0.24);
+  --mdv-shadow: 0 1px 2px rgba(11, 11, 11, 0.08), 0 8px 24px rgba(11, 11, 11, 0.1);
+  --mdv-focus: #2a78d6;
+
+  --mdv-measure: 44rem;
+  --mdv-space-1: 4px;
+  --mdv-space-2: 8px;
+  --mdv-space-3: 12px;
+  --mdv-space-4: 16px;
+  --mdv-space-5: 24px;
+  --mdv-space-6: 32px;
+
+  color-scheme: light;
+}
+
+/* The specified dark set, applied when the viewer has not chosen otherwise. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --mdv-surface: #1a1a19;
+    --mdv-page: #0d0d0d;
+    --mdv-text-primary: #ffffff;
+    --mdv-text-secondary: #c3c2b7;
+    --mdv-text-muted: #898781;
+    --mdv-grid: #2c2c2a;
+    --mdv-axis: #383835;
+    --mdv-border: rgba(255, 255, 255, 0.1);
+    --mdv-success-text: #0ca30c;
+
+    --mdv-series-1: #3987e5;
+    --mdv-series-2: #d95926;
+    --mdv-series-3: #199e70;
+    --mdv-series-4: #c98500;
+    --mdv-series-5: #d55181;
+    --mdv-series-6: #008300;
+    --mdv-series-7: #9085e9;
+    --mdv-series-8: #e66767;
+
+    --mdv-danger-text: #f2b8b5;
+    --mdv-warning-text: #e8c37a;
+
+    --mdv-chrome: #161615;
+    --mdv-chrome-raised: #232322;
+    --mdv-chrome-sunken: #111110;
+    --mdv-hover: rgba(255, 255, 255, 0.06);
+    --mdv-active: rgba(255, 255, 255, 0.11);
+    --mdv-accent: #3987e5;
+    --mdv-accent-contrast: #0d0d0d;
+    --mdv-accent-soft: rgba(57, 135, 229, 0.22);
+    --mdv-selection: rgba(57, 135, 229, 0.34);
+    --mdv-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+    --mdv-focus: #3987e5;
+
+    color-scheme: dark;
+  }
+}
+
+/* The explicit toggle. Identical values; a separate scope so it wins under a
+   light system preference as well as a dark one. */
+:root[data-theme='dark'] {
+  --mdv-surface: #1a1a19;
+  --mdv-page: #0d0d0d;
+  --mdv-text-primary: #ffffff;
+  --mdv-text-secondary: #c3c2b7;
+  --mdv-text-muted: #898781;
+  --mdv-grid: #2c2c2a;
+  --mdv-axis: #383835;
+  --mdv-border: rgba(255, 255, 255, 0.1);
+  --mdv-success-text: #0ca30c;
+
+  --mdv-series-1: #3987e5;
+  --mdv-series-2: #d95926;
+  --mdv-series-3: #199e70;
+  --mdv-series-4: #c98500;
+  --mdv-series-5: #d55181;
+  --mdv-series-6: #008300;
+  --mdv-series-7: #9085e9;
+  --mdv-series-8: #e66767;
+
+  --mdv-danger-text: #f2b8b5;
+  --mdv-warning-text: #e8c37a;
+
+  --mdv-chrome: #161615;
+  --mdv-chrome-raised: #232322;
+  --mdv-chrome-sunken: #111110;
+  --mdv-hover: rgba(255, 255, 255, 0.06);
+  --mdv-active: rgba(255, 255, 255, 0.11);
+  --mdv-accent: #3987e5;
+  --mdv-accent-contrast: #0d0d0d;
+  --mdv-accent-soft: rgba(57, 135, 229, 0.22);
+  --mdv-selection: rgba(57, 135, 229, 0.34);
+  --mdv-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --mdv-focus: #3987e5;
+
+  color-scheme: dark;
+}
+
+/* SPEC 11.7: under forced colours, drop the palette and let the system win. */
+@media (forced-colors: active) {
+  :root {
+    --mdv-border: CanvasText;
+    --mdv-grid: CanvasText;
+    --mdv-accent: Highlight;
+    --mdv-accent-contrast: HighlightText;
+    --mdv-focus: CanvasText;
+  }
+}

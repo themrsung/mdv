@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mdv.dev/schema/1.0/block/bar.json",
+  "title": "MDV bar block",
+  "description": "Verbatim from SPEC Appendix D. The reference per-type schema: every other block schema follows this shape.",
+  "type": "object",
+  "allOf": [{ "$ref": "../common/block.json" }],
+  "properties": {
+    "x": { "$ref": "../common/channel.json", "description": "Category or time bucket" },
+    "y": {
+      "oneOf": [
+        { "$ref": "../common/channel.json" },
+        { "type": "array", "items": { "$ref": "../common/channel.json" } }
+      ]
+    },
+    "series": { "$ref": "../common/channel.json" },
+    "stack": { "enum": ["none", "normal", "percent", "center"], "default": "none" },
+    "orientation": { "enum": ["vertical", "horizontal"], "default": "vertical" },
+    "barWidth": {
+      "oneOf": [{ "type": "number", "exclusiveMinimum": 0, "maximum": 24 }, { "const": "auto" }],
+      "default": "auto"
+    },
+    "corner": { "type": "number", "minimum": 0, "default": 4 },
+    "sort": {
+      "oneOf": [{ "enum": ["none", "asc", "desc"] }, { "type": "string" }],
+      "default": "none"
+    }
+  },
+  "required": ["x", "y"],
+  "not": { "required": ["series"], "properties": { "y": { "type": "array" } } },
+  "patternProperties": { "^x-": true },
+  "unevaluatedProperties": false
+}

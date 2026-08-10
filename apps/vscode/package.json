@@ -1,0 +1,461 @@
+{
+  "name": "mdv",
+  "displayName": "MDV — Markdown Visual",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MDV language support: preview, grammar, diagnostics, and export commands.",
+  "license": "MIT",
+  "publisher": "mdv",
+  "engines": {
+    "vscode": "^1.90.0",
+    "node": ">=20.11"
+  },
+  "categories": [
+    "Programming Languages",
+    "Visualization",
+    "Formatters"
+  ],
+  "keywords": [
+    "markdown",
+    "mdv",
+    "chart",
+    "visualization",
+    "data"
+  ],
+  "main": "./dist/extension.js",
+  "browser": "./dist/web/extension.js",
+  "activationEvents": [
+    "onLanguage:mdv",
+    "onLanguage:markdown",
+    "onCustomEditor:mdv.reader"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In an untrusted workspace MDV parses, validates and previews documents, but never fetches external data: the repository's own .vscode/settings.json cannot turn on network access (SPEC 29.6).",
+      "restrictedConfigurations": [
+        "mdv.security.allowExternal",
+        "mdv.security.allowedOrigins"
+      ]
+    },
+    "virtualWorkspaces": {
+      "supported": "limited",
+      "description": "Everything but PDF export works over a virtual filesystem; PDF export needs a real one."
+    }
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "mdv",
+        "extensions": [
+          ".mdv"
+        ],
+        "aliases": [
+          "Markdown Visual",
+          "mdv"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/mdv-light.svg",
+          "dark": "./icons/mdv-dark.svg"
+        }
+      },
+      {
+        "id": "mdv-block",
+        "aliases": [
+          "MDV Visual Block"
+        ],
+        "configuration": "./block-language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "mdv",
+        "scopeName": "text.html.markdown.mdv",
+        "path": "./syntaxes/mdv.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.mdv": "mdv-block"
+        }
+      },
+      {
+        "scopeName": "markdown.mdv.codeblock",
+        "path": "./syntaxes/mdv-injection.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.mdv": "mdv-block"
+        }
+      }
+    ],
+    "markdown.markdownItPlugins": true,
+    "snippets": [
+      {
+        "language": "mdv",
+        "path": "./snippets/mdv.json"
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "mdv.reader",
+        "displayName": "MDV Reader",
+        "selector": [
+          {
+            "filenamePattern": "*.mdv"
+          }
+        ],
+        "priority": "option"
+      }
+    ],
+    "commands": [
+      {
+        "command": "mdv.showPreview",
+        "title": "Open Preview",
+        "category": "MDV",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "mdv.showPreviewToSide",
+        "title": "Open Preview to the Side",
+        "category": "MDV",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "mdv.export.pdf",
+        "title": "Export to PDF",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.export.html",
+        "title": "Export to HTML",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.export.svg",
+        "title": "Export to SVG",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.export.png",
+        "title": "Export to PNG",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.exportBlock",
+        "title": "Export Block as Image",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.insertChart",
+        "title": "Insert Chart…",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.tableToChart",
+        "title": "Convert Table to Chart",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.pasteData",
+        "title": "Paste as Dataset",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.showData",
+        "title": "Show Resolved Data",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.validateTheme",
+        "title": "Validate Theme",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.togglePreviewTheme",
+        "title": "Toggle Dark Preview",
+        "category": "MDV"
+      },
+      {
+        "command": "mdv.allowExternalForWorkspace",
+        "title": "Allow External Data for this Workspace",
+        "category": "MDV"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "mdv.showPreview",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorLangId == mdv"
+      },
+      {
+        "command": "mdv.showPreviewToSide",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "editorLangId == mdv"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "mdv.showPreview",
+          "when": "editorLangId == mdv || editorLangId == markdown"
+        },
+        {
+          "command": "mdv.showPreviewToSide",
+          "when": "editorLangId == mdv || editorLangId == markdown"
+        },
+        {
+          "command": "mdv.export.pdf",
+          "when": "editorLangId == mdv && mdv.hostHasNode"
+        },
+        {
+          "command": "mdv.export.png",
+          "when": "editorLangId == mdv && mdv.hostHasNode"
+        },
+        {
+          "command": "mdv.export.html",
+          "when": "editorLangId == mdv"
+        },
+        {
+          "command": "mdv.export.svg",
+          "when": "editorLangId == mdv"
+        },
+        {
+          "command": "mdv.exportBlock",
+          "when": "editorLangId == mdv"
+        },
+        {
+          "command": "mdv.insertChart",
+          "when": "editorLangId == mdv || editorLangId == markdown"
+        },
+        {
+          "command": "mdv.tableToChart",
+          "when": "editorLangId == mdv || editorLangId == markdown"
+        },
+        {
+          "command": "mdv.pasteData",
+          "when": "editorLangId == mdv || editorLangId == markdown"
+        },
+        {
+          "command": "mdv.showData",
+          "when": "editorLangId == mdv"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "mdv.showPreviewToSide",
+          "when": "editorLangId == mdv",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "mdv.exportBlock",
+          "when": "editorLangId == mdv",
+          "group": "mdv@1"
+        },
+        {
+          "command": "mdv.tableToChart",
+          "when": "editorLangId == mdv || editorLangId == markdown",
+          "group": "mdv@2"
+        },
+        {
+          "command": "mdv.pasteData",
+          "when": "editorLangId == mdv || editorLangId == markdown",
+          "group": "mdv@3"
+        },
+        {
+          "command": "mdv.showData",
+          "when": "editorLangId == mdv",
+          "group": "mdv@4"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "MDV",
+      "properties": {
+        "mdv.preview.theme": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "light",
+            "dark",
+            "high-contrast"
+          ],
+          "enumDescriptions": [
+            "Follow the editor's colour theme.",
+            "Always use the light MDV theme.",
+            "Always use the dark MDV theme.",
+            "Always use the high-contrast MDV theme."
+          ],
+          "default": "auto",
+          "scope": "window",
+          "description": "Which MDV theme the preview renders with."
+        },
+        "mdv.preview.scrollSync": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Keep the preview and the editor scrolled together, and reveal a block's source when it is clicked."
+        },
+        "mdv.preview.debounceMs": {
+          "type": "number",
+          "default": 150,
+          "minimum": 16,
+          "maximum": 5000,
+          "scope": "window",
+          "description": "How long to wait after the last keystroke before re-rendering the preview. Clamped to one frame at the low end."
+        },
+        "mdv.preview.openOnStartup": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Open the preview automatically when the window starts with an .mdv file active."
+        },
+        "mdv.validate.enable": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Report MDV diagnostics as you type."
+        },
+        "mdv.validate.level": {
+          "type": "number",
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "enumDescriptions": [
+            "Level 1 — the core chart types.",
+            "Level 2 — the full chart set, transforms and interaction.",
+            "Level 3 — everything, including math and plugins."
+          ],
+          "default": 2,
+          "scope": "resource",
+          "description": "The conformance level (SPEC 16.1) documents are judged against."
+        },
+        "mdv.validate.strict": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "Promote warnings to errors (SPEC 14.3)."
+        },
+        "mdv.format.enable": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Register MDV as a formatter for .mdv documents."
+        },
+        "mdv.format.attributeOrder": {
+          "type": "string",
+          "enum": [
+            "canonical",
+            "alphabetical",
+            "preserve"
+          ],
+          "enumDescriptions": [
+            "The order SPEC 26 prescribes.",
+            "Sort attribute keys by codepoint.",
+            "Leave the author's order alone."
+          ],
+          "default": "canonical",
+          "scope": "resource",
+          "description": "How block header attributes are ordered when formatting."
+        },
+        "mdv.security.allowExternal": {
+          "type": "boolean",
+          "default": false,
+          "scope": "machine-overridable",
+          "markdownDescription": "Allow documents to load data from `src:` URLs. Off by default, and **a workspace cannot turn this on for itself** — a repository must not be able to grant network access to its own documents (SPEC 29.6)."
+        },
+        "mdv.security.allowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "machine-overridable",
+          "markdownDescription": "Origins external data may be fetched from, e.g. `https://data.example.com`. An empty list with `#mdv.security.allowExternal#` on permits any origin the reader's own policy allows."
+        },
+        "mdv.export.pdf.pageSize": {
+          "type": "string",
+          "enum": [
+            "A4",
+            "A3",
+            "A5",
+            "Letter",
+            "Legal",
+            "Tabloid"
+          ],
+          "default": "A4",
+          "scope": "resource",
+          "description": "Page size for PDF export."
+        },
+        "mdv.export.defaultDirectory": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Where exports are written. Relative paths resolve against the workspace folder; empty means beside the source file."
+        },
+        "mdv.completion.columnNames": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Offer the column names of a block's own data as completions for encoding channels."
+        },
+        "mdv.codeLens.enable": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "description": "Show Preview / Export SVG / Show data actions above each visual block."
+        },
+        "mdv.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "scope": "window",
+          "description": "Log pipeline activity to the MDV output channel. (The SPEC 29.4 language server is not implemented; this traces the in-process engine.)"
+        }
+      }
+    },
+    "configurationDefaults": {
+      "[mdv]": {
+        "editor.wordWrap": "on",
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "pnpm run build:extension && pnpm run build:webview && pnpm run build:web",
+    "build:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --platform=node --format=cjs --target=node20 --external:vscode --minify",
+    "build:webview": "esbuild src/webview/main.ts --bundle --outfile=dist/webview.js --platform=browser --format=iife --target=es2022 --minify",
+    "build:web": "esbuild src/extension.ts --bundle --outfile=dist/web/extension.js --platform=browser --format=cjs --target=es2022 --external:vscode --define:process.env.NODE_ENV=\"'production'\" --minify",
+    "dev": "pnpm run build:extension --sourcemap --minify=false && pnpm run build:webview --sourcemap --minify=false",
+    "watch": "pnpm run build:extension --sourcemap --minify=false --watch",
+    "clean": "rm -rf dist *.vsix",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@mdv/charts": "workspace:*",
+    "@mdv/core": "workspace:*",
+    "@mdv/parser": "workspace:*",
+    "@mdv/render-svg": "workspace:*",
+    "@mdv/themes": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.125.0",
+    "esbuild": "^0.28.2"
+  }
+}
