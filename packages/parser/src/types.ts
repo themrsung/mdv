@@ -289,6 +289,24 @@ export interface MdvBlock extends UnistNode {
     /** The fence run that opened the block, e.g. '```' or '~~~~'. */
     fence: string;
   };
+  /**
+   * Where `raw.data` came from, present exactly when the block has a `---`
+   * separator (SPEC 5.1).
+   *
+   * `raw.data` is text with the container indentation already stripped, so it
+   * cannot be located in the source by searching for it, and a host must not go
+   * looking for the separator itself — where a block's header stops and its data
+   * starts is this package's decision, not a regular expression anyone may
+   * re-derive. Recorded so the language server can fold a data section
+   * independently of the block that holds it (SPEC 29.4) and so a reader that
+   * rejects a row can point at the row.
+   *
+   * Empty and collapsed at the end of the separator line when the separator is
+   * the last line of the block: a data section was declared and none was given.
+   * Absent — not empty — when there is no separator at all, because then the
+   * whole body is header and there is no data section to point at.
+   */
+  dataPosition?: Range;
   /** Set at resolve (SPEC 18 stage 2). */
   data?: TableRef;
   /** The conformance level this block requires (SPEC 16.1). */

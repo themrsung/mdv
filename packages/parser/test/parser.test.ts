@@ -417,6 +417,51 @@ describe('SPEC 5.4 — data section', () => {
     const doc = parse('```mdv sparkline data="1,4,2,8"\n```\n');
     expect(codes(doc)).not.toContain('MDV1204');
   });
+
+  // `raw.data` has the indentation taken off, so it cannot be found in the
+  // source by searching for it. Where the data section sits is the parser's
+  // answer to give, and a host that folds it or points at a row needs it.
+  it('records where the data section is', () => {
+    const source = '```mdv bar\nx: a\n---\np | 1\nq | 2\n```\n';
+    const block = firstBlock(parse(source));
+    const range = block.dataPosition;
+    if (range === undefined) throw new Error('no dataPosition');
+    expect(source.slice(range.start.offset, range.end.offset)).toBe('p | 1\nq | 2');
+  });
+
+  it('points past the container indentation, like `raw.data` does', () => {
+    const source = '> ```mdv bar\n> x: a\n> ---\n>   padded | row\n> ```\n';
+    const block = directivesOrBlocks(parse(source));
+    const range = block.dataPosition;
+    if (range === undefined) throw new Error('no dataPosition');
+    expect(source.slice(range.start.offset, range.end.offset)).toBe('  padded | row');
+  });
+
+  // Absent, not empty: the whole body is header and there is no data section to
+  // point at. A host folding data sections must fold nothing here.
+  it('is absent when there is no separator', () => {
+    const block = firstBlock(parse('```mdv bar\nx: a\ny: b\n```\n'));
+    expect(block.dataPosition).toBeUndefined();
+  });
+
+  // Present and empty: a data section was declared and none was given. That is
+  // a different thing to say, and MDV1202 says it separately.
+  it('is empty at the end of the separator when the section is', () => {
+    const source = '```mdv bar\nx: a\n---\n```\n';
+    const block = firstBlock(parse(source));
+    const range = block.dataPosition;
+    if (range === undefined) throw new Error('no dataPosition');
+    expect(range.start.offset).toBe(range.end.offset);
+    expect(source.slice(0, range.start.offset)).toBe('```mdv bar\nx: a\n---');
+  });
+
+  it('covers an unterminated block to the end of the document', () => {
+    const source = '```mdv bar\nx: a\n---\np | 1\n';
+    const block = firstBlock(parse(source));
+    const range = block.dataPosition;
+    if (range === undefined) throw new Error('no dataPosition');
+    expect(source.slice(range.start.offset, range.end.offset)).toBe('p | 1');
+  });
 });
 
 describe('SPEC 5.5 — the attribute cascade inside a block', () => {

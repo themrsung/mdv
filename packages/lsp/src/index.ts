@@ -27,6 +27,8 @@ export {
 
 export { formatting, type FormatterOptions } from './features/formatting.js';
 
+export { symbols } from './features/symbols.js';
+
 export { MAX_DIFF_LINES, editsWithin, splitLines, textEdits, type LineEdit } from './edits.js';
 
 export {

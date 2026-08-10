@@ -516,6 +516,15 @@ export interface ClientCapabilities {
       readonly dynamicRegistration?: boolean;
       readonly relatedDocumentSupport?: boolean;
     };
+    readonly foldingRange?: {
+      /**
+       * The client folds whole lines only. Every range this server sends is one,
+       * so nothing branches on it — it is declared to say that on purpose.
+       */
+      readonly lineFoldingOnly?: boolean;
+      /** Yes, the nesting is the protocol's (LSP 3.17 `FoldingRangeClientCapabilities`). */
+      readonly foldingRange?: { readonly collapsedText?: boolean };
+    };
   };
   readonly workspace?: {
     readonly configuration?: boolean;

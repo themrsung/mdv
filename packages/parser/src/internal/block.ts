@@ -160,7 +160,7 @@ export function buildVisualBlock(
   const id = attrs['id'];
   if (typeof id === 'string' && id.length > 0) bag.tagBlock(mark, id);
 
-  return {
+  const block: MdvBlock = {
     type: 'mdvBlock',
     blockType,
     attrs,
@@ -169,6 +169,20 @@ export function buildVisualBlock(
     level: levelOfBlockType(blockType),
     position: root.range(startOffset, endOffset),
   };
+
+  // Where the data section is, for the hosts that need to address it rather
+  // than just read it — folding it on its own in the LSP (SPEC 29.4), pointing
+  // at the row a reader rejected. Only the parser knows where the separator
+  // fell, and it is the only thing entitled to say so.
+  if (separator !== -1) {
+    const separatorEnd = root.lineEnd(startLine + 1 + separator);
+    block.dataPosition = root.range(
+      dataLines[0]?.offset ?? separatorEnd,
+      Math.max(separatorEnd, root.lineEnd(contentEnd)),
+    );
+  }
+
+  return block;
 }
 
 /** `true` when the info string of a fenced code block makes it a visual block. */

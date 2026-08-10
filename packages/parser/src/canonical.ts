@@ -13,8 +13,20 @@
 
 import { compareStrings } from './internal/source.js';
 
-/** Keys whose whole value is source coordinates, dropped when positions are off. */
-const POSITIONAL: ReadonlySet<string> = new Set(['range', 'attrsPosition', 'mdvAttrsPosition']);
+/**
+ * Keys whose whole value is source coordinates, dropped when positions are off.
+ *
+ * Every carrier of coordinates that is not literally named `position` has to be
+ * listed here, or {@link sameDocument} starts comparing where the text sits
+ * instead of what it says — and the formatter, whose whole job is to move text,
+ * would then refuse every document it was asked to format.
+ */
+const POSITIONAL: ReadonlySet<string> = new Set([
+  'range',
+  'attrsPosition',
+  'mdvAttrsPosition',
+  'dataPosition',
+]);
 
 /** Options for {@link canonicalAst}. */
 export interface CanonicalOptions {
