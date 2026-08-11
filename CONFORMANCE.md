@@ -11,7 +11,7 @@
 | | Total | Passed | Failed | Skipped |
 | --- | ---: | ---: | ---: | ---: |
 | Cases | 13 | 13 | 0 | 0 |
-| Checks | 79 | 79 | 0 | 0 |
+| Checks | 80 | 80 | 0 | 0 |
 
 ## Cases
 
@@ -25,7 +25,7 @@
 | `render/bar/stacked-percent` | 2 | pass | ✓ | ✓ | ✓ |  |  | ✓ |  | ✓ |
 | `render/donut/center` | 1 | pass | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |
 | `render/error-cards/unknown-field` | 1 | pass | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ✓ |
-| `render/line/multi-series` | 1 | pass | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |
+| `render/line/multi-series` | 1 | pass | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ |
 | `render/metric/kpi-row` | 1 | pass | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ✓ |
 | `render/pie/simple` | 1 | pass | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |
 | `render/scatter/two-measures` | 1 | pass | ✓ | ✓ | ✓ | ✓ |  | ✓ |  | ✓ |
@@ -52,7 +52,7 @@
 | `type.scatter` `scatter` | 1 | 8.6 | `render/scatter/two-measures` |
 | `type.metric` `metric` | 1 | 8.13 | `render/metric/kpi-row` |
 | `type.table` `table` | 1 | 10.1 | `render/table/enhanced` |
-| `theme.tokens` Theme tokens | 1 | 11.1 | `a11y/table-view/details`, `data/csv/quoted-fields`, `data/datasets/shared-reference`, `data/tsv/simple`, `render/area/stacked`, `render/bar/stacked-percent`, `render/donut/center`, `render/error-cards/unknown-field`, `render/line/multi-series`, `render/metric/kpi-row`, `render/pie/simple`, `render/scatter/two-measures`, `render/table/enhanced` |
+| `theme.tokens` Theme tokens | 1 | 11.1 | `render/line/multi-series` |
 | `render.marks` Mark specifications | 1 | 11.4 | `a11y/table-view/details`, `data/csv/quoted-fields`, `data/datasets/shared-reference`, `data/tsv/simple`, `render/area/stacked`, `render/bar/stacked-percent`, `render/donut/center`, `render/error-cards/unknown-field`, `render/line/multi-series`, `render/metric/kpi-row`, `render/pie/simple`, `render/scatter/two-measures`, `render/table/enhanced` |
 | `a11y.names` Accessible names | 1 | 12.1 | `a11y/table-view/details`, `data/csv/quoted-fields`, `data/datasets/shared-reference`, `data/tsv/simple`, `render/area/stacked`, `render/bar/stacked-percent`, `render/donut/center`, `render/error-cards/unknown-field`, `render/line/multi-series`, `render/metric/kpi-row`, `render/pie/simple`, `render/scatter/two-measures`, `render/table/enhanced` |
 | `a11y.table-view` The table view | 1 | 12.3 | `a11y/table-view/details` |

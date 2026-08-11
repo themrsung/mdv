@@ -26,6 +26,8 @@ async function documentOf(source: string): Promise<ResolvedDocument> {
 interface CoverageSpec {
   /** Checks that passed; every other check is absent rather than failing. */
   readonly checks?: readonly CheckName[];
+  /** Checks that ran to a skip — present in the result, but proving nothing. */
+  readonly skipped?: readonly CheckName[];
   /** The rendered output, when the test is about what was drawn. */
   readonly svg?: string;
   readonly meta?: Partial<CaseMeta>;
@@ -33,7 +35,14 @@ interface CoverageSpec {
 
 /** The ids `source` covers. */
 async function covers(source: string, spec: CoverageSpec = {}): Promise<readonly string[]> {
-  const checks: CheckResult[] = (spec.checks ?? []).map((check) => ({ check, status: 'pass' }));
+  const checks: CheckResult[] = [
+    ...(spec.checks ?? []).map((check): CheckResult => ({ check, status: 'pass' })),
+    ...(spec.skipped ?? []).map((check): CheckResult => ({
+      check,
+      status: 'skip',
+      reason: 'nothing pinned',
+    })),
+  ];
   return coverageOf({
     meta: { level: 1, tags: [], covers: [], pin: [], ...spec.meta },
     document: await documentOf(source),
@@ -118,6 +127,29 @@ North,120
       const svg = '<g class="mdv-error-card-shadow" />';
 
       expect(await covers(BAR, { checks: ['render'], svg })).not.toContain('render.error-cards');
+    });
+  });
+
+  /**
+   * The requirement is that the marks are painted from the token set, and one
+   * render cannot show that: the light theme is the default surface, so a
+   * build with the light palette written into it passes `render` and reads no
+   * token at all. Only the second render, of the same document under the other
+   * theme, is evidence.
+   */
+  describe('theme tokens (SPEC 11.1)', () => {
+    it('is not claimed by the light render alone', async () => {
+      expect(await covers(BAR, { checks: ['render'] })).not.toContain('theme.tokens');
+    });
+
+    it('is claimed when the case also held to a dark render', async () => {
+      expect(await covers(BAR, { checks: ['render', 'dark'] })).toContain('theme.tokens');
+    });
+
+    it('is not claimed by a dark check that skipped for want of a golden', async () => {
+      expect(await covers(BAR, { checks: ['render'], skipped: ['dark'] })).not.toContain(
+        'theme.tokens',
+      );
     });
   });
 

@@ -4,9 +4,10 @@
     "line",
     "series"
   ],
-  "note": "SPEC 8.3: wide-form y, a monotone curve, and direct end labels.",
+  "note": "SPEC 8.3: wide-form y, a monotone curve, and direct end labels. This is also the corpus's dark case (SPEC 11.1): three series reach three palette entries and the axes, grid and labels reach the surface and text tokens, so re-rendering the same document under the dark theme is what shows the marks are painted from the token set rather than from a hard-coded light palette.",
   "pin": [
     "ast",
-    "svg"
+    "svg",
+    "dark"
   ]
 }

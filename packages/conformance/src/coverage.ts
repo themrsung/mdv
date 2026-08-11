@@ -181,11 +181,23 @@ function tableView(block: ResolvedBlock): boolean {
 // Output (SPEC 12, SPEC 22, SPEC 28)
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * What the rendered artefacts prove.
+ *
+ * `theme.tokens` (SPEC 11.1) is claimed by the *dark* render, not the light
+ * one. The light render is the default surface, so it is satisfied by a build
+ * that hard-codes the light palette and never reads a token at all; only the
+ * second render, of the same document under the other theme, can show that the
+ * marks are painted *from* the token set. That is why the dark golden exists.
+ *
+ * A `dark` check that skipped therefore contributes nothing here: skipping is
+ * how a case says it pinned no dark golden, and a requirement reached by a
+ * check that did not run would be exactly the unsubstantiated claim the
+ * coverage rule exists to prevent.
+ */
 function addRender(input: CoverageInput, add: (id: string) => void): void {
-  if (passed(input.checks, 'render')) {
-    add('render.marks');
-    add('theme.tokens');
-  }
+  if (passed(input.checks, 'render')) add('render.marks');
+  if (passed(input.checks, 'dark')) add('theme.tokens');
   if (passed(input.checks, 'pdf')) add('export.pdf');
 
   const svg = input.svg;
