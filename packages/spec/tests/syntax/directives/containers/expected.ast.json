@@ -1,0 +1,514 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            46,
+            62
+          ],
+          "type": "text",
+          "value": "Quarterly review"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        44,
+        62
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            64,
+            298
+          ],
+          "type": "text",
+          "value": "Block directives are containers, so what is inside them is still Markdown and\nstill MDV. The grid holds two chart blocks; the callout holds a paragraph; the\nfigure is a leaf, and takes its caption from an attribute rather than a body."
+        }
+      ],
+      "position": [
+        64,
+        298
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "cols": 2,
+        "gap": 16
+      },
+      "attrsPosition": {
+        "cols": {
+          "end": {
+            "column": 19,
+            "line": 12,
+            "offset": 318
+          },
+          "start": {
+            "column": 18,
+            "line": 12,
+            "offset": 317
+          }
+        },
+        "gap": {
+          "end": {
+            "column": 26,
+            "line": 12,
+            "offset": 325
+          },
+          "start": {
+            "column": 24,
+            "line": 12,
+            "offset": 323
+          }
+        }
+      },
+      "children": [
+        {
+          "attrs": {
+            "title": "Revenue",
+            "type": "bar",
+            "x": "region",
+            "y": "revenue"
+          },
+          "attrsPosition": {
+            "title": {
+              "end": {
+                "column": 15,
+                "line": 15,
+                "offset": 353
+              },
+              "start": {
+                "column": 8,
+                "line": 15,
+                "offset": 346
+              }
+            },
+            "type": {
+              "end": {
+                "column": 11,
+                "line": 14,
+                "offset": 338
+              },
+              "start": {
+                "column": 8,
+                "line": 14,
+                "offset": 335
+              }
+            },
+            "x": {
+              "end": {
+                "column": 10,
+                "line": 16,
+                "offset": 363
+              },
+              "start": {
+                "column": 4,
+                "line": 16,
+                "offset": 357
+              }
+            },
+            "y": {
+              "end": {
+                "column": 11,
+                "line": 17,
+                "offset": 374
+              },
+              "start": {
+                "column": 4,
+                "line": 17,
+                "offset": 367
+              }
+            }
+          },
+          "blockType": "bar",
+          "data": {
+            "datasetId": "#block-0",
+            "key": "#block-0||"
+          },
+          "dataPosition": {
+            "end": {
+              "column": 9,
+              "line": 21,
+              "offset": 412
+            },
+            "start": {
+              "column": 1,
+              "line": 19,
+              "offset": 379
+            }
+          },
+          "level": 1,
+          "position": [
+            328,
+            416
+          ],
+          "raw": {
+            "data": "region,revenue\nNorth,120\nSouth,84\n",
+            "fence": "```",
+            "header": "title: Revenue\nx: region\ny: revenue\n"
+          },
+          "type": "mdvBlock"
+        },
+        {
+          "attrs": {
+            "title": "Trend",
+            "type": "line",
+            "x": "month",
+            "y": "revenue"
+          },
+          "attrsPosition": {
+            "title": {
+              "end": {
+                "column": 13,
+                "line": 25,
+                "offset": 442
+              },
+              "start": {
+                "column": 8,
+                "line": 25,
+                "offset": 437
+              }
+            },
+            "type": {
+              "end": {
+                "column": 12,
+                "line": 24,
+                "offset": 429
+              },
+              "start": {
+                "column": 8,
+                "line": 24,
+                "offset": 425
+              }
+            },
+            "x": {
+              "end": {
+                "column": 9,
+                "line": 26,
+                "offset": 451
+              },
+              "start": {
+                "column": 4,
+                "line": 26,
+                "offset": 446
+              }
+            },
+            "y": {
+              "end": {
+                "column": 11,
+                "line": 27,
+                "offset": 462
+              },
+              "start": {
+                "column": 4,
+                "line": 27,
+                "offset": 455
+              }
+            }
+          },
+          "blockType": "line",
+          "data": {
+            "datasetId": "#block-1",
+            "key": "#block-1||"
+          },
+          "dataPosition": {
+            "end": {
+              "column": 12,
+              "line": 31,
+              "offset": 504
+            },
+            "start": {
+              "column": 1,
+              "line": 29,
+              "offset": 467
+            }
+          },
+          "level": 1,
+          "position": [
+            418,
+            508
+          ],
+          "raw": {
+            "data": "month,revenue\n2026-01,120\n2026-02,148\n",
+            "fence": "```",
+            "header": "title: Trend\nx: month\ny: revenue\n"
+          },
+          "type": "mdvBlock"
+        }
+      ],
+      "kind": "container",
+      "name": "mdv-grid",
+      "position": [
+        300,
+        513
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "attrs": {
+        "kind": "note"
+      },
+      "attrsPosition": {
+        "kind": {
+          "end": {
+            "column": 25,
+            "line": 36,
+            "offset": 539
+          },
+          "start": {
+            "column": 21,
+            "line": 36,
+            "offset": 535
+          }
+        }
+      },
+      "children": [
+        {
+          "children": [
+            {
+              "position": [
+                542,
+                618
+              ],
+              "type": "text",
+              "value": "The grid closes before the callout opens, so neither nests inside the other."
+            }
+          ],
+          "position": [
+            542,
+            618
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "kind": "container",
+      "name": "mdv-callout",
+      "position": [
+        515,
+        623
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "attrs": {
+        "caption": "Revenue by region, 2026",
+        "id": "fig-revenue"
+      },
+      "attrsPosition": {
+        "caption": {
+          "end": {
+            "column": 47,
+            "line": 42,
+            "offset": 671
+          },
+          "start": {
+            "column": 22,
+            "line": 42,
+            "offset": 646
+          }
+        },
+        "id": {
+          "end": {
+            "column": 62,
+            "line": 42,
+            "offset": 686
+          },
+          "start": {
+            "column": 51,
+            "line": 42,
+            "offset": 675
+          }
+        }
+      },
+      "kind": "leaf",
+      "name": "mdv-figure",
+      "position": [
+        625,
+        687
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            689,
+            735
+          ],
+          "type": "text",
+          "value": "A trailing paragraph, outside every directive."
+        }
+      ],
+      "position": [
+        689,
+        735
+      ],
+      "type": "paragraph"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 22,
+          "offset": 416
+        },
+        "start": {
+          "column": 1,
+          "line": 14,
+          "offset": 328
+        }
+      },
+      "raw": "region,revenue\nNorth,120\nSouth,84\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "North",
+            120
+          ],
+          [
+            "South",
+            84
+          ]
+        ]
+      }
+    },
+    "#block-1": {
+      "id": "#block-1",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 32,
+          "offset": 508
+        },
+        "start": {
+          "column": 1,
+          "line": 24,
+          "offset": 418
+        }
+      },
+      "raw": "month,revenue\n2026-01,120\n2026-02,148\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "month",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            {},
+            120
+          ],
+          [
+            {},
+            148
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 24,
+          "line": 3,
+          "offset": 38
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 42
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Quarterly review"
+  },
+  "position": [
+    0,
+    736
+  ],
+  "type": "root"
+}

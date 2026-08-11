@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["directives", "syntax"],
+  "note": "SPEC 9.1: the three shapes of a block directive — a container holding visual blocks, a container holding prose, and a leaf that carries only attributes. What is inside a container is parsed as ordinary content, so the charts resolve exactly as they would at the top level.",
+  "pin": ["ast"]
+}

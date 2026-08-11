@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["directives", "sparkline", "syntax"],
+  "note": "SPEC 9.2: the inline forms, and the three ways of not writing one — a backslash escape, a code span, and a name without the mandatory `mdv-` prefix. All three must survive as text, because a document that spells `:spark` means it for some other renderer.",
+  "pin": ["ast"]
+}

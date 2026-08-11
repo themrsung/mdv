@@ -1,0 +1,16 @@
+---
+mdv: "1.0"
+title: Inline directives
+---
+
+# Inline directives
+
+Inline directives run inside a sentence and leave the rest of the line as
+ordinary Markdown. Revenue rose :mdv-delta[+12.4%]{tone=up} on the quarter,
+tracking :mdv-spark[120,148,131,167]{type=line} against a target of
+:mdv-metric[160]{label="Target" unit="k"}, which the **bold** text around them
+is unaffected by.
+
+An escaped \:mdv-spark is a literal colon, and `:mdv-spark[1,2]` inside code is
+code. A name without the prefix — :spark[1,2] — belongs to some other
+vocabulary and is left alone.

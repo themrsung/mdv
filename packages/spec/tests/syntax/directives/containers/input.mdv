@@ -1,0 +1,44 @@
+---
+mdv: "1.0"
+title: Quarterly review
+---
+
+# Quarterly review
+
+Block directives are containers, so what is inside them is still Markdown and
+still MDV. The grid holds two chart blocks; the callout holds a paragraph; the
+figure is a leaf, and takes its caption from an attribute rather than a body.
+
+:::mdv-grid{cols=2 gap=16}
+
+```mdv bar
+title: Revenue
+x: region
+y: revenue
+---
+region,revenue
+North,120
+South,84
+```
+
+```mdv line
+title: Trend
+x: month
+y: revenue
+---
+month,revenue
+2026-01,120
+2026-02,148
+```
+
+:::
+
+:::mdv-callout{kind=note}
+
+The grid closes before the callout opens, so neither nests inside the other.
+
+:::
+
+::mdv-figure{caption="Revenue by region, 2026" id=fig-revenue}
+
+A trailing paragraph, outside every directive.
