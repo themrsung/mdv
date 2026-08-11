@@ -53,6 +53,8 @@ export { signature, type SignatureSettings } from './features/signature.js';
 
 export { symbols } from './features/symbols.js';
 
+export { mdvFeatures, type MdvFeatureSettings } from './preset.js';
+
 export { MAX_DIFF_LINES, editsWithin, splitLines, textEdits, type LineEdit } from './edits.js';
 
 export {
