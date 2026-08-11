@@ -30,17 +30,13 @@
 import { parse } from '@mdv/parser';
 import type { Diagnostic } from '@mdv/parser';
 import { createLayoutContext, resolve } from '@mdv/core';
-import type { MdvConfig, MdvPlugin, ResolvedDocument } from '@mdv/core';
-import { builtinChartTypes } from '@mdv/charts';
-import { getBuiltinTheme, listBuiltinThemes } from '@mdv/themes';
+import type { ResolvedDocument } from '@mdv/core';
+import { getBuiltinTheme } from '@mdv/themes';
 import { createStandardFontMetrics, exportPdf, pdfOptionsFromFrontMatter } from '@mdv/render-pdf';
 import type { PdfExportOptions } from '@mdv/render-pdf';
 
-import { capabilitiesFor } from './capabilities.js';
+import { mdvConfig } from './config.js';
 import type { PipelineInputs } from './types.js';
-
-/** Reported as the plugin that carried the built-ins into core. */
-const EXTENSION_VERSION = '0.0.0';
 
 /**
  * What the host asks of an export, beyond the document itself.
@@ -70,36 +66,17 @@ export interface PdfOutput {
   readonly blockCount: number;
 }
 
-/** The plugin that carries the built-in chart types and themes into core. */
-function builtinsPlugin(): MdvPlugin {
-  return {
-    name: 'mdv-vscode builtins',
-    version: EXTENSION_VERSION,
-    chartTypes: builtinChartTypes,
-    themes: listBuiltinThemes(),
-  };
-}
-
 /**
  * Resolve `inputs.source` the way an export needs it.
  *
- * The security settings are the *same* ones the preview obeys: with
- * `mdv.security.allowExternal` off there is no `fetch` capability in the config,
- * and `@mdv/core` refuses every remote `src:` with `MDV4002` rather than
- * silently reaching the network because this happens to be an export.
+ * The configuration is the *same* one the preview and the language server get
+ * (`config.ts`), so an export cannot disagree with the screen about which chart
+ * types exist or which origins may load — including the case where
+ * `mdv.security.allowExternal` is off and every remote `src:` is refused with
+ * `MDV4002` rather than silently fetched because this happens to be an export.
  */
 async function resolveForExport(inputs: PipelineInputs): Promise<ResolvedDocument> {
-  const config: MdvConfig = {
-    plugins: [builtinsPlugin()],
-    capabilities: capabilitiesFor(inputs.allowExternal),
-    level: inputs.level,
-    security: {
-      allowExternal: inputs.allowExternal,
-      allowedOrigins: [...inputs.allowedOrigins],
-    },
-    ...(inputs.strict ? { strict: true } : {}),
-  };
-  return resolve(parse(inputs.source), config);
+  return resolve(parse(inputs.source), mdvConfig(inputs));
 }
 
 /**

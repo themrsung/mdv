@@ -19,24 +19,9 @@ import {
   tableToChart,
 } from './authoring.js';
 import { allowExternalForWorkspace, togglePreviewTheme, validateTheme } from './theme.js';
+import { COMMANDS } from './ids.js';
 
-/** SPEC 29.5's command ids, in one place so the manifest and the code agree. */
-export const COMMANDS = {
-  showPreview: 'mdv.showPreview',
-  showPreviewToSide: 'mdv.showPreviewToSide',
-  exportPdf: 'mdv.export.pdf',
-  exportHtml: 'mdv.export.html',
-  exportSvg: 'mdv.export.svg',
-  exportPng: 'mdv.export.png',
-  exportBlock: 'mdv.exportBlock',
-  insertChart: 'mdv.insertChart',
-  tableToChart: 'mdv.tableToChart',
-  pasteData: 'mdv.pasteData',
-  showData: 'mdv.showData',
-  validateTheme: 'mdv.validateTheme',
-  togglePreviewTheme: 'mdv.togglePreviewTheme',
-  allowExternal: 'mdv.allowExternalForWorkspace',
-} as const;
+export { COMMANDS };
 
 /** The column a "to the side" preview opens in. */
 function sideColumn(): vscode.ViewColumn {

@@ -78,6 +78,9 @@ importers:
       '@mdv/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@mdv/lsp':
+        specifier: workspace:*
+        version: link:../../packages/lsp
       '@mdv/parser':
         specifier: workspace:*
         version: link:../../packages/parser
