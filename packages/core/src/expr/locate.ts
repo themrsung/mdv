@@ -160,6 +160,78 @@ export function callAt(source: string, at: number): CallSite | undefined {
   return undefined;
 }
 
+/** One field reference inside an expression, and where its name is written. */
+export interface FieldRef {
+  /** The field name, exactly as the parser reads it. */
+  readonly name: string;
+  /** Offset of the first character of the *name* within the expression source. */
+  readonly offset: number;
+  /**
+   * `true` when written as `[Net revenue]`.
+   *
+   * A bracketed reference can spell any name at all; a bare one is an
+   * identifier, so a rename that would stop it being one has to bracket it or
+   * decline (SPEC 6.8).
+   */
+  readonly bracketed: boolean;
+}
+
+/**
+ * Every field an expression reads, in source order.
+ *
+ * This is the scanner's half of `parse.ts`'s `primary()`: a bracket run that is
+ * one name is a field, and a bare identifier is a field unless it is a literal
+ * keyword, the callee of a call, or one of the word operators (`in`,
+ * `contains`) — which is decided the same way the parser decides it, by whether
+ * an operand can stand where the word does. It is kept apart from the AST
+ * because the AST carries no offsets: a `FieldNode` knows its name and not
+ * where the name was typed, and a rename needs the second fact.
+ *
+ * Runs on a prefix when the whole source does not scan (the same tolerance
+ * {@link callAt} has), so a document that is mid-edit still answers.
+ */
+export function fieldRefs(source: string): readonly FieldRef[] {
+  const refs: FieldRef[] = [];
+  const tokens = scan(source);
+  /** Whether the next token would be read as an operand rather than an operator. */
+  let operand = true;
+
+  for (let index = 0; index < tokens.length; index += 1) {
+    const token = tokens[index] as Token;
+
+    if (token.kind === 'field') {
+      // `[` opens a list literal where an operand cannot go, and the scanner
+      // only calls a bracket run a field when it holds exactly one name.
+      refs.push({ name: token.text, offset: token.start + 1, bracketed: true });
+      operand = false;
+      continue;
+    }
+
+    if (token.kind === 'identifier') {
+      if (!operand) {
+        // A word operator: `revenue in [1, 2]`.
+        operand = true;
+        continue;
+      }
+      operand = false;
+      if (token.text === 'true' || token.text === 'false' || token.text === 'null') continue;
+      const next = tokens[index + 1];
+      if (next?.kind === 'punct' && next.text === '(') continue; // A callee names no field.
+      refs.push({ name: token.text, offset: token.start, bracketed: false });
+      continue;
+    }
+
+    if (token.kind === 'punct') {
+      operand = token.text !== ')' && token.text !== ']';
+      continue;
+    }
+
+    operand = false; // A number or a string literal.
+  }
+
+  return refs;
+}
+
 /**
  * Tokens of a prefix, which is usually not a well-formed expression.
  *

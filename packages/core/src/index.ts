@@ -85,8 +85,19 @@ export * from './dataset/index.js';
  * anything, and it should not have to reach past the package's `exports` map to
  * find out. These three names collide with nothing.
  */
-export type { CallSite } from './expr/locate.js';
-export { callAt, expressionAt } from './expr/locate.js';
+export type { CallSite, FieldRef } from './expr/locate.js';
+export { callAt, expressionAt, fieldRefs } from './expr/locate.js';
+
+/**
+ * The column locator, exported by name for the same reason and with the same
+ * care: `./data/index.js` is not star-exported either, and `locate.ts` is the
+ * one module in it an editor needs — "where does this block write this column
+ * name" is a question about a document, and answering it a second time inside
+ * a language server would be a second implementation of SPEC 6.7's lineage
+ * rules that could disagree with this one.
+ */
+export type { ColumnLocation, ColumnMap, ColumnSite, ColumnSiteKind } from './data/locate.js';
+export { HEADER_PATH, checkColumnName, locateColumns } from './data/locate.js';
 
 /**
  * The stages `resolve()` below is assembled from, exported because the pipeline

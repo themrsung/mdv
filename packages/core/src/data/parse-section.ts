@@ -120,7 +120,14 @@ function read(
   }
 }
 
-function firstChar(value: string | undefined, fallback: string): string {
+/**
+ * The one character a `delimiter:` attribute means (SPEC 6.2.2).
+ *
+ * Exported because `locate.ts` has to split a header row the same way the
+ * reader will, and a locator that disagreed with the reader about where a cell
+ * starts would hand out ranges that edit the wrong characters.
+ */
+export function firstChar(value: string | undefined, fallback: string): string {
   if (value === undefined || value.length === 0) return fallback;
   if (value === '\\t') return '\t';
   return value[0] as string;
