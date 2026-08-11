@@ -13,8 +13,10 @@
  *
  * Coverage is only ever collected from a case that **passed**. A failing case
  * proves nothing, and a level substantiated by failures would be a lie told
- * with arithmetic.
+ * with arithmetic. Neither does a case that passed by degrading: see
+ * {@link stubbed}.
  */
+import { unimplementedChartTypes } from '@mdv/charts';
 import { detectFormat, facetWrapOf } from '@mdv/core';
 import type { DatasetNode, ResolvedBlock, ResolvedDocument } from '@mdv/core';
 import type { MdvNode } from '@mdv/parser';
@@ -152,10 +154,38 @@ function addBlocks(doc: ResolvedDocument, add: (id: string) => void): void {
       add('render.error-cards');
       continue;
     }
-    add(`type.${block.blockType}`);
+    if (!stubbed(block.blockType)) add(`type.${block.blockType}`);
     if (faceted(block)) add('layout.faceting');
     if (tableView(block)) add('a11y.table-view');
   }
+}
+
+/**
+ * The spellings that resolve to a table-rendering stub (SPEC 15.2).
+ *
+ * Read off the stubs this build registers rather than written out again here:
+ * the day `histogram` grows a real implementation its entry leaves
+ * {@link unimplementedChartTypes}, and the requirement starts being credited
+ * without anyone having to remember this file. Aliases are included because
+ * `type.candlestick` and `type.ohlc` are separate requirements and a block is
+ * spelled whichever way its author wrote it.
+ */
+const STUBBED: ReadonlySet<string> = new Set(
+  unimplementedChartTypes.flatMap((type) => [type.name, ...(type.aliases ?? [])]),
+);
+
+/**
+ * Whether a block of this type was drawn by a stub.
+ *
+ * A stub draws a table and says so with `MDV1500`. That is the *graceful
+ * degradation* SPEC 15.2 asks for, and it is emphatically not the type: a case
+ * whose `sankey` came out as a table has shown a table. Crediting
+ * `type.sankey` for it would substantiate Level 2 with the very fallback that
+ * exists because Level 2 is unimplemented — the precise over-claim the derived
+ * coverage in this module is built to make impossible.
+ */
+function stubbed(blockType: string): boolean {
+  return STUBBED.has(blockType);
 }
 
 /** A block facets when it binds `row:`/`column:`, or wraps a small multiple (SPEC 7.6). */

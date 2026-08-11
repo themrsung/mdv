@@ -82,6 +82,47 @@ describe('coverageOf', () => {
     expect(await covers(BAR, { meta: { covers: ['a11y.keyboard'] } })).toContain('a11y.keyboard');
   });
 
+  describe('unimplemented types (SPEC 15.2)', () => {
+    /**
+     * A stub renders the data as a table and says so. The case passes — that
+     * is what graceful degradation *means* — so coverage is collected from it,
+     * and the one id it must not collect is the type that was never drawn.
+     */
+    const HISTOGRAM = `\`\`\`mdv histogram
+x: revenue
+---
+region,revenue
+North,120
+\`\`\`
+`;
+
+    it('does not claim a type that came out as a table', async () => {
+      expect(await covers(HISTOGRAM, { checks: ['render'] })).not.toContain('type.histogram');
+    });
+
+    it('still credits what the document really did show', async () => {
+      expect(await covers(HISTOGRAM, { checks: ['render'] })).toContain('data.csv');
+    });
+
+    it('does not claim the alias either, since `ohlc` and `candlestick` are two ids', async () => {
+      const CANDLESTICK = `\`\`\`mdv candlestick
+x: date
+---
+date,open,high,low,close
+2026-01-02,1,2,0,1
+\`\`\`
+`;
+      const ids = await covers(CANDLESTICK, { checks: ['render'] });
+
+      expect(ids).not.toContain('type.candlestick');
+      expect(ids).not.toContain('type.ohlc');
+    });
+
+    it('claims a type the build really implements, so the rule is about stubs alone', async () => {
+      expect(await covers(BAR, { checks: ['render'] })).toContain('type.bar');
+    });
+  });
+
   describe('error cards (SPEC 14.1)', () => {
     /**
      * The case that motivated deriving this from the output: `y:` names a
