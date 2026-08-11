@@ -55,6 +55,15 @@ export { symbols } from './features/symbols.js';
 
 export { mdvFeatures, type MdvFeatureSettings } from './preset.js';
 
+export {
+  serve,
+  serveStdio,
+  serveWorker,
+  type ServeOptions,
+  type StdioHost,
+  type WorkerScopeLike,
+} from './serve.js';
+
 export { MAX_DIFF_LINES, editsWithin, splitLines, textEdits, type LineEdit } from './edits.js';
 
 export {
