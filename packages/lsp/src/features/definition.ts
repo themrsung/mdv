@@ -15,22 +15,18 @@
  * carries the uri that was asked about.
  */
 
-import { locateDatasets } from '@mdv/core';
 import type { DatasetSite } from '@mdv/core';
-import { parse } from '@mdv/parser';
 
-import { toLspRange } from '../convert.js';
 import type { TextDocument } from '../documents.js';
-import { throwIfCancelled } from '../protocol/connection.js';
 import type { CancellationToken } from '../protocol/connection.js';
 import type {
   Location,
-  Range,
   ReferenceParams,
   ServerCapabilities,
   TextDocumentPositionParams,
 } from '../protocol/types.js';
 import type { Feature, ServerContext } from '../server.js';
+import { datasetsAt, idRange, last } from './dataset.js';
 import { Sites } from './site.js';
 import type { BlockSettings } from './site.js';
 
@@ -111,63 +107,8 @@ class Definitions {
     token: CancellationToken,
   ): { document: TextDocument; sites: readonly DatasetSite[]; site: DatasetSite | undefined } {
     const document = this.#sites.document(params.textDocument.uri);
-    throwIfCancelled(token);
-    const sites = locateDatasets(parse(document.text));
-    return { document, sites, site: siteAt(sites, document.offsetAt(params.position)) };
+    return { document, ...datasetsAt(document, params.position, token) };
   }
-}
-
-/**
- * The site the cursor is in.
- *
- * A declaration contains the references written inside it — a front-matter
- * dataset's `from:` lives in the middle of its own declaration — and the locator
- * lists the wider site first, so the *last* one that contains the cursor is the
- * most specific thing it is standing on.
- */
-function siteAt(sites: readonly DatasetSite[], offset: number): DatasetSite | undefined {
-  return last(
-    sites,
-    (site) => site.range.start.offset <= offset && offset <= site.range.end.offset,
-  );
-}
-
-/** `Array.prototype.findLast`, which is a lib newer than this package targets. */
-function last(
-  sites: readonly DatasetSite[],
-  match: (site: DatasetSite) => boolean,
-): DatasetSite | undefined {
-  for (let index = sites.length - 1; index >= 0; index -= 1) {
-    const site = sites[index] as DatasetSite;
-    if (match(site)) return site;
-  }
-  return undefined;
-}
-
-/**
- * The id alone, rather than the value that carries it.
- *
- * A site's range covers the text as written — quotes, `@`, and any projection —
- * and highlighting all of that for `@sales[date, revenue]` would tell an author
- * the name of their dataset is twenty characters long. `text` and `offset` say
- * where the bare id sits inside the parsed value, and the value is the same
- * characters as the written one at a shift, which is found by looking for it.
- *
- * A value YAML rewrote rather than trimmed is not found and falls back to the
- * whole range: a range that is too wide is still a range that lands in the right
- * place, which is the point of the jump.
- */
-function idRange(document: TextDocument, site: DatasetSite): Range {
-  const { start, end } = site.range;
-  const written = document.text.slice(start.offset, end.offset);
-  const shift = site.offset < 0 ? -1 : written.indexOf(site.text);
-  if (shift === -1) return toLspRange(document, site.range);
-
-  const from = start.offset + shift + site.offset;
-  return toLspRange(document, {
-    start: { ...start, offset: from },
-    end: { ...end, offset: from + site.id.length },
-  });
 }
 
 /**

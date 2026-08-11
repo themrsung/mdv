@@ -475,6 +475,23 @@ export interface RenameParams extends TextDocumentPositionParams {
   readonly newName: string;
 }
 
+/**
+ * What `textDocument/prepareRename` answers with.
+ *
+ * The protocol also allows a bare `Range` and a `{ defaultBehavior: true }`
+ * marker that tells the client to guess the word itself. This server always
+ * sends the long form: a client guessing at `"@sales[date, revenue]"` would put
+ * the whole value in the rename box, and the range and the text that fills it
+ * have to be the same characters or the author edits one and replaces another.
+ *
+ * `null` in place of this is the protocol's "nothing here can be renamed", and
+ * is not an error — the cursor being in prose is the ordinary case.
+ */
+export interface PrepareRenameResult {
+  readonly range: Range;
+  readonly placeholder: string;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Semantic tokens
 // ─────────────────────────────────────────────────────────────────────────────

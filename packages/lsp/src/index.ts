@@ -35,6 +35,8 @@ export { formatting, type FormatterOptions } from './features/formatting.js';
 
 export { hover, type HoverSettings } from './features/hover.js';
 
+export { rename, type RenameSettings } from './features/rename.js';
+
 export { signature, type SignatureSettings } from './features/signature.js';
 
 export { symbols } from './features/symbols.js';
