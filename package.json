@@ -14,6 +14,8 @@
     "build:editor": "pnpm --filter @mdv/editor build",
     "deploy:build": "pnpm run build:editor && node scripts/build-vercel-output.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "conformance": "pnpm --filter @mdv/conformance build && node packages/conformance/dist/bin.js",
+    "conformance:report": "pnpm --filter @mdv/conformance build && node packages/conformance/dist/bin.js --out CONFORMANCE.md",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:update": "vitest run -u",

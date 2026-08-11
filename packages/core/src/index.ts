@@ -106,6 +106,18 @@ export type {
 export { HEADER_PATH, checkColumnName, locateColumns, locateHeader } from './data/locate.js';
 
 /**
+ * Format auto-detection (SPEC 6.2.6), exported for the same reason.
+ *
+ * A `DatasetNode` records the format the author *wrote* — `auto`, or nothing at
+ * all — not the one detection settled on, so anything that needs to name the
+ * syntax a section actually used has to ask. Asking is the only safe way: the
+ * rules are exhaustive and ordered, and a caller that re-derived them would be
+ * a second answer to a question SPEC 6.2.6 gives one answer to.
+ */
+export type { ConcreteFormat } from './data/detect.js';
+export { detectFormat } from './data/detect.js';
+
+/**
  * The stages `resolve()` below is assembled from, exported because the pipeline
  * is not always driven end to end: an editor re-runs stage 2 on every keystroke
  * but stage 6 only on a resize, and a CLI that lints wants the cascade without

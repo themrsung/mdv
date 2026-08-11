@@ -20,6 +20,7 @@ const WORKSPACE_PACKAGES = [
   'react',
   'cli',
   'lsp',
+  'conformance',
 ] as const;
 
 /**

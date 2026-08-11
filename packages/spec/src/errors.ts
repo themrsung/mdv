@@ -1,4 +1,4 @@
-import rawErrorTable from '../errors.json';
+import rawErrorTable from '../errors.json' with { type: 'json' };
 import type { ErrorCodeEntry, ErrorGroupKey, ErrorSeverity, ErrorTable } from './types.js';
 
 /**

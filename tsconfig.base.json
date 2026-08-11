@@ -49,7 +49,9 @@
       "@mdv/cli": ["packages/cli/src/index.ts"],
       "@mdv/cli/*": ["packages/cli/src/*"],
       "@mdv/lsp": ["packages/lsp/src/index.ts"],
-      "@mdv/lsp/*": ["packages/lsp/src/*"]
+      "@mdv/lsp/*": ["packages/lsp/src/*"],
+      "@mdv/conformance": ["packages/conformance/src/index.ts"],
+      "@mdv/conformance/*": ["packages/conformance/src/*"]
     }
   }
 }

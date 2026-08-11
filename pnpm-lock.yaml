@@ -138,6 +138,30 @@ importers:
         specifier: ^26.2.0
         version: 26.2.0
 
+  packages/conformance:
+    dependencies:
+      '@mdv/charts':
+        specifier: workspace:*
+        version: link:../charts
+      '@mdv/core':
+        specifier: workspace:*
+        version: link:../core
+      '@mdv/parser':
+        specifier: workspace:*
+        version: link:../parser
+      '@mdv/render-pdf':
+        specifier: workspace:*
+        version: link:../render-pdf
+      '@mdv/render-svg':
+        specifier: workspace:*
+        version: link:../render-svg
+      '@mdv/spec':
+        specifier: workspace:*
+        version: link:../spec
+      '@mdv/themes':
+        specifier: workspace:*
+        version: link:../themes
+
   packages/core:
     dependencies:
       '@mdv/parser':

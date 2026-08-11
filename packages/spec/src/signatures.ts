@@ -1,4 +1,4 @@
-import rawSignatureTable from '../signatures.json';
+import rawSignatureTable from '../signatures.json' with { type: 'json' };
 import type { Arity, FunctionSignature, SignatureTable, StepSignature } from './types.js';
 
 /**

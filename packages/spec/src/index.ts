@@ -20,6 +20,17 @@ export {
 } from './errors.js';
 export type { ErrorCode } from './errors.js';
 
+export {
+  CONFORMANCE_LEVELS,
+  LEVEL_REQUIREMENTS,
+  LEVEL_TABLE,
+  isKnownRequirement,
+  levelName,
+  lookupRequirement,
+  requirementsAt,
+  requirementsUpTo,
+} from './levels.js';
+
 export { BLOCK_SCHEMA, CLOSED_VALUES, COMMON_ATTRS, attrDoc, attrSchema } from './schemas.js';
 
 export {
@@ -45,6 +56,8 @@ export type {
   FixtureCategory,
   FixtureMeta,
   FunctionSignature,
+  LevelRequirement,
+  LevelTable,
   SchemaNode,
   SignatureGroup,
   SignatureParam,

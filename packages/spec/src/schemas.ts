@@ -20,7 +20,7 @@
  * anything about a document. These functions read a data file out loud.
  */
 
-import rawBlockSchema from '../schemas/common/block.json';
+import rawBlockSchema from '../schemas/common/block.json' with { type: 'json' };
 import type { AttrDoc, BlockSchema, SchemaNode } from './types.js';
 
 /** `schemas/common/block.json`: the attributes every block type accepts. */

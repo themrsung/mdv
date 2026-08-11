@@ -134,6 +134,49 @@ export interface FixtureMeta {
   readonly tags: readonly string[];
   /** Optional human note explaining what the case pins down. */
   readonly note?: string;
+  /**
+   * Requirement ids from {@link LevelRequirement} this case exercises, for the
+   * ones a run cannot see for itself.
+   *
+   * A conformance run derives most coverage from the document — the block types
+   * it contains, the data format each block resolved from, whether it faceted —
+   * because derived evidence cannot drift from the case. Some requirements leave
+   * no such trace (a keyboard contract, an accessible-name rule the SVG happens
+   * to satisfy incidentally), and those are declared here. Every id MUST appear
+   * in `levels.json`; an unknown one is a corpus error, not a silent no-op.
+   */
+  readonly covers?: readonly string[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conformance levels (SPEC 16.1)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * One feature named by the SPEC 16.1 level table.
+ *
+ * That table is three rows of prose. This is the same content broken into
+ * individually addressable requirements, so that "Level 2 is substantiated by
+ * the suite" can be checked rather than asserted: a level is substantiated only
+ * when every requirement at or below it is exercised by a passing case.
+ */
+export interface LevelRequirement {
+  /** Stable dotted id, e.g. `"type.bar"`. Referenced by `FixtureMeta.covers`. */
+  readonly id: string;
+  /** The lowest level at which a reader must implement this. */
+  readonly level: ConformanceLevel;
+  /** Short human label, e.g. `` "`bar`" `` or `"The attribute cascade"`. */
+  readonly label: string;
+  /** The section that defines the feature, e.g. `"8.2"`. */
+  readonly spec: string;
+}
+
+/** Shape of `packages/spec/levels.json`. */
+export interface LevelTable {
+  readonly specVersion: string;
+  /** Level number (as a string key) → the name SPEC 16.1 gives it. */
+  readonly levels: Readonly<Record<string, string>>;
+  readonly requirements: readonly LevelRequirement[];
 }
 
 /**

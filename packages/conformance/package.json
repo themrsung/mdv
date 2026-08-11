@@ -1,0 +1,38 @@
+{
+  "name": "@mdv/conformance",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Runs the normative fixture corpus (SPEC 16.2) and reports what this build actually substantiates.",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mdv-conformance": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@mdv/charts": "workspace:*",
+    "@mdv/core": "workspace:*",
+    "@mdv/parser": "workspace:*",
+    "@mdv/render-pdf": "workspace:*",
+    "@mdv/render-svg": "workspace:*",
+    "@mdv/spec": "workspace:*",
+    "@mdv/themes": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}
