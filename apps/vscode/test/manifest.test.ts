@@ -32,6 +32,37 @@ function exists(relative: string): boolean {
   }
 }
 
+/**
+ * The modules a source file imports for their value, in source order.
+ *
+ * `import type` and `import { type X }` are erased by the compiler and are not
+ * bundler edges, so they are left out; a bare `import './x.js'` is an edge and
+ * is included. Deliberately a regex and not the TypeScript API: the question is
+ * only which specifiers esbuild will follow out of a handful of hand-written
+ * entry files, and the answer must not depend on a parser this package's tests
+ * do not otherwise need.
+ */
+function valueImportsOf(relative: string): string[] {
+  const source = readFileSync(join(root, relative), 'utf8');
+  const found: string[] = [];
+  // `import <clause> from '<spec>'` or a side-effect `import '<spec>'`.
+  const pattern = /(^|\n)\s*import\s+(?:([\s\S]*?)\s+from\s+)?['"]([^'"]+)['"]/g;
+  for (const [, , clause, specifier] of source.matchAll(pattern)) {
+    if (clause !== undefined && /^type\s/.test(clause.trim())) continue; // `import type X from`
+    if (clause !== undefined && clause.trim().startsWith('{')) {
+      // Every named binding may carry its own `type`; if all of them do, the
+      // whole statement is erased.
+      const names = clause
+        .trim()
+        .replace(/^\{|\}$/g, '')
+        .split(',');
+      if (names.every((name) => name.trim() === '' || /^type\s/.test(name.trim()))) continue;
+    }
+    found.push(specifier);
+  }
+  return found;
+}
+
 /** How many `mdvBlock` nodes a parsed document contains, at any depth. */
 function countBlocks(node: unknown): number {
   if (typeof node !== 'object' || node === null) return 0;
@@ -44,6 +75,7 @@ function countBlocks(node: unknown): number {
 interface Manifest {
   main: string;
   browser: string;
+  scripts: Record<string, string>;
   activationEvents: string[];
   capabilities: {
     untrustedWorkspaces: { supported: string; restrictedConfigurations: string[] };
@@ -109,6 +141,37 @@ describe('package.json: activation and entry points', () => {
   it('points at the bundles esbuild produces', () => {
     expect(manifest.main).toBe('./dist/extension.js');
     expect(manifest.browser).toBe('./dist/web/extension.js');
+  });
+
+  it('builds each host from its own entry, into the file the manifest names', () => {
+    expect(manifest.scripts['build:extension']).toContain('src/extension-node.ts');
+    expect(manifest.scripts['build:extension']).toContain('--outfile=dist/extension.js');
+    expect(manifest.scripts['build:web']).toContain('src/extension-web.ts');
+    expect(manifest.scripts['build:web']).toContain('--outfile=dist/web/extension.js');
+  });
+
+  it('keeps the two client halves out of the shared module', () => {
+    // esbuild follows imports, not runtime branches: one shared entry that could
+    // reach `client-node.ts` would put `node:child_process` in the browser
+    // bundle, and one that could reach `client-web.ts` would put a `Worker` in
+    // the desktop one. `extension.ts` therefore takes a factory and imports
+    // neither, and only the two entries below know which host they are in.
+    //
+    // Value imports only: a `import type` is erased before esbuild sees it, and
+    // prose in a doc comment is not an edge at all — hence the specifier scan
+    // rather than a substring search over the file.
+    expect(valueImportsOf('src/extension.ts')).toEqual(
+      expect.not.arrayContaining(['./lsp/client-node.js', './lsp/client-web.js']),
+    );
+    expect(valueImportsOf('src/extension-node.ts')).toContain('./lsp/client-node.js');
+    expect(valueImportsOf('src/extension-node.ts')).not.toContain('./lsp/client-web.js');
+    expect(valueImportsOf('src/extension-web.ts')).toContain('./lsp/client-web.js');
+    expect(valueImportsOf('src/extension-web.ts')).not.toContain('./lsp/client-node.js');
+
+    // The dependency the halves are split over, named nowhere they are shared.
+    for (const file of ['src/extension.ts', 'src/extension-node.ts', 'src/extension-web.ts']) {
+      expect(valueImportsOf(file)).not.toContain('vscode-languageclient');
+    }
   });
 
   it('restricts exactly the two settings that can reach the network', () => {

@@ -4,10 +4,12 @@ The reference editor integration for **MDV** — Markdown Data Visualization. It
 implements SPEC 29 (`Editor Integration`) against `@mdv/core`, `@mdv/parser`,
 `@mdv/charts`, `@mdv/render-svg` and `@mdv/themes` from this monorepo.
 
-> **The language server is not implemented.** SPEC 29.4 specifies a full
-> `@mdv/lsp` server; that is milestone M7 and is out of scope for this pass.
-> Everything the server would provide is either computed in-process here or
-> absent, and both cases are listed under [Known gaps](#known-gaps).
+> **The language server runs out of process.** SPEC 29.4's `@mdv/lsp` is wired
+> in: the desktop bundle forks `dist/server.cjs`, the web bundle starts
+> `dist/web/server.js` in a worker, and the extension keeps a complete
+> in-process engine as the fallback for hosts where neither can start. Which one
+> answered is in the log line `activate` writes, and in
+> [Known gaps](#known-gaps).
 
 ---
 
@@ -20,22 +22,27 @@ folder.
 # from the repository root, once
 pnpm install
 
-# build the three bundles
+# build the five bundles
 pnpm --filter mdv run build
 ```
 
 That produces:
 
-| File                    | Host                     | Notes                                 |
-| ----------------------- | ------------------------ | ------------------------------------- |
-| `dist/extension.js`     | desktop (`main`)         | CommonJS, `node20`, `vscode` external |
-| `dist/web/extension.js` | `vscode.dev` (`browser`) | no Node builtins at all               |
-| `dist/webview.js`       | preview webview          | IIFE, loaded under a nonce            |
+| File                    | Entry                      | Host                     | Notes                                     |
+| ----------------------- | -------------------------- | ------------------------ | ----------------------------------------- |
+| `dist/extension.js`     | `src/extension-node.ts`    | desktop (`main`)         | CommonJS, `node20`, `vscode` external     |
+| `dist/web/extension.js` | `src/extension-web.ts`     | `vscode.dev` (`browser`) | no Node builtins at all                   |
+| `dist/server.cjs`       | `src/lsp/server-node.ts`   | forked by the desktop    | `@mdv/lsp` over stdio; no `vscode` import |
+| `dist/web/server.js`    | `src/lsp/server-worker.ts` | worker, in the browser   | IIFE, started from the extension URI      |
+| `dist/webview.js`       | `src/webview/main.ts`      | preview webview          | IIFE, loaded under a nonce                |
 
-The bundles are self-contained: esbuild inlines the sibling packages **from
-source**, resolved through the `paths` map in `tsconfig.base.json`, so the only
-module required at runtime is `vscode` itself (plus `buffer`/`process` in the
-desktop bundle).
+Five bundles from five entries, because each one is loaded by something that
+cannot load the others: the two hosts differ over `vscode-languageclient`, and
+the two servers over how they reach a message channel. The bundles are
+self-contained — esbuild inlines the sibling packages **from source**, resolved
+through the `paths` map in `tsconfig.base.json` — so the only module required at
+runtime is `vscode` itself (plus `buffer`/`process` in the desktop bundle), and
+the server bundles do not require even that.
 
 ### Run it
 
@@ -133,17 +140,32 @@ parsed, or is not a usable theme reports `MDV1502` and degrades to the preview
 theme. A palette that loads but fails validation is a warning (`MDV3080`), never
 a silent substitution — SPEC 11.2 rule 4.
 
-### Diagnostics (SPEC 29.4, in-process)
+### Diagnostics (SPEC 29.4)
 
-Diagnostics are computed by calling `@mdv/core` directly and published to a
-`DiagnosticCollection`. All of that sits behind `DiagnosticService` in
-`src/diagnostics/service.ts` — a four-member interface (`kind`, `revalidate`,
-`revalidateAll`, `dispose`). Swapping in a `vscode-languageclient` that lets a
-real server publish is one line in `extension.ts`; nothing else in the extension
-knows which engine is running.
+Two engines produce the same diagnostics, and both sit behind `DiagnosticService`
+in `src/diagnostics/service.ts` — a four-member interface (`kind`, `revalidate`,
+`revalidateAll`, `dispose`). Nothing else in the extension knows which one is
+running; the choice is made once, in `activate`, and read back off `kind`.
 
-Code lenses, completion and formatting are likewise computed in-process from the
-same memoised pipeline rather than by a server.
+- **`language-server`** — the default. `@mdv/lsp` runs in a forked process
+  (desktop) or a worker (web) and publishes into VS Code's diagnostic store
+  itself, so the extension never calls `@mdv/core` to validate. It also answers
+  completion, code lenses and formatting, which is why the extension registers
+  no provider of its own while the server is up: VS Code merges providers rather
+  than choosing between them, so a second registration would double every
+  completion item and every lens.
+- **`in-process`** — the fallback, used when no client can be built for the
+  host. `@mdv/core` is called directly and the results are published to a
+  `DiagnosticCollection` owned here.
+
+Which host builds which client is the only thing `src/extension-node.ts` and
+`src/extension-web.ts` do; `src/extension.ts` imports neither half of
+`vscode-languageclient`, because esbuild follows imports rather than runtime
+branches and a shared entry would drag `node:child_process` into the web bundle.
+
+A settings change, a colour-theme change or a theme file landing re-validates
+through the same interface either way — over `workspace/didChangeConfiguration`
+for the server, by re-running the pipeline for the in-process engine.
 
 ### Commands (SPEC 29.5)
 
@@ -191,12 +213,12 @@ rule blanks the entire preview.
 
 ## Known gaps
 
-| Gap                   | Detail                                                                                                                                                                                                                                                                                                           |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Language server**   | SPEC 29.4's `@mdv/lsp` is **not implemented** (milestone M7). Diagnostics, completion, code lenses and formatting are in-process; hover, code actions, symbols, folding, rename, inlay hints and semantic tokens are absent. `mdv.trace.server` currently controls the verbosity of the in-process engine's log. |
-| **PNG export**        | `mdv.export.png` reports that it is unavailable: rasterising needs a canvas backend (`@mdv/render-canvas`, SPEC 23.2) that does not exist here. `mdv.exportBlock` therefore writes SVG.                                                                                                                          |
-| **Remote themes**     | `theme: https://…` is never fetched. `mdv.security.allowExternal` gates it as external data, and even with the setting on the reader is `vscode.workspace.fs`, which speaks to the workspace, not the network. Such a block reports `MDV4002` and renders on the preview theme.                                  |
-| **Integration tests** | See below.                                                                                                                                                                                                                                                                                                       |
+| Gap                   | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Language server**   | Complete over LSP: SPEC 29.4's twelve features all run. The **in-process fallback** is narrower — diagnostics, completion, code lenses and formatting only, with hover, signature help, code actions, symbols, definition, rename, inlay hints and semantic tokens absent — so a host that cannot start the server loses those eight. `mdv.trace.server` sets the client's LSP trace level, and the in-process engine's log verbosity when it is the one running. |
+| **PNG export**        | `mdv.export.png` reports that it is unavailable: rasterising needs a canvas backend (`@mdv/render-canvas`, SPEC 23.2) that does not exist here. `mdv.exportBlock` therefore writes SVG.                                                                                                                                                                                                                                                                           |
+| **Remote themes**     | `theme: https://…` is never fetched. `mdv.security.allowExternal` gates it as external data, and even with the setting on the reader is `vscode.workspace.fs`, which speaks to the workspace, not the network. Such a block reports `MDV4002` and renders on the preview theme.                                                                                                                                                                                   |
+| **Integration tests** | See below.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ## Testing
 

@@ -445,9 +445,9 @@
   },
   "scripts": {
     "build": "pnpm run build:extension && pnpm run build:webview && pnpm run build:server && pnpm run build:web && pnpm run build:web-server",
-    "build:extension": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --platform=node --format=cjs --target=node20 --external:vscode --minify",
+    "build:extension": "esbuild src/extension-node.ts --bundle --outfile=dist/extension.js --platform=node --format=cjs --target=node20 --external:vscode --minify",
     "build:webview": "esbuild src/webview/main.ts --bundle --outfile=dist/webview.js --platform=browser --format=iife --target=es2022 --minify",
-    "build:web": "esbuild src/extension.ts --bundle --outfile=dist/web/extension.js --platform=browser --format=cjs --target=es2022 --external:vscode --define:process.env.NODE_ENV=\"'production'\" --minify",
+    "build:web": "esbuild src/extension-web.ts --bundle --outfile=dist/web/extension.js --platform=browser --format=cjs --target=es2022 --external:vscode --define:process.env.NODE_ENV=\"'production'\" --minify",
     "build:server": "esbuild src/lsp/server-node.ts --bundle --outfile=dist/server.cjs --platform=node --format=cjs --target=node20 --minify",
     "build:web-server": "esbuild src/lsp/server-worker.ts --bundle --outfile=dist/web/server.js --platform=browser --format=iife --target=es2022 --define:process.env.NODE_ENV=\"'production'\" --minify",
     "dev": "pnpm run build:extension --sourcemap --minify=false && pnpm run build:webview --sourcemap --minify=false",

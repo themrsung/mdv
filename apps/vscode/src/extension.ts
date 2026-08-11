@@ -13,14 +13,13 @@
  *
  * ## The language server
  *
- * SPEC 29.4 describes a full LSP in `@mdv/lsp`. **It is not implemented in this
- * tree.** Diagnostics are computed in-process behind the `DiagnosticService`
- * interface (see `diagnostics/service.ts`), and the smaller language features
- * that setting names in SPEC 29.6 refer to — code lenses, column-name
- * completion, formatting — are likewise in-process. Everything else in SPEC
- * 29.4's table (hover, signature help, code actions, symbols, folding,
- * definition/references, rename, inlay hints, semantic tokens) is absent, and
- * `README.md` says so.
+ * SPEC 29.4's language server lives in `@mdv/lsp` and runs out of process. This
+ * module does not know which host it is in and does not import either half of
+ * `vscode-languageclient`: it takes a {@link LanguageClientFactory} and lets
+ * `extension-node.ts` or `extension-web.ts` decide. That is also the engine
+ * switch — a factory means the server, no factory means the in-process
+ * diagnostics of `diagnostics/inprocess.ts` — because SPEC 29.6's settings list
+ * is closed and a user-facing toggle is not one of the settings on it.
  *
  * ## Never crashing the host
  *
@@ -36,6 +35,7 @@ import { SettingsStore } from './settings.js';
 import { PipelineStore, isPreviewable } from './documents.js';
 import { detectHost, publishHostContext } from './host.js';
 import { InProcessDiagnosticService, type DiagnosticService } from './diagnostics/index.js';
+import { LanguageServerDiagnosticService, type LanguageClientFactory } from './lsp/client.js';
 import { PreviewManager } from './preview/manager.js';
 import { PREVIEW_VIEW_TYPE } from './preview/panel.js';
 import { registerCommands } from './commands/index.js';
@@ -58,8 +58,20 @@ export interface MdvExtensionApi {
   extendMarkdownIt(md: MarkdownItLike): MarkdownItLike;
 }
 
-/** Called by VS Code on `onLanguage:mdv` or `onLanguage:markdown`. */
-export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
+/**
+ * Activation, minus the one thing the two hosts disagree about.
+ *
+ * Called from `extension-node.ts` and `extension-web.ts`, which are what VS Code
+ * actually loads; neither adds anything but the factory.
+ *
+ * @param createClient How to build a language client, or `undefined` to compute
+ *   diagnostics in this process. Nothing else in the extension changes shape
+ *   between the two — see {@link DiagnosticService}.
+ */
+export function activateWith(
+  context: vscode.ExtensionContext,
+  createClient?: LanguageClientFactory,
+): MdvExtensionApi {
   const channel = createLogChannel();
   context.subscriptions.push(channel);
 
@@ -73,9 +85,13 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
   const themeFiles = new WorkspaceThemeFiles();
   setActiveThemeFiles(themeFiles);
 
-  // The LSP swap point. Replacing this one line with a `LanguageClient`-backed
-  // service is the whole of adopting SPEC 29.4.
-  const diagnostics: DiagnosticService = new InProcessDiagnosticService(settings, pipelines);
+  // The LSP swap point (SPEC 29.4). Constructing the service starts nothing
+  // synchronously — the client queues its own start — so the budget above holds
+  // either way.
+  const diagnostics: DiagnosticService =
+    createClient === undefined
+      ? new InProcessDiagnosticService(settings, pipelines)
+      : new LanguageServerDiagnosticService(() => settings.current, createClient);
 
   context.subscriptions.push(
     settings,
@@ -85,9 +101,7 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
     themeFiles,
     new vscode.Disposable(() => setActiveThemeFiles(undefined)),
     registerCommands({ extension: context, settings, pipelines, previews, diagnostics, host }),
-    registerFormatter(settings),
-    registerCodeLens(settings, pipelines),
-    registerCompletion(settings, pipelines),
+    ...inProcessProviders(diagnostics, settings, pipelines),
     registerReader(previews),
     vscode.window.registerWebviewPanelSerializer(PREVIEW_VIEW_TYPE, previews.serializer()),
   );
@@ -127,7 +141,7 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
       void publishHostContext(host);
       log(
         `activated — node host: ${String(host.node)}, workspace trusted: ${String(host.trusted)}, ` +
-          `diagnostics: ${diagnostics.kind} (the SPEC 29.4 language server is not implemented)`,
+          `language features: ${diagnostics.kind}`,
       );
       if (settings.current.preview.openOnStartup) openStartupPreview(previews);
     }),
@@ -138,6 +152,31 @@ export function activate(context: vscode.ExtensionContext): MdvExtensionApi {
   return {
     extendMarkdownIt: createMarkdownItExtension(() => settings.current, editorKind),
   };
+}
+
+/**
+ * The language features this process answers itself.
+ *
+ * Formatting, completion and code lenses are not diagnostics, but they are in
+ * `@mdv/lsp`'s advertised capabilities (`mdvFeatures`, SPEC 29.4), so when the
+ * server is running these three registrations are not a fallback — they are a
+ * duplicate. VS Code merges providers rather than choosing between them: every
+ * completion item would appear twice and every lens row would render twice.
+ *
+ * The diagnostics engine is the thing asked, rather than `createClient`,
+ * because the question is which process is answering, and `kind` is that answer.
+ */
+function inProcessProviders(
+  diagnostics: DiagnosticService,
+  settings: SettingsStore,
+  pipelines: PipelineStore,
+): vscode.Disposable[] {
+  if (diagnostics.kind !== 'in-process') return [];
+  return [
+    registerFormatter(settings),
+    registerCodeLens(settings, pipelines),
+    registerCompletion(settings, pipelines),
+  ];
 }
 
 /** `mdv.preview.openOnStartup` (SPEC 29.6). */
