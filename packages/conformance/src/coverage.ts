@@ -189,13 +189,35 @@ function addRender(input: CoverageInput, add: (id: string) => void): void {
   if (passed(input.checks, 'pdf')) add('export.pdf');
 
   const svg = input.svg;
-  if (
-    svg !== undefined &&
-    /role="(?:img|figure)"/u.test(svg) &&
-    /aria-label(?:ledby)?="/u.test(svg)
-  ) {
+  if (svg === undefined) return;
+
+  if (/role="(?:img|figure)"/u.test(svg) && /aria-label(?:ledby)?="/u.test(svg)) {
     add('a11y.names');
   }
+  if (drewErrorCard(svg)) add('render.error-cards');
+}
+
+/**
+ * An error card in the output (SPEC 14.1).
+ *
+ * The two derivations upstream — an `mdvError` node, a `failed` block — both
+ * read a document, and a document is too early: a block whose `y:` names a
+ * column that is not there resolves cleanly and only collapses in layout, when
+ * the chart type is finally asked to bind its channels. The card is the thing
+ * SPEC 14.1 requires, so the card is what is looked for, in the one artefact
+ * that is downstream of every way of producing one.
+ *
+ * Matched as a whole class *token* in a class *attribute*, because neither
+ * half of that is pedantry: `mdv-error-card` also appears in the embedded
+ * stylesheet, which every SVG carries whether it drew a card or not, and a
+ * substring match would accept `mdv-error-card-shadow` — `\b` does not help,
+ * since a hyphen is already a word boundary.
+ */
+function drewErrorCard(svg: string): boolean {
+  for (const [, classes] of svg.matchAll(/class="([^"]*)"/gu)) {
+    if (classes !== undefined && classes.split(/\s+/u).includes('mdv-error-card')) return true;
+  }
+  return false;
 }
 
 function passed(checks: readonly CheckResult[], name: CheckResult['check']): boolean {
