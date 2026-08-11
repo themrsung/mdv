@@ -1,0 +1,11 @@
+{
+  "level": 2,
+  "tags": [
+    "theme"
+  ],
+  "note": "SPEC 11.6: a front-matter theme override, resolved against `extends: default` and composed onto it. Tokens, font and metrics are patched key by key while `categorical` replaces the base list outright, and the SVG is pinned because an override that resolves without reaching the marks has not been applied.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

@@ -1,0 +1,430 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            49,
+            80
+          ],
+          "type": "text",
+          "value": "Reading a chart without a mouse"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        47,
+        80
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            82,
+            361
+          ],
+          "type": "text",
+          "value": "The normative requirement is an equivalence: keyboard focus MUST produce the\nsame readout as hover. Not a similar one, not an abbreviated one — the same,\nfrom the same formatting path, because two paths are two things to keep in\nstep and one of them will eventually be forgotten."
+        }
+      ],
+      "position": [
+        82,
+        361
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            363,
+            374
+          ],
+          "type": "text",
+          "value": "A chart is "
+        },
+        {
+          "children": [
+            {
+              "position": [
+                376,
+                379
+              ],
+              "type": "text",
+              "value": "one"
+            }
+          ],
+          "position": [
+            374,
+            381
+          ],
+          "type": "strong"
+        },
+        {
+          "position": [
+            381,
+            610
+          ],
+          "type": "text",
+          "value": " tab stop, never one per mark. Arrow keys walk the focus\norder from there, Home and End jump to its ends, Page Up and Page Down move\nbetween series, Enter and Space select, Escape drops the readout without\nleaving the chart, and "
+        },
+        {
+          "position": [
+            610,
+            613
+          ],
+          "type": "inlineCode",
+          "value": "T"
+        },
+        {
+          "position": [
+            613,
+            781
+          ],
+          "type": "text",
+          "value": " toggles the table view. Fifteen data points would\notherwise be fifteen tab stops, and a page of charts would be unusable by\nexactly the reader the contract exists for."
+        }
+      ],
+      "position": [
+        363,
+        781
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "table": true,
+        "title": "Response time by service",
+        "type": "line",
+        "x": "minute",
+        "y": [
+          "api",
+          "worker"
+        ]
+      },
+      "attrsPosition": {
+        "table": {
+          "end": {
+            "column": 12,
+            "line": 24,
+            "offset": 865
+          },
+          "start": {
+            "column": 8,
+            "line": 24,
+            "offset": 861
+          }
+        },
+        "title": {
+          "end": {
+            "column": 32,
+            "line": 21,
+            "offset": 826
+          },
+          "start": {
+            "column": 8,
+            "line": 21,
+            "offset": 802
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 20,
+            "offset": 794
+          },
+          "start": {
+            "column": 8,
+            "line": 20,
+            "offset": 790
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 22,
+            "offset": 836
+          },
+          "start": {
+            "column": 4,
+            "line": 22,
+            "offset": 830
+          }
+        },
+        "y": {
+          "end": {
+            "column": 17,
+            "line": 23,
+            "offset": 853
+          },
+          "start": {
+            "column": 4,
+            "line": 23,
+            "offset": 840
+          }
+        },
+        "y[0]": {
+          "end": {
+            "column": 8,
+            "line": 23,
+            "offset": 844
+          },
+          "start": {
+            "column": 5,
+            "line": 23,
+            "offset": 841
+          }
+        },
+        "y[1]": {
+          "end": {
+            "column": 16,
+            "line": 23,
+            "offset": 852
+          },
+          "start": {
+            "column": 10,
+            "line": 23,
+            "offset": 846
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 10,
+          "line": 31,
+          "offset": 937
+        },
+        "start": {
+          "column": 1,
+          "line": 26,
+          "offset": 870
+        }
+      },
+      "level": 1,
+      "position": [
+        783,
+        941
+      ],
+      "raw": {
+        "data": "minute,api,worker\n0,142,310\n1,138,298\n2,151,344\n3,147,301\n4,139,289\n",
+        "fence": "```",
+        "header": "title: Response time by service\nx: minute\ny: [api, worker]\ntable: true\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            943,
+            1343
+          ],
+          "type": "text",
+          "value": "This case is here to name the contract, not to prove it. Keyboard navigation\nis behaviour over time — a key arrives, a readout changes — and a golden is one\ndocument frozen at one instant, so no file in this directory can hold the\nevidence. The corpus renders with the interaction layer off on purpose, since\nthe hit-rect overlay belongs to a live document and would pin nothing but its\nown geometry."
+        }
+      ],
+      "position": [
+        943,
+        1343
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1345,
+            1379
+          ],
+          "type": "text",
+          "value": "So the requirement is declared in "
+        },
+        {
+          "position": [
+            1379,
+            1390
+          ],
+          "type": "inlineCode",
+          "value": "meta.json"
+        },
+        {
+          "position": [
+            1390,
+            1536
+          ],
+          "type": "text",
+          "value": " rather than derived, which is the\none honest way to record it: the executable evidence is the interaction layer's\nown tests, where a synthesised "
+        },
+        {
+          "position": [
+            1536,
+            1548
+          ],
+          "type": "inlineCode",
+          "value": "ArrowRight"
+        },
+        {
+          "position": [
+            1548,
+            1631
+          ],
+          "type": "text",
+          "value": " and a synthesised pointer move are\nasserted to produce the identical readout rows."
+        }
+      ],
+      "position": [
+        1345,
+        1631
+      ],
+      "type": "paragraph"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 32,
+          "offset": 941
+        },
+        "start": {
+          "column": 1,
+          "line": 20,
+          "offset": 783
+        }
+      },
+      "raw": "minute,api,worker\n0,142,310\n1,138,298\n2,151,344\n3,147,301\n4,139,289\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "minute",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "api",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "worker",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            0,
+            142,
+            310
+          ],
+          [
+            1,
+            138,
+            298
+          ],
+          [
+            2,
+            151,
+            344
+          ],
+          [
+            3,
+            147,
+            301
+          ],
+          [
+            4,
+            139,
+            289
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 27,
+          "line": 3,
+          "offset": 41
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 45
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Keyboard navigation"
+  },
+  "position": [
+    0,
+    1632
+  ],
+  "type": "root"
+}

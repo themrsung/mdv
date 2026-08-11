@@ -1,0 +1,15 @@
+{
+  "level": 2,
+  "tags": [
+    "a11y",
+    "keyboard"
+  ],
+  "note": "SPEC 12.4: one tab stop per chart, arrow keys walking the focus order, and a keyboard readout identical to the hover one. Declared rather than derived — the requirement is behaviour over time, and a golden is one document at one instant. The executable evidence is the interaction layer's own tests; this case exists so the corpus names the contract and says where it is kept.",
+  "covers": [
+    "a11y.keyboard"
+  ],
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

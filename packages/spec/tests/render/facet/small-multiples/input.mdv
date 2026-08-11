@@ -1,0 +1,58 @@
+---
+mdv: "1.0"
+title: Small multiples
+---
+
+# One question asked four times
+
+A facet is not four charts. It is one chart cut into panels over the values of
+a field, and the panels share their scales — which is the whole reason the
+form works, because a shared scale is what makes two panels comparable at a
+glance rather than four separate y-axes that happen to sit side by side.
+
+`column: region` cuts by region, and `columns: 2` wraps the four panels into a
+two-by-two grid instead of one long row. Panel order follows first appearance
+in the data, the same rule series identity uses, so filtering the data cannot
+reshuffle the grid underneath a reader who has learnt where to look.
+
+```mdv line
+title: Signups by region
+x: week
+y: signups
+column: region
+columns: 2
+---
+region,week,signups
+north,2026-06-01,120
+north,2026-06-08,138
+north,2026-06-15,151
+south,2026-06-01,86
+south,2026-06-08,92
+south,2026-06-15,79
+east,2026-06-01,204
+east,2026-06-08,188
+east,2026-06-15,231
+west,2026-06-01,41
+west,2026-06-08,55
+west,2026-06-15,62
+```
+
+Binding both `row:` and `column:` asks for the grid the two fields describe,
+so the wrap has nothing left to decide and is ignored. Axes are drawn on the
+outer panels only: the left column carries the value axis and the bottom row
+the category axis, because repeating an identical ladder in every cell is ink
+that is not data.
+
+```mdv bar
+title: Signups by channel and quarter
+x: channel
+y: signups
+row: channel
+column: quarter
+---
+channel,quarter,signups
+organic,Q1,310
+organic,Q2,348
+paid,Q1,190
+paid,Q2,142
+```

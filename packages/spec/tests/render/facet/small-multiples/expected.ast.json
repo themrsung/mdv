@@ -1,0 +1,588 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            45,
+            74
+          ],
+          "type": "text",
+          "value": "One question asked four times"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        43,
+        74
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            76,
+            378
+          ],
+          "type": "text",
+          "value": "A facet is not four charts. It is one chart cut into panels over the values of\na field, and the panels share their scales — which is the whole reason the\nform works, because a shared scale is what makes two panels comparable at a\nglance rather than four separate y-axes that happen to sit side by side."
+        }
+      ],
+      "position": [
+        76,
+        378
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            380,
+            396
+          ],
+          "type": "inlineCode",
+          "value": "column: region"
+        },
+        {
+          "position": [
+            396,
+            417
+          ],
+          "type": "text",
+          "value": " cuts by region, and "
+        },
+        {
+          "position": [
+            417,
+            429
+          ],
+          "type": "inlineCode",
+          "value": "columns: 2"
+        },
+        {
+          "position": [
+            429,
+            683
+          ],
+          "type": "text",
+          "value": " wraps the four panels into a\ntwo-by-two grid instead of one long row. Panel order follows first appearance\nin the data, the same rule series identity uses, so filtering the data cannot\nreshuffle the grid underneath a reader who has learnt where to look."
+        }
+      ],
+      "position": [
+        380,
+        683
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "column": "region",
+        "columns": 2,
+        "title": "Signups by region",
+        "type": "line",
+        "x": "week",
+        "y": "signups"
+      },
+      "attrsPosition": {
+        "column": {
+          "end": {
+            "column": 15,
+            "line": 22,
+            "offset": 755
+          },
+          "start": {
+            "column": 9,
+            "line": 22,
+            "offset": 749
+          }
+        },
+        "columns": {
+          "end": {
+            "column": 11,
+            "line": 23,
+            "offset": 766
+          },
+          "start": {
+            "column": 10,
+            "line": 23,
+            "offset": 765
+          }
+        },
+        "title": {
+          "end": {
+            "column": 25,
+            "line": 19,
+            "offset": 721
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 704
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 18,
+            "offset": 696
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 692
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 20,
+            "offset": 729
+          },
+          "start": {
+            "column": 4,
+            "line": 20,
+            "offset": 725
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 21,
+            "offset": 740
+          },
+          "start": {
+            "column": 4,
+            "line": 21,
+            "offset": 733
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 19,
+          "line": 37,
+          "offset": 1030
+        },
+        "start": {
+          "column": 1,
+          "line": 25,
+          "offset": 771
+        }
+      },
+      "level": 1,
+      "position": [
+        685,
+        1034
+      ],
+      "raw": {
+        "data": "region,week,signups\nnorth,2026-06-01,120\nnorth,2026-06-08,138\nnorth,2026-06-15,151\nsouth,2026-06-01,86\nsouth,2026-06-08,92\nsouth,2026-06-15,79\neast,2026-06-01,204\neast,2026-06-08,188\neast,2026-06-15,231\nwest,2026-06-01,41\nwest,2026-06-08,55\nwest,2026-06-15,62\n",
+        "fence": "```",
+        "header": "title: Signups by region\nx: week\ny: signups\ncolumn: region\ncolumns: 2\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1036,
+            1049
+          ],
+          "type": "text",
+          "value": "Binding both "
+        },
+        {
+          "position": [
+            1049,
+            1055
+          ],
+          "type": "inlineCode",
+          "value": "row:"
+        },
+        {
+          "position": [
+            1055,
+            1060
+          ],
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "position": [
+            1060,
+            1069
+          ],
+          "type": "inlineCode",
+          "value": "column:"
+        },
+        {
+          "position": [
+            1069,
+            1362
+          ],
+          "type": "text",
+          "value": " asks for the grid the two fields describe,\nso the wrap has nothing left to decide and is ignored. Axes are drawn on the\nouter panels only: the left column carries the value axis and the bottom row\nthe category axis, because repeating an identical ladder in every cell is ink\nthat is not data."
+        }
+      ],
+      "position": [
+        1036,
+        1362
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "column": "quarter",
+        "row": "channel",
+        "title": "Signups by channel and quarter",
+        "type": "bar",
+        "x": "channel",
+        "y": "signups"
+      },
+      "attrsPosition": {
+        "column": {
+          "end": {
+            "column": 16,
+            "line": 51,
+            "offset": 1463
+          },
+          "start": {
+            "column": 9,
+            "line": 51,
+            "offset": 1456
+          }
+        },
+        "row": {
+          "end": {
+            "column": 13,
+            "line": 50,
+            "offset": 1447
+          },
+          "start": {
+            "column": 6,
+            "line": 50,
+            "offset": 1440
+          }
+        },
+        "title": {
+          "end": {
+            "column": 38,
+            "line": 47,
+            "offset": 1412
+          },
+          "start": {
+            "column": 8,
+            "line": 47,
+            "offset": 1382
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 46,
+            "offset": 1374
+          },
+          "start": {
+            "column": 8,
+            "line": 46,
+            "offset": 1371
+          }
+        },
+        "x": {
+          "end": {
+            "column": 11,
+            "line": 48,
+            "offset": 1423
+          },
+          "start": {
+            "column": 4,
+            "line": 48,
+            "offset": 1416
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 49,
+            "offset": 1434
+          },
+          "start": {
+            "column": 4,
+            "line": 49,
+            "offset": 1427
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-1",
+        "key": "#block-1||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 12,
+          "line": 57,
+          "offset": 1545
+        },
+        "start": {
+          "column": 1,
+          "line": 53,
+          "offset": 1468
+        }
+      },
+      "level": 1,
+      "position": [
+        1364,
+        1549
+      ],
+      "raw": {
+        "data": "channel,quarter,signups\norganic,Q1,310\norganic,Q2,348\npaid,Q1,190\npaid,Q2,142\n",
+        "fence": "```",
+        "header": "title: Signups by channel and quarter\nx: channel\ny: signups\nrow: channel\ncolumn: quarter\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 38,
+          "offset": 1034
+        },
+        "start": {
+          "column": 1,
+          "line": 18,
+          "offset": 685
+        }
+      },
+      "raw": "region,week,signups\nnorth,2026-06-01,120\nnorth,2026-06-08,138\nnorth,2026-06-15,151\nsouth,2026-06-01,86\nsouth,2026-06-08,92\nsouth,2026-06-15,79\neast,2026-06-01,204\neast,2026-06-08,188\neast,2026-06-15,231\nwest,2026-06-01,41\nwest,2026-06-08,55\nwest,2026-06-15,62\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "week",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "signups",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "north",
+            {},
+            120
+          ],
+          [
+            "north",
+            {},
+            138
+          ],
+          [
+            "north",
+            {},
+            151
+          ],
+          [
+            "south",
+            {},
+            86
+          ],
+          [
+            "south",
+            {},
+            92
+          ],
+          [
+            "south",
+            {},
+            79
+          ],
+          [
+            "east",
+            {},
+            204
+          ],
+          [
+            "east",
+            {},
+            188
+          ],
+          [
+            "east",
+            {},
+            231
+          ],
+          [
+            "west",
+            {},
+            41
+          ],
+          [
+            "west",
+            {},
+            55
+          ],
+          [
+            "west",
+            {},
+            62
+          ]
+        ]
+      }
+    },
+    "#block-1": {
+      "id": "#block-1",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 58,
+          "offset": 1549
+        },
+        "start": {
+          "column": 1,
+          "line": 46,
+          "offset": 1364
+        }
+      },
+      "raw": "channel,quarter,signups\norganic,Q1,310\norganic,Q2,348\npaid,Q1,190\npaid,Q2,142\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "channel",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "quarter",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "signups",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "organic",
+            "Q1",
+            310
+          ],
+          [
+            "organic",
+            "Q2",
+            348
+          ],
+          [
+            "paid",
+            "Q1",
+            190
+          ],
+          [
+            "paid",
+            "Q2",
+            142
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 23,
+          "line": 3,
+          "offset": 37
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 41
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Small multiples"
+  },
+  "position": [
+    0,
+    1550
+  ],
+  "type": "root"
+}

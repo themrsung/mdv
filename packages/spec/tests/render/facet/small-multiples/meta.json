@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "facet",
+    "layout"
+  ],
+  "note": "SPEC 7.6: both shapes of a facet. A one-axis cut wrapped by `columns:` into a grid, and a two-axis `row:`/`column:` cut where the fields already describe the grid and the wrap has nothing to decide. Panels share their scales, which is the property that makes the form worth having, and the axes are drawn on the outer panels only.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

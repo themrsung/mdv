@@ -1,0 +1,52 @@
+---
+mdv: "1.0"
+title: House style
+theme:
+  name: house
+  extends: default
+  tokens:
+    grid: "#dfe3e8"
+    axis: "#b6bec7"
+    text-secondary: "#4c5560"
+  font:
+    family: "Iowan Old Style, Palatino, Georgia, serif"
+    size: 14
+  categorical:
+    - "#2f5d8a"
+    - "#c2703d"
+    - "#4a7a5c"
+  metrics:
+    radius: 2
+---
+
+# House style
+
+A custom theme is an override, not a replacement. `extends: default` names the
+theme it starts from and the rest of the map is a patch: the tokens listed here
+win, every token not listed keeps the value the base gave it, and the marks,
+status colours and scheme all come through untouched. A document that wants
+one different grey should have to write one line, not restate a palette.
+
+The palette is the exception to the patching rule. `categorical` is assigned in
+fixed order and never cycled, so a partial list would silently change which
+series got which colour; it replaces the base's list outright, and with it the
+base's validation verdict, because a verdict about a palette says nothing about
+a different one.
+
+```mdv line
+title: Signups by plan
+x: month
+y: [free, pro, team]
+---
+month,free,pro,team
+2026-03,410,120,44
+2026-04,438,141,52
+2026-05,402,168,61
+2026-06,455,183,58
+```
+
+Three series reach the three colours the front matter named, the gridlines and
+the value labels reach the overridden tokens, and every piece of text is set in
+the overridden family at the overridden size — which is what makes this a
+render case rather than a parse one. A theme that resolves but never reaches
+the marks has not been applied.

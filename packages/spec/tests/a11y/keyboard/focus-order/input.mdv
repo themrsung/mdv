@@ -1,0 +1,44 @@
+---
+mdv: "1.0"
+title: Keyboard navigation
+---
+
+# Reading a chart without a mouse
+
+The normative requirement is an equivalence: keyboard focus MUST produce the
+same readout as hover. Not a similar one, not an abbreviated one — the same,
+from the same formatting path, because two paths are two things to keep in
+step and one of them will eventually be forgotten.
+
+A chart is **one** tab stop, never one per mark. Arrow keys walk the focus
+order from there, Home and End jump to its ends, Page Up and Page Down move
+between series, Enter and Space select, Escape drops the readout without
+leaving the chart, and `T` toggles the table view. Fifteen data points would
+otherwise be fifteen tab stops, and a page of charts would be unusable by
+exactly the reader the contract exists for.
+
+```mdv line
+title: Response time by service
+x: minute
+y: [api, worker]
+table: true
+---
+minute,api,worker
+0,142,310
+1,138,298
+2,151,344
+3,147,301
+4,139,289
+```
+
+This case is here to name the contract, not to prove it. Keyboard navigation
+is behaviour over time — a key arrives, a readout changes — and a golden is one
+document frozen at one instant, so no file in this directory can hold the
+evidence. The corpus renders with the interaction layer off on purpose, since
+the hit-rect overlay belongs to a live document and would pin nothing but its
+own geometry.
+
+So the requirement is declared in `meta.json` rather than derived, which is the
+one honest way to record it: the executable evidence is the interaction layer's
+own tests, where a synthesised `ArrowRight` and a synthesised pointer move are
+asserted to produce the identical readout rows.
