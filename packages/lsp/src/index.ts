@@ -19,6 +19,14 @@ export { toLspDiagnostic, toLspDiagnostics, toLspEdit, toLspRange } from './conv
 
 export { codeActions, type CodeActionSettings } from './features/code-actions.js';
 
+export {
+  CODE_LENS_COMMANDS,
+  codeLens,
+  type CodeLensCommands,
+  type CodeLensSettings,
+  type LensName,
+} from './features/code-lens.js';
+
 export { completion, type CompletionSettings } from './features/completion.js';
 
 export { definition, type DefinitionSettings } from './features/definition.js';
