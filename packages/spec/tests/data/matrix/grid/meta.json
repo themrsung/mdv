@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["matrix", "data"],
+  "note": "SPEC 6.2.5: a grid read as the long `row`/`column`/`value` table, the corner cell discarded rather than named, and an empty cell kept as a null-valued record.",
+  "pin": ["ast"]
+}

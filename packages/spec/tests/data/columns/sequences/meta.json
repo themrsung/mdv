@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["columns", "data"],
+  "note": "SPEC 6.2.4: field name to sequence, a flow sequence wrapped across lines beside a block sequence, and only `true`/`false` typed as boolean.",
+  "pin": ["ast"]
+}

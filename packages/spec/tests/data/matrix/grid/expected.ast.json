@@ -1,0 +1,340 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            41,
+            68
+          ],
+          "type": "text",
+          "value": "Deliveries by depot and day"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        39,
+        68
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            70,
+            213
+          ],
+          "type": "text",
+          "value": "A matrix is written as the grid a reader wants to look at and read as the\nlong table an encoder can bind: every cell becomes its own record of "
+        },
+        {
+          "position": [
+            213,
+            218
+          ],
+          "type": "inlineCode",
+          "value": "row"
+        },
+        {
+          "position": [
+            218,
+            220
+          ],
+          "type": "text",
+          "value": ",\n"
+        },
+        {
+          "position": [
+            220,
+            228
+          ],
+          "type": "inlineCode",
+          "value": "column"
+        },
+        {
+          "position": [
+            228,
+            234
+          ],
+          "type": "text",
+          "value": ", and "
+        },
+        {
+          "position": [
+            234,
+            241
+          ],
+          "type": "inlineCode",
+          "value": "value"
+        },
+        {
+          "position": [
+            241,
+            352
+          ],
+          "type": "text",
+          "value": ". Two depots across three days are six rows, and the\nfield names are always those three — the corner cell says "
+        },
+        {
+          "position": [
+            352,
+            359
+          ],
+          "type": "inlineCode",
+          "value": "depot"
+        },
+        {
+          "position": [
+            359,
+            426
+          ],
+          "type": "text",
+          "value": ", and that\nword is a label for the reader that no channel can name."
+        }
+      ],
+      "position": [
+        70,
+        426
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            428,
+            617
+          ],
+          "type": "text",
+          "value": "Wednesday at the northern depot has not been counted yet. An empty cell is\na cell that exists and is empty, so the record is kept and its value reads\nnull rather than the row going missing."
+        }
+      ],
+      "position": [
+        428,
+        617
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "matrix",
+        "title": "Deliveries by depot and day",
+        "type": "heatmap"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 15,
+            "line": 20,
+            "offset": 683
+          },
+          "start": {
+            "column": 9,
+            "line": 20,
+            "offset": 677
+          }
+        },
+        "title": {
+          "end": {
+            "column": 35,
+            "line": 19,
+            "offset": 668
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 641
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 18,
+            "offset": 633
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 626
+          }
+        }
+      },
+      "blockType": "heatmap",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 28,
+          "line": 25,
+          "offset": 799
+        },
+        "start": {
+          "column": 1,
+          "line": 22,
+          "offset": 688
+        }
+      },
+      "level": 2,
+      "position": [
+        619,
+        803
+      ],
+      "raw": {
+        "data": "| depot | Mon | Tue | Wed |\n| ----- | --- | --- | --- |\n| north | 12  | 18  |     |\n| south | 7   | 9   | 14  |\n",
+        "fence": "```",
+        "header": "title: Deliveries by depot and day\nformat: matrix\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "matrix",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 26,
+          "offset": 803
+        },
+        "start": {
+          "column": 1,
+          "line": 18,
+          "offset": 619
+        }
+      },
+      "raw": "| depot | Mon | Tue | Wed |\n| ----- | --- | --- | --- |\n| north | 12  | 18  |     |\n| south | 7   | 9   | 14  |\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "row",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "column",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "value",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "north",
+            "Mon",
+            12
+          ],
+          [
+            "north",
+            "Tue",
+            18
+          ],
+          [
+            "north",
+            "Wed",
+            null
+          ],
+          [
+            "south",
+            "Mon",
+            7
+          ],
+          [
+            "south",
+            "Tue",
+            9
+          ],
+          [
+            "south",
+            "Wed",
+            14
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 19,
+          "line": 3,
+          "offset": 33
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 37
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Matrix data"
+  },
+  "position": [
+    0,
+    804
+  ],
+  "type": "root"
+}

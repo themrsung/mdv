@@ -1,0 +1,26 @@
+---
+mdv: "1.0"
+title: Matrix data
+---
+
+# Deliveries by depot and day
+
+A matrix is written as the grid a reader wants to look at and read as the
+long table an encoder can bind: every cell becomes its own record of `row`,
+`column`, and `value`. Two depots across three days are six rows, and the
+field names are always those three — the corner cell says `depot`, and that
+word is a label for the reader that no channel can name.
+
+Wednesday at the northern depot has not been counted yet. An empty cell is
+a cell that exists and is empty, so the record is kept and its value reads
+null rather than the row going missing.
+
+```mdv heatmap
+title: Deliveries by depot and day
+format: matrix
+---
+| depot | Mon | Tue | Wed |
+| ----- | --- | --- | --- |
+| north | 12  | 18  |     |
+| south | 7   | 9   | 14  |
+```

@@ -1,0 +1,32 @@
+---
+mdv: "1.0"
+title: Columns data
+---
+
+# Shipments by month
+
+Values arrive one field at a time rather than one record at a time, so a
+column is written once and read down instead of across. A flow sequence may
+wrap onto the next line, and a block sequence says the same thing in the
+form a hand-editing author usually reaches for.
+
+The accepted grammar is MDV attribute notation, not YAML, and the whole of
+the difference is visible here: `shipped` and `live` differ by one word each
+and land on different types, because only `true` and `false` are booleans.
+`no` is the string "no" — the Norway problem, declined.
+
+```mdv bar
+title: Units shipped by month
+x: month
+y: actual
+format: columns
+---
+month:  [Jan, Feb,
+         Mar]
+actual: [120, 145, 132]
+shipped: [yes, no, yes]
+live:
+  - true
+  - false
+  - true
+```

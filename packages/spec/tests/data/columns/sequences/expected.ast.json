@@ -1,0 +1,375 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            42,
+            60
+          ],
+          "type": "text",
+          "value": "Shipments by month"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        40,
+        60
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            62,
+            331
+          ],
+          "type": "text",
+          "value": "Values arrive one field at a time rather than one record at a time, so a\ncolumn is written once and read down instead of across. A flow sequence may\nwrap onto the next line, and a block sequence says the same thing in the\nform a hand-editing author usually reaches for."
+        }
+      ],
+      "position": [
+        62,
+        331
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            333,
+            440
+          ],
+          "type": "text",
+          "value": "The accepted grammar is MDV attribute notation, not YAML, and the whole of\nthe difference is visible here: "
+        },
+        {
+          "position": [
+            440,
+            449
+          ],
+          "type": "inlineCode",
+          "value": "shipped"
+        },
+        {
+          "position": [
+            449,
+            454
+          ],
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "position": [
+            454,
+            460
+          ],
+          "type": "inlineCode",
+          "value": "live"
+        },
+        {
+          "position": [
+            460,
+            527
+          ],
+          "type": "text",
+          "value": " differ by one word each\nand land on different types, because only "
+        },
+        {
+          "position": [
+            527,
+            533
+          ],
+          "type": "inlineCode",
+          "value": "true"
+        },
+        {
+          "position": [
+            533,
+            538
+          ],
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "position": [
+            538,
+            545
+          ],
+          "type": "inlineCode",
+          "value": "false"
+        },
+        {
+          "position": [
+            545,
+            560
+          ],
+          "type": "text",
+          "value": " are booleans.\n"
+        },
+        {
+          "position": [
+            560,
+            564
+          ],
+          "type": "inlineCode",
+          "value": "no"
+        },
+        {
+          "position": [
+            564,
+            615
+          ],
+          "type": "text",
+          "value": " is the string \"no\" — the Norway problem, declined."
+        }
+      ],
+      "position": [
+        333,
+        615
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "columns",
+        "title": "Units shipped by month",
+        "type": "bar",
+        "x": "month",
+        "y": "actual"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 16,
+            "line": 22,
+            "offset": 692
+          },
+          "start": {
+            "column": 9,
+            "line": 22,
+            "offset": 685
+          }
+        },
+        "title": {
+          "end": {
+            "column": 30,
+            "line": 19,
+            "offset": 657
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 635
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 18,
+            "offset": 627
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 624
+          }
+        },
+        "x": {
+          "end": {
+            "column": 9,
+            "line": 20,
+            "offset": 666
+          },
+          "start": {
+            "column": 4,
+            "line": 20,
+            "offset": 661
+          }
+        },
+        "y": {
+          "end": {
+            "column": 10,
+            "line": 21,
+            "offset": 676
+          },
+          "start": {
+            "column": 4,
+            "line": 21,
+            "offset": 670
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 9,
+          "line": 31,
+          "offset": 811
+        },
+        "start": {
+          "column": 1,
+          "line": 24,
+          "offset": 697
+        }
+      },
+      "level": 1,
+      "position": [
+        617,
+        815
+      ],
+      "raw": {
+        "data": "month:  [Jan, Feb,\n         Mar]\nactual: [120, 145, 132]\nshipped: [yes, no, yes]\nlive:\n  - true\n  - false\n  - true\n",
+        "fence": "```",
+        "header": "title: Units shipped by month\nx: month\ny: actual\nformat: columns\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "columns",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 32,
+          "offset": 815
+        },
+        "start": {
+          "column": 1,
+          "line": 18,
+          "offset": 617
+        }
+      },
+      "raw": "month:  [Jan, Feb,\n         Mar]\nactual: [120, 145, 132]\nshipped: [yes, no, yes]\nlive:\n  - true\n  - false\n  - true\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "month",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "actual",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "shipped",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "live",
+            "type": "boolean"
+          }
+        ],
+        "rows": [
+          [
+            "Jan",
+            120,
+            "yes",
+            true
+          ],
+          [
+            "Feb",
+            145,
+            "no",
+            false
+          ],
+          [
+            "Mar",
+            132,
+            "yes",
+            true
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 20,
+          "line": 3,
+          "offset": 34
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 38
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Columns data"
+  },
+  "position": [
+    0,
+    816
+  ],
+  "type": "root"
+}
