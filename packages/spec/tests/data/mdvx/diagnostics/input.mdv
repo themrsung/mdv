@@ -1,0 +1,43 @@
+---
+mdv: "1.0"
+title: MDVX diagnostics
+---
+
+# Three ways an expression can be wrong
+
+An expression can fail to parse, it can parse and then be handed the wrong
+kinds of value, or it can name a function that does not exist. MDVX reports
+each of those differently on purpose, because the fix is different in each
+case and the author is reading the report, not the parser.
+
+`revenue * region` parses perfectly well and is only wrong once the data
+arrives, so it is a warning that says how many values went null. `revenu(cost)`
+is a misspelling the whitelist can catch without any data at all, and the
+unclosed `(revenue - cost` never becomes a tree, so the offset of the failure
+is the most useful thing to hand back.
+
+```mdv bar
+x: region
+y: revenue
+transform:
+  - derive:
+      typed: revenue * region
+      unknown: revenu(cost)
+      malformed: (revenue - cost
+---
+region,revenue,cost
+north,40,25
+south,24,12
+```
+
+The block fails and says so, and the document around it does not.
+
+```mdv bar
+title: The rest of the document is unharmed
+x: region
+y: revenue
+---
+region,revenue
+north,40
+south,24
+```

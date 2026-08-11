@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["mdvx", "data"],
+  "note": "SPEC 6.8: operator precedence, `in`/`contains`, `&&`, and whitelisted calls, evaluated per row into derived columns.",
+  "pin": ["ast"]
+}

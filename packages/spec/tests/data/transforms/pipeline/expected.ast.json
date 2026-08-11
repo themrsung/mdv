@@ -1,0 +1,781 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            48,
+            65
+          ],
+          "type": "text",
+          "value": "Revenue by region"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        46,
+        65
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            67,
+            140
+          ],
+          "type": "text",
+          "value": "A pipeline is an ordered list and the order is the whole of the meaning:\n"
+        },
+        {
+          "position": [
+            140,
+            148
+          ],
+          "type": "inlineCode",
+          "value": "filter"
+        },
+        {
+          "position": [
+            148,
+            167
+          ],
+          "type": "text",
+          "value": " drops rows before "
+        },
+        {
+          "position": [
+            167,
+            175
+          ],
+          "type": "inlineCode",
+          "value": "derive"
+        },
+        {
+          "position": [
+            175,
+            205
+          ],
+          "type": "text",
+          "value": " computes anything from them, "
+        },
+        {
+          "position": [
+            205,
+            213
+          ],
+          "type": "inlineCode",
+          "value": "derive"
+        },
+        {
+          "position": [
+            213,
+            235
+          ],
+          "type": "text",
+          "value": " adds\nthe column that "
+        },
+        {
+          "position": [
+            235,
+            246
+          ],
+          "type": "inlineCode",
+          "value": "aggregate"
+        },
+        {
+          "position": [
+            246,
+            268
+          ],
+          "type": "text",
+          "value": " then folds away, and "
+        },
+        {
+          "position": [
+            268,
+            274
+          ],
+          "type": "inlineCode",
+          "value": "sort"
+        },
+        {
+          "position": [
+            274,
+            279
+          ],
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "position": [
+            279,
+            286
+          ],
+          "type": "inlineCode",
+          "value": "limit"
+        },
+        {
+          "position": [
+            286,
+            339
+          ],
+          "type": "text",
+          "value": " run last —\non the grouped rows, not on the raw ones."
+        }
+      ],
+      "position": [
+        67,
+        339
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            341,
+            406
+          ],
+          "type": "text",
+          "value": "Every step here is load-bearing. The zero-unit row is dropped by "
+        },
+        {
+          "position": [
+            406,
+            414
+          ],
+          "type": "inlineCode",
+          "value": "filter"
+        },
+        {
+          "position": [
+            414,
+            451
+          ],
+          "type": "text",
+          "value": "\nbefore it can pull an average down, "
+        },
+        {
+          "position": [
+            451,
+            460
+          ],
+          "type": "inlineCode",
+          "value": "revenue"
+        },
+        {
+          "position": [
+            460,
+            586
+          ],
+          "type": "text",
+          "value": " does not exist in the data\nsection at all, the four regions arrive in first-appearance order and leave in\nrevenue order, and "
+        },
+        {
+          "position": [
+            586,
+            593
+          ],
+          "type": "inlineCode",
+          "value": "limit"
+        },
+        {
+          "position": [
+            593,
+            653
+          ],
+          "type": "text",
+          "value": " cuts the smallest of them rather than the last one\nwritten."
+        }
+      ],
+      "position": [
+        341,
+        653
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "id": "sales",
+        "transform": [
+          {
+            "filter": "units > 0"
+          },
+          {
+            "derive": {
+              "revenue": "units * price"
+            }
+          },
+          {
+            "aggregate": {
+              "group": [
+                "region"
+              ],
+              "mean": {
+                "avgPrice": "price"
+              },
+              "sum": [
+                "revenue"
+              ]
+            }
+          },
+          {
+            "sort": [
+              "-revenue"
+            ]
+          },
+          {
+            "limit": 3
+          }
+        ],
+        "type": "dataset"
+      },
+      "attrsPosition": {
+        "id": {
+          "end": {
+            "column": 24,
+            "line": 19,
+            "offset": 678
+          },
+          "start": {
+            "column": 19,
+            "line": 19,
+            "offset": 673
+          }
+        },
+        "transform": {
+          "end": {
+            "column": 13,
+            "line": 29,
+            "offset": 876
+          },
+          "start": {
+            "column": 3,
+            "line": 21,
+            "offset": 692
+          }
+        },
+        "transform[0]": {
+          "end": {
+            "column": 24,
+            "line": 21,
+            "offset": 713
+          },
+          "start": {
+            "column": 5,
+            "line": 21,
+            "offset": 694
+          }
+        },
+        "transform[0].filter": {
+          "end": {
+            "column": 24,
+            "line": 21,
+            "offset": 713
+          },
+          "start": {
+            "column": 13,
+            "line": 21,
+            "offset": 702
+          }
+        },
+        "transform[1]": {
+          "end": {
+            "column": 29,
+            "line": 23,
+            "offset": 754
+          },
+          "start": {
+            "column": 5,
+            "line": 22,
+            "offset": 718
+          }
+        },
+        "transform[1].derive": {
+          "end": {
+            "column": 29,
+            "line": 23,
+            "offset": 754
+          },
+          "start": {
+            "column": 7,
+            "line": 23,
+            "offset": 732
+          }
+        },
+        "transform[1].derive.revenue": {
+          "end": {
+            "column": 29,
+            "line": 23,
+            "offset": 754
+          },
+          "start": {
+            "column": 16,
+            "line": 23,
+            "offset": 741
+          }
+        },
+        "transform[2]": {
+          "end": {
+            "column": 30,
+            "line": 27,
+            "offset": 842
+          },
+          "start": {
+            "column": 5,
+            "line": 24,
+            "offset": 759
+          }
+        },
+        "transform[2].aggregate": {
+          "end": {
+            "column": 30,
+            "line": 27,
+            "offset": 842
+          },
+          "start": {
+            "column": 7,
+            "line": 25,
+            "offset": 776
+          }
+        },
+        "transform[2].aggregate.group": {
+          "end": {
+            "column": 22,
+            "line": 25,
+            "offset": 791
+          },
+          "start": {
+            "column": 14,
+            "line": 25,
+            "offset": 783
+          }
+        },
+        "transform[2].aggregate.group[0]": {
+          "end": {
+            "column": 21,
+            "line": 25,
+            "offset": 790
+          },
+          "start": {
+            "column": 15,
+            "line": 25,
+            "offset": 784
+          }
+        },
+        "transform[2].aggregate.mean": {
+          "end": {
+            "column": 30,
+            "line": 27,
+            "offset": 842
+          },
+          "start": {
+            "column": 13,
+            "line": 27,
+            "offset": 825
+          }
+        },
+        "transform[2].aggregate.mean.avgPrice": {
+          "end": {
+            "column": 29,
+            "line": 27,
+            "offset": 841
+          },
+          "start": {
+            "column": 24,
+            "line": 27,
+            "offset": 836
+          }
+        },
+        "transform[2].aggregate.sum": {
+          "end": {
+            "column": 21,
+            "line": 26,
+            "offset": 812
+          },
+          "start": {
+            "column": 12,
+            "line": 26,
+            "offset": 803
+          }
+        },
+        "transform[2].aggregate.sum[0]": {
+          "end": {
+            "column": 20,
+            "line": 26,
+            "offset": 811
+          },
+          "start": {
+            "column": 13,
+            "line": 26,
+            "offset": 804
+          }
+        },
+        "transform[3]": {
+          "end": {
+            "column": 21,
+            "line": 28,
+            "offset": 863
+          },
+          "start": {
+            "column": 5,
+            "line": 28,
+            "offset": 847
+          }
+        },
+        "transform[3].sort": {
+          "end": {
+            "column": 21,
+            "line": 28,
+            "offset": 863
+          },
+          "start": {
+            "column": 11,
+            "line": 28,
+            "offset": 853
+          }
+        },
+        "transform[3].sort[0]": {
+          "end": {
+            "column": 20,
+            "line": 28,
+            "offset": 862
+          },
+          "start": {
+            "column": 12,
+            "line": 28,
+            "offset": 854
+          }
+        },
+        "transform[4]": {
+          "end": {
+            "column": 13,
+            "line": 29,
+            "offset": 876
+          },
+          "start": {
+            "column": 5,
+            "line": 29,
+            "offset": 868
+          }
+        },
+        "transform[4].limit": {
+          "end": {
+            "column": 13,
+            "line": 29,
+            "offset": 876
+          },
+          "start": {
+            "column": 12,
+            "line": 29,
+            "offset": 875
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 19,
+            "offset": 669
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 662
+          }
+        }
+      },
+      "blockType": "dataset",
+      "dataPosition": {
+        "end": {
+          "column": 15,
+          "line": 38,
+          "offset": 1018
+        },
+        "start": {
+          "column": 1,
+          "line": 31,
+          "offset": 881
+        }
+      },
+      "level": 1,
+      "position": [
+        655,
+        1022
+      ],
+      "raw": {
+        "data": "region,quarter,units,price\nnorth,Q1,10,4.50\nnorth,Q2,6,4.50\nsouth,Q1,8,3.00\nsouth,Q2,9,3.00\neast,Q1,20,5.00\nwest,Q1,0,9.00\nwest,Q2,3,2.00\n",
+        "fence": "```",
+        "header": "transform:\n  - filter: \"units > 0\"\n  - derive:\n      revenue: units * price\n  - aggregate:\n      group: [region]\n      sum: [revenue]\n      mean: {avgPrice: price}\n  - sort: [-revenue]\n  - limit: 3\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1024,
+            1134
+          ],
+          "type": "text",
+          "value": "The chart adds no pipeline of its own, so what it draws is exactly the table\nabove: three bars, largest first."
+        }
+      ],
+      "position": [
+        1024,
+        1134
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "data": "@sales",
+        "title": "Revenue by region",
+        "type": "bar",
+        "x": "region",
+        "y": "revenue"
+      },
+      "attrsPosition": {
+        "data": {
+          "end": {
+            "column": 15,
+            "line": 46,
+            "offset": 1186
+          },
+          "start": {
+            "column": 7,
+            "line": 46,
+            "offset": 1178
+          }
+        },
+        "title": {
+          "end": {
+            "column": 25,
+            "line": 45,
+            "offset": 1171
+          },
+          "start": {
+            "column": 8,
+            "line": 45,
+            "offset": 1154
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 44,
+            "offset": 1146
+          },
+          "start": {
+            "column": 8,
+            "line": 44,
+            "offset": 1143
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 47,
+            "offset": 1196
+          },
+          "start": {
+            "column": 4,
+            "line": 47,
+            "offset": 1190
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 48,
+            "offset": 1207
+          },
+          "start": {
+            "column": 4,
+            "line": 48,
+            "offset": 1200
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "sales",
+        "key": "sales||"
+      },
+      "level": 1,
+      "position": [
+        1136,
+        1211
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "title: Revenue by region\ndata: \"@sales\"\nx: region\ny: revenue\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "sales": {
+      "id": "sales",
+      "origin": "block",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 39,
+          "offset": 1022
+        },
+        "start": {
+          "column": 1,
+          "line": 19,
+          "offset": 655
+        }
+      },
+      "raw": "region,quarter,units,price\nnorth,Q1,10,4.50\nnorth,Q2,6,4.50\nsouth,Q1,8,3.00\nsouth,Q2,9,3.00\neast,Q1,20,5.00\nwest,Q1,0,9.00\nwest,Q2,3,2.00\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "avgPrice",
+            "type": "number"
+          }
+        ],
+        "rows": [
+          [
+            "east",
+            100,
+            5
+          ],
+          [
+            "north",
+            72,
+            4.5
+          ],
+          [
+            "south",
+            51,
+            3
+          ]
+        ]
+      },
+      "transform": [
+        {
+          "filter": "units > 0"
+        },
+        {
+          "derive": {
+            "revenue": "units * price"
+          }
+        },
+        {
+          "aggregate": {
+            "group": [
+              "region"
+            ],
+            "mean": {
+              "avgPrice": "price"
+            },
+            "sum": [
+              "revenue"
+            ]
+          }
+        },
+        {
+          "sort": [
+            "-revenue"
+          ]
+        },
+        {
+          "limit": 3
+        }
+      ]
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 26,
+          "line": 3,
+          "offset": 40
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 44
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Transform pipeline"
+  },
+  "position": [
+    0,
+    1212
+  ],
+  "type": "root"
+}

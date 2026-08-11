@@ -1,0 +1,49 @@
+---
+mdv: "1.0"
+title: Transform pipeline
+---
+
+# Revenue by region
+
+A pipeline is an ordered list and the order is the whole of the meaning:
+`filter` drops rows before `derive` computes anything from them, `derive` adds
+the column that `aggregate` then folds away, and `sort` and `limit` run last —
+on the grouped rows, not on the raw ones.
+
+Every step here is load-bearing. The zero-unit row is dropped by `filter`
+before it can pull an average down, `revenue` does not exist in the data
+section at all, the four regions arrive in first-appearance order and leave in
+revenue order, and `limit` cuts the smallest of them rather than the last one
+written.
+
+```mdv dataset id=sales
+transform:
+  - filter: "units > 0"
+  - derive:
+      revenue: units * price
+  - aggregate:
+      group: [region]
+      sum: [revenue]
+      mean: {avgPrice: price}
+  - sort: [-revenue]
+  - limit: 3
+---
+region,quarter,units,price
+north,Q1,10,4.50
+north,Q2,6,4.50
+south,Q1,8,3.00
+south,Q2,9,3.00
+east,Q1,20,5.00
+west,Q1,0,9.00
+west,Q2,3,2.00
+```
+
+The chart adds no pipeline of its own, so what it draws is exactly the table
+above: three bars, largest first.
+
+```mdv bar
+title: Revenue by region
+data: "@sales"
+x: region
+y: revenue
+```

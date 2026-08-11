@@ -18,7 +18,13 @@
  */
 import { unimplementedChartTypes } from '@mdv/charts';
 import { detectFormat, facetWrapOf } from '@mdv/core';
-import type { DatasetNode, ResolvedBlock, ResolvedDocument } from '@mdv/core';
+import type {
+  DatasetNode,
+  ResolvedBlock,
+  ResolvedDocument,
+  TransformPipeline,
+  TransformStep,
+} from '@mdv/core';
 import type { MdvNode } from '@mdv/parser';
 import { isKnownRequirement } from '@mdv/spec';
 import type { CaseMeta, CheckResult } from './types.js';
@@ -110,12 +116,16 @@ function addSyntax(doc: ResolvedDocument, add: (id: string) => void): void {
 
 function addData(doc: ResolvedDocument, add: (id: string) => void): void {
   const datasets = doc.datasets.list();
+  const pipelines: TransformPipeline[] = [];
 
   for (const node of datasets) {
     const format = concreteFormat(node);
     if (format !== undefined) add(`data.${format}`);
     if (node.src !== undefined) add('data.external');
-    if (node.transform !== undefined && node.transform.length > 0) add('data.transforms');
+    if (node.transform !== undefined && node.transform.length > 0) {
+      add('data.transforms');
+      pipelines.push(node.transform);
+    }
     if (node.origin === 'front-matter' || node.origin === 'block') add('data.datasets');
     if (inferred(node.table?.fields)) add('data.inference');
   }
@@ -123,9 +133,41 @@ function addData(doc: ResolvedDocument, add: (id: string) => void): void {
   for (const block of doc.blocks) {
     if (inferred(block.table?.fields)) add('data.inference');
     const pipeline = block.attrs.transform;
-    if (pipeline !== undefined && pipeline.length > 0) add('data.transforms');
+    if (pipeline !== undefined && pipeline.length > 0) {
+      add('data.transforms');
+      pipelines.push(pipeline);
+    }
     if (typeof block.attrs.src === 'string') add('data.external');
   }
+
+  if (pipelines.some((pipeline) => pipeline.some(evaluatesExpression)) && !diagnosedMdvx(doc)) {
+    add('data.mdvx');
+  }
+}
+
+/**
+ * Whether a step hands MDVX something to evaluate.
+ *
+ * Only `filter` and `derive` do. Every other step is named fields, numbers and
+ * literals, and a field name is not an expression however much `revenue` looks
+ * like one — `sort: [-revenue]` proves nothing about the language (SPEC 6.7).
+ */
+function evaluatesExpression(step: TransformStep): boolean {
+  if ('filter' in step) return true;
+  return 'derive' in step && Object.keys(step.derive).length > 0;
+}
+
+/**
+ * Whether the document reported on an expression rather than evaluating one.
+ *
+ * Appendix C numbers the expression reports `MDV22xx`, at every severity: a
+ * malformed expression, a type error that nulled a column, an unknown function.
+ * `data.mdvx` is a claim that the language *ran*, so one of those anywhere in
+ * the document withdraws it — a case is free to pin the diagnostics and prove
+ * the reporting instead, which is what `data/mdvx/diagnostics` does.
+ */
+function diagnosedMdvx(doc: ResolvedDocument): boolean {
+  return doc.diagnostics.some((diagnostic) => diagnostic.code.startsWith('MDV22'));
 }
 
 /**

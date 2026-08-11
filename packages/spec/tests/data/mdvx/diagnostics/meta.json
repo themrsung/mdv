@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["mdvx", "error", "data"],
+  "note": "SPEC 6.8: a malformed expression, a type error, and an unknown function are three different reports — MDV2200, MDV2210, MDV2220.",
+  "pin": ["diagnostics"]
+}

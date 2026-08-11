@@ -1,0 +1,48 @@
+---
+mdv: "1.0"
+title: MDVX expressions
+---
+
+# What an expression may say
+
+MDVX is deliberately small: one expression compiles once and is evaluated per
+row, it reads fields by bare name, and the only functions it can call are the
+whitelisted ones. Everything below is one row's worth of arithmetic, and none
+of it can reach outside the row it is given.
+
+Precedence is the ordinary one, so `units * price - cost` needs no parentheses
+and `(units - 2) * price` cannot do without them. `in` and `contains` are
+spelled as words but are comparisons like any other, `&&` binds tighter than
+`||`, and `if` is a function rather than a syntax — which is why it takes its
+two branches as arguments and evaluates to a value.
+
+```mdv dataset id=sales
+transform:
+  - filter: "quarter in ['Q1', 'Q2'] && units > 0"
+  - derive:
+      revenue: units * price - cost
+      pairs: (units - 2) * price
+      band: if(units >= 10, 'bulk', 'small')
+      label: upper(concat(region, ' ', quarter))
+      margin: round((units * price - cost) / (units * price) * 100)
+      flagged: region contains 'o'
+---
+region,quarter,units,price,cost
+north,Q1,10,4,25
+south,Q1,8,3,12
+east,Q2,20,5,40
+west,Q3,4,9,10
+inner,Q2,0,1,0
+```
+
+The `west` row is gone because `Q3` is not in the list, and `inner` is gone
+because zero units fail the second half of the same filter — one expression,
+two reasons, one pass over the data. North's margin lands on 37.5 before
+rounding and 38 after it: `round` goes half away from zero rather than to
+even, which is the sort of thing a table has to decide once and then never
+vary.
+
+```mdv table
+title: Derived columns
+data: "@sales"
+```

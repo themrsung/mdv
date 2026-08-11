@@ -1,0 +1,723 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            46,
+            72
+          ],
+          "type": "text",
+          "value": "What an expression may say"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        44,
+        72
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            74,
+            352
+          ],
+          "type": "text",
+          "value": "MDVX is deliberately small: one expression compiles once and is evaluated per\nrow, it reads fields by bare name, and the only functions it can call are the\nwhitelisted ones. Everything below is one row's worth of arithmetic, and none\nof it can reach outside the row it is given."
+        }
+      ],
+      "position": [
+        74,
+        352
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            354,
+            389
+          ],
+          "type": "text",
+          "value": "Precedence is the ordinary one, so "
+        },
+        {
+          "position": [
+            389,
+            411
+          ],
+          "type": "inlineCode",
+          "value": "units * price - cost"
+        },
+        {
+          "position": [
+            411,
+            437
+          ],
+          "type": "text",
+          "value": " needs no parentheses\nand "
+        },
+        {
+          "position": [
+            437,
+            458
+          ],
+          "type": "inlineCode",
+          "value": "(units - 2) * price"
+        },
+        {
+          "position": [
+            458,
+            483
+          ],
+          "type": "text",
+          "value": " cannot do without them. "
+        },
+        {
+          "position": [
+            483,
+            487
+          ],
+          "type": "inlineCode",
+          "value": "in"
+        },
+        {
+          "position": [
+            487,
+            492
+          ],
+          "type": "text",
+          "value": " and "
+        },
+        {
+          "position": [
+            492,
+            502
+          ],
+          "type": "inlineCode",
+          "value": "contains"
+        },
+        {
+          "position": [
+            502,
+            560
+          ],
+          "type": "text",
+          "value": " are\nspelled as words but are comparisons like any other, "
+        },
+        {
+          "position": [
+            560,
+            564
+          ],
+          "type": "inlineCode",
+          "value": "&&"
+        },
+        {
+          "position": [
+            564,
+            584
+          ],
+          "type": "text",
+          "value": " binds tighter than\n"
+        },
+        {
+          "position": [
+            584,
+            588
+          ],
+          "type": "inlineCode",
+          "value": "||"
+        },
+        {
+          "position": [
+            588,
+            594
+          ],
+          "type": "text",
+          "value": ", and "
+        },
+        {
+          "position": [
+            594,
+            598
+          ],
+          "type": "inlineCode",
+          "value": "if"
+        },
+        {
+          "position": [
+            598,
+            713
+          ],
+          "type": "text",
+          "value": " is a function rather than a syntax — which is why it takes its\ntwo branches as arguments and evaluates to a value."
+        }
+      ],
+      "position": [
+        354,
+        713
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "id": "sales",
+        "transform": [
+          {
+            "filter": "quarter in ['Q1', 'Q2'] && units > 0"
+          },
+          {
+            "derive": {
+              "band": "if(units >= 10, 'bulk', 'small')",
+              "flagged": "region contains 'o'",
+              "label": "upper(concat(region, ' ', quarter))",
+              "margin": "round((units * price - cost) / (units * price) * 100)",
+              "pairs": "(units - 2) * price",
+              "revenue": "units * price - cost"
+            }
+          }
+        ],
+        "type": "dataset"
+      },
+      "attrsPosition": {
+        "id": {
+          "end": {
+            "column": 24,
+            "line": 19,
+            "offset": 738
+          },
+          "start": {
+            "column": 19,
+            "line": 19,
+            "offset": 733
+          }
+        },
+        "transform": {
+          "end": {
+            "column": 35,
+            "line": 28,
+            "offset": 1078
+          },
+          "start": {
+            "column": 3,
+            "line": 21,
+            "offset": 752
+          }
+        },
+        "transform[0]": {
+          "end": {
+            "column": 51,
+            "line": 21,
+            "offset": 800
+          },
+          "start": {
+            "column": 5,
+            "line": 21,
+            "offset": 754
+          }
+        },
+        "transform[0].filter": {
+          "end": {
+            "column": 51,
+            "line": 21,
+            "offset": 800
+          },
+          "start": {
+            "column": 13,
+            "line": 21,
+            "offset": 762
+          }
+        },
+        "transform[1]": {
+          "end": {
+            "column": 35,
+            "line": 28,
+            "offset": 1078
+          },
+          "start": {
+            "column": 5,
+            "line": 22,
+            "offset": 805
+          }
+        },
+        "transform[1].derive": {
+          "end": {
+            "column": 35,
+            "line": 28,
+            "offset": 1078
+          },
+          "start": {
+            "column": 7,
+            "line": 23,
+            "offset": 819
+          }
+        },
+        "transform[1].derive.band": {
+          "end": {
+            "column": 45,
+            "line": 25,
+            "offset": 926
+          },
+          "start": {
+            "column": 13,
+            "line": 25,
+            "offset": 894
+          }
+        },
+        "transform[1].derive.flagged": {
+          "end": {
+            "column": 35,
+            "line": 28,
+            "offset": 1078
+          },
+          "start": {
+            "column": 16,
+            "line": 28,
+            "offset": 1059
+          }
+        },
+        "transform[1].derive.label": {
+          "end": {
+            "column": 49,
+            "line": 26,
+            "offset": 975
+          },
+          "start": {
+            "column": 14,
+            "line": 26,
+            "offset": 940
+          }
+        },
+        "transform[1].derive.margin": {
+          "end": {
+            "column": 68,
+            "line": 27,
+            "offset": 1043
+          },
+          "start": {
+            "column": 15,
+            "line": 27,
+            "offset": 990
+          }
+        },
+        "transform[1].derive.pairs": {
+          "end": {
+            "column": 33,
+            "line": 24,
+            "offset": 881
+          },
+          "start": {
+            "column": 14,
+            "line": 24,
+            "offset": 862
+          }
+        },
+        "transform[1].derive.revenue": {
+          "end": {
+            "column": 36,
+            "line": 23,
+            "offset": 848
+          },
+          "start": {
+            "column": 16,
+            "line": 23,
+            "offset": 828
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 19,
+            "offset": 729
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 722
+          }
+        }
+      },
+      "blockType": "dataset",
+      "dataPosition": {
+        "end": {
+          "column": 15,
+          "line": 35,
+          "offset": 1193
+        },
+        "start": {
+          "column": 1,
+          "line": 30,
+          "offset": 1083
+        }
+      },
+      "level": 1,
+      "position": [
+        715,
+        1197
+      ],
+      "raw": {
+        "data": "region,quarter,units,price,cost\nnorth,Q1,10,4,25\nsouth,Q1,8,3,12\neast,Q2,20,5,40\nwest,Q3,4,9,10\ninner,Q2,0,1,0\n",
+        "fence": "```",
+        "header": "transform:\n  - filter: \"quarter in ['Q1', 'Q2'] && units > 0\"\n  - derive:\n      revenue: units * price - cost\n      pairs: (units - 2) * price\n      band: if(units >= 10, 'bulk', 'small')\n      label: upper(concat(region, ' ', quarter))\n      margin: round((units * price - cost) / (units * price) * 100)\n      flagged: region contains 'o'\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1199,
+            1203
+          ],
+          "type": "text",
+          "value": "The "
+        },
+        {
+          "position": [
+            1203,
+            1209
+          ],
+          "type": "inlineCode",
+          "value": "west"
+        },
+        {
+          "position": [
+            1209,
+            1230
+          ],
+          "type": "text",
+          "value": " row is gone because "
+        },
+        {
+          "position": [
+            1230,
+            1234
+          ],
+          "type": "inlineCode",
+          "value": "Q3"
+        },
+        {
+          "position": [
+            1234,
+            1259
+          ],
+          "type": "text",
+          "value": " is not in the list, and "
+        },
+        {
+          "position": [
+            1259,
+            1266
+          ],
+          "type": "inlineCode",
+          "value": "inner"
+        },
+        {
+          "position": [
+            1266,
+            1451
+          ],
+          "type": "text",
+          "value": " is gone\nbecause zero units fail the second half of the same filter — one expression,\ntwo reasons, one pass over the data. North's margin lands on 37.5 before\nrounding and 38 after it: "
+        },
+        {
+          "position": [
+            1451,
+            1458
+          ],
+          "type": "inlineCode",
+          "value": "round"
+        },
+        {
+          "position": [
+            1458,
+            1579
+          ],
+          "type": "text",
+          "value": " goes half away from zero rather than to\neven, which is the sort of thing a table has to decide once and then never\nvary."
+        }
+      ],
+      "position": [
+        1199,
+        1579
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "data": "@sales",
+        "title": "Derived columns",
+        "type": "table"
+      },
+      "attrsPosition": {
+        "data": {
+          "end": {
+            "column": 15,
+            "line": 47,
+            "offset": 1631
+          },
+          "start": {
+            "column": 7,
+            "line": 47,
+            "offset": 1623
+          }
+        },
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 46,
+            "offset": 1616
+          },
+          "start": {
+            "column": 8,
+            "line": 46,
+            "offset": 1601
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 45,
+            "offset": 1593
+          },
+          "start": {
+            "column": 8,
+            "line": 45,
+            "offset": 1588
+          }
+        }
+      },
+      "blockType": "table",
+      "data": {
+        "datasetId": "sales",
+        "key": "sales||"
+      },
+      "level": 1,
+      "position": [
+        1581,
+        1635
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "title: Derived columns\ndata: \"@sales\"\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "sales": {
+      "id": "sales",
+      "origin": "block",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 36,
+          "offset": 1197
+        },
+        "start": {
+          "column": 1,
+          "line": 19,
+          "offset": 715
+        }
+      },
+      "raw": "region,quarter,units,price,cost\nnorth,Q1,10,4,25\nsouth,Q1,8,3,12\neast,Q2,20,5,40\nwest,Q3,4,9,10\ninner,Q2,0,1,0\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "quarter",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "units",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "price",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "cost",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "pairs",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "band",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "label",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "margin",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "flagged",
+            "type": "boolean"
+          }
+        ],
+        "rows": [
+          [
+            "north",
+            "Q1",
+            10,
+            4,
+            25,
+            15,
+            32,
+            "bulk",
+            "NORTH Q1",
+            38,
+            true
+          ],
+          [
+            "south",
+            "Q1",
+            8,
+            3,
+            12,
+            12,
+            18,
+            "small",
+            "SOUTH Q1",
+            50,
+            true
+          ],
+          [
+            "east",
+            "Q2",
+            20,
+            5,
+            40,
+            60,
+            90,
+            "bulk",
+            "EAST Q2",
+            60,
+            false
+          ]
+        ]
+      },
+      "transform": [
+        {
+          "filter": "quarter in ['Q1', 'Q2'] && units > 0"
+        },
+        {
+          "derive": {
+            "band": "if(units >= 10, 'bulk', 'small')",
+            "flagged": "region contains 'o'",
+            "label": "upper(concat(region, ' ', quarter))",
+            "margin": "round((units * price - cost) / (units * price) * 100)",
+            "pairs": "(units - 2) * price",
+            "revenue": "units * price - cost"
+          }
+        }
+      ]
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 24,
+          "line": 3,
+          "offset": 38
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 42
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "MDVX expressions"
+  },
+  "position": [
+    0,
+    1636
+  ],
+  "type": "root"
+}

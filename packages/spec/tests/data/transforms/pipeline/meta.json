@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["transforms", "data"],
+  "note": "SPEC 6.7: a five-step pipeline on the dataset itself — filter, derive, aggregate, sort, limit — where each step can only be read as having run in order.",
+  "pin": ["ast"]
+}

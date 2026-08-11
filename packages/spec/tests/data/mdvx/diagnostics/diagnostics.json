@@ -1,0 +1,47 @@
+[
+  {
+    "code": "MDV2101",
+    "severity": "info",
+    "source": "data",
+    "range": [
+      716,
+      913
+    ]
+  },
+  {
+    "code": "MDV2200",
+    "severity": "error",
+    "source": "data",
+    "range": [
+      716,
+      913
+    ]
+  },
+  {
+    "code": "MDV2210",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      716,
+      913
+    ]
+  },
+  {
+    "code": "MDV2220",
+    "severity": "error",
+    "source": "data",
+    "range": [
+      716,
+      913
+    ]
+  },
+  {
+    "code": "MDV2101",
+    "severity": "info",
+    "source": "data",
+    "range": [
+      982,
+      1098
+    ]
+  }
+]
