@@ -378,3 +378,45 @@ describe('SPEC 27 — sameDocument', () => {
     expect(sameDocument(clean, broken)).toBe(false);
   });
 });
+
+/**
+ * SPEC 5.2 / SPEC 19 - a formatter is only allowed to rewrite an info string it
+ * managed to read completely. The parser recovers what it can from a malformed
+ * one so the rest of the document still renders, but those recovered attributes
+ * are a partial reading: rebuilding the line from them would delete the text the
+ * parser rejected, and the diagnostic pointing at it would vanish on the next
+ * parse. Every case below is a line `parseInfoString` reports on.
+ */
+describe('SPEC 5.2 - malformed info strings survive formatting', () => {
+  const MALFORMED: Record<string, string> = {
+    'the spec template itself': '```mdv <type> [key=value …]\n```\n',
+    'a bare word after the type': '```mdv bar oops\ntitle: T\n```\n',
+    'an unclosed quote': '```mdv bar title="unclosed\n```\n',
+    'a key with no value': '```mdv bar title=\n```\n',
+    'punctuation where a type goes': '```mdv !!!\n```\n',
+  };
+
+  it.each(Object.keys(MALFORMED))('reports on %s', (name) => {
+    const document = parse(MALFORMED[name] as string);
+    expect(document.diagnostics.length).toBeGreaterThan(0);
+  });
+
+  it.each(Object.keys(MALFORMED))('echoes %s verbatim', (name) => {
+    const source = MALFORMED[name] as string;
+    const printed = toMarkdown(parse(source));
+    const infoLine = (text: string): string => text.split('\n')[0] as string;
+    expect(infoLine(printed)).toBe(infoLine(source));
+  });
+
+  it.each(Object.keys(MALFORMED))('still reaches a fixed point on %s', (name) => {
+    const source = MALFORMED[name] as string;
+    const once = toMarkdown(parse(source));
+    expect(toMarkdown(parse(once))).toBe(once);
+    expect(sameDocument(parse(once), parse(source))).toBe(true);
+  });
+
+  it('keeps canonicalising info strings it did read', () => {
+    const source = '```mdv bar zeta=1 alpha=2\ntitle: T\n```\n';
+    expect(toMarkdown(parse(source))).toContain('```mdv bar alpha=2 zeta=1');
+  });
+});

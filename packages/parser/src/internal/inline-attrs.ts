@@ -31,6 +31,13 @@ export interface InfoString {
   readonly typeRange: Range | null;
   readonly attrs: AttrMap;
   readonly positions: AttrRanges;
+  /**
+   * `true` when any part of the line was rejected: a token that is neither a
+   * type nor `key=value` is dropped, and a value with no text or an unclosed
+   * quote is recovered as a guess. Either way the attributes no longer describe
+   * the whole line, so the caller keeps the source verbatim (SPEC 19).
+   */
+  readonly malformed: boolean;
 }
 
 /**
@@ -52,6 +59,7 @@ export function parseInfoString(
   const positions: Record<string, Range> = {};
   let type: string | null = null;
   let typeRange: Range | null = null;
+  let malformed = false;
 
   let i = skipSpace(text, start);
   // The `mdv` token itself.
@@ -69,6 +77,7 @@ export function parseInfoString(
       bag.add('MDV1200', root.range(base + i, base + end), {
         detail: `\`${text.slice(i, end)}\` is neither a block type nor a \`key=value\` attribute.`,
       });
+      malformed = true;
       i = end;
       continue;
     }
@@ -86,6 +95,7 @@ export function parseInfoString(
               ? `\`${token}\` is not a valid block type; types are letters, digits and hyphens.`
               : `\`${token}\` is not a \`key=value\` attribute.`,
         });
+        malformed = true;
         i = end;
         continue;
       }
@@ -105,13 +115,14 @@ export function parseInfoString(
           ? `The value of \`${key}\` opens a quote that is never closed.`
           : `\`${key}=\` has no value; write \`${key}=""\` for an empty string.`,
       });
+      malformed = true;
     }
     attrs[key] = value.value;
     positions[key] = root.range(base + cursor, base + value.end);
     i = value.end;
   }
 
-  return { type, typeRange, attrs, positions };
+  return { type, typeRange, attrs, positions, malformed };
 }
 
 /** What {@link parseAttrBlock} recovers from `{...}`. */

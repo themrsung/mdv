@@ -160,6 +160,19 @@ function tableHandler(
 // ─────────────────────────────────────────────────────────────────────────────
 
 function blockHandler(node: MdvBlock, resolved: Resolved): string {
+  // SPEC 19: a line the parser could not fully read is echoed, not rewritten.
+  // `raw.info` is set only in that case, and rebuilding the info string from
+  // the attributes would silently drop whatever the parser had to reject.
+  const head = node.raw.info ?? canonicalHead(node, resolved);
+  const fence = chooseFence(node, head, resolved);
+  const header = node.raw.header;
+  const data = node.raw.data;
+  const separator = data === '' ? '' : '---\n';
+  return `${fence}${head}\n${header}${separator}${data}${fence}`;
+}
+
+/** The info string rebuilt from the attributes that live on it (SPEC 27). */
+function canonicalHead(node: MdvBlock, resolved: Resolved): string {
   const positions = node.attrsPosition;
   const line = node.position?.start.line;
   const onInfoLine = (key: string): boolean =>
@@ -173,16 +186,11 @@ function blockHandler(node: MdvBlock, resolved: Resolved): string {
 
   // The type is written in the info string unless the header claimed it.
   const typeInHeader = positions['type'] !== undefined && !onInfoLine('type');
-  const head =
+  return (
     'mdv' +
     (node.blockType !== '' && !typeInHeader ? ` ${node.blockType}` : '') +
-    emitInlineAttrs(node.attrs, orderKeys(infoKeys, resolved), resolved, false);
-
-  const fence = chooseFence(node, head, resolved);
-  const header = node.raw.header;
-  const data = node.raw.data;
-  const separator = data === '' ? '' : '---\n';
-  return `${fence}${head}\n${header}${separator}${data}${fence}`;
+    emitInlineAttrs(node.attrs, orderKeys(infoKeys, resolved), resolved, false)
+  );
 }
 
 /**

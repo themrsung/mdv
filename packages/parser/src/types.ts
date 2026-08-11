@@ -304,6 +304,14 @@ export interface MdvBlock extends UnistNode {
     data: string;
     /** The fence run that opened the block, e.g. '```' or '~~~~'. */
     fence: string;
+    /**
+     * The info string, verbatim and including the leading `mdv`, present only
+     * when part of it could not be parsed (SPEC 5.2). A formatter re-emits it
+     * untouched: the attributes it did recover no longer describe the whole
+     * line, so rebuilding the line from them would delete the author's text.
+     * Well-formed blocks leave this unset and are rebuilt in canonical order.
+     */
+    info?: string;
   };
   /**
    * Where `raw.data` came from, present exactly when the block has a `---`

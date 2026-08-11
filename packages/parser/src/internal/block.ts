@@ -101,6 +101,10 @@ export function buildVisualBlock(
 
   // ── info string (SPEC 5.2) ────────────────────────────────────────────────
   const info = parseInfoString(openText, runEnd, openOffset, root, bag);
+  // What the scanner was given, minus the trailing whitespace no one can see.
+  // Kept only when the scanner could not account for all of it, so that the
+  // formatter echoes the line instead of rebuilding it from a partial reading.
+  const rawInfo = openText.slice(runEnd).replace(/\s+$/, '');
 
   // ── header section (SPEC 5.3) ─────────────────────────────────────────────
   const header = parseHeaderLines(headerLines, root, bag);
@@ -167,7 +171,7 @@ export function buildVisualBlock(
     blockType,
     attrs,
     attrsPosition,
-    raw: { header: rawHeader, data: rawData, fence },
+    raw: { header: rawHeader, data: rawData, fence, ...(info.malformed ? { info: rawInfo } : {}) },
     level: levelOfBlockType(blockType),
     position: root.range(startOffset, endOffset),
   };
