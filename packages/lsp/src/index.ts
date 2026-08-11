@@ -99,3 +99,7 @@ export {
   type ServerContext,
   type ServerOptions,
 } from './server.js';
+
+export { portTransport, type MessagePortLike } from './transport/port.js';
+
+export { streamTransport, type ByteSink, type ByteSource } from './transport/stream.js';
