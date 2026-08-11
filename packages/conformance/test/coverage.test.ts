@@ -88,7 +88,7 @@ describe('coverageOf', () => {
      * is what graceful degradation *means* — so coverage is collected from it,
      * and the one id it must not collect is the type that was never drawn.
      */
-    const HISTOGRAM = `\`\`\`mdv histogram
+    const TREEMAP = `\`\`\`mdv treemap
 x: revenue
 ---
 region,revenue
@@ -97,11 +97,11 @@ North,120
 `;
 
     it('does not claim a type that came out as a table', async () => {
-      expect(await covers(HISTOGRAM, { checks: ['render'] })).not.toContain('type.histogram');
+      expect(await covers(TREEMAP, { checks: ['render'] })).not.toContain('type.treemap');
     });
 
     it('still credits what the document really did show', async () => {
-      expect(await covers(HISTOGRAM, { checks: ['render'] })).toContain('data.csv');
+      expect(await covers(TREEMAP, { checks: ['render'] })).toContain('data.csv');
     });
 
     it('does not claim the alias either, since `ohlc` and `candlestick` are two ids', async () => {

@@ -211,9 +211,11 @@ function addBlocks(doc: ResolvedDocument, add: (id: string) => void): void {
  * The spellings that resolve to a table-rendering stub (SPEC 15.2).
  *
  * Read off the stubs this build registers rather than written out again here:
- * the day `histogram` grows a real implementation its entry leaves
+ * the day `box` grows a real implementation its entry leaves
  * {@link unimplementedChartTypes}, and the requirement starts being credited
- * without anyone having to remember this file. Aliases are included because
+ * without anyone having to remember this file — which is exactly how
+ * `type.histogram` began being credited when SPEC 8.7 landed. Aliases are
+ * included because
  * `type.candlestick` and `type.ohlc` are separate requirements and a block is
  * spelled whichever way its author wrote it.
  */

@@ -261,11 +261,21 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('histogram')).toBe(2);
+    expect(levels.get('box')).toBe(2);
     expect(levels.get('ohlcv')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
     expect(levels.get('gantt')).toBe(3);
+  });
+
+  it('drops a name from the list the moment the real module lands', () => {
+    // `histogram` graduated (SPEC 8.7). This list is the *only* thing that
+    // decides whether a name degrades, so a name left on it after its module
+    // arrives would keep drawing the table however complete the module is.
+    expect(UNIMPLEMENTED_TYPES.map((spec) => spec.name)).not.toContain('histogram');
+    const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
+    expect(codesOf(real)).toEqual([]);
+    expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
   });
 });
