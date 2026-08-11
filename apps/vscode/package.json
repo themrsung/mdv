@@ -462,7 +462,8 @@
     "@mdv/parser": "workspace:*",
     "@mdv/render-pdf": "workspace:*",
     "@mdv/render-svg": "workspace:*",
-    "@mdv/themes": "workspace:*"
+    "@mdv/themes": "workspace:*",
+    "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
     "@types/vscode": "^1.125.0",
