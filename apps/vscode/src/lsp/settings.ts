@@ -37,6 +37,7 @@
  * rather than to whatever a partial parse happened to leave behind.
  */
 
+import type { FormatOptions, MdvConfig } from '@mdv/core';
 import type { CodeLensCommands, MdvFeatureSettings } from '@mdv/lsp';
 
 import { COMMANDS } from '../commands/ids.js';
@@ -112,8 +113,23 @@ const LENS_COMMANDS: CodeLensCommands = {
   showData: COMMANDS.showData,
 };
 
+/**
+ * The feature set a server built from `payload` runs.
+ *
+ * Narrower than `MdvFeatureSettings` on two members. `@mdv/lsp` lets `config`
+ * and `format` each be a function of the document, for a host whose settings
+ * are scoped per workspace folder; this extension resolves settings once when
+ * it starts the server, so it always hands over one config for the whole
+ * server. Saying so here is what lets a caller — the preview, the exporter,
+ * a test — read `.config.level` without first proving it is not a callback.
+ */
+export interface MdvFeatures extends MdvFeatureSettings {
+  readonly config: MdvConfig;
+  readonly format: () => FormatOptions;
+}
+
 /** The feature set a server built from `payload` runs. */
-export function featureSettings(payload: ServerSettings): MdvFeatureSettings {
+export function featureSettings(payload: ServerSettings): MdvFeatures {
   return {
     config: mdvConfig(payload),
     commands: LENS_COMMANDS,

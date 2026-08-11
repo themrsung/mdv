@@ -23,6 +23,8 @@
     "packages/*/test/**/*.tsx",
     "apps/*/src/**/*.ts",
     "apps/*/src/**/*.tsx",
+    "apps/*/test/**/*.ts",
+    "apps/*/test/**/*.tsx",
     "apps/*/vite.config.ts",
     "vitest.config.ts",
     "eslint.config.js"

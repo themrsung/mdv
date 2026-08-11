@@ -218,7 +218,7 @@ rule blanks the entire preview.
 | **Language server**   | Complete over LSP: SPEC 29.4's twelve features all run. The **in-process fallback** is narrower — diagnostics, completion, code lenses and formatting only, with hover, signature help, code actions, symbols, definition, rename, inlay hints and semantic tokens absent — so a host that cannot start the server loses those eight. `mdv.trace.server` sets the client's LSP trace level, and the in-process engine's log verbosity when it is the one running. |
 | **PNG export**        | `mdv.export.png` reports that it is unavailable: rasterising needs a canvas backend (`@mdv/render-canvas`, SPEC 23.2) that does not exist here. `mdv.exportBlock` therefore writes SVG.                                                                                                                                                                                                                                                                           |
 | **Remote themes**     | `theme: https://…` is never fetched. `mdv.security.allowExternal` gates it as external data, and even with the setting on the reader is `vscode.workspace.fs`, which speaks to the workspace, not the network. Such a block reports `MDV4002` and renders on the preview theme.                                                                                                                                                                                   |
-| **Integration tests** | See below.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Integration tests** | Both entry points are activated in the test suite, but against a double of the `vscode` API rather than a real extension host, and no webview is ever rendered. See below.                                                                                                                                                                                                                                                                                        |
 
 ## Testing
 
@@ -228,26 +228,35 @@ pnpm exec vitest run apps/vscode
 pnpm --filter mdv run build
 ```
 
-**No VS Code integration test host was available in this environment**, so
-nothing here has been exercised inside a real extension host — no
-`@vscode/test-electron` run, no manual smoke test of the preview. What _is_
-verified is:
+168 tests over ten files. They divide in two.
 
-- the whole package type-checks under `strict` with `exactOptionalPropertyTypes`
-  and `noUncheckedIndexedAccess`;
-- all three esbuild bundles build;
-- 102 unit tests covering the pipeline and its incrementality (asserting the
-  exact `PipelineStats` for a re-render, an edit to one chart, and an edit to a
-  shared dataset), the attribute cascade and encoding lift, theme selection and
-  theme-file loading (URI resolution, the read cache, and the invalidation that
-  a file watcher drives), the markdown-it plugin, and the manifest and static
-  assets — activation events,
-  every menu/keybinding command being declared, the seventeen settings, asset
-  existence, icon safety, grammar `#include` resolution and regex validity, and
-  every snippet expanding into a document the parser accepts.
+**Host-free tests** import nothing that reaches the `vscode` module: the
+pipeline and its incrementality (asserting the exact `PipelineStats` for a
+re-render, an edit to one chart, and an edit to a shared dataset), the attribute
+cascade and encoding lift, theme selection and theme-file loading (URI
+resolution, the read cache, and the invalidation a file watcher drives), the
+markdown-it plugin, the settings payload that reaches the language server, and
+the manifest and static assets — activation events, every menu/keybinding
+command being declared, the seventeen settings, asset existence, icon safety,
+grammar `#include` resolution and regex validity, and every snippet expanding
+into a document the parser accepts.
 
-The unit tests deliberately import **nothing** that reaches the `vscode` module,
-which is why logging is dependency-injected (`LogSink` in `src/log.ts`, with
-`src/channel.ts` as the only file that touches `vscode.window.createOutputChannel`).
-The VS Code-facing half — panel lifecycle, command registration, the custom
-editor — is therefore covered by compilation only.
+**Activation tests** (`test/activation.test.ts`) run the real entry points —
+`src/extension-node.ts` and `src/extension-web.ts` — against doubles under
+`test/double/`: a `vscode` API surface, a `vscode-languageclient` for each of
+its two adapters, and a `Worker`. `vitest.config.ts` aliases the three module
+specifiers to them. Both hosts are activated in the same file so that the two
+can be asserted to disagree only where they must: the same commands, the same
+preview serializer, custom editor, content providers, context keys and
+markdown-it contribution, the same client id, name and diagnostic collection —
+and a different transport, stdio against a bundled server module for the
+desktop, a `Worker` over the script URL for the web. The tests also cover what
+the settings do to a started server (argv for one transport, a query string for
+the other), the restart a settings change forces, and the fact that a
+deactivate leaves nothing behind.
+
+What is still **not** verified: nothing here has run inside a real extension
+host. There is no `@vscode/test-electron` or `@vscode/test-web` run and no
+manual smoke test of the preview, so the doubles' fidelity to VS Code is an
+assumption, and webview rendering — the panel's HTML actually drawing in a
+browser context — is covered by neither half.

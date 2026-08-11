@@ -37,8 +37,26 @@ const alias = WORKSPACE_PACKAGES.flatMap((pkg) => [
   },
 ]);
 
+/**
+ * The extension host's own modules, doubled (SPEC 29).
+ *
+ * `vscode` is supplied by the running host and `vscode-languageclient` forks a
+ * process or a worker the moment it starts; neither exists under vitest. The
+ * doubles in `apps/vscode/test/double` stand in for both. `tsc` still resolves
+ * the real declarations, so only the runtime is swapped, and nothing outside
+ * `apps/vscode` imports either specifier.
+ */
+const hostAlias = [
+  { find: /^vscode$/, module: 'vscode' },
+  { find: /^vscode-languageclient\/node$/, module: 'languageclient-node' },
+  { find: /^vscode-languageclient\/browser$/, module: 'languageclient-browser' },
+].map(({ find, module }) => ({
+  find,
+  replacement: resolve(root, `apps/vscode/test/double/${module}.ts`),
+}));
+
 export default defineConfig({
-  resolve: { alias },
+  resolve: { alias: [...alias, ...hostAlias] },
   test: {
     globals: false,
     environment: 'node',

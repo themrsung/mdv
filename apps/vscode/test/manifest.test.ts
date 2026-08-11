@@ -58,7 +58,9 @@ function valueImportsOf(relative: string): string[] {
         .split(',');
       if (names.every((name) => name.trim() === '' || /^type\s/.test(name.trim()))) continue;
     }
-    found.push(specifier);
+    // The specifier group is not optional, so a match always has one; the
+    // regex types cannot distinguish it from `clause`, which is.
+    if (specifier !== undefined) found.push(specifier);
   }
   return found;
 }
