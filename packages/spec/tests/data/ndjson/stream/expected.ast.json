@@ -1,0 +1,311 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            41,
+            66
+          ],
+          "type": "text",
+          "value": "Request latency by minute"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        39,
+        66
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            68,
+            332
+          ],
+          "type": "text",
+          "value": "One complete JSON value per line, which is the format's whole reason to\nexist: a writer can append a record without rewriting a closing bracket,\nand a reader can stop early. Blank lines are skipped, so a stream that was\nflushed in batches still reads as one table."
+        }
+      ],
+      "position": [
+        68,
+        332
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            334,
+            340
+          ],
+          "type": "inlineCode",
+          "value": "shed"
+        },
+        {
+          "position": [
+            340,
+            436
+          ],
+          "type": "text",
+          "value": " appears from the second line on and is appended in first-seen\norder, exactly as it would be in "
+        },
+        {
+          "position": [
+            436,
+            442
+          ],
+          "type": "inlineCode",
+          "value": "json"
+        },
+        {
+          "position": [
+            442,
+            514
+          ],
+          "type": "text",
+          "value": " — the two readers differ in how\nrecords are framed and in nothing else."
+        }
+      ],
+      "position": [
+        334,
+        514
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "ndjson",
+        "title": "p99 latency by minute",
+        "type": "line",
+        "x": "minute",
+        "y": "p99"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 15,
+            "line": 21,
+            "offset": 588
+          },
+          "start": {
+            "column": 9,
+            "line": 21,
+            "offset": 582
+          }
+        },
+        "title": {
+          "end": {
+            "column": 29,
+            "line": 18,
+            "offset": 556
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 535
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 17,
+            "offset": 527
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 523
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 19,
+            "offset": 566
+          },
+          "start": {
+            "column": 4,
+            "line": 19,
+            "offset": 560
+          }
+        },
+        "y": {
+          "end": {
+            "column": 7,
+            "line": 20,
+            "offset": 573
+          },
+          "start": {
+            "column": 4,
+            "line": 20,
+            "offset": 570
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 39,
+          "line": 26,
+          "offset": 697
+        },
+        "start": {
+          "column": 1,
+          "line": 23,
+          "offset": 593
+        }
+      },
+      "level": 1,
+      "position": [
+        516,
+        701
+      ],
+      "raw": {
+        "data": "{\"minute\": 1, \"p99\": 41.2}\n\n{\"minute\": 2, \"p99\": 38.7, \"shed\": 4}\n{\"minute\": 3, \"p99\": 52.9, \"shed\": 11}\n",
+        "fence": "```",
+        "header": "title: p99 latency by minute\nx: minute\ny: p99\nformat: ndjson\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "ndjson",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 27,
+          "offset": 701
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 516
+        }
+      },
+      "raw": "{\"minute\": 1, \"p99\": 41.2}\n\n{\"minute\": 2, \"p99\": 38.7, \"shed\": 4}\n{\"minute\": 3, \"p99\": 52.9, \"shed\": 11}\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "minute",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "p99",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "shed",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            1,
+            41.2,
+            null
+          ],
+          [
+            2,
+            38.7,
+            4
+          ],
+          [
+            3,
+            52.9,
+            11
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 19,
+          "line": 3,
+          "offset": 33
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 37
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "NDJSON data"
+  },
+  "position": [
+    0,
+    702
+  ],
+  "type": "root"
+}

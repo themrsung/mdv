@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["ndjson", "data"],
+  "note": "SPEC 6.2.3: one JSON value per line, blank lines skipped, and a later-only key appended in first-seen order.",
+  "pin": ["ast"]
+}

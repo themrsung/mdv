@@ -1,0 +1,27 @@
+---
+mdv: "1.0"
+title: JSON data
+---
+
+# Tail latency by service
+
+Records arrive shaped for a program rather than for a table, so `latency`
+is an object and not two columns. Flattening gives it path names — and a
+path is an ordinary field name once it has one, which is why `y:` can bind
+`latency.p99` without knowing the value was ever nested.
+
+Field order is the first record's key order. `region` is absent there and
+appears only in the second, so it is appended rather than sorted into
+place, and the record that never had it reads empty.
+
+```mdv bar
+title: p99 latency by service
+x: service
+y: latency.p99
+format: json
+---
+[
+  { "service": "gateway", "latency": { "p50": 12, "p99": 41 } },
+  { "service": "search", "latency": { "p50": 18, "p99": 96 }, "region": "eu" }
+]
+```

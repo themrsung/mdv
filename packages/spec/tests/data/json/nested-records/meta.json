@@ -1,0 +1,6 @@
+{
+  "level": 2,
+  "tags": ["json", "data"],
+  "note": "SPEC 6.2.3: nested objects flattened to `.` paths, field order taken from the first record, and a later-only key appended rather than sorted.",
+  "pin": ["ast"]
+}

@@ -1,0 +1,27 @@
+---
+mdv: "1.0"
+title: NDJSON data
+---
+
+# Request latency by minute
+
+One complete JSON value per line, which is the format's whole reason to
+exist: a writer can append a record without rewriting a closing bracket,
+and a reader can stop early. Blank lines are skipped, so a stream that was
+flushed in batches still reads as one table.
+
+`shed` appears from the second line on and is appended in first-seen
+order, exactly as it would be in `json` — the two readers differ in how
+records are framed and in nothing else.
+
+```mdv line
+title: p99 latency by minute
+x: minute
+y: p99
+format: ndjson
+---
+{"minute": 1, "p99": 41.2}
+
+{"minute": 2, "p99": 38.7, "shed": 4}
+{"minute": 3, "p99": 52.9, "shed": 11}
+```

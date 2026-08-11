@@ -1,0 +1,353 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            39,
+            62
+          ],
+          "type": "text",
+          "value": "Tail latency by service"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        37,
+        62
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            64,
+            128
+          ],
+          "type": "text",
+          "value": "Records arrive shaped for a program rather than for a table, so "
+        },
+        {
+          "position": [
+            128,
+            137
+          ],
+          "type": "inlineCode",
+          "value": "latency"
+        },
+        {
+          "position": [
+            137,
+            272
+          ],
+          "type": "text",
+          "value": "\nis an object and not two columns. Flattening gives it path names — and a\npath is an ordinary field name once it has one, which is why "
+        },
+        {
+          "position": [
+            272,
+            276
+          ],
+          "type": "inlineCode",
+          "value": "y:"
+        },
+        {
+          "position": [
+            276,
+            286
+          ],
+          "type": "text",
+          "value": " can bind\n"
+        },
+        {
+          "position": [
+            286,
+            299
+          ],
+          "type": "inlineCode",
+          "value": "latency.p99"
+        },
+        {
+          "position": [
+            299,
+            342
+          ],
+          "type": "text",
+          "value": " without knowing the value was ever nested."
+        }
+      ],
+      "position": [
+        64,
+        342
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            344,
+            389
+          ],
+          "type": "text",
+          "value": "Field order is the first record's key order. "
+        },
+        {
+          "position": [
+            389,
+            397
+          ],
+          "type": "inlineCode",
+          "value": "region"
+        },
+        {
+          "position": [
+            397,
+            540
+          ],
+          "type": "text",
+          "value": " is absent there and\nappears only in the second, so it is appended rather than sorted into\nplace, and the record that never had it reads empty."
+        }
+      ],
+      "position": [
+        344,
+        540
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "json",
+        "title": "p99 latency by service",
+        "type": "bar",
+        "x": "service",
+        "y": "latency.p99"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 13,
+            "line": 21,
+            "offset": 621
+          },
+          "start": {
+            "column": 9,
+            "line": 21,
+            "offset": 617
+          }
+        },
+        "title": {
+          "end": {
+            "column": 30,
+            "line": 18,
+            "offset": 582
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 560
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 17,
+            "offset": 552
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 549
+          }
+        },
+        "x": {
+          "end": {
+            "column": 11,
+            "line": 19,
+            "offset": 593
+          },
+          "start": {
+            "column": 4,
+            "line": 19,
+            "offset": 586
+          }
+        },
+        "y": {
+          "end": {
+            "column": 15,
+            "line": 20,
+            "offset": 608
+          },
+          "start": {
+            "column": 4,
+            "line": 20,
+            "offset": 597
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 2,
+          "line": 26,
+          "offset": 773
+        },
+        "start": {
+          "column": 1,
+          "line": 23,
+          "offset": 626
+        }
+      },
+      "level": 1,
+      "position": [
+        542,
+        777
+      ],
+      "raw": {
+        "data": "[\n  { \"service\": \"gateway\", \"latency\": { \"p50\": 12, \"p99\": 41 } },\n  { \"service\": \"search\", \"latency\": { \"p50\": 18, \"p99\": 96 }, \"region\": \"eu\" }\n]\n",
+        "fence": "```",
+        "header": "title: p99 latency by service\nx: service\ny: latency.p99\nformat: json\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "json",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 27,
+          "offset": 777
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 542
+        }
+      },
+      "raw": "[\n  { \"service\": \"gateway\", \"latency\": { \"p50\": 12, \"p99\": 41 } },\n  { \"service\": \"search\", \"latency\": { \"p50\": 18, \"p99\": 96 }, \"region\": \"eu\" }\n]\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "service",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "latency.p50",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "latency.p99",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "category"
+          }
+        ],
+        "rows": [
+          [
+            "gateway",
+            12,
+            41,
+            null
+          ],
+          [
+            "search",
+            18,
+            96,
+            "eu"
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 17,
+          "line": 3,
+          "offset": 31
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 35
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "JSON data"
+  },
+  "position": [
+    0,
+    778
+  ],
+  "type": "root"
+}
