@@ -1,5 +1,5 @@
 /**
- * Renaming a dataset id, checked by doing it (SPEC 29.4).
+ * Renaming a dataset id or a column, checked by doing it (SPEC 29.4).
  *
  * A `WorkspaceEdit` asserted as a list of ranges is a test that goes green while
  * the document it edits turns to nonsense, so almost nothing here looks at the
@@ -302,5 +302,126 @@ describe('textDocument/rename', () => {
     // `prepareRename` already said no; a client that asked anyway gets told
     // what it did wrong rather than an empty edit it would apply happily.
     expect(error.code).toBe(ErrorCodes.invalidParams);
+  });
+});
+
+/**
+ * One block that writes `revenue` three times, in the three kinds of place a
+ * column name is written: a channel, an expression, and the header cell that
+ * declares it. The header comes last in the source and first out of the
+ * locator, which is the disagreement `applied` is watching for.
+ */
+const BLOCK = [
+  '```mdv line',
+  'x: date',
+  'y: revenue',
+  'transform:',
+  '  - filter: "revenue > 0"',
+  '---',
+  'date,revenue',
+  '2026-01-01,10',
+  '```',
+  '',
+].join('\n');
+
+/** `BLOCK` after the rename every test below asks for. */
+const RENAMED = BLOCK.replace('y: revenue', 'y: turnover')
+  .replace('"revenue > 0"', '"turnover > 0"')
+  .replace('date,revenue', 'date,turnover');
+
+describe('renaming a column', () => {
+  it('offers the header cell alone, and fills the box with it', async () => {
+    const source = BLOCK.replace('date,revenue', 'date,reve‸nue');
+    const prepared = await prepareAt(source);
+    expect(covered(source, prepared?.range as Range)).toBe('revenue');
+    expect(prepared?.placeholder).toBe('revenue');
+  });
+
+  it('rewrites the header and every reference, from a reference', async () => {
+    const source = BLOCK.replace('y: revenue', 'y: reve‸nue');
+    expect(applied(source, await renameAt(source, 'turnover'))).toBe(RENAMED);
+  });
+
+  it('rewrites the same set asked from the header cell', async () => {
+    const source = BLOCK.replace('date,revenue', 'date,reve‸nue');
+    expect(applied(source, await renameAt(source, 'turnover'))).toBe(RENAMED);
+  });
+
+  it('rewrites the same set asked from inside an expression', async () => {
+    const source = BLOCK.replace('"revenue > 0"', '"reve‸nue > 0"');
+    expect(applied(source, await renameAt(source, 'turnover'))).toBe(RENAMED);
+  });
+
+  it('does nothing when the name has not changed', async () => {
+    const source = BLOCK.replace('y: revenue', 'y: reve‸nue');
+    expect(await renameAt(source, 'revenue')).toBeNull();
+  });
+
+  it('leaves a column of the same name in another block alone', async () => {
+    // Columns are block-scoped (SPEC 29.4): the second block's `revenue` is a
+    // different column that happens to be spelled the same, and a rename that
+    // reached it would break a chart the author was not editing.
+    const source = `${BLOCK.replace('y: revenue', 'y: reve‸nue')}\n${BLOCK}`;
+    expect(applied(source, await renameAt(source, 'turnover'))).toBe(`${RENAMED}\n${BLOCK}`);
+  });
+
+  it('refuses a name the header row could not hold', async () => {
+    const source = BLOCK.replace('y: revenue', 'y: reve‸nue');
+    const error = await refusalAt(source, 'net,revenue');
+    expect(error.code).toBe(ErrorCodes.requestFailed);
+    expect(error.message).toContain('separates the header cells');
+  });
+
+  it('refuses a name an expression could not hold bare', async () => {
+    // `filter: "revenue > 0"` spells the name as a bare identifier and
+    // `Net revenue` is two of them, so the rename would have to invent the
+    // brackets — an edit to the expression's grammar the author did not ask for.
+    const source = BLOCK.replace('y: revenue', 'y: reve‸nue');
+    const error = await refusalAt(source, 'Net revenue');
+    expect(error.code).toBe(ErrorCodes.requestFailed);
+    expect(error.message).toContain('bracketed');
+  });
+
+  it('declines a column a `rename:` step carries under another name', async () => {
+    const source = [
+      '```mdv line',
+      'x: date',
+      'transform:',
+      '  - rename:',
+      '      revenue: turnover',
+      '---',
+      'date,reve‸nue',
+      '2026-01-01,10',
+      '```',
+      '',
+    ].join('\n');
+    // The old name is the mapping *key*, and the parser records ranges for
+    // values — so one of this column's two uses cannot be cut out of the text
+    // as written, and the contract says that means none of them are.
+    expect(await prepareAt(source)).toBeNull();
+    const error = await refusalAt(source, 'takings');
+    expect(error.code).toBe(ErrorCodes.requestFailed);
+    expect(error.message).toContain('revenue');
+  });
+
+  it('declines the columns of a block that publishes its rows', async () => {
+    const source = [
+      '```mdv dataset',
+      'id: sales',
+      '---',
+      'date,reve‸nue',
+      '2026-01-01,10',
+      '```',
+      '',
+      '```mdv line',
+      'data: "@sales"',
+      'y: revenue',
+      '```',
+      '',
+    ].join('\n');
+    // `@sales` is read by blocks this rename cannot see from the header row it
+    // is standing in, and moving the header would leave the chart below
+    // pointing at a column that no longer exists.
+    expect(await prepareAt(source)).toBeNull();
   });
 });

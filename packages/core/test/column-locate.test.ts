@@ -219,6 +219,9 @@ describe('blocks that declare no columns of their own', () => {
     ['`header: false`', ['header: false', '---', 'date,revenue']],
     ['names given by `columns:`', ['columns: [date, revenue]', '---', '[["2026-01-01", 10]]']],
     ['rows read from a file', ['src: sales.csv', 'x: date']],
+    // The mirror of the first case: `@sales` is written in blocks this one
+    // cannot see, and moving the header without them would break every reader.
+    ['rows an `id:` publishes', ['id: sales', 'x: date', '---', 'date,revenue']],
     ['`json`, which names a column once per record', ['---', '[{"date": "2026-01-01"}]']],
     ['`matrix`, which names none', ['format: matrix', '---', '1\t2', '3\t4']],
   ];

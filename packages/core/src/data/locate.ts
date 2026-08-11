@@ -117,7 +117,8 @@ const KEYWORDS: ReadonlySet<string> = new Set(['true', 'false', 'null']);
  * block writes each name.
  *
  * `undefined` when the block declares no columns anywhere this file can point
- * at: no data section, rows that come from somewhere else, `header: false`,
+ * at: no data section, rows that come from somewhere else or that an `id:`
+ * hands to the rest of the document, `header: false`,
  * names supplied by `columns:` rather than by the text, or a format whose names
  * are not all on one line (`json`, `ndjson`, `columns`) or absent entirely
  * (`matrix`).
@@ -230,6 +231,11 @@ function readHeader(block: MdvBlock): Header | undefined {
   if (raw.trim() === '') return undefined;
 
   const attrs = block.attrs;
+  // Rows published under an id are read by `@id` from anywhere in the document
+  // (SPEC 6.3), and the `x: date` that reads them is a reference in another
+  // block's text. That is the case below seen from the other end: a name whose
+  // uses are not all in this block is a name this file cannot move.
+  if (attrs['id'] !== undefined) return undefined;
   if (attrs['header'] === false) return undefined; // Names are `column_1`, `column_2`.
   if (attrs['columns'] !== undefined) return undefined; // Names come from the header, not the text.
   if (attrs['src'] !== undefined) return undefined;
