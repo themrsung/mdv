@@ -341,7 +341,9 @@ export function buildPdf(
   const layout: BlockLayout = (block, widthPx, heightPx) => {
     const context: LayoutContextWithRegistry = {
       theme,
-      colorScheme: doc.config.colorScheme,
+      // `theme` is `ctx.printTheme ?? doc.theme`, so the document's scheme is
+      // the wrong answer whenever a print theme replaced it (SPEC 28.5).
+      colorScheme: theme.scheme,
       metrics,
       locale: doc.config.locale,
       timezone: doc.config.timezone,

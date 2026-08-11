@@ -239,6 +239,31 @@ function fromPlugins(
 }
 
 /**
+ * The theme a surface starts from, before any `theme:` setting (SPEC 11.7).
+ *
+ * The embedder's colour scheme is a *precedence step*, not a decoration: a dark
+ * request answered with light tokens has not honoured it. Asking
+ * {@link fromPlugins} for `default` cannot honour it either, because a plugin
+ * registers its two surfaces as two themes under two names — the pairing
+ * `@mdv/themes`' `themeNameForScheme` states, and the reason `fromPlugins`'
+ * name-first fallback returns the light `default` for a dark request rather
+ * than nothing at all.
+ *
+ * So the surface is asked for by the name that belongs to it, and the answer is
+ * confirmed against `scheme` rather than assumed from the name. A plugin that
+ * registered nothing for this surface falls through to the built-in fallback,
+ * which is the one theme guaranteed to be the surface it claims.
+ */
+function baseTheme(themes: readonly Theme[], scheme: ColorScheme): Theme {
+  const named = scheme === 'dark' ? 'dark' : 'default';
+  return (
+    themes.find((theme) => theme.name === named && theme.scheme === scheme) ??
+    themes.find((theme) => theme.name === 'default' && theme.scheme === scheme) ??
+    fallbackTheme(scheme)
+  );
+}
+
+/**
  * Apply a {@link ThemeOverride} (SPEC 11.6) over a resolved base.
  *
  * Only the fields core can apply without a colour engine are applied: token
@@ -318,7 +343,7 @@ export function resolveThemeSetting(
   scheme: ColorScheme,
   pluginThemes: readonly Theme[] = [],
 ): ThemeResolution {
-  const base = fromPlugins(pluginThemes, 'default', scheme) ?? fallbackTheme(scheme);
+  const base = baseTheme(pluginThemes, scheme);
 
   if (setting === undefined) return { theme: base };
 

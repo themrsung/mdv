@@ -780,7 +780,11 @@ export function createLayoutContext(
     timezone: config.timezone,
     level: config.level,
     buildTime: config.buildTime,
-    colorScheme: config.colorScheme,
+    // The scheme of the theme one line above, not the document's: a per-block
+    // `theme:` is the top of SPEC 11.7's precedence order, so a dark block in a
+    // light document must hand layout the dark surface it is drawing on, or a
+    // chart type picking "the right validated palette" picks the other one.
+    colorScheme: block.theme.scheme,
     a11y: config.a11y,
     animate: config.render.animate,
     // `exactOptionalPropertyTypes`: an absent sink and a sink of `undefined` are

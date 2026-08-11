@@ -79,7 +79,13 @@ export function resolveConfig(
     level: data.level ?? 2,
     strict: config?.strict ?? false,
     theme: theme.theme,
-    colorScheme: scheme,
+    // The surface actually resolved, not the surface asked for (SPEC 11.7:
+    // "the block's `theme`, the document's `theme`, the embedder's setting,
+    // then `prefers-color-scheme`"). Front matter's `theme: dark` outranks an
+    // embedder that said nothing, and this field is what an embedder stamps as
+    // `data-theme` — reporting the request would point the stylesheet at one
+    // surface while the tokens baked into the marks are the other.
+    colorScheme: theme.theme.scheme,
     locale: data.format.locale,
     timezone: data.timezone,
     buildTime: data.buildTime,
