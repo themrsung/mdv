@@ -282,7 +282,19 @@ function blockRequest(
     ...(section !== undefined ? { raw: section } : {}),
     ...(typeof src === 'string' ? { src } : {}),
   };
-  const inline = readDeclaration(id, block.attrs, 'inline', diag, section, range);
+  // `transform:` on a visual block is the *block's* pipeline, and the request
+  // below carries it: `resolveTableRef` applies it on top of whatever the
+  // dataset prepared. Reading the same attribute onto the synthetic dataset as
+  // well would run the pipeline twice — invisibly for a `filter`, and as `× 4`
+  // for a `derive` that doubles a column.
+  const { transform: _blockPipeline, ...inline } = readDeclaration(
+    id,
+    block.attrs,
+    'inline',
+    diag,
+    section,
+    range,
+  );
   declarations.push({ ...inline, ...declaration });
 
   return {

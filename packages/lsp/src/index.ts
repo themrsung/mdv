@@ -35,6 +35,8 @@ export { formatting, type FormatterOptions } from './features/formatting.js';
 
 export { hover, type HoverSettings } from './features/hover.js';
 
+export { inlay, type InlayHintSettings } from './features/inlay.js';
+
 export { rename, type RenameSettings } from './features/rename.js';
 
 export { signature, type SignatureSettings } from './features/signature.js';

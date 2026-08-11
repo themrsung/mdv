@@ -369,6 +369,26 @@ describe('resolveDocumentDataSync', () => {
     expect(data.blocks[0]?.ref.key).not.toBe(data.blocks[1]?.ref.key);
   });
 
+  it('applies an inline block’s transform once, not once per stage', () => {
+    const doc = document([
+      block('bar', { format: 'csv', transform: [{ derive: { revenue: 'revenue * 2' } }] }, CSV),
+    ]);
+    const data = resolveDocumentDataSync(doc, dataOptionsFrom(undefined, doc));
+
+    expect(data.blocks[0]?.table.rows).toEqual([
+      ['Q1', 2480],
+      ['Q2', 3020],
+    ]);
+    // The synthetic dataset holds the data as written. The block's pipeline is
+    // the block's, carried by the request, so reading it onto the inline
+    // declaration too would double it — silently for a `filter`, and as `× 4`
+    // here. It is also what a reader of the header row must be shown.
+    expect(data.registry.get('#block-0')?.table?.rows).toEqual([
+      ['Q1', 1240],
+      ['Q2', 1510],
+    ]);
+  });
+
   it('refuses to fetch, and says so, rather than drawing an empty chart', () => {
     const doc = document([block('bar', { src: 'https://example.com/a.csv' })]);
     const data = resolveDocumentDataSync(doc, dataOptionsFrom(undefined, doc));

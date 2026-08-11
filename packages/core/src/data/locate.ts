@@ -113,18 +113,61 @@ const BARE_NAME = /^[A-Za-z_$][A-Za-z_$0-9]*$/u;
 const KEYWORDS: ReadonlySet<string> = new Set(['true', 'false', 'null']);
 
 /**
+ * The header cells of a block's own data section, in source order.
+ *
+ * Every cell the row has, spelled as the author spelled it: empty cells and
+ * repeated names are included, because a caller that only reads them — a type
+ * annotation, a column count — is right about all of them, and only a caller
+ * that means to *rewrite* one has to care that a repeat cannot be told apart
+ * (which is {@link locateColumns}, and why that is a different function).
+ */
+export interface HeaderRow {
+  /** One site per cell of the header row, empty names included. */
+  readonly cells: readonly ColumnSite[];
+  /** The character that separates them (`,`, a TAB, or `|`). */
+  readonly delimiter: string;
+}
+
+/**
+ * Where this block writes its column names, if it writes them at all.
+ *
+ * `undefined` when the block names no columns anywhere this file can point at:
+ * no data section, rows that come from somewhere else, `header: false`, names
+ * supplied by `columns:` rather than by the text, or a format whose names are
+ * not all on one line (`json`, `ndjson`, `columns`) or absent entirely
+ * (`matrix`).
+ */
+export function locateHeader(block: MdvBlock): HeaderRow | undefined {
+  const header = readHeader(block);
+  if (header === undefined) return undefined;
+
+  const cells = header.cells.map((cell) => ({
+    name: cell.name,
+    kind: 'header' as const,
+    path: HEADER_PATH,
+    range: header.range,
+    text: header.line,
+    offset: cell.offset,
+  }));
+
+  return { cells, delimiter: header.delimiter };
+}
+
+/**
  * Every column this block declares in its own data section, and everywhere the
  * block writes each name.
  *
- * `undefined` when the block declares no columns anywhere this file can point
- * at: no data section, rows that come from somewhere else or that an `id:`
- * hands to the rest of the document, `header: false`,
- * names supplied by `columns:` rather than by the text, or a format whose names
- * are not all on one line (`json`, `ndjson`, `columns`) or absent entirely
- * (`matrix`).
+ * {@link locateHeader} minus the cells no edit can safely touch. `undefined`
+ * for everything that has no locatable header, and additionally for rows
+ * published under an `id:` — those are read by `@id` from anywhere in the
+ * document (SPEC 6.3), and the `x: date` that reads them is a reference in
+ * another block's text, so a name whose uses are not all in this block is a
+ * name this file cannot move.
  */
 export function locateColumns(block: MdvBlock): ColumnMap | undefined {
-  const header = readHeader(block);
+  if (block.attrs['id'] !== undefined) return undefined;
+
+  const header = locateHeader(block);
   if (header === undefined) return undefined;
 
   // A name written twice in one header does not identify a column: the reader
@@ -137,16 +180,7 @@ export function locateColumns(block: MdvBlock): ColumnMap | undefined {
   for (const [index, cell] of header.cells.entries()) {
     if (cell.name === '') continue;
     if (seen.get(cell.name) !== 1) continue;
-    const sites: ColumnSite[] = [
-      {
-        name: cell.name,
-        kind: 'header',
-        path: HEADER_PATH,
-        range: header.range,
-        text: header.line,
-        offset: cell.offset,
-      },
-    ];
+    const sites: ColumnSite[] = [cell];
     collectReferences(block, cell.name, sites);
     columns.push({ name: cell.name, index, sites });
   }
@@ -231,11 +265,6 @@ function readHeader(block: MdvBlock): Header | undefined {
   if (raw.trim() === '') return undefined;
 
   const attrs = block.attrs;
-  // Rows published under an id are read by `@id` from anywhere in the document
-  // (SPEC 6.3), and the `x: date` that reads them is a reference in another
-  // block's text. That is the case below seen from the other end: a name whose
-  // uses are not all in this block is a name this file cannot move.
-  if (attrs['id'] !== undefined) return undefined;
   if (attrs['header'] === false) return undefined; // Names are `column_1`, `column_2`.
   if (attrs['columns'] !== undefined) return undefined; // Names come from the header, not the text.
   if (attrs['src'] !== undefined) return undefined;

@@ -96,8 +96,14 @@ export { callAt, expressionAt, fieldRefs } from './expr/locate.js';
  * a language server would be a second implementation of SPEC 6.7's lineage
  * rules that could disagree with this one.
  */
-export type { ColumnLocation, ColumnMap, ColumnSite, ColumnSiteKind } from './data/locate.js';
-export { HEADER_PATH, checkColumnName, locateColumns } from './data/locate.js';
+export type {
+  ColumnLocation,
+  ColumnMap,
+  ColumnSite,
+  ColumnSiteKind,
+  HeaderRow,
+} from './data/locate.js';
+export { HEADER_PATH, checkColumnName, locateColumns, locateHeader } from './data/locate.js';
 
 /**
  * The stages `resolve()` below is assembled from, exported because the pipeline

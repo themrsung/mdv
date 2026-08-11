@@ -19,7 +19,13 @@
  */
 
 import { registryFromPlugins, resolveSync } from '@mdv/core';
-import type { ChartType, ChartTypeRegistry, MdvConfig, ResolvedBlock } from '@mdv/core';
+import type {
+  ChartType,
+  ChartTypeRegistry,
+  MdvConfig,
+  ResolvedBlock,
+  ResolvedDocument,
+} from '@mdv/core';
 import { parse } from '@mdv/parser';
 
 import type { TextDocument } from '../documents.js';
@@ -128,19 +134,11 @@ export class Sites {
     throwIfCancelled(token);
 
     const offset = document.offsetAt(position);
-    let block: ResolvedBlock | undefined;
-    try {
-      const resolved = resolveSync(parse(document.text), config);
-      block = resolved.blocks.find(
-        (candidate) =>
-          candidate.range.start.offset <= offset && offset <= candidate.range.end.offset,
-      );
-    } catch (error) {
-      this.#context.logger.error(
-        `${this.#feature} could not read ${document.uri}: ${reasonOf(error)}`,
-      );
-      return undefined;
-    }
+    const resolved = this.#resolve(document, config);
+    if (resolved === undefined) return undefined;
+    const block = resolved.blocks.find(
+      (candidate) => candidate.range.start.offset <= offset && offset <= candidate.range.end.offset,
+    );
     if (block === undefined) return undefined;
 
     const fenceLine = document.positionAt(block.range.start.offset).line;
@@ -157,8 +155,44 @@ export class Sites {
     return { block, registry, chartType: registry.get(block.blockType), fenceLine, lastHeaderLine };
   }
 
+  /**
+   * The whole resolved document, for a feature whose request is about a range
+   * of it rather than a point in it.
+   *
+   * The counterpart of {@link at}, and the reason it is here rather than in the
+   * one feature that wants it: same pipeline, same silence when it throws, one
+   * run per request instead of one per block. A feature that walks every block
+   * therefore cannot come to a different conclusion than one that walks the
+   * block under the cursor.
+   */
+  all(document: TextDocument, token: CancellationToken): ResolvedDocument | undefined {
+    const config = this.#configFor(document);
+    throwIfCancelled(token);
+    return this.#resolve(document, config);
+  }
+
   #configFor(document: TextDocument): MdvConfig | undefined {
     return configFor(this.#options.config, document);
+  }
+
+  /**
+   * One run of the pipeline, or nothing.
+   *
+   * A document that cannot be resolved at all is one the `diagnostics` feature
+   * is already complaining about; a second complaint on this channel would be a
+   * popup per keystroke. So it is logged for whoever runs the server, and the
+   * author is answered with the same nothing they get for a position that holds
+   * no answer.
+   */
+  #resolve(document: TextDocument, config: MdvConfig | undefined): ResolvedDocument | undefined {
+    try {
+      return resolveSync(parse(document.text), config);
+    } catch (error) {
+      this.#context.logger.error(
+        `${this.#feature} could not read ${document.uri}: ${reasonOf(error)}`,
+      );
+      return undefined;
+    }
   }
 
   /**
