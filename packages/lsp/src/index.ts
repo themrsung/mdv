@@ -47,6 +47,8 @@ export { inlay, type InlayHintSettings } from './features/inlay.js';
 
 export { rename, type RenameSettings } from './features/rename.js';
 
+export { TOKEN_MODIFIERS, TOKEN_TYPES, semanticTokens } from './features/semantic-tokens.js';
+
 export { signature, type SignatureSettings } from './features/signature.js';
 
 export { symbols } from './features/symbols.js';
