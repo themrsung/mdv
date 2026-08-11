@@ -21,7 +21,7 @@
  * So the construction is a parameter: {@link LanguageClientFactory}. This file
  * holds the half that is identical in both hosts (when to start, when to
  * restart, what to tell the server) and knows the concrete client only through
- * {@link LanguageClientLike}, the four members of `BaseLanguageClient` it
+ * {@link LanguageClientLike}, the three members of `BaseLanguageClient` it
  * actually uses. That also makes the lifecycle testable in a plain Node process,
  * which is the whole of `test/lsp-client.test.ts`.
  *
@@ -102,10 +102,10 @@ export interface DocumentFilterLike {
 /**
  * The slice of `vscode-languageclient`'s `LanguageClientOptions` this file owns.
  *
- * Only the parts that must be identical in both hosts. A host adapter spreads
+ * Only the parts that must be identical in both hosts. A host adapter copies
  * this into the real options object and adds what only it can express — the
- * `RevealOutputChannelOn.Never` enum member, an `outputChannel` shared with the
- * extension's own — without either host being able to disagree about the
+ * `RevealOutputChannelOn.Never` enum member, whose value has to come from that
+ * host's own entry point — without either host being able to disagree about the
  * document selector or the collection name.
  */
 export interface MdvClientOptions {
@@ -132,7 +132,7 @@ export function clientOptions(payload: ServerSettings): MdvClientOptions {
 }
 
 /**
- * The four members of `BaseLanguageClient` this file uses.
+ * The three members of `BaseLanguageClient` this file uses.
  *
  * Structural on purpose: `new LanguageClient(...)` from either
  * `vscode-languageclient/node` or `/browser` satisfies it as-is, and a test can
