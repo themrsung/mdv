@@ -1,0 +1,337 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            45,
+            60
+          ],
+          "type": "text",
+          "value": "Storage by tier"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        43,
+        60
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            62,
+            229
+          ],
+          "type": "text",
+          "value": "Stacked, because the total is meaningful and the parts sum to it. Two\nunstacked translucent areas would already be near the readable limit; three\nwould not be a chart."
+        }
+      ],
+      "position": [
+        62,
+        229
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "table",
+        "stack": "normal",
+        "title": "Storage by tier",
+        "type": "area",
+        "x": "month",
+        "y": [
+          "hot",
+          "warm",
+          "cold"
+        ]
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 17,
+            "offset": 323
+          },
+          "start": {
+            "column": 9,
+            "line": 17,
+            "offset": 318
+          }
+        },
+        "stack": {
+          "end": {
+            "column": 14,
+            "line": 16,
+            "offset": 309
+          },
+          "start": {
+            "column": 8,
+            "line": 16,
+            "offset": 303
+          }
+        },
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 13,
+            "offset": 265
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 250
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 12,
+            "offset": 242
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 238
+          }
+        },
+        "x": {
+          "end": {
+            "column": 9,
+            "line": 14,
+            "offset": 274
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 269
+          }
+        },
+        "y": {
+          "end": {
+            "column": 21,
+            "line": 15,
+            "offset": 295
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 278
+          }
+        },
+        "y[0]": {
+          "end": {
+            "column": 8,
+            "line": 15,
+            "offset": 282
+          },
+          "start": {
+            "column": 5,
+            "line": 15,
+            "offset": 279
+          }
+        },
+        "y[1]": {
+          "end": {
+            "column": 14,
+            "line": 15,
+            "offset": 288
+          },
+          "start": {
+            "column": 10,
+            "line": 15,
+            "offset": 284
+          }
+        },
+        "y[2]": {
+          "end": {
+            "column": 20,
+            "line": 15,
+            "offset": 294
+          },
+          "start": {
+            "column": 16,
+            "line": 15,
+            "offset": 290
+          }
+        }
+      },
+      "blockType": "area",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 29,
+          "line": 23,
+          "offset": 472
+        },
+        "start": {
+          "column": 1,
+          "line": 19,
+          "offset": 328
+        }
+      },
+      "level": 1,
+      "position": [
+        231,
+        476
+      ],
+      "raw": {
+        "data": "month   |  hot | warm | cold\n2026-03 | 12.4 | 31.0 | 88.2\n2026-04 | 13.1 | 33.5 | 91.7\n2026-05 | 14.8 | 34.2 | 96.4\n2026-06 | 15.2 | 36.9 | 99.1\n",
+        "fence": "```",
+        "header": "title: Storage by tier\nx: month\ny: [hot, warm, cold]\nstack: normal\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 24,
+          "offset": 476
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 231
+        }
+      },
+      "raw": "month   |  hot | warm | cold\n2026-03 | 12.4 | 31.0 | 88.2\n2026-04 | 13.1 | 33.5 | 91.7\n2026-05 | 14.8 | 34.2 | 96.4\n2026-06 | 15.2 | 36.9 | 99.1\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "month",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "hot",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "warm",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "cold",
+            "type": "number"
+          }
+        ],
+        "rows": [
+          [
+            {},
+            12.4,
+            31,
+            88.2
+          ],
+          [
+            {},
+            13.1,
+            33.5,
+            91.7
+          ],
+          [
+            {},
+            14.8,
+            34.2,
+            96.4
+          ],
+          [
+            {},
+            15.2,
+            36.9,
+            99.1
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 23,
+          "line": 3,
+          "offset": 37
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 41
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Storage by tier"
+  },
+  "position": [
+    0,
+    477
+  ],
+  "type": "root"
+}

@@ -1,0 +1,266 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            38,
+            56
+          ],
+          "type": "text",
+          "value": "Revenue by channel"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        36,
+        56
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            58,
+            198
+          ],
+          "type": "text",
+          "value": "The first record is the header, and a quoted field carries the delimiter\nwithout ending its cell — which is the only reason RFC 4180 exists."
+        }
+      ],
+      "position": [
+        58,
+        198
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "csv",
+        "title": "Revenue by channel",
+        "type": "bar",
+        "x": "channel",
+        "y": "revenue"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 12,
+            "line": 15,
+            "offset": 270
+          },
+          "start": {
+            "column": 9,
+            "line": 15,
+            "offset": 267
+          }
+        },
+        "title": {
+          "end": {
+            "column": 26,
+            "line": 12,
+            "offset": 236
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 218
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 11,
+            "offset": 210
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 207
+          }
+        },
+        "x": {
+          "end": {
+            "column": 11,
+            "line": 13,
+            "offset": 247
+          },
+          "start": {
+            "column": 4,
+            "line": 13,
+            "offset": 240
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 14,
+            "offset": 258
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 251
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 10,
+          "line": 21,
+          "offset": 352
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 275
+        }
+      },
+      "level": 1,
+      "position": [
+        200,
+        356
+      ],
+      "raw": {
+        "data": "channel,revenue\n\"Organic, unpaid\",48210\nDirect,31980\nReferral,12440\nPaid,8710\n",
+        "fence": "```",
+        "header": "title: Revenue by channel\nx: channel\ny: revenue\nformat: csv\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "csv",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 22,
+          "offset": 356
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 200
+        }
+      },
+      "raw": "channel,revenue\n\"Organic, unpaid\",48210\nDirect,31980\nReferral,12440\nPaid,8710\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "channel",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "Organic, unpaid",
+            48210
+          ],
+          [
+            "Direct",
+            31980
+          ],
+          [
+            "Referral",
+            12440
+          ],
+          [
+            "Paid",
+            8710
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 16,
+          "line": 3,
+          "offset": 30
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 34
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "CSV data"
+  },
+  "position": [
+    0,
+    357
+  ],
+  "type": "root"
+}

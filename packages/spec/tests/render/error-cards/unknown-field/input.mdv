@@ -1,0 +1,34 @@
+---
+mdv: "1.0"
+title: A block that cannot render
+---
+
+# A block that cannot render
+
+`revenu` is not a field in the data section. The block fails, and failing
+means an error card that names the block, the code, and the misspelling —
+never a blank space where a chart was promised.
+
+```mdv bar
+title: Revenue by region
+x: region
+y: revenu
+---
+region,revenue
+APAC,42100
+EMEA,31800
+AMER,58400
+```
+
+The rest of the document renders regardless.
+
+```mdv bar
+title: Revenue by region
+x: region
+y: revenue
+---
+region,revenue
+APAC,42100
+EMEA,31800
+AMER,58400
+```

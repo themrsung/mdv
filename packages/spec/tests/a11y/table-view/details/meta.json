@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "a11y",
+    "table-view"
+  ],
+  "note": "SPEC 12.3: the table view is a design commitment, not a convenience; PDF export is lossless because of it.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

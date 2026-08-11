@@ -1,0 +1,6 @@
+{
+  "level": 1,
+  "tags": ["tsv", "data"],
+  "note": "SPEC 6.2.2: tab-separated records, declared rather than detected.",
+  "pin": ["ast"]
+}

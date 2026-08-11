@@ -1,0 +1,610 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            40,
+            50
+          ],
+          "type": "text",
+          "value": "This month"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        38,
+        50
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            52,
+            202
+          ],
+          "type": "text",
+          "value": "Exactly one hero figure per view. The two tiles after it read at body scale\nand earn their place by carrying a delta that names its comparison period."
+        }
+      ],
+      "position": [
+        52,
+        202
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "delta": 0.082,
+        "deltaOf": "vs. last month",
+        "format": "$~s",
+        "goodDirection": "up",
+        "label": "Monthly recurring revenue",
+        "size": "hero",
+        "trend": [
+          1.08,
+          1.11,
+          1.14,
+          1.19,
+          1.22,
+          1.28
+        ],
+        "type": "metric",
+        "value": 1284000
+      },
+      "attrsPosition": {
+        "delta": {
+          "end": {
+            "column": 13,
+            "line": 15,
+            "offset": 292
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 287
+          }
+        },
+        "deltaOf": {
+          "end": {
+            "column": 24,
+            "line": 16,
+            "offset": 316
+          },
+          "start": {
+            "column": 10,
+            "line": 16,
+            "offset": 302
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 14,
+            "offset": 279
+          },
+          "start": {
+            "column": 9,
+            "line": 14,
+            "offset": 274
+          }
+        },
+        "goodDirection": {
+          "end": {
+            "column": 18,
+            "line": 17,
+            "offset": 334
+          },
+          "start": {
+            "column": 16,
+            "line": 17,
+            "offset": 332
+          }
+        },
+        "label": {
+          "end": {
+            "column": 33,
+            "line": 12,
+            "offset": 250
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 225
+          }
+        },
+        "size": {
+          "end": {
+            "column": 11,
+            "line": 18,
+            "offset": 345
+          },
+          "start": {
+            "column": 7,
+            "line": 18,
+            "offset": 341
+          }
+        },
+        "trend": {
+          "end": {
+            "column": 44,
+            "line": 19,
+            "offset": 389
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 353
+          }
+        },
+        "trend[0]": {
+          "end": {
+            "column": 13,
+            "line": 19,
+            "offset": 358
+          },
+          "start": {
+            "column": 9,
+            "line": 19,
+            "offset": 354
+          }
+        },
+        "trend[1]": {
+          "end": {
+            "column": 19,
+            "line": 19,
+            "offset": 364
+          },
+          "start": {
+            "column": 15,
+            "line": 19,
+            "offset": 360
+          }
+        },
+        "trend[2]": {
+          "end": {
+            "column": 25,
+            "line": 19,
+            "offset": 370
+          },
+          "start": {
+            "column": 21,
+            "line": 19,
+            "offset": 366
+          }
+        },
+        "trend[3]": {
+          "end": {
+            "column": 31,
+            "line": 19,
+            "offset": 376
+          },
+          "start": {
+            "column": 27,
+            "line": 19,
+            "offset": 372
+          }
+        },
+        "trend[4]": {
+          "end": {
+            "column": 37,
+            "line": 19,
+            "offset": 382
+          },
+          "start": {
+            "column": 33,
+            "line": 19,
+            "offset": 378
+          }
+        },
+        "trend[5]": {
+          "end": {
+            "column": 43,
+            "line": 19,
+            "offset": 388
+          },
+          "start": {
+            "column": 39,
+            "line": 19,
+            "offset": 384
+          }
+        },
+        "type": {
+          "end": {
+            "column": 14,
+            "line": 11,
+            "offset": 217
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 211
+          }
+        },
+        "value": {
+          "end": {
+            "column": 15,
+            "line": 13,
+            "offset": 265
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 258
+          }
+        }
+      },
+      "blockType": "metric",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "level": 1,
+      "position": [
+        204,
+        393
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "label: Monthly recurring revenue\nvalue: 1284000\nformat: \"$~s\"\ndelta: 0.082\ndeltaOf: vs. last month\ngoodDirection: up\nsize: hero\ntrend: [1.08, 1.11, 1.14, 1.19, 1.22, 1.28]\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "attrs": {
+        "delta": -0.006,
+        "deltaOf": "vs. last month",
+        "format": ".1%",
+        "goodDirection": "up",
+        "label": "Net revenue retention",
+        "type": "metric",
+        "value": 1.104
+      },
+      "attrsPosition": {
+        "delta": {
+          "end": {
+            "column": 14,
+            "line": 26,
+            "offset": 478
+          },
+          "start": {
+            "column": 8,
+            "line": 26,
+            "offset": 472
+          }
+        },
+        "deltaOf": {
+          "end": {
+            "column": 24,
+            "line": 27,
+            "offset": 502
+          },
+          "start": {
+            "column": 10,
+            "line": 27,
+            "offset": 488
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 25,
+            "offset": 464
+          },
+          "start": {
+            "column": 9,
+            "line": 25,
+            "offset": 459
+          }
+        },
+        "goodDirection": {
+          "end": {
+            "column": 18,
+            "line": 28,
+            "offset": 520
+          },
+          "start": {
+            "column": 16,
+            "line": 28,
+            "offset": 518
+          }
+        },
+        "label": {
+          "end": {
+            "column": 29,
+            "line": 23,
+            "offset": 437
+          },
+          "start": {
+            "column": 8,
+            "line": 23,
+            "offset": 416
+          }
+        },
+        "type": {
+          "end": {
+            "column": 14,
+            "line": 22,
+            "offset": 408
+          },
+          "start": {
+            "column": 8,
+            "line": 22,
+            "offset": 402
+          }
+        },
+        "value": {
+          "end": {
+            "column": 13,
+            "line": 24,
+            "offset": 450
+          },
+          "start": {
+            "column": 8,
+            "line": 24,
+            "offset": 445
+          }
+        }
+      },
+      "blockType": "metric",
+      "data": {
+        "datasetId": "#block-1",
+        "key": "#block-1||"
+      },
+      "level": 1,
+      "position": [
+        395,
+        524
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "label: Net revenue retention\nvalue: 1.104\nformat: \".1%\"\ndelta: -0.006\ndeltaOf: vs. last month\ngoodDirection: up\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "attrs": {
+        "delta": -12,
+        "deltaOf": "vs. last week",
+        "goodDirection": "down",
+        "label": "Support backlog",
+        "type": "metric",
+        "value": 41
+      },
+      "attrsPosition": {
+        "delta": {
+          "end": {
+            "column": 11,
+            "line": 34,
+            "offset": 583
+          },
+          "start": {
+            "column": 8,
+            "line": 34,
+            "offset": 580
+          }
+        },
+        "deltaOf": {
+          "end": {
+            "column": 23,
+            "line": 35,
+            "offset": 606
+          },
+          "start": {
+            "column": 10,
+            "line": 35,
+            "offset": 593
+          }
+        },
+        "goodDirection": {
+          "end": {
+            "column": 20,
+            "line": 36,
+            "offset": 626
+          },
+          "start": {
+            "column": 16,
+            "line": 36,
+            "offset": 622
+          }
+        },
+        "label": {
+          "end": {
+            "column": 23,
+            "line": 32,
+            "offset": 562
+          },
+          "start": {
+            "column": 8,
+            "line": 32,
+            "offset": 547
+          }
+        },
+        "type": {
+          "end": {
+            "column": 14,
+            "line": 31,
+            "offset": 539
+          },
+          "start": {
+            "column": 8,
+            "line": 31,
+            "offset": 533
+          }
+        },
+        "value": {
+          "end": {
+            "column": 10,
+            "line": 33,
+            "offset": 572
+          },
+          "start": {
+            "column": 8,
+            "line": 33,
+            "offset": 570
+          }
+        }
+      },
+      "blockType": "metric",
+      "data": {
+        "datasetId": "#block-2",
+        "key": "#block-2||"
+      },
+      "level": 1,
+      "position": [
+        526,
+        630
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "label: Support backlog\nvalue: 41\ndelta: -12\ndeltaOf: vs. last week\ngoodDirection: down\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 20,
+          "offset": 393
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 204
+        }
+      },
+      "state": "ready",
+      "table": {
+        "fields": [],
+        "rows": []
+      }
+    },
+    "#block-1": {
+      "id": "#block-1",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 29,
+          "offset": 524
+        },
+        "start": {
+          "column": 1,
+          "line": 22,
+          "offset": 395
+        }
+      },
+      "state": "ready",
+      "table": {
+        "fields": [],
+        "rows": []
+      }
+    },
+    "#block-2": {
+      "id": "#block-2",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 37,
+          "offset": 630
+        },
+        "start": {
+          "column": 1,
+          "line": 31,
+          "offset": 526
+        }
+      },
+      "state": "ready",
+      "table": {
+        "fields": [],
+        "rows": []
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 18,
+          "line": 3,
+          "offset": 32
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 36
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "This month"
+  },
+  "position": [
+    0,
+    631
+  ],
+  "type": "root"
+}

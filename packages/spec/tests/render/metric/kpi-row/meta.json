@@ -1,0 +1,13 @@
+{
+  "level": 1,
+  "tags": [
+    "metric",
+    "kpi"
+  ],
+  "note": "SPEC 8.13: one hero, deltas signed and naming their period, goodDirection deciding the colour rather than the sign. The first two tiles also pin two known warts: `format:` on a metric is a number format (SPEC 8.13) but collides with the data-section format enum (SPEC 6.2), so it draws MDV1502; and a tile whose value is a literal draws MDV2100 for the data section it does not need.",
+  "pin": [
+    "ast",
+    "diagnostics",
+    "svg"
+  ]
+}

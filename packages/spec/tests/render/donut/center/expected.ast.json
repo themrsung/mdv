@@ -1,0 +1,306 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            48,
+            66
+          ],
+          "type": "text",
+          "value": "Traffic by channel"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        46,
+        66
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            68,
+            198
+          ],
+          "type": "text",
+          "value": "The hole is not decoration: it is where the total goes. A donut without\ncenter content is a pie that gave up its area for nothing."
+        }
+      ],
+      "position": [
+        68,
+        198
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "channel",
+        "center": {
+          "title": "Total",
+          "value": "sum(sessions)"
+        },
+        "format": "table",
+        "title": "Traffic by channel",
+        "type": "donut",
+        "value": "sessions"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 18,
+            "line": 13,
+            "offset": 256
+          },
+          "start": {
+            "column": 11,
+            "line": 13,
+            "offset": 249
+          }
+        },
+        "center": {
+          "end": {
+            "column": 47,
+            "line": 15,
+            "offset": 319
+          },
+          "start": {
+            "column": 9,
+            "line": 15,
+            "offset": 281
+          }
+        },
+        "center.title": {
+          "end": {
+            "column": 22,
+            "line": 15,
+            "offset": 294
+          },
+          "start": {
+            "column": 17,
+            "line": 15,
+            "offset": 289
+          }
+        },
+        "center.value": {
+          "end": {
+            "column": 46,
+            "line": 15,
+            "offset": 318
+          },
+          "start": {
+            "column": 31,
+            "line": 15,
+            "offset": 303
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 16,
+            "offset": 333
+          },
+          "start": {
+            "column": 9,
+            "line": 16,
+            "offset": 328
+          }
+        },
+        "title": {
+          "end": {
+            "column": 26,
+            "line": 12,
+            "offset": 238
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 220
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 11,
+            "offset": 212
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 207
+          }
+        },
+        "value": {
+          "end": {
+            "column": 16,
+            "line": 14,
+            "offset": 272
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 264
+          }
+        }
+      },
+      "blockType": "donut",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 20,
+          "line": 22,
+          "offset": 437
+        },
+        "start": {
+          "column": 1,
+          "line": 18,
+          "offset": 338
+        }
+      },
+      "level": 1,
+      "position": [
+        200,
+        441
+      ],
+      "raw": {
+        "data": "channel  | sessions\nOrganic  |    48210\nDirect   |    31980\nReferral |    12440\nPaid     |     8710\n",
+        "fence": "```",
+        "header": "title: Traffic by channel\ncategory: channel\nvalue: sessions\ncenter: {title: Total, value: \"sum(sessions)\"}\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 23,
+          "offset": 441
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 200
+        }
+      },
+      "raw": "channel  | sessions\nOrganic  |    48210\nDirect   |    31980\nReferral |    12440\nPaid     |     8710\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "channel",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "sessions",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "Organic",
+            48210
+          ],
+          [
+            "Direct",
+            31980
+          ],
+          [
+            "Referral",
+            12440
+          ],
+          [
+            "Paid",
+            8710
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 26,
+          "line": 3,
+          "offset": 40
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 44
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Traffic by channel"
+  },
+  "position": [
+    0,
+    442
+  ],
+  "type": "root"
+}

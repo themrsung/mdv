@@ -1,0 +1,324 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            51,
+            72
+          ],
+          "type": "text",
+          "value": "Latency vs throughput"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        49,
+        72
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            74,
+            210
+          ],
+          "type": "text",
+          "value": "Both axes quantitative, one mark per host, and a fitted trend to make the\nrelationship an assertion rather than an invitation to squint."
+        }
+      ],
+      "position": [
+        74,
+        210
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "table",
+        "series": "region",
+        "shape": "region",
+        "title": "Latency vs throughput",
+        "trend": "linear",
+        "type": "scatter",
+        "x": "rps",
+        "y": "p99_ms"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 18,
+            "offset": 329
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 324
+          }
+        },
+        "series": {
+          "end": {
+            "column": 15,
+            "line": 15,
+            "offset": 287
+          },
+          "start": {
+            "column": 9,
+            "line": 15,
+            "offset": 281
+          }
+        },
+        "shape": {
+          "end": {
+            "column": 14,
+            "line": 16,
+            "offset": 301
+          },
+          "start": {
+            "column": 8,
+            "line": 16,
+            "offset": 295
+          }
+        },
+        "title": {
+          "end": {
+            "column": 29,
+            "line": 12,
+            "offset": 255
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 234
+          }
+        },
+        "trend": {
+          "end": {
+            "column": 14,
+            "line": 17,
+            "offset": 315
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 309
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 11,
+            "offset": 226
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 219
+          }
+        },
+        "x": {
+          "end": {
+            "column": 7,
+            "line": 13,
+            "offset": 262
+          },
+          "start": {
+            "column": 4,
+            "line": 13,
+            "offset": 259
+          }
+        },
+        "y": {
+          "end": {
+            "column": 10,
+            "line": 14,
+            "offset": 272
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 266
+          }
+        }
+      },
+      "blockType": "scatter",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 23,
+          "line": 26,
+          "offset": 494
+        },
+        "start": {
+          "column": 1,
+          "line": 20,
+          "offset": 334
+        }
+      },
+      "level": 1,
+      "position": [
+        212,
+        498
+      ],
+      "raw": {
+        "data": "region |  rps | p99_ms\napac   | 1240 |    182\napac   | 1610 |    204\nemea   | 1980 |    221\nemea   | 2440 |    268\namer   | 3120 |    301\namer   | 3780 |    366\n",
+        "fence": "```",
+        "header": "title: Latency vs throughput\nx: rps\ny: p99_ms\nseries: region\nshape: region\ntrend: linear\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 27,
+          "offset": 498
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 212
+        }
+      },
+      "raw": "region |  rps | p99_ms\napac   | 1240 |    182\napac   | 1610 |    204\nemea   | 1980 |    221\nemea   | 2440 |    268\namer   | 3120 |    301\namer   | 3780 |    366\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "rps",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "p99_ms",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "apac",
+            1240,
+            182
+          ],
+          [
+            "apac",
+            1610,
+            204
+          ],
+          [
+            "emea",
+            1980,
+            221
+          ],
+          [
+            "emea",
+            2440,
+            268
+          ],
+          [
+            "amer",
+            3120,
+            301
+          ],
+          [
+            "amer",
+            3780,
+            366
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 29,
+          "line": 3,
+          "offset": 43
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 47
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Latency vs throughput"
+  },
+  "position": [
+    0,
+    499
+  ],
+  "type": "root"
+}

@@ -1,0 +1,266 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            43,
+            56
+          ],
+          "type": "text",
+          "value": "Seats by plan"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        41,
+        56
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            58,
+            229
+          ],
+          "type": "text",
+          "value": "Four parts of one whole, and the question is \"roughly what share\" rather\nthan \"which is larger by how much\". Above six slices this would be a\nhorizontal bar chart instead."
+        }
+      ],
+      "position": [
+        58,
+        229
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "plan",
+        "format": "table",
+        "title": "Seats by plan",
+        "type": "pie",
+        "value": "seats"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 15,
+            "line": 14,
+            "offset": 277
+          },
+          "start": {
+            "column": 11,
+            "line": 14,
+            "offset": 273
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 16,
+            "offset": 304
+          },
+          "start": {
+            "column": 9,
+            "line": 16,
+            "offset": 299
+          }
+        },
+        "title": {
+          "end": {
+            "column": 21,
+            "line": 13,
+            "offset": 262
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 249
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 12,
+            "offset": 241
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 238
+          }
+        },
+        "value": {
+          "end": {
+            "column": 13,
+            "line": 15,
+            "offset": 290
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 285
+          }
+        }
+      },
+      "blockType": "pie",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 19,
+          "line": 22,
+          "offset": 403
+        },
+        "start": {
+          "column": 1,
+          "line": 18,
+          "offset": 309
+        }
+      },
+      "level": 1,
+      "position": [
+        231,
+        407
+      ],
+      "raw": {
+        "data": "plan       | seats\nEnterprise |  4820\nBusiness   |  3190\nTeam       |  1240\nFree       |   870\n",
+        "fence": "```",
+        "header": "title: Seats by plan\ncategory: plan\nvalue: seats\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 23,
+          "offset": 407
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 231
+        }
+      },
+      "raw": "plan       | seats\nEnterprise |  4820\nBusiness   |  3190\nTeam       |  1240\nFree       |   870\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "plan",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "seats",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "Enterprise",
+            4820
+          ],
+          [
+            "Business",
+            3190
+          ],
+          [
+            "Team",
+            1240
+          ],
+          [
+            "Free",
+            870
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 21,
+          "line": 3,
+          "offset": 35
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 39
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Seats by plan"
+  },
+  "position": [
+    0,
+    408
+  ],
+  "type": "root"
+}

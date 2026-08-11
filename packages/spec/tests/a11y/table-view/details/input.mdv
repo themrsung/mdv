@@ -1,0 +1,35 @@
+---
+mdv: "1.0"
+title: Signups by week
+---
+
+# Signups by week
+
+Every visual block must have its data reachable as a table. The first chart
+takes the default and renders a collapsed `details`; the second asks for the
+table to be visible, because the exact figures are the point.
+
+```mdv bar
+title: Signups by week
+x: week
+y: signups
+---
+week,signups
+W-31,1204
+W-32,1388
+W-33,1291
+W-34,1502
+```
+
+```mdv line
+title: Signups by week
+x: week
+y: signups
+table: visible
+---
+week,signups
+W-31,1204
+W-32,1388
+W-33,1291
+W-34,1502
+```

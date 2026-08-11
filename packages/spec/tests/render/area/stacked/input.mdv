@@ -1,0 +1,24 @@
+---
+mdv: "1.0"
+title: Storage by tier
+---
+
+# Storage by tier
+
+Stacked, because the total is meaningful and the parts sum to it. Two
+unstacked translucent areas would already be near the readable limit; three
+would not be a chart.
+
+```mdv area
+title: Storage by tier
+x: month
+y: [hot, warm, cold]
+stack: normal
+format: table
+---
+month   |  hot | warm | cold
+2026-03 | 12.4 | 31.0 | 88.2
+2026-04 | 13.1 | 33.5 | 91.7
+2026-05 | 14.8 | 34.2 | 96.4
+2026-06 | 15.2 | 36.9 | 99.1
+```

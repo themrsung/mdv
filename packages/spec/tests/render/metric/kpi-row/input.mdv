@@ -1,0 +1,37 @@
+---
+mdv: "1.0"
+title: This month
+---
+
+# This month
+
+Exactly one hero figure per view. The two tiles after it read at body scale
+and earn their place by carrying a delta that names its comparison period.
+
+```mdv metric
+label: Monthly recurring revenue
+value: 1284000
+format: "$~s"
+delta: 0.082
+deltaOf: vs. last month
+goodDirection: up
+size: hero
+trend: [1.08, 1.11, 1.14, 1.19, 1.22, 1.28]
+```
+
+```mdv metric
+label: Net revenue retention
+value: 1.104
+format: ".1%"
+delta: -0.006
+deltaOf: vs. last month
+goodDirection: up
+```
+
+```mdv metric
+label: Support backlog
+value: 41
+delta: -12
+deltaOf: vs. last week
+goodDirection: down
+```

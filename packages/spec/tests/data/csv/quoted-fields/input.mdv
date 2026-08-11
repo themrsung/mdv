@@ -1,0 +1,22 @@
+---
+mdv: "1.0"
+title: CSV data
+---
+
+# Revenue by channel
+
+The first record is the header, and a quoted field carries the delimiter
+without ending its cell — which is the only reason RFC 4180 exists.
+
+```mdv bar
+title: Revenue by channel
+x: channel
+y: revenue
+format: csv
+---
+channel,revenue
+"Organic, unpaid",48210
+Direct,31980
+Referral,12440
+Paid,8710
+```

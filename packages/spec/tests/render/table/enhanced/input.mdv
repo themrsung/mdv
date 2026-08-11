@@ -1,0 +1,29 @@
+---
+mdv: "1.0"
+title: Regional performance
+---
+
+# Regional performance
+
+Per-column configuration, ordered as written. The in-cell encodings
+supplement the number and never replace it.
+
+```mdv table
+title: Regional performance
+columns:
+  region:  {label: Region, align: left}
+  revenue: {label: Revenue, type: number, format: "$,.0f", align: right}
+  growth:  {label: YoY, type: number, format: "+.1%", heat: diverging, midpoint: 0}
+  trend:   {type: sparkline, curve: monotone}
+sort: [-revenue]
+total: {revenue: sum, growth: mean}
+zebra: true
+sticky: header
+format: table
+---
+region | revenue | growth | trend
+APAC   |   42100 |  0.182 | 31,34,38,42
+EMEA   |   31800 | -0.041 | 34,33,32,32
+AMER   |   58400 |  0.067 | 52,54,55,58
+LATAM  |    9400 |  0.213 | 7,8,8,9
+```

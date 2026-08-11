@@ -1,0 +1,27 @@
+---
+mdv: "1.0"
+title: Latency vs throughput
+---
+
+# Latency vs throughput
+
+Both axes quantitative, one mark per host, and a fitted trend to make the
+relationship an assertion rather than an invitation to squint.
+
+```mdv scatter
+title: Latency vs throughput
+x: rps
+y: p99_ms
+series: region
+shape: region
+trend: linear
+format: table
+---
+region |  rps | p99_ms
+apac   | 1240 |    182
+apac   | 1610 |    204
+emea   | 1980 |    221
+emea   | 2440 |    268
+amer   | 3120 |    301
+amer   | 3780 |    366
+```

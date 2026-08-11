@@ -1,0 +1,524 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            44,
+            64
+          ],
+          "type": "text",
+          "value": "Regional performance"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        42,
+        64
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            66,
+            98
+          ],
+          "type": "text",
+          "value": "One declaration, two views. The "
+        },
+        {
+          "position": [
+            98,
+            107
+          ],
+          "type": "inlineCode",
+          "value": "dataset"
+        },
+        {
+          "position": [
+            107,
+            207
+          ],
+          "type": "text",
+          "value": " block draws nothing; both charts\nbelow read it by reference, so the two figures cannot drift apart."
+        }
+      ],
+      "position": [
+        66,
+        207
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "fields": {
+          "date": {
+            "type": "date"
+          }
+        },
+        "id": "sales",
+        "type": "dataset"
+      },
+      "attrsPosition": {
+        "fields": {
+          "end": {
+            "column": 21,
+            "line": 13,
+            "offset": 261
+          },
+          "start": {
+            "column": 3,
+            "line": 13,
+            "offset": 243
+          }
+        },
+        "fields.date": {
+          "end": {
+            "column": 21,
+            "line": 13,
+            "offset": 261
+          },
+          "start": {
+            "column": 9,
+            "line": 13,
+            "offset": 249
+          }
+        },
+        "fields.date.type": {
+          "end": {
+            "column": 20,
+            "line": 13,
+            "offset": 260
+          },
+          "start": {
+            "column": 16,
+            "line": 13,
+            "offset": 256
+          }
+        },
+        "id": {
+          "end": {
+            "column": 24,
+            "line": 11,
+            "offset": 232
+          },
+          "start": {
+            "column": 19,
+            "line": 11,
+            "offset": 227
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 11,
+            "offset": 223
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 216
+          }
+        }
+      },
+      "blockType": "dataset",
+      "dataPosition": {
+        "end": {
+          "column": 38,
+          "line": 19,
+          "offset": 455
+        },
+        "start": {
+          "column": 1,
+          "line": 15,
+          "offset": 266
+        }
+      },
+      "level": 1,
+      "position": [
+        209,
+        459
+      ],
+      "raw": {
+        "data": "date       | region | units | revenue\n2026-01-31 | APAC   |  1204 |  482000\n2026-01-31 | EMEA   |   980 |  414000\n2026-02-28 | APAC   |  1310 |  530000\n2026-02-28 | EMEA   |  1015 |  427000\n",
+        "fence": "```",
+        "header": "fields:\n  date: {type: date}\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            464,
+            481
+          ],
+          "type": "text",
+          "value": "Revenue over time"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        461,
+        481
+      ],
+      "type": "heading"
+    },
+    {
+      "attrs": {
+        "data": "@sales",
+        "series": "region",
+        "title": "Revenue by month",
+        "type": "line",
+        "x": "date",
+        "y": "revenue"
+      },
+      "attrsPosition": {
+        "data": {
+          "end": {
+            "column": 15,
+            "line": 26,
+            "offset": 533
+          },
+          "start": {
+            "column": 7,
+            "line": 26,
+            "offset": 525
+          }
+        },
+        "series": {
+          "end": {
+            "column": 15,
+            "line": 29,
+            "offset": 567
+          },
+          "start": {
+            "column": 9,
+            "line": 29,
+            "offset": 561
+          }
+        },
+        "title": {
+          "end": {
+            "column": 24,
+            "line": 25,
+            "offset": 518
+          },
+          "start": {
+            "column": 8,
+            "line": 25,
+            "offset": 502
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 24,
+            "offset": 494
+          },
+          "start": {
+            "column": 8,
+            "line": 24,
+            "offset": 490
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 27,
+            "offset": 541
+          },
+          "start": {
+            "column": 4,
+            "line": 27,
+            "offset": 537
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 28,
+            "offset": 552
+          },
+          "start": {
+            "column": 4,
+            "line": 28,
+            "offset": 545
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "sales",
+        "key": "sales||"
+      },
+      "level": 1,
+      "position": [
+        483,
+        571
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "title: Revenue by month\ndata: \"@sales\"\nx: date\ny: revenue\nseries: region\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            576,
+            591
+          ],
+          "type": "text",
+          "value": "Units by region"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        573,
+        591
+      ],
+      "type": "heading"
+    },
+    {
+      "attrs": {
+        "data": "@sales",
+        "title": "Units by region",
+        "type": "bar",
+        "x": "region",
+        "y": "units"
+      },
+      "attrsPosition": {
+        "data": {
+          "end": {
+            "column": 15,
+            "line": 36,
+            "offset": 641
+          },
+          "start": {
+            "column": 7,
+            "line": 36,
+            "offset": 633
+          }
+        },
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 35,
+            "offset": 626
+          },
+          "start": {
+            "column": 8,
+            "line": 35,
+            "offset": 611
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 34,
+            "offset": 603
+          },
+          "start": {
+            "column": 8,
+            "line": 34,
+            "offset": 600
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 37,
+            "offset": 651
+          },
+          "start": {
+            "column": 4,
+            "line": 37,
+            "offset": 645
+          }
+        },
+        "y": {
+          "end": {
+            "column": 9,
+            "line": 38,
+            "offset": 660
+          },
+          "start": {
+            "column": 4,
+            "line": 38,
+            "offset": 655
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "sales",
+        "key": "sales||"
+      },
+      "level": 1,
+      "position": [
+        593,
+        664
+      ],
+      "raw": {
+        "data": "",
+        "fence": "```",
+        "header": "title: Units by region\ndata: \"@sales\"\nx: region\ny: units\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "sales": {
+      "fields": {
+        "date": {
+          "type": "date"
+        }
+      },
+      "id": "sales",
+      "origin": "block",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 20,
+          "offset": 459
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 209
+        }
+      },
+      "raw": "date       | region | units | revenue\n2026-01-31 | APAC   |  1204 |  482000\n2026-01-31 | EMEA   |   980 |  414000\n2026-02-28 | APAC   |  1310 |  530000\n2026-02-28 | EMEA   |  1015 |  427000\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "units",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            {},
+            "APAC",
+            1204,
+            482000
+          ],
+          [
+            {},
+            "EMEA",
+            980,
+            414000
+          ],
+          [
+            {},
+            "APAC",
+            1310,
+            530000
+          ],
+          [
+            {},
+            "EMEA",
+            1015,
+            427000
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 22,
+          "line": 3,
+          "offset": 36
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 40
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Shared dataset"
+  },
+  "position": [
+    0,
+    665
+  ],
+  "type": "root"
+}

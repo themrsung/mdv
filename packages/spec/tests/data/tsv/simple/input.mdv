@@ -1,0 +1,22 @@
+---
+mdv: "1.0"
+title: TSV data
+---
+
+# Requests by service
+
+Tab-separated records have no quoting rules to get wrong — and no way to
+carry a tab inside a cell. That trade is the whole format.
+
+```mdv bar
+title: Requests by service
+x: service
+y: requests
+format: tsv
+---
+service	requests
+gateway	184320
+search	96410
+media	54180
+auth	31220
+```

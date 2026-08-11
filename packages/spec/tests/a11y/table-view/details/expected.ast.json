@@ -1,0 +1,417 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            45,
+            60
+          ],
+          "type": "text",
+          "value": "Signups by week"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        43,
+        60
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            62,
+            180
+          ],
+          "type": "text",
+          "value": "Every visual block must have its data reachable as a table. The first chart\ntakes the default and renders a collapsed "
+        },
+        {
+          "position": [
+            180,
+            189
+          ],
+          "type": "inlineCode",
+          "value": "details"
+        },
+        {
+          "position": [
+            189,
+            276
+          ],
+          "type": "text",
+          "value": "; the second asks for the\ntable to be visible, because the exact figures are the point."
+        }
+      ],
+      "position": [
+        62,
+        276
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "title": "Signups by week",
+        "type": "bar",
+        "x": "week",
+        "y": "signups"
+      },
+      "attrsPosition": {
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 13,
+            "offset": 311
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 296
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 12,
+            "offset": 288
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 285
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 14,
+            "offset": 319
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 315
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 15,
+            "offset": 330
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 323
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 10,
+          "line": 21,
+          "offset": 387
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 335
+        }
+      },
+      "level": 1,
+      "position": [
+        278,
+        391
+      ],
+      "raw": {
+        "data": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+        "fence": "```",
+        "header": "title: Signups by week\nx: week\ny: signups\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "attrs": {
+        "table": "visible",
+        "title": "Signups by week",
+        "type": "line",
+        "x": "week",
+        "y": "signups"
+      },
+      "attrsPosition": {
+        "table": {
+          "end": {
+            "column": 15,
+            "line": 28,
+            "offset": 461
+          },
+          "start": {
+            "column": 8,
+            "line": 28,
+            "offset": 454
+          }
+        },
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 25,
+            "offset": 427
+          },
+          "start": {
+            "column": 8,
+            "line": 25,
+            "offset": 412
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 24,
+            "offset": 404
+          },
+          "start": {
+            "column": 8,
+            "line": 24,
+            "offset": 400
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 26,
+            "offset": 435
+          },
+          "start": {
+            "column": 4,
+            "line": 26,
+            "offset": 431
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 27,
+            "offset": 446
+          },
+          "start": {
+            "column": 4,
+            "line": 27,
+            "offset": 439
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "#block-1",
+        "key": "#block-1||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 10,
+          "line": 34,
+          "offset": 518
+        },
+        "start": {
+          "column": 1,
+          "line": 30,
+          "offset": 466
+        }
+      },
+      "level": 1,
+      "position": [
+        393,
+        522
+      ],
+      "raw": {
+        "data": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+        "fence": "```",
+        "header": "title: Signups by week\nx: week\ny: signups\ntable: visible\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 22,
+          "offset": 391
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 278
+        }
+      },
+      "raw": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "week",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "signups",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "W-31",
+            1204
+          ],
+          [
+            "W-32",
+            1388
+          ],
+          [
+            "W-33",
+            1291
+          ],
+          [
+            "W-34",
+            1502
+          ]
+        ]
+      }
+    },
+    "#block-1": {
+      "id": "#block-1",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 35,
+          "offset": 522
+        },
+        "start": {
+          "column": 1,
+          "line": 24,
+          "offset": 393
+        }
+      },
+      "raw": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "week",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "signups",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "W-31",
+            1204
+          ],
+          [
+            "W-32",
+            1388
+          ],
+          [
+            "W-33",
+            1291
+          ],
+          [
+            "W-34",
+            1502
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 23,
+          "line": 3,
+          "offset": 37
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 41
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Signups by week"
+  },
+  "position": [
+    0,
+    523
+  ],
+  "type": "root"
+}

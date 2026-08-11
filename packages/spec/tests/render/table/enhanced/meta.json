@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "table",
+    "columns"
+  ],
+  "note": "SPEC 10.1: heat tints the cell, sparkline parses a comma-separated list, and both keep the number legible.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

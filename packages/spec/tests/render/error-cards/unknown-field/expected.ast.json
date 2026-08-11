@@ -1,0 +1,405 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            56,
+            82
+          ],
+          "type": "text",
+          "value": "A block that cannot render"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        54,
+        82
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            84,
+            92
+          ],
+          "type": "inlineCode",
+          "value": "revenu"
+        },
+        {
+          "position": [
+            92,
+            279
+          ],
+          "type": "text",
+          "value": " is not a field in the data section. The block fails, and failing\nmeans an error card that names the block, the code, and the misspelling —\nnever a blank space where a chart was promised."
+        }
+      ],
+      "position": [
+        84,
+        279
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "title": "Revenue by region",
+        "type": "bar",
+        "x": "region",
+        "y": "revenu"
+      },
+      "attrsPosition": {
+        "title": {
+          "end": {
+            "column": 25,
+            "line": 13,
+            "offset": 316
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 299
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 12,
+            "offset": 291
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 288
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 14,
+            "offset": 326
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 320
+          }
+        },
+        "y": {
+          "end": {
+            "column": 10,
+            "line": 15,
+            "offset": 336
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 330
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 11,
+          "line": 20,
+          "offset": 388
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 341
+        }
+      },
+      "level": 1,
+      "position": [
+        281,
+        392
+      ],
+      "raw": {
+        "data": "region,revenue\nAPAC,42100\nEMEA,31800\nAMER,58400\n",
+        "fence": "```",
+        "header": "title: Revenue by region\nx: region\ny: revenu\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            394,
+            438
+          ],
+          "type": "text",
+          "value": "The rest of the document renders regardless."
+        }
+      ],
+      "position": [
+        394,
+        438
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "title": "Revenue by region",
+        "type": "bar",
+        "x": "region",
+        "y": "revenue"
+      },
+      "attrsPosition": {
+        "title": {
+          "end": {
+            "column": 25,
+            "line": 26,
+            "offset": 475
+          },
+          "start": {
+            "column": 8,
+            "line": 26,
+            "offset": 458
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 25,
+            "offset": 450
+          },
+          "start": {
+            "column": 8,
+            "line": 25,
+            "offset": 447
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 27,
+            "offset": 485
+          },
+          "start": {
+            "column": 4,
+            "line": 27,
+            "offset": 479
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 28,
+            "offset": 496
+          },
+          "start": {
+            "column": 4,
+            "line": 28,
+            "offset": 489
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-1",
+        "key": "#block-1||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 11,
+          "line": 33,
+          "offset": 548
+        },
+        "start": {
+          "column": 1,
+          "line": 30,
+          "offset": 501
+        }
+      },
+      "level": 1,
+      "position": [
+        440,
+        552
+      ],
+      "raw": {
+        "data": "region,revenue\nAPAC,42100\nEMEA,31800\nAMER,58400\n",
+        "fence": "```",
+        "header": "title: Revenue by region\nx: region\ny: revenue\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 21,
+          "offset": 392
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 281
+        }
+      },
+      "raw": "region,revenue\nAPAC,42100\nEMEA,31800\nAMER,58400\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "APAC",
+            42100
+          ],
+          [
+            "EMEA",
+            31800
+          ],
+          [
+            "AMER",
+            58400
+          ]
+        ]
+      }
+    },
+    "#block-1": {
+      "id": "#block-1",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 34,
+          "offset": 552
+        },
+        "start": {
+          "column": 1,
+          "line": 25,
+          "offset": 440
+        }
+      },
+      "raw": "region,revenue\nAPAC,42100\nEMEA,31800\nAMER,58400\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "APAC",
+            42100
+          ],
+          [
+            "EMEA",
+            31800
+          ],
+          [
+            "AMER",
+            58400
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 34,
+          "line": 3,
+          "offset": 48
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 52
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "A block that cannot render"
+  },
+  "position": [
+    0,
+    553
+  ],
+  "type": "root"
+}

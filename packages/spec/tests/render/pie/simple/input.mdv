@@ -1,0 +1,23 @@
+---
+mdv: "1.0"
+title: Seats by plan
+---
+
+# Seats by plan
+
+Four parts of one whole, and the question is "roughly what share" rather
+than "which is larger by how much". Above six slices this would be a
+horizontal bar chart instead.
+
+```mdv pie
+title: Seats by plan
+category: plan
+value: seats
+format: table
+---
+plan       | seats
+Enterprise |  4820
+Business   |  3190
+Team       |  1240
+Free       |   870
+```

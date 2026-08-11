@@ -1,0 +1,266 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            38,
+            57
+          ],
+          "type": "text",
+          "value": "Requests by service"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        36,
+        57
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            59,
+            190
+          ],
+          "type": "text",
+          "value": "Tab-separated records have no quoting rules to get wrong — and no way to\ncarry a tab inside a cell. That trade is the whole format."
+        }
+      ],
+      "position": [
+        59,
+        190
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "tsv",
+        "title": "Requests by service",
+        "type": "bar",
+        "x": "service",
+        "y": "requests"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 12,
+            "line": 15,
+            "offset": 264
+          },
+          "start": {
+            "column": 9,
+            "line": 15,
+            "offset": 261
+          }
+        },
+        "title": {
+          "end": {
+            "column": 27,
+            "line": 12,
+            "offset": 229
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 210
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 11,
+            "offset": 202
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 199
+          }
+        },
+        "x": {
+          "end": {
+            "column": 11,
+            "line": 13,
+            "offset": 240
+          },
+          "start": {
+            "column": 4,
+            "line": 13,
+            "offset": 233
+          }
+        },
+        "y": {
+          "end": {
+            "column": 12,
+            "line": 14,
+            "offset": 252
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 244
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 11,
+          "line": 21,
+          "offset": 336
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 269
+        }
+      },
+      "level": 1,
+      "position": [
+        192,
+        340
+      ],
+      "raw": {
+        "data": "service\trequests\ngateway\t184320\nsearch\t96410\nmedia\t54180\nauth\t31220\n",
+        "fence": "```",
+        "header": "title: Requests by service\nx: service\ny: requests\nformat: tsv\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "tsv",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 22,
+          "offset": 340
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 192
+        }
+      },
+      "raw": "service\trequests\ngateway\t184320\nsearch\t96410\nmedia\t54180\nauth\t31220\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "service",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "requests",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "gateway",
+            184320
+          ],
+          [
+            "search",
+            96410
+          ],
+          [
+            "media",
+            54180
+          ],
+          [
+            "auth",
+            31220
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 16,
+          "line": 3,
+          "offset": 30
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 34
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "TSV data"
+  },
+  "position": [
+    0,
+    341
+  ],
+  "type": "root"
+}

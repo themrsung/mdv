@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "scatter",
+    "trend"
+  ],
+  "note": "SPEC 8.6: two measures, shape redundant with colour for CVD.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

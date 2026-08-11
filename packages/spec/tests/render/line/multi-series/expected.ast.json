@@ -1,0 +1,356 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            48,
+            66
+          ],
+          "type": "text",
+          "value": "Daily active users"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        46,
+        66
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            68,
+            251
+          ],
+          "type": "text",
+          "value": "Three platforms on one continuous domain. The shape of the change is the\npoint; the individual magnitudes are secondary, which is what makes this a\nline chart rather than a bar chart."
+        }
+      ],
+      "position": [
+        68,
+        251
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "curve": "monotone",
+        "format": "table",
+        "label": "end",
+        "title": "Daily active users",
+        "type": "line",
+        "x": "date",
+        "y": [
+          "ios",
+          "android",
+          "web"
+        ]
+      },
+      "attrsPosition": {
+        "curve": {
+          "end": {
+            "column": 16,
+            "line": 16,
+            "offset": 337
+          },
+          "start": {
+            "column": 8,
+            "line": 16,
+            "offset": 329
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 18,
+            "offset": 362
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 357
+          }
+        },
+        "label": {
+          "end": {
+            "column": 11,
+            "line": 17,
+            "offset": 348
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 345
+          }
+        },
+        "title": {
+          "end": {
+            "column": 26,
+            "line": 13,
+            "offset": 290
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 272
+          }
+        },
+        "type": {
+          "end": {
+            "column": 12,
+            "line": 12,
+            "offset": 264
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 260
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 14,
+            "offset": 298
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 294
+          }
+        },
+        "y": {
+          "end": {
+            "column": 23,
+            "line": 15,
+            "offset": 321
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 302
+          }
+        },
+        "y[0]": {
+          "end": {
+            "column": 8,
+            "line": 15,
+            "offset": 306
+          },
+          "start": {
+            "column": 5,
+            "line": 15,
+            "offset": 303
+          }
+        },
+        "y[1]": {
+          "end": {
+            "column": 17,
+            "line": 15,
+            "offset": 315
+          },
+          "start": {
+            "column": 10,
+            "line": 15,
+            "offset": 308
+          }
+        },
+        "y[2]": {
+          "end": {
+            "column": 22,
+            "line": 15,
+            "offset": 320
+          },
+          "start": {
+            "column": 19,
+            "line": 15,
+            "offset": 317
+          }
+        }
+      },
+      "blockType": "line",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 35,
+          "line": 25,
+          "offset": 576
+        },
+        "start": {
+          "column": 1,
+          "line": 20,
+          "offset": 367
+        }
+      },
+      "level": 1,
+      "position": [
+        253,
+        580
+      ],
+      "raw": {
+        "data": "date       |  ios | android |  web\n2026-07-01 | 4210 |    5180 | 2240\n2026-07-02 | 4380 |    5240 | 2190\n2026-07-03 | 4120 |    5310 | 2260\n2026-07-04 | 4490 |    5402 | 2310\n2026-07-05 | 4660 |    5388 | 2288\n",
+        "fence": "```",
+        "header": "title: Daily active users\nx: date\ny: [ios, android, web]\ncurve: monotone\nlabel: end\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 26,
+          "offset": 580
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 253
+        }
+      },
+      "raw": "date       |  ios | android |  web\n2026-07-01 | 4210 |    5180 | 2240\n2026-07-02 | 4380 |    5240 | 2190\n2026-07-03 | 4120 |    5310 | 2260\n2026-07-04 | 4490 |    5402 | 2310\n2026-07-05 | 4660 |    5388 | 2288\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "ios",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "android",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "web",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            {},
+            4210,
+            5180,
+            2240
+          ],
+          [
+            {},
+            4380,
+            5240,
+            2190
+          ],
+          [
+            {},
+            4120,
+            5310,
+            2260
+          ],
+          [
+            {},
+            4490,
+            5402,
+            2310
+          ],
+          [
+            {},
+            4660,
+            5388,
+            2288
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 26,
+          "line": 3,
+          "offset": 40
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 44
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Daily active users"
+  },
+  "position": [
+    0,
+    581
+  ],
+  "type": "root"
+}

@@ -1,0 +1,23 @@
+---
+mdv: "1.0"
+title: Traffic by channel
+---
+
+# Traffic by channel
+
+The hole is not decoration: it is where the total goes. A donut without
+center content is a pie that gave up its area for nothing.
+
+```mdv donut
+title: Traffic by channel
+category: channel
+value: sessions
+center: {title: Total, value: "sum(sessions)"}
+format: table
+---
+channel  | sessions
+Organic  |    48210
+Direct   |    31980
+Referral |    12440
+Paid     |     8710
+```

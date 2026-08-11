@@ -1,0 +1,13 @@
+{
+  "level": 1,
+  "tags": [
+    "error",
+    "render"
+  ],
+  "note": "SPEC 2.4: one block failing MUST NOT take the document with it.",
+  "pin": [
+    "ast",
+    "diagnostics",
+    "svg"
+  ]
+}

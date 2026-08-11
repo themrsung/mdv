@@ -1,0 +1,6 @@
+{
+  "level": 1,
+  "tags": ["csv", "data"],
+  "note": "SPEC 6.2.2: the header record, and a quoted field that spans the delimiter.",
+  "pin": ["ast"]
+}

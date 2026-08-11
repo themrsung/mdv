@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "area",
+    "stack"
+  ],
+  "note": "SPEC 8.4: three series stacked to a meaningful total.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

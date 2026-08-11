@@ -1,0 +1,6 @@
+{
+  "level": 1,
+  "tags": ["dataset", "reference", "data"],
+  "note": "SPEC 6.3: a declared dataset, referenced with @ by two blocks that render different views of it.",
+  "pin": ["ast"]
+}

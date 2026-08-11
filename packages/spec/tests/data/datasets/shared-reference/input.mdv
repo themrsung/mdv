@@ -1,0 +1,39 @@
+---
+mdv: "1.0"
+title: Shared dataset
+---
+
+# Regional performance
+
+One declaration, two views. The `dataset` block draws nothing; both charts
+below read it by reference, so the two figures cannot drift apart.
+
+```mdv dataset id=sales
+fields:
+  date: {type: date}
+---
+date       | region | units | revenue
+2026-01-31 | APAC   |  1204 |  482000
+2026-01-31 | EMEA   |   980 |  414000
+2026-02-28 | APAC   |  1310 |  530000
+2026-02-28 | EMEA   |  1015 |  427000
+```
+
+## Revenue over time
+
+```mdv line
+title: Revenue by month
+data: "@sales"
+x: date
+y: revenue
+series: region
+```
+
+## Units by region
+
+```mdv bar
+title: Units by region
+data: "@sales"
+x: region
+y: units
+```

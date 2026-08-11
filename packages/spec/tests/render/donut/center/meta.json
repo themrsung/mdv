@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "donut",
+    "part-to-whole"
+  ],
+  "note": "SPEC 8.5: the donut center carries the total the slices sum to.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

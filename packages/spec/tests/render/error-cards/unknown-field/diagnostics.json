@@ -1,0 +1,20 @@
+[
+  {
+    "code": "MDV2101",
+    "severity": "info",
+    "source": "data",
+    "range": [
+      281,
+      392
+    ]
+  },
+  {
+    "code": "MDV2101",
+    "severity": "info",
+    "source": "data",
+    "range": [
+      440,
+      552
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "level": 1,
+  "tags": [
+    "pie",
+    "part-to-whole"
+  ],
+  "note": "SPEC 8.5: four slices, inside the six-slice advisory.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

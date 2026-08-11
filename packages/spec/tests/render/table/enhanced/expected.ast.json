@@ -1,0 +1,590 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            50,
+            70
+          ],
+          "type": "text",
+          "value": "Regional performance"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        48,
+        70
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            72,
+            183
+          ],
+          "type": "text",
+          "value": "Per-column configuration, ordered as written. The in-cell encodings\nsupplement the number and never replace it."
+        }
+      ],
+      "position": [
+        72,
+        183
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "columns": {
+          "growth": {
+            "format": "+.1%",
+            "heat": "diverging",
+            "label": "YoY",
+            "midpoint": 0,
+            "type": "number"
+          },
+          "region": {
+            "align": "left",
+            "label": "Region"
+          },
+          "revenue": {
+            "align": "right",
+            "format": "$,.0f",
+            "label": "Revenue",
+            "type": "number"
+          },
+          "trend": {
+            "curve": "monotone",
+            "type": "sparkline"
+          }
+        },
+        "format": "table",
+        "sort": [
+          "-revenue"
+        ],
+        "sticky": "header",
+        "title": "Regional performance",
+        "total": {
+          "growth": "mean",
+          "revenue": "sum"
+        },
+        "type": "table",
+        "zebra": true
+      },
+      "attrsPosition": {
+        "columns": {
+          "end": {
+            "column": 46,
+            "line": 17,
+            "offset": 477
+          },
+          "start": {
+            "column": 3,
+            "line": 14,
+            "offset": 237
+          }
+        },
+        "columns.growth": {
+          "end": {
+            "column": 84,
+            "line": 16,
+            "offset": 431
+          },
+          "start": {
+            "column": 12,
+            "line": 16,
+            "offset": 359
+          }
+        },
+        "columns.growth.format": {
+          "end": {
+            "column": 53,
+            "line": 16,
+            "offset": 400
+          },
+          "start": {
+            "column": 47,
+            "line": 16,
+            "offset": 394
+          }
+        },
+        "columns.growth.heat": {
+          "end": {
+            "column": 70,
+            "line": 16,
+            "offset": 417
+          },
+          "start": {
+            "column": 61,
+            "line": 16,
+            "offset": 408
+          }
+        },
+        "columns.growth.label": {
+          "end": {
+            "column": 23,
+            "line": 16,
+            "offset": 370
+          },
+          "start": {
+            "column": 20,
+            "line": 16,
+            "offset": 367
+          }
+        },
+        "columns.growth.midpoint": {
+          "end": {
+            "column": 83,
+            "line": 16,
+            "offset": 430
+          },
+          "start": {
+            "column": 82,
+            "line": 16,
+            "offset": 429
+          }
+        },
+        "columns.growth.type": {
+          "end": {
+            "column": 37,
+            "line": 16,
+            "offset": 384
+          },
+          "start": {
+            "column": 31,
+            "line": 16,
+            "offset": 378
+          }
+        },
+        "columns.region": {
+          "end": {
+            "column": 40,
+            "line": 14,
+            "offset": 274
+          },
+          "start": {
+            "column": 12,
+            "line": 14,
+            "offset": 246
+          }
+        },
+        "columns.region.align": {
+          "end": {
+            "column": 39,
+            "line": 14,
+            "offset": 273
+          },
+          "start": {
+            "column": 35,
+            "line": 14,
+            "offset": 269
+          }
+        },
+        "columns.region.label": {
+          "end": {
+            "column": 26,
+            "line": 14,
+            "offset": 260
+          },
+          "start": {
+            "column": 20,
+            "line": 14,
+            "offset": 254
+          }
+        },
+        "columns.revenue": {
+          "end": {
+            "column": 73,
+            "line": 15,
+            "offset": 347
+          },
+          "start": {
+            "column": 12,
+            "line": 15,
+            "offset": 286
+          }
+        },
+        "columns.revenue.align": {
+          "end": {
+            "column": 72,
+            "line": 15,
+            "offset": 346
+          },
+          "start": {
+            "column": 67,
+            "line": 15,
+            "offset": 341
+          }
+        },
+        "columns.revenue.format": {
+          "end": {
+            "column": 58,
+            "line": 15,
+            "offset": 332
+          },
+          "start": {
+            "column": 51,
+            "line": 15,
+            "offset": 325
+          }
+        },
+        "columns.revenue.label": {
+          "end": {
+            "column": 27,
+            "line": 15,
+            "offset": 301
+          },
+          "start": {
+            "column": 20,
+            "line": 15,
+            "offset": 294
+          }
+        },
+        "columns.revenue.type": {
+          "end": {
+            "column": 41,
+            "line": 15,
+            "offset": 315
+          },
+          "start": {
+            "column": 35,
+            "line": 15,
+            "offset": 309
+          }
+        },
+        "columns.trend": {
+          "end": {
+            "column": 46,
+            "line": 17,
+            "offset": 477
+          },
+          "start": {
+            "column": 12,
+            "line": 17,
+            "offset": 443
+          }
+        },
+        "columns.trend.curve": {
+          "end": {
+            "column": 45,
+            "line": 17,
+            "offset": 476
+          },
+          "start": {
+            "column": 37,
+            "line": 17,
+            "offset": 468
+          }
+        },
+        "columns.trend.type": {
+          "end": {
+            "column": 28,
+            "line": 17,
+            "offset": 459
+          },
+          "start": {
+            "column": 19,
+            "line": 17,
+            "offset": 450
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 22,
+            "offset": 571
+          },
+          "start": {
+            "column": 9,
+            "line": 22,
+            "offset": 566
+          }
+        },
+        "sort": {
+          "end": {
+            "column": 17,
+            "line": 18,
+            "offset": 494
+          },
+          "start": {
+            "column": 7,
+            "line": 18,
+            "offset": 484
+          }
+        },
+        "sort[0]": {
+          "end": {
+            "column": 16,
+            "line": 18,
+            "offset": 493
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 485
+          }
+        },
+        "sticky": {
+          "end": {
+            "column": 15,
+            "line": 21,
+            "offset": 557
+          },
+          "start": {
+            "column": 9,
+            "line": 21,
+            "offset": 551
+          }
+        },
+        "title": {
+          "end": {
+            "column": 28,
+            "line": 12,
+            "offset": 225
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 205
+          }
+        },
+        "total": {
+          "end": {
+            "column": 36,
+            "line": 19,
+            "offset": 530
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 502
+          }
+        },
+        "total.growth": {
+          "end": {
+            "column": 35,
+            "line": 19,
+            "offset": 529
+          },
+          "start": {
+            "column": 31,
+            "line": 19,
+            "offset": 525
+          }
+        },
+        "total.revenue": {
+          "end": {
+            "column": 21,
+            "line": 19,
+            "offset": 515
+          },
+          "start": {
+            "column": 18,
+            "line": 19,
+            "offset": 512
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 11,
+            "offset": 197
+          },
+          "start": {
+            "column": 8,
+            "line": 11,
+            "offset": 192
+          }
+        },
+        "zebra": {
+          "end": {
+            "column": 12,
+            "line": 20,
+            "offset": 542
+          },
+          "start": {
+            "column": 8,
+            "line": 20,
+            "offset": 538
+          }
+        }
+      },
+      "blockType": "table",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 36,
+          "line": 28,
+          "offset": 765
+        },
+        "start": {
+          "column": 1,
+          "line": 24,
+          "offset": 576
+        }
+      },
+      "level": 1,
+      "position": [
+        185,
+        769
+      ],
+      "raw": {
+        "data": "region | revenue | growth | trend\nAPAC   |   42100 |  0.182 | 31,34,38,42\nEMEA   |   31800 | -0.041 | 34,33,32,32\nAMER   |   58400 |  0.067 | 52,54,55,58\nLATAM  |    9400 |  0.213 | 7,8,8,9\n",
+        "fence": "```",
+        "header": "title: Regional performance\ncolumns:\n  region:  {label: Region, align: left}\n  revenue: {label: Revenue, type: number, format: \"$,.0f\", align: right}\n  growth:  {label: YoY, type: number, format: \"+.1%\", heat: diverging, midpoint: 0}\n  trend:   {type: sparkline, curve: monotone}\nsort: [-revenue]\ntotal: {revenue: sum, growth: mean}\nzebra: true\nsticky: header\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 29,
+          "offset": 769
+        },
+        "start": {
+          "column": 1,
+          "line": 11,
+          "offset": 185
+        }
+      },
+      "raw": "region | revenue | growth | trend\nAPAC   |   42100 |  0.182 | 31,34,38,42\nEMEA   |   31800 | -0.041 | 34,33,32,32\nAMER   |   58400 |  0.067 | 52,54,55,58\nLATAM  |    9400 |  0.213 | 7,8,8,9\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "revenue",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "growth",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "trend",
+            "type": "string"
+          }
+        ],
+        "rows": [
+          [
+            "APAC",
+            42100,
+            0.182,
+            "31,34,38,42"
+          ],
+          [
+            "EMEA",
+            31800,
+            -0.041,
+            "34,33,32,32"
+          ],
+          [
+            "AMER",
+            58400,
+            0.067,
+            "52,54,55,58"
+          ],
+          [
+            "LATAM",
+            9400,
+            0.213,
+            "7,8,8,9"
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 28,
+          "line": 3,
+          "offset": 42
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 46
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Regional performance"
+  },
+  "position": [
+    0,
+    770
+  ],
+  "type": "root"
+}

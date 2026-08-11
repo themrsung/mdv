@@ -1,0 +1,47 @@
+[
+  {
+    "code": "MDV1502",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      204,
+      393
+    ]
+  },
+  {
+    "code": "MDV2100",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      204,
+      393
+    ]
+  },
+  {
+    "code": "MDV1502",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      395,
+      524
+    ]
+  },
+  {
+    "code": "MDV2100",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      395,
+      524
+    ]
+  },
+  {
+    "code": "MDV2100",
+    "severity": "warning",
+    "source": "data",
+    "range": [
+      526,
+      630
+    ]
+  }
+]
