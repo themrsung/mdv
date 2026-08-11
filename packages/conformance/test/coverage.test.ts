@@ -206,6 +206,79 @@ North,120
     });
   });
 
+  /**
+   * Two requirements, not one: SPEC 9.1 is the container syntax and SPEC 9.2
+   * the inline sparkline. They are spelled with the same `:` sigil and land on
+   * the same AST node type, which is exactly why the derivation has to read
+   * `kind` — deriving both from "a directive was seen" would let one case
+   * substantiate a feature the document never used.
+   */
+  describe('directives (SPEC 9.1, SPEC 9.2)', () => {
+    const CONTAINER = ':::mdv-grid{cols=2}\n\nLeft.\n\n:::\n';
+    const SPARK = 'Revenue :mdv-spark[1,2,3]{type=line} held.\n';
+
+    it('claims the block syntax for a container directive', async () => {
+      expect(await covers(CONTAINER)).toContain('syntax.directives');
+    });
+
+    it('does not claim the block syntax for an inline one', async () => {
+      expect(await covers(SPARK)).not.toContain('syntax.directives');
+    });
+
+    it('claims the sparkline for the inline `mdv-spark` the parser really emits', async () => {
+      expect(await covers(SPARK)).toContain('syntax.inline-sparkline');
+    });
+
+    /**
+     * The parser spells every directive with the `mdv-` prefix, so a rule
+     * written against a bare `sparkline` matches nothing and the requirement
+     * can never be substantiated. Pinning the spelling here is what stops that
+     * from being reintroduced.
+     */
+    it('is not claimed by another inline directive', async () => {
+      expect(await covers('A :mdv-metric[42]{label=Answer} today.\n')).not.toContain(
+        'syntax.inline-sparkline',
+      );
+    });
+  });
+
+  /**
+   * SPEC 11.6 is the *override*, not a theme being in force: every document
+   * resolves under some theme, so anything weaker than "this document restyled
+   * itself and core honoured it" would credit the whole corpus.
+   */
+  describe('custom themes (SPEC 11.6)', () => {
+    const custom = (theme: string): string =>
+      `---\nmdv: "1.0"\ntheme:\n${theme}---\n\n# Restyled\n`;
+
+    it('claims an override that resolved', async () => {
+      const ids = await covers(custom('  extends: default\n  name: corpus\n  grid: "#dfe3e8"\n'));
+
+      expect(ids).toContain('theme.custom');
+    });
+
+    it('is not claimed by a document that named a built-in', async () => {
+      expect(await covers('---\nmdv: "1.0"\ntheme: dark\n---\n\n# Plain\n')).not.toContain(
+        'theme.custom',
+      );
+    });
+
+    it('is not claimed by a document with no front matter at all', async () => {
+      expect(await covers(BAR)).not.toContain('theme.custom');
+    });
+
+    /**
+     * `MDV1502` is how core reports an override it could not honour, and it
+     * leaves the base theme standing. The document is then evidence of the
+     * degradation path (SPEC 15.2), not of custom theming.
+     */
+    it('is not claimed when the override was reported instead of applied', async () => {
+      const ids = await covers(custom('  extends: no-such-theme\n  name: corpus\n'));
+
+      expect(ids).not.toContain('theme.custom');
+    });
+  });
+
   it('collects nothing from the output when the case rendered no SVG', async () => {
     expect(await covers(BAR, { checks: ['render'] })).not.toContain('a11y.names');
   });

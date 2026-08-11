@@ -58,6 +58,7 @@ export function coverageOf(input: CoverageInput): readonly string[] {
     addSyntax(doc, add);
     addData(doc, add);
     addBlocks(doc, add);
+    addTheme(doc, add);
   }
   addRender(input, add);
 
@@ -84,12 +85,16 @@ function addSyntax(doc: ResolvedDocument, add: (id: string) => void): void {
         sawError = true;
         break;
       case 'mdvDirective': {
-        add('syntax.directives');
         const directive = node as { name?: unknown; kind?: unknown };
         const name = typeof directive.name === 'string' ? directive.name : '';
-        if (name === 'sparkline' && directive.kind === 'inline') add('syntax.inline-sparkline');
-        if (name === 'math') add('syntax.math');
-        if (name === 'include') add('syntax.include');
+        // `syntax.directives` is SPEC 9.1, which is the *block* form; the
+        // inline form is SPEC 9.2 and has its own requirement. An inline
+        // `:mdv-metric[…]` must not substantiate the container syntax.
+        if (directive.kind !== 'inline') add('syntax.directives');
+        // The parser spells the sparkline `mdv-spark`, prefix and all — there
+        // is no `sparkline` directive to match, and `math` and `include` are
+        // not directives at all (`$…$` and a reserved block type).
+        if (name === 'mdv-spark' && directive.kind === 'inline') add('syntax.inline-sparkline');
         break;
       }
       case 'root':
@@ -247,6 +252,33 @@ function faceted(block: ResolvedBlock): boolean {
 function tableView(block: ResolvedBlock): boolean {
   const attr = block.attrs.table;
   return attr !== undefined && attr !== 'none';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Themes (SPEC 11)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * A custom theme in force (SPEC 11.6).
+ *
+ * The requirement is the *override*: front matter's `theme:` map, with its
+ * `extends` and its partial token set, resolved against the registered themes
+ * and composed onto the base. A bare name is not it — `theme: dark` selects one
+ * of the built-ins SPEC 11.1 already requires, and crediting that here would
+ * let `theme.custom` be substantiated by a document that customised nothing.
+ *
+ * An override core cannot honour is reported as `MDV1502` and leaves the base
+ * theme standing (SPEC 15.2: degrade, never fail), so a document that earned
+ * one has shown the diagnostic rather than the theme. The check is
+ * document-wide rather than per-key because `MDV1502` is the code both the
+ * document-level and the per-block resolutions emit, and under-crediting a case
+ * is the safe direction for a derivation the conformance claim rests on.
+ */
+function addTheme(doc: ResolvedDocument, add: (id: string) => void): void {
+  const setting = doc.frontmatter?.theme;
+  if (typeof setting !== 'object' || setting === null || Array.isArray(setting)) return;
+  if (doc.diagnostics.some((diagnostic) => diagnostic.code === 'MDV1502')) return;
+  add('theme.custom');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
