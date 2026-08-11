@@ -18,6 +18,8 @@ import { DEFAULT_ROOT, loadCorpus } from './corpus.js';
 import { buildReport, renderReport } from './report.js';
 import { runCorpus } from './run.js';
 import type { ConformanceReport } from './types.js';
+import { updateCorpus } from './update.js';
+import type { GoldenWrite, UpdateOptions, UpdateReport } from './update.js';
 
 /** Where a stream of text goes. */
 export interface TextSink {
@@ -52,6 +54,8 @@ const OPTIONS = {
   json: { type: 'boolean' },
   tag: { type: 'string', multiple: true },
   'no-pdf': { type: 'boolean' },
+  update: { type: 'boolean' },
+  'dry-run': { type: 'boolean' },
   quiet: { type: 'boolean', short: 'q' },
   help: { type: 'boolean', short: 'h' },
 } as const;
@@ -67,6 +71,8 @@ Options:
       --json         Emit the report as JSON instead of Markdown
       --tag <tag>    Only cases carrying this tag. Repeatable.
       --no-pdf       Skip the PDF checks
+      --update       Mint the goldens each case asks for instead of checking them
+      --dry-run      With --update: list what would change, write nothing
   -q, --quiet        Do not print the one-line summary to stderr
   -h, --help         Show this message
 
@@ -100,13 +106,31 @@ export async function main(argv: readonly string[], io: ConformanceIo): Promise<
     return EXIT_CODES.usage;
   }
 
-  const root = resolve(io.cwd, values.root ?? DEFAULT_ROOT);
-  const corpus = await loadCorpus(root);
-  const results = await runCorpus(corpus, {
+  const selection: UpdateOptions = {
     ...(level === undefined ? {} : { level }),
     ...(values.tag === undefined ? {} : { tags: values.tag }),
     ...(values['no-pdf'] === true ? { pdf: false } : {}),
-  });
+  };
+  const root = resolve(io.cwd, values.root ?? DEFAULT_ROOT);
+
+  if (values.update === true) {
+    // A report is a statement about goldens; minting them is what makes the
+    // statement true. Writing both in one command would report on the corpus
+    // this run had just rewritten, which says nothing.
+    if (values.out !== undefined || values.json === true) {
+      io.stderr.write('--update writes goldens, not a report: drop --out and --json\n');
+      return EXIT_CODES.usage;
+    }
+    const dryRun = values['dry-run'] === true;
+    return update(root, { ...selection, ...(dryRun ? { dryRun } : {}) }, io, values.quiet === true);
+  }
+  if (values['dry-run'] === true) {
+    io.stderr.write('--dry-run only means something with --update\n');
+    return EXIT_CODES.usage;
+  }
+
+  const corpus = await loadCorpus(root);
+  const results = await runCorpus(corpus, selection);
   const report = buildReport(corpus, results, level ?? 3);
 
   const text =
@@ -127,6 +151,53 @@ export async function main(argv: readonly string[], io: ConformanceIo): Promise<
 
   if (values.quiet !== true) io.stderr.write(summary(report));
   return report.ok ? EXIT_CODES.ok : EXIT_CODES.failed;
+}
+
+/**
+ * `--update`: mint the goldens and say which files moved.
+ *
+ * Only the files that changed are listed. A corpus already in step prints
+ * nothing at all, which is the right answer from a command whose job is to be
+ * run before committing — the output *is* the diff you are about to make.
+ */
+async function update(
+  root: string,
+  options: UpdateOptions,
+  io: ConformanceIo,
+  quiet: boolean,
+): Promise<number> {
+  let report: UpdateReport;
+  try {
+    report = await updateCorpus(root, options);
+  } catch (error) {
+    io.stderr.write(`cannot update ${root}: ${errorText(error)}\n`);
+    return EXIT_CODES.io;
+  }
+  for (const write of report.writes) {
+    if (write.status !== 'unchanged') io.stdout.write(`${write.status.padEnd(7)} ${write.path}\n`);
+  }
+  for (const issue of report.issues) {
+    io.stderr.write(`corpus: ${issue.path === '' ? '.' : issue.path}: ${issue.message}\n`);
+  }
+  for (const failure of report.failures) {
+    io.stderr.write(`${failure.case}: ${failure.stage} failed, left alone: ${failure.reason}\n`);
+  }
+  if (!quiet) io.stderr.write(updateSummary(report, options.dryRun === true));
+  return report.ok ? EXIT_CODES.ok : EXIT_CODES.failed;
+}
+
+/** One line for the same human, in the same place as {@link summary}. */
+function updateSummary(report: UpdateReport, dryRun: boolean): string {
+  const count = (status: GoldenWrite['status']): number =>
+    report.writes.filter((write) => write.status === status).length;
+  const parts = [
+    `${count('created')} created`,
+    `${count('updated')} updated`,
+    `${count('unchanged')} unchanged`,
+  ];
+  if (report.failures.length > 0) parts.push(`${report.failures.length} could not be minted`);
+  if (report.issues.length > 0) parts.push(`${report.issues.length} corpus issues`);
+  return `${parts.join(', ')}${dryRun ? ' — dry run, nothing written' : ''}\n`;
 }
 
 /**

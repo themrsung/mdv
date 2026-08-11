@@ -33,10 +33,10 @@ import { canonicalAst, sameDocument, toMarkdown } from '@mdv/parser';
 import type { Diagnostic } from '@mdv/parser';
 import { createStandardFontMetrics, naturalSize, tracePdf } from '@mdv/render-pdf';
 import { toSvgString } from '@mdv/render-svg';
-import type { ConformanceLevel } from '@mdv/spec';
+import type { ConformanceLevel, GoldenName } from '@mdv/spec';
 import { getBuiltinTheme, listBuiltinThemes } from '@mdv/themes';
 
-import { INPUT_FILE, normaliseGolden } from './corpus.js';
+import { GOLDEN_FILE_OF, INPUT_FILE, META_FILE, normaliseGolden } from './corpus.js';
 import { coverageOf } from './coverage.js';
 import type {
   CaseResult,
@@ -169,8 +169,13 @@ interface RunState {
   svg?: string | undefined;
 }
 
-/** `undefined` when the case should run; the reason it should not, otherwise. */
-function filterReason(fixture: FixtureCase, options: RunOptions): string | undefined {
+/**
+ * `undefined` when the case should run; the reason it should not, otherwise.
+ *
+ * Shared with the write path so `--level` and `--tag` select the same cases
+ * whether they are being compared or minted.
+ */
+export function filterReason(fixture: FixtureCase, options: RunOptions): string | undefined {
   const level = options.level;
   if (level !== undefined && fixture.meta.level > level) {
     return `level ${String(fixture.meta.level)} case, run is level ${String(level)}`;
@@ -220,14 +225,17 @@ async function pipeline(fixture: FixtureCase, options: RunOptions, state: RunSta
   // ── ast ────────────────────────────────────────────────────────────────────
   // SPEC 16.2: `expected.ast.json` is the canonical AST *after resolution*, so
   // it pins the dataset attachment as well as the parse.
-  if (goldens.ast !== undefined) {
-    const ok = compare(state, 'ast', goldens.ast, () => canonicalAst(resolved.ast));
-    if (!ok) return;
+  const astOwed = owed(fixture, 'ast');
+  if (goldens.ast !== undefined || astOwed !== undefined) {
+    const ok = compareOr(state, 'ast', goldens.ast, astOwed, () => canonicalAst(resolved.ast));
+    if (ok === FAILED) return;
   }
 
   // ── diagnostics ────────────────────────────────────────────────────────────
-  if (goldens.diagnostics !== undefined) {
+  const diagnosticsOwed = owed(fixture, 'diagnostics');
+  if (goldens.diagnostics !== undefined || diagnosticsOwed !== undefined) {
     const ok = attempt(state, 'diagnostics', undefined, () => {
+      if (diagnosticsOwed !== undefined) throw new UnmintedError(diagnosticsOwed);
       const mismatch = diagnosticsMismatch(goldens.diagnostics ?? [], resolved.diagnostics);
       if (mismatch !== undefined) throw new GoldenError(mismatch);
       return true;
@@ -236,10 +244,18 @@ async function pipeline(fixture: FixtureCase, options: RunOptions, state: RunSta
   }
 
   // ── render ─────────────────────────────────────────────────────────────────
+  const svgOwed = owed(fixture, 'svg');
   if (resolved.blocks.length === 0) {
+    // A drawn golden and nothing drawn is a broken case, not a quiet skip:
+    // skipping here is how an `expected.svg` beside a document that stopped
+    // producing blocks would go unnoticed for as long as nobody looked.
+    if (goldens.svg !== undefined || svgOwed !== undefined) {
+      state.checks.push({ check: 'render', status: 'fail', reason: NO_BLOCKS });
+      return;
+    }
     state.checks.push({ check: 'render', status: 'skip', reason: 'no visual blocks' });
   } else {
-    const svg = compareOr(state, 'render', goldens.svg, () => svgFor(resolved));
+    const svg = compareOr(state, 'render', goldens.svg, svgOwed, () => svgFor(resolved));
     if (svg === FAILED) return;
     state.svg = svg;
   }
@@ -247,8 +263,13 @@ async function pipeline(fixture: FixtureCase, options: RunOptions, state: RunSta
   // ── dark ───────────────────────────────────────────────────────────────────
   // Only ever a golden comparison: re-rendering under the dark theme with
   // nothing to compare against re-tests the light path and reports it twice.
-  if (goldens.dark !== undefined && resolved.blocks.length > 0) {
-    const ok = await compareAsync(state, 'dark', goldens.dark, async () => {
+  const darkOwed = owed(fixture, 'dark');
+  if (goldens.dark !== undefined || darkOwed !== undefined) {
+    if (resolved.blocks.length === 0) {
+      state.checks.push({ check: 'dark', status: 'fail', reason: NO_BLOCKS });
+      return;
+    }
+    const ok = await compareAsync(state, 'dark', goldens.dark, darkOwed, async () => {
       const dark = await resolve(parsed, conformanceConfig(fixture.meta.level, 'dark'));
       return svgFor(dark);
     });
@@ -260,9 +281,28 @@ async function pipeline(fixture: FixtureCase, options: RunOptions, state: RunSta
     state.checks.push({ check: 'pdf', status: 'skip', reason: 'pdf checks disabled' });
     return;
   }
-  await compareAsync(state, 'pdf', goldens.pdf, async () =>
+  await compareAsync(state, 'pdf', goldens.pdf, owed(fixture, 'pdf'), async () =>
     canonicalAst(await traceOf(resolved, fixture.source)),
   );
+}
+
+/** Said of a case that pins something drawn and drew nothing. */
+export const NO_BLOCKS = 'the case pins a rendered golden but the document has no visual blocks';
+
+/**
+ * The complaint for a golden the case promised and did not ship, or `undefined`
+ * when it owes nothing.
+ *
+ * A promise is `meta.pin`; a file beside the case is its own promise, already
+ * kept. The debt is reported as a failed *check* rather than as a
+ * {@link CorpusIssue} on purpose: `--update` loads the corpus it is about to
+ * fill, and a loader that refused the very state the write path exists to
+ * repair could never be run.
+ */
+function owed(fixture: FixtureCase, name: GoldenName): string | undefined {
+  if (fixture.goldens[name] !== undefined) return undefined;
+  if (!fixture.meta.pin.includes(name)) return undefined;
+  return `${META_FILE} pins ${JSON.stringify(name)} but ${GOLDEN_FILE_OF[name]} is missing; run pnpm test:update`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -280,8 +320,11 @@ async function pipeline(fixture: FixtureCase, options: RunOptions, state: RunSta
  * whether a rendering change was intended, and `interaction: false` because the
  * hit-rect overlay belongs to a live document (SPEC 7.5) and would pin nothing
  * but its own geometry.
+ *
+ * Exported so the write path mints the bytes the read path compares: two
+ * spellings of "render the corpus" would drift the day one of them was tuned.
  */
-function svgFor(doc: ResolvedDocument): string {
+export function svgFor(doc: ResolvedDocument): string {
   return doc.blocks
     .map((block) => toSvgString(sceneFor(doc, block), { inlineStyles: true, interaction: false }))
     .join('\n\n');
@@ -300,8 +343,10 @@ function sceneFor(doc: ResolvedDocument, block: ResolvedBlock): Scene {
  * Export diagnostics (`MDV5100` and friends) are collected and discarded — the
  * `diagnostics` golden pins the resolve stage, and a corpus that wants to pin an
  * export diagnostic needs a file the corpus does not yet define.
+ *
+ * Exported for the same reason as {@link svgFor}.
  */
-async function traceOf(doc: ResolvedDocument, source: string): Promise<unknown> {
+export async function traceOf(doc: ResolvedDocument, source: string): Promise<unknown> {
   const first = doc.blocks[0];
   const registry = first === undefined ? undefined : createLayoutContext(doc, first).registry;
   const discarded: Diagnostic[] = [];
@@ -317,6 +362,22 @@ async function traceOf(doc: ResolvedDocument, source: string): Promise<unknown> 
     sourceName: INPUT_FILE,
     ...(registry === undefined ? {} : { registry }),
   });
+}
+
+/**
+ * A diagnostic reduced to the fields a golden is allowed to hold it to.
+ *
+ * Everything {@link diagnosticsMismatch} can compare is minted, because a
+ * minted golden must fail if any of it changes; an author who wants a looser
+ * pin deletes fields by hand, which is a decision and looks like one.
+ */
+export function fingerprintOf(diagnostic: Diagnostic): DiagnosticFingerprint {
+  return {
+    code: diagnostic.code,
+    severity: diagnostic.severity,
+    source: diagnostic.source,
+    range: [diagnostic.range.start.offset, diagnostic.range.end.offset],
+  };
 }
 
 /**
@@ -378,19 +439,50 @@ function rangeText(range: readonly [number, number]): string {
 const FAILED = Symbol('failed');
 type Failed = typeof FAILED;
 
+/**
+ * A failure the runner raised on purpose.
+ *
+ * Told apart from an error thrown by the build because its message is already
+ * the report line and its {@link detail} is already formatted: printing the
+ * stack of the comparison that found a golden mismatch buries the diff under
+ * the plumbing.
+ */
+abstract class ExpectedFailure extends Error {
+  constructor(
+    message: string,
+    /** Many lines, already formatted. Empty when the message says it all. */
+    readonly detail: string,
+  ) {
+    super(message);
+  }
+}
+
 /** A round-trip difference, already formatted. */
-class RoundTripError extends Error {
-  constructor(readonly diff: string) {
-    super('parse → toMarkdown → parse changed the document');
+class RoundTripError extends ExpectedFailure {
+  constructor(diff: string) {
+    super('parse → toMarkdown → parse changed the document', diff);
     this.name = 'RoundTripError';
   }
 }
 
 /** A golden mismatch, already formatted. */
-class GoldenError extends Error {
-  constructor(readonly diff: string) {
-    super('output does not match the golden');
+class GoldenError extends ExpectedFailure {
+  constructor(diff: string) {
+    super('output does not match the golden', diff);
     this.name = 'GoldenError';
+  }
+}
+
+/**
+ * A golden the case promised and does not ship.
+ *
+ * Thrown *after* the artefact was produced, so the stage is still exercised and
+ * a case that cannot render yet fails on the render rather than on the paperwork.
+ */
+class UnmintedError extends ExpectedFailure {
+  constructor(message: string) {
+    super(message, '');
+    this.name = 'UnmintedError';
   }
 }
 
@@ -428,37 +520,26 @@ async function attemptAsync<T>(
 }
 
 function failure(check: CheckName, error: unknown): CheckResult {
-  const detail = error instanceof RoundTripError || error instanceof GoldenError ? error.diff : '';
+  const detail = error instanceof ExpectedFailure ? error.detail : stackOf(error);
   return {
     check,
     status: 'fail',
     reason: errorText(error),
-    ...(detail === '' ? { detail: stackOf(error) } : { detail }),
+    ...(detail === '' ? {} : { detail }),
   };
-}
-
-/** Produce a string and hold it to a golden. */
-function compare(state: RunState, check: CheckName, golden: string, body: () => string): boolean {
-  return (
-    attempt(state, check, undefined, () => {
-      const actual = normaliseGolden(body());
-      if (actual !== golden) throw new GoldenError(diffOf(golden, actual));
-      return actual;
-    }) !== FAILED
-  );
 }
 
 async function compareAsync(
   state: RunState,
   check: CheckName,
   golden: string | undefined,
+  unminted: string | undefined,
   body: () => Promise<string>,
 ): Promise<boolean> {
   return (
-    (await attemptAsync(state, check, golden === undefined ? UNPINNED : undefined, async () => {
+    (await attemptAsync(state, check, unpinned(golden, unminted), async () => {
       const actual = normaliseGolden(await body());
-      if (golden !== undefined && actual !== golden) throw new GoldenError(diffOf(golden, actual));
-      return actual;
+      return held(actual, golden, unminted);
     })) !== FAILED
   );
 }
@@ -473,13 +554,29 @@ function compareOr(
   state: RunState,
   check: CheckName,
   golden: string | undefined,
+  unminted: string | undefined,
   body: () => string,
 ): string | Failed {
-  return attempt(state, check, golden === undefined ? UNPINNED : undefined, () => {
-    const actual = normaliseGolden(body());
-    if (golden !== undefined && actual !== golden) throw new GoldenError(diffOf(golden, actual));
-    return actual;
-  });
+  return attempt(state, check, unpinned(golden, unminted), () =>
+    held(normaliseGolden(body()), golden, unminted),
+  );
+}
+
+/**
+ * The produced text, once it has answered for itself.
+ *
+ * The order matters: an owed golden is reported only after the artefact exists,
+ * so "you never minted this" is never mistaken for "this stage is broken".
+ */
+function held(actual: string, golden: string | undefined, unminted: string | undefined): string {
+  if (unminted !== undefined) throw new UnmintedError(unminted);
+  if (golden !== undefined && actual !== golden) throw new GoldenError(diffOf(golden, actual));
+  return actual;
+}
+
+/** The `pass` reason for a check with nothing to compare against, if it is one. */
+function unpinned(golden: string | undefined, unminted: string | undefined): string | undefined {
+  return golden === undefined && unminted === undefined ? UNPINNED : undefined;
 }
 
 /** Said of a check that ran with no golden to compare against. */

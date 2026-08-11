@@ -7,7 +7,13 @@
  * claim — a report is a record of what this build did with this corpus, and the
  * only claim it supports is "the level whose every requirement is covered".
  */
-import type { ConformanceLevel, FixtureCategory, FixtureMeta, LevelRequirement } from '@mdv/spec';
+import type {
+  ConformanceLevel,
+  FixtureCategory,
+  FixtureMeta,
+  GoldenName,
+  LevelRequirement,
+} from '@mdv/spec';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Checks
@@ -93,9 +99,10 @@ export interface Goldens {
   readonly diagnostics?: readonly DiagnosticFingerprint[];
 }
 
-/** `meta.json` after validation: `covers` is always a list. */
+/** `meta.json` after validation: `covers` and `pin` are always lists. */
 export interface CaseMeta extends FixtureMeta {
   readonly covers: readonly string[];
+  readonly pin: readonly GoldenName[];
 }
 
 /** One fixture directory, loaded and validated. */

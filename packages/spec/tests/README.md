@@ -29,9 +29,25 @@ output". A `syntax/` case usually ships `expected.ast.json` and
 {
   "level": 2,              // conformance level required to pass this case
   "tags": ["bar", "stack"],// free-form selectors
-  "note": "optional prose" // why this case exists
+  "note": "optional prose",// why this case exists
+  "pin": ["ast", "svg"]    // goldens this case promises to ship
 }
 ```
+
+### `pin`
+
+A case that ships no goldens asserts nothing, and a corpus of them passes every
+run. `pin` is the case's promise, written before the output exists: each name in
+it — `ast`, `diagnostics`, `svg`, `dark`, `pdf` — is a golden the case will be
+held to.
+
+A pinned golden that is missing **fails that check**, with `run pnpm test:update`
+as the reason. It is deliberately not a corpus error: the corpus still has to
+load for the command that mints the file to run.
+
+Pinning is the one thing `--update` will not do for you. It mints the goldens a
+case asks for and refreshes the ones already beside it, so deciding that an
+output is worth asserting stays a human edit to `meta.json`.
 
 ### `diagnostics.json`
 
@@ -65,6 +81,19 @@ SPEC 16.3. Goldens are regenerated **only** by an explicit `pnpm test:update`,
 and a regeneration commit **MUST NOT** also contain source changes. That rule is
 the only thing that lets a reviewer tell an intentional rendering change from an
 accidental one.
+
+`pnpm conformance:update` runs the golden half alone; `--dry-run` lists what it
+would write without touching the disk. Three rules keep it from being a way to
+make failures disappear:
+
+- it mints only what a case asked for in `pin`, and writes nothing else;
+- a case that throws writes nothing, so a crash never quietly erases the golden
+  that would have caught it;
+- it reports what changed, per file, so the diff is reviewable before it is
+  committed.
+
+Neither `--out` nor `--json` may be combined with `--update`: a run that has just
+rewritten the corpus cannot also report on it.
 
 ## Status
 

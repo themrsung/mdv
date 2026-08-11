@@ -379,3 +379,106 @@ describe('the summary line', () => {
     expect(temp.io.out).toContain('# MDV conformance report');
   });
 });
+
+describe('--update', () => {
+  it('mints the goldens and names every file it touched', async () => {
+    const temp = await fresh();
+    await temp.addCase('render/bar/simple', { meta: { level: 1, pin: ['ast'] } });
+    const code = await run(temp, '--update');
+
+    expect(code).toBe(EXIT_CODES.ok);
+    expect(temp.io.out).toBe('created render/bar/simple/expected.ast.json\n');
+    expect(
+      await readFile(join(temp.root, 'render/bar/simple', GOLDEN_FILES.ast), 'utf8'),
+    ).toContain('"type"');
+  });
+
+  it('leaves a corpus already in step silent, because there is no diff to review', async () => {
+    const temp = await fresh();
+    await temp.addCase('render/bar/simple', { meta: { level: 1, pin: ['ast'] } });
+    await run(temp, '--update');
+    temp.io.out = '';
+    const code = await run(temp, '--update');
+
+    expect(code).toBe(EXIT_CODES.ok);
+    expect(temp.io.out).toBe('');
+  });
+
+  it('says what it would write under --dry-run, and writes nothing', async () => {
+    const temp = await fresh();
+    await temp.addCase('render/bar/simple', { meta: { level: 1, pin: ['ast'] } });
+    const code = await run(temp, '--update', '--dry-run');
+
+    expect(code).toBe(EXIT_CODES.ok);
+    expect(temp.io.out).toContain('created render/bar/simple/expected.ast.json');
+    expect(temp.io.err).toContain('dry run, nothing written');
+    await expect(
+      readFile(join(temp.root, 'render/bar/simple', GOLDEN_FILES.ast), 'utf8'),
+    ).rejects.toThrow();
+  });
+
+  it('is 1, and names the case, when a golden could not be minted', async () => {
+    const temp = await fresh();
+    await temp.addCase('a11y/prose/only', { meta: { level: 1, pin: ['svg'] }, source: PROSE_CASE });
+    const code = await run(temp, '--update');
+
+    expect(code).toBe(EXIT_CODES.failed);
+    expect(temp.io.err).toContain('a11y/prose/only: render failed, left alone');
+    expect(temp.io.err).toContain('1 could not be minted');
+  });
+
+  it('refuses to write a report in the same run that rewrote the corpus', async () => {
+    const temp = await fresh();
+
+    expect(await run(temp, '--update', '--json')).toBe(EXIT_CODES.usage);
+    expect(await run(temp, '--update', '--out', join(temp.root, 'r.md'))).toBe(EXIT_CODES.usage);
+    expect(temp.io.err).toContain('drop --out and --json');
+    expect(temp.io.out).toBe('');
+  });
+
+  it('rejects --dry-run on a read-only run, where it would mean nothing', async () => {
+    const temp = await fresh();
+    const code = await run(temp, '--dry-run');
+
+    expect(code).toBe(EXIT_CODES.usage);
+    expect(temp.io.err).toContain('--dry-run only means something with --update');
+  });
+
+  it('honours the selection flags, so one case can be re-minted alone', async () => {
+    const temp = await fresh();
+    await temp.addCase('render/bar/one', { meta: { level: 1, tags: ['bar'], pin: ['ast'] } });
+    await temp.addCase('render/bar/two', { meta: { level: 1, tags: ['line'], pin: ['ast'] } });
+    await run(temp, '--update', '--tag', 'bar');
+
+    expect(temp.io.out).toBe('created render/bar/one/expected.ast.json\n');
+  });
+
+  it('is suppressed by --quiet, except for the file list itself', async () => {
+    const temp = await fresh();
+    await temp.addCase('render/bar/simple', { meta: { level: 1, pin: ['ast'] } });
+    const code = await run(temp, '--update', '--quiet');
+
+    expect(code).toBe(EXIT_CODES.ok);
+    expect(temp.io.err).toBe('');
+    expect(temp.io.out).toContain('created render/bar/simple/expected.ast.json');
+  });
+
+  it('reports a corpus it cannot read exactly as a read-only run does', async () => {
+    const temp = await fresh();
+    const code = await main(['--root', join(temp.root, 'nowhere'), '--update'], temp.io);
+
+    expect(code).toBe(EXIT_CODES.failed);
+    expect(temp.io.err).toContain('cannot read corpus root');
+    expect(temp.io.out).toBe('');
+  });
+
+  it('mints nothing when the corpus is unsound, and says which path is wrong', async () => {
+    const temp = await fresh();
+    await temp.write('not-a-category/case/input.mdv', BAR_CASE);
+    const code = await run(temp, '--update');
+
+    expect(code).toBe(EXIT_CODES.failed);
+    expect(temp.io.err).toContain('corpus: not-a-category');
+    expect(temp.io.err).toContain('1 corpus issues');
+  });
+});

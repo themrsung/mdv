@@ -6,6 +6,9 @@
  * {@link runCorpus} and {@link buildReport} are separate steps over plain data,
  * so a harness can run the corpus in a test, keep the results, and render the
  * report without going near a process.
+ *
+ * {@link updateCorpus} is the one entry point that writes: it mints the goldens
+ * the corpus asks for, through the same stages a run checks them with.
  */
 
 export {
@@ -36,6 +39,9 @@ export {
   runCorpus,
 } from './run.js';
 export type { RunOptions } from './run.js';
+
+export { updateCases, updateCorpus } from './update.js';
+export type { GoldenWrite, UpdateFailure, UpdateOptions, UpdateReport } from './update.js';
 
 export { CHECK_ORDER } from './types.js';
 export type {

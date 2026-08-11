@@ -314,17 +314,18 @@ describe('normaliseGolden', () => {
 describe('readMeta', () => {
   it('accepts the minimum: a level', () => {
     expect(readMeta({ level: 3 })).toEqual({
-      meta: { level: 3, tags: [], covers: [] },
+      meta: { level: 3, tags: [], covers: [], pin: [] },
       errors: [],
     });
   });
 
-  it('keeps tags, note and covers', () => {
+  it('keeps tags, note, covers and pin', () => {
     const { meta, errors } = readMeta({
       level: 1,
       tags: ['bar'],
       note: 'why this case exists',
       covers: ['type.bar'],
+      pin: ['ast', 'svg'],
     });
 
     expect(errors).toEqual([]);
@@ -333,6 +334,7 @@ describe('readMeta', () => {
       tags: ['bar'],
       note: 'why this case exists',
       covers: ['type.bar'],
+      pin: ['ast', 'svg'],
     });
   });
 

@@ -15,7 +15,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { join, sep } from 'node:path';
 import { isKnownRequirement } from '@mdv/spec';
-import type { ConformanceLevel, FixtureCategory } from '@mdv/spec';
+import type { ConformanceLevel, FixtureCategory, GoldenName } from '@mdv/spec';
 import type {
   CaseMeta,
   Corpus,
@@ -59,7 +59,21 @@ export const GOLDEN_FILES = {
 
 const EXPECTED_FILES: ReadonlySet<string> = new Set(Object.values(GOLDEN_FILES));
 
-const META_KEYS: ReadonlySet<string> = new Set(['level', 'tags', 'note', 'covers']);
+/**
+ * Every golden a case can pin, in check order.
+ *
+ * {@link GoldenName} is exactly `keyof Goldens`, so a name indexes the loaded
+ * goldens directly and there is no second table to keep in step.
+ */
+export const GOLDEN_NAMES: readonly GoldenName[] = ['ast', 'diagnostics', 'svg', 'dark', 'pdf'];
+
+/** The file that holds each golden (SPEC 16.2). */
+export const GOLDEN_FILE_OF: Readonly<Record<GoldenName, string>> = {
+  ...GOLDEN_FILES,
+  diagnostics: DIAGNOSTICS_FILE,
+};
+
+const META_KEYS: ReadonlySet<string> = new Set(['level', 'tags', 'note', 'covers', 'pin']);
 
 /** Directories that are never part of the corpus, whatever they contain. */
 const IGNORED_DIRS: ReadonlySet<string> = new Set(['node_modules', '.git']);
@@ -78,7 +92,8 @@ export function normaliseGolden(text: string): string {
   return text.replace(/\r\n/gu, '\n').replace(/\n+$/u, '');
 }
 
-async function readIfPresent(path: string): Promise<string | undefined> {
+/** The file's text, or `undefined` when it is not there. Other errors throw. */
+export async function readIfPresent(path: string): Promise<string | undefined> {
   try {
     return await readFile(path, 'utf8');
   } catch (error) {
@@ -119,7 +134,7 @@ export function readMeta(value: unknown): {
   const errors: string[] = [];
   if (!isRecord(value)) {
     return {
-      meta: { level: 1, tags: [], covers: [] },
+      meta: { level: 1, tags: [], covers: [], pin: [] },
       errors: [`${META_FILE} must be a JSON object`],
     };
   }
@@ -169,16 +184,44 @@ export function readMeta(value: unknown): {
     }
   }
 
+  const pin: GoldenName[] = [];
+  const rawPin = value['pin'];
+  if (rawPin === undefined) {
+    // A file beside the case is its own declaration; this is for the promise
+    // made before the file exists.
+  } else if (!Array.isArray(rawPin)) {
+    errors.push(`${META_FILE}: "pin" must be an array of golden names`);
+  } else {
+    for (const name of rawPin) {
+      if (!isGoldenName(name)) {
+        errors.push(
+          `${META_FILE}: "pin" must hold ${GOLDEN_NAMES.join(', ')}, got ${JSON.stringify(name)}`,
+        );
+      } else if (pin.includes(name)) {
+        errors.push(`${META_FILE}: "pin" repeats ${JSON.stringify(name)}`);
+      } else {
+        pin.push(name);
+      }
+    }
+  }
+
   const note = value['note'];
   if (note !== undefined && typeof note !== 'string') {
     errors.push(`${META_FILE}: "note" must be a string`);
   }
 
-  const meta: CaseMeta =
-    typeof note === 'string'
-      ? { level, tags, note, covers: [...covers].sort() }
-      : { level, tags, covers: [...covers].sort() };
+  const rest = { level, tags, covers: [...covers].sort(), pin: sortGoldens(pin) };
+  const meta: CaseMeta = typeof note === 'string' ? { ...rest, note } : rest;
   return { meta, errors };
+}
+
+function isGoldenName(value: unknown): value is GoldenName {
+  return typeof value === 'string' && (GOLDEN_NAMES as readonly string[]).includes(value);
+}
+
+/** Check order, so `pin` reads the way the run reports. */
+function sortGoldens(names: readonly GoldenName[]): readonly GoldenName[] {
+  return [...names].sort((a, b) => GOLDEN_NAMES.indexOf(a) - GOLDEN_NAMES.indexOf(b));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -369,7 +412,7 @@ async function loadCase(
 
   const source = (await readIfPresent(join(dir, INPUT_FILE))) ?? '';
 
-  let meta: CaseMeta = { level: 1, tags: [], covers: [] };
+  let meta: CaseMeta = { level: 1, tags: [], covers: [], pin: [] };
   const rawMeta = await readIfPresent(join(dir, META_FILE));
   if (rawMeta === undefined) {
     errors.push(`${META_FILE} is required`);

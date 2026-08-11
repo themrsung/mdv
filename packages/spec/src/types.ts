@@ -146,7 +146,24 @@ export interface FixtureMeta {
    * in `levels.json`; an unknown one is a corpus error, not a silent no-op.
    */
   readonly covers?: readonly string[];
+  /**
+   * The outputs this case promises to pin, as {@link GoldenName}s.
+   *
+   * A case asserts on whichever `expected.*` files it ships, so a file is its
+   * own declaration and needs no entry here. This field is for the other
+   * direction: a name listed with no file beside it is a corpus error, which is
+   * what stops a case from being *written* to pin an output and then quietly
+   * shipping without it. `pnpm test:update` turns each promise into a file.
+   */
+  readonly pin?: readonly GoldenName[];
 }
+
+/**
+ * A golden a case can pin, named after the file that holds it (SPEC 16.2):
+ * `expected.ast.json`, `diagnostics.json`, `expected.svg`, `expected.dark.svg`,
+ * `expected.pdf.json`.
+ */
+export type GoldenName = 'ast' | 'diagnostics' | 'svg' | 'dark' | 'pdf';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Conformance levels (SPEC 16.1)

@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { loadCorpus } from '../src/corpus.js';
-import { conformanceConfig, diffOf, runCase, runCorpus } from '../src/run.js';
+import { NO_BLOCKS, conformanceConfig, diffOf, runCase, runCorpus } from '../src/run.js';
 import { CHECK_ORDER } from '../src/types.js';
 import type { CaseResult, CheckName, CheckStatus, Corpus } from '../src/types.js';
 
@@ -193,13 +193,22 @@ describe('goldens', () => {
     expect(checkNamed(pinned, 'dark').status).toBe('fail');
   });
 
-  it('does not compare dark for a document with nothing to draw', async () => {
+  it('fails a render golden beside a document with nothing to draw', async () => {
+    const result = await runCase(
+      withGoldens({ svg: '<svg>never read</svg>' }, { source: PROSE_CASE }),
+    );
+
+    expect(checkNamed(result, 'render')).toMatchObject({ status: 'fail', reason: NO_BLOCKS });
+    expect(ran(result)).not.toContain('pdf');
+  });
+
+  it('fails a dark golden beside a document with nothing to draw', async () => {
     const result = await runCase(
       withGoldens({ dark: '<svg>never read</svg>' }, { source: PROSE_CASE }),
     );
 
-    expect(ran(result)).not.toContain('dark');
-    expect(result.status).toBe('pass');
+    expect(checkNamed(result, 'dark')).toMatchObject({ status: 'fail', reason: NO_BLOCKS });
+    expect(result.status).toBe('fail');
   });
 });
 

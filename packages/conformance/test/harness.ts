@@ -18,7 +18,7 @@ import type { ConformanceLevel } from '@mdv/spec';
 import type { ConformanceIo } from '../src/cli.js';
 import { normaliseGolden } from '../src/corpus.js';
 import { conformanceConfig } from '../src/run.js';
-import type { CaseResult, FixtureCase, Goldens } from '../src/types.js';
+import type { CaseMeta, CaseResult, FixtureCase, Goldens } from '../src/types.js';
 
 /** A captured invocation. */
 export interface Capture extends ConformanceIo {
@@ -148,16 +148,29 @@ export const NO_DATA_CODE = 'MDV2100';
  */
 export const BAR_DIAGNOSTIC = 'MDV2101';
 
+/**
+ * What a test wants to be different about a fixture.
+ *
+ * `meta` is merged rather than replaced: a test that is about the level should
+ * not have to restate `tags`, `covers` and `pin` to stay well-typed, and every
+ * field the loader fills in is one a hand-written fixture would otherwise be
+ * free to forget.
+ */
+export interface FixtureOverrides extends Partial<Omit<FixtureCase, 'meta'>> {
+  readonly meta?: Partial<CaseMeta>;
+}
+
 /** A fixture built in memory, for tests about running rather than loading. */
-export function fixtureCase(overrides: Partial<FixtureCase> = {}): FixtureCase {
+export function fixtureCase(overrides: FixtureOverrides = {}): FixtureCase {
+  const { meta, ...rest } = overrides;
   return {
     id: 'render/bar/simple',
     category: 'render',
     dir: join(tmpdir(), 'mdv-not-read', 'render', 'bar', 'simple'),
-    meta: { level: 1, tags: [], covers: [] },
     source: BAR_CASE,
     goldens: {},
-    ...overrides,
+    ...rest,
+    meta: { level: 1, tags: [], covers: [], pin: [], ...meta },
   };
 }
 
@@ -180,7 +193,7 @@ export function caseResult(overrides: Partial<CaseResult> = {}): CaseResult {
 }
 
 /** As {@link fixtureCase}, with the goldens replaced rather than merged. */
-export function withGoldens(goldens: Goldens, overrides: Partial<FixtureCase> = {}): FixtureCase {
+export function withGoldens(goldens: Goldens, overrides: FixtureOverrides = {}): FixtureCase {
   return fixtureCase({ ...overrides, goldens });
 }
 
