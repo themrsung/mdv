@@ -71,6 +71,7 @@ import { formatNumber } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
 import { planOf } from './internal/plan.js';
 import { seriesFill } from './internal/paint.js';
+import { quantile } from './internal/stats.js';
 import { extentOf, resolveDomain } from './internal/domain.js';
 
 /** How a bin's count is expressed on the value axis (SPEC 8.7 `normalize`). */
@@ -188,18 +189,6 @@ function readAttrs(input: EncodeInput): HistogramOptions {
     cumulative: boolAttr(attrs, 'cumulative', false),
     corner: numberAttr(attrs, 'corner', input.theme.marks.bar.cornerRadius, 0, 64),
   };
-}
-
-/** The `p`-quantile of an ascending sample, interpolated between neighbours. */
-function quantile(sorted: readonly number[], p: number): number {
-  if (sorted.length === 0) return Number.NaN;
-  const position = (sorted.length - 1) * p;
-  const lower = Math.floor(position);
-  const upper = Math.ceil(position);
-  const a = sorted[lower];
-  const b = sorted[upper];
-  if (a === undefined || b === undefined) return Number.NaN;
-  return a + (b - a) * (position - lower);
 }
 
 /**
