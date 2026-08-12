@@ -184,7 +184,9 @@ export function createSequentialScale(options: SequentialScaleOptions): Scale<nu
 export interface DivergingScaleOptions {
   /** `[low, mid, high]`. The midpoint is where the neutral gray sits. */
   domain: readonly [number, number, number];
+  /** The low arm in **display order**: the low extreme first, midpoint last. */
   lowSteps: readonly ColorString[];
+  /** The high arm in **display order**: nearest the midpoint first. */
   highSteps: readonly ColorString[];
   mid: ColorString;
   format?: string;
@@ -194,19 +196,24 @@ export interface DivergingScaleOptions {
 /**
  * A diverging scale: two hues meeting at a **neutral gray midpoint** (SPEC 11.3).
  * Never a hue at the midpoint — zero must read as "nothing".
+ *
+ * Both arms arrive in display order, so `[...lowSteps, mid, ...highSteps]` is the
+ * ramp as the eye reads it and is what `range` reports — a legend can paint it
+ * without knowing this function's conventions. Sampling walks *outward from the
+ * midpoint* in both directions instead, because that is where the two arms meet
+ * and where a value's distance from zero is measured from; the low arm is
+ * therefore reversed before it is sampled.
  */
 export function createDivergingScale(options: DivergingScaleOptions): Scale<number, ColorString> {
   const [d0, dm, d1] = options.domain;
   const locale = options.locale ?? 'en-US';
-  // Both arms are listed light→dark; the low arm runs outward from the midpoint,
-  // so it is sampled in reverse.
   const lowRamp = [...options.lowSteps].reverse();
   const highRamp = [...options.highSteps];
 
   const scale: Scale<number, ColorString> = {
     type: 'linear',
     domain: Object.freeze([d0, dm, d1]),
-    range: Object.freeze([...lowRamp, options.mid, ...highRamp]) as readonly ColorString[],
+    range: Object.freeze([...options.lowSteps, options.mid, ...highRamp]) as readonly ColorString[],
     scale(value: number): ColorString | undefined {
       if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
       if (value === dm) return options.mid;

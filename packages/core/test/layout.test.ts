@@ -393,9 +393,12 @@ describe('the continuous ramp legend (SPEC 8.9)', () => {
   });
 
   it('keeps both ends, because a ramp labelled at one end is a scale it is not', () => {
-    const crowded = ramped({}, {
-      labels: Array.from({ length: 40 }, (_, i) => ({ at: i / 39, text: `${i * 1000}` })),
-    }).ramp;
+    const crowded = ramped(
+      {},
+      {
+        labels: Array.from({ length: 40 }, (_, i) => ({ at: i / 39, text: `${i * 1000}` })),
+      },
+    ).ramp;
     const ticks = crowded?.ticks ?? [];
     expect(ticks.length).toBeLessThan(40);
     expect(ticks[0]?.text).toBe('0');
@@ -454,7 +457,9 @@ describe('the continuous ramp legend (SPEC 8.9)', () => {
     const first = bands[0];
     const last = bands[bands.length - 1];
     // The low end is the first band and it sits lowest on the screen.
-    expect(first?.kind === 'rect' ? first.y : 0).toBeGreaterThan(last?.kind === 'rect' ? last.y : 0);
+    expect(first?.kind === 'rect' ? first.y : 0).toBeGreaterThan(
+      last?.kind === 'rect' ? last.y : 0,
+    );
   });
 
   it('outlines the bar, so a pale low end does not dissolve into the surface', () => {

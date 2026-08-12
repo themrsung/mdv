@@ -247,9 +247,7 @@ function measureRamp(
     vertical,
   );
 
-  const labelWidth = vertical
-    ? ticks.reduce((widest, tick) => Math.max(widest, tick.width), 0)
-    : 0;
+  const labelWidth = vertical ? ticks.reduce((widest, tick) => Math.max(widest, tick.width), 0) : 0;
   const size: Size = vertical
     ? {
         width: Math.min(
@@ -315,11 +313,7 @@ function cullTicks(
 
   /** Where a tick's own extent begins, with the two ends turned inward. */
   const start = (tick: RampTickInput): number =>
-    tick.at <= 0
-      ? 0
-      : tick.at >= 1
-        ? length - tick.size
-        : tick.at * length - tick.size / 2;
+    tick.at <= 0 ? 0 : tick.at >= 1 ? length - tick.size : tick.at * length - tick.size / 2;
   const clears = (before: RampTickInput, after: RampTickInput): boolean =>
     start(before) + before.size + gap <= start(after);
 

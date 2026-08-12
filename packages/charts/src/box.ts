@@ -66,7 +66,14 @@ import {
   missingChannel,
   unknownEnum,
 } from './internal/diagnostics.js';
-import { alignFor, composeDescription, countPhrase, extremesOf, presentationOf, subjectPhrase } from './internal/a11y.js';
+import {
+  alignFor,
+  composeDescription,
+  countPhrase,
+  extremesOf,
+  presentationOf,
+  subjectPhrase,
+} from './internal/a11y.js';
 import { buildLegend } from './internal/series.js';
 import { closePath, lineTo, moveTo, px } from './internal/geometry.js';
 import {
@@ -527,8 +534,7 @@ function boxA11yTable(
   valueFormat: string | undefined,
   showOutliers: boolean,
 ): A11yTable {
-  const anyOutliers =
-    showOutliers && groups.some((group) => group.summary.outliers.length > 0);
+  const anyOutliers = showOutliers && groups.some((group) => group.summary.outliers.length > 0);
   const numeric = ['Lower whisker', 'Q1', 'Median', 'Q3', 'Upper whisker'];
   const fmt = (value: number): string => formatNumber(value, valueFormat);
   return {

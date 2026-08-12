@@ -396,7 +396,8 @@ describe('box: attributes', () => {
   it('displaces the points under `points: jitter`, and reproducibly', () => {
     const first = runChart(boxChart, values(), { encoding: XY, attrs: { points: 'jitter' } });
     const second = runChart(boxChart, values(), { encoding: XY, attrs: { points: 'jitter' } });
-    const cx = (run: typeof first): number[] => nodesOfKind(run.laid.nodes, 'circle').map((c) => c.cx);
+    const cx = (run: typeof first): number[] =>
+      nodesOfKind(run.laid.nodes, 'circle').map((c) => c.cx);
     expect(cx(first)).toEqual(cx(second));
     expect(new Set(cx(first)).size).toBeGreaterThan(2);
   });

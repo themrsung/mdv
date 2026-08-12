@@ -18,7 +18,6 @@
 import type {
   AxisModel,
   BarMark,
-  BlockAttrs,
   ChannelSpec,
   ChartHitRegion,
   ChartLayoutResult,
