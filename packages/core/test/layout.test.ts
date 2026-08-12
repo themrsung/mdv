@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { AxisModel, ChartHitRegion, DirectLabel, Scale } from '@mdv/core';
+import type {
+  AxisModel,
+  ChartHitRegion,
+  DirectLabel,
+  LegendModel,
+  LegendRamp,
+  Scale,
+} from '@mdv/core';
 import { createBandScale, createContinuousScale } from '../src/scale/index.js';
 import { createTableMetrics } from '../src/metrics/index.js';
 import {
@@ -14,10 +21,12 @@ import {
   measureLegend,
   placeDirectLabels,
   renderAxis,
+  renderLegend,
   resolveDimension,
   resolvePadding,
   roundCoord,
   MIN_HIT_SIZE,
+  RAMP_THICKNESS,
 } from '../src/layout/index.js';
 import { createReporter } from '../src/encode/report.js';
 import { RANGE, THEME } from './fixtures/visual.js';
@@ -316,6 +325,164 @@ describe('legend measurement (SPEC 7.4)', () => {
     const legend = measureLegend({ position: 'inline', entries }, { width: 400, height: 300 }, ctx);
     expect(legend.inline).toBe(true);
     expect(legend.size).toEqual({ width: 0, height: 0 });
+  });
+});
+
+describe('the continuous ramp legend (SPEC 8.9)', () => {
+  const stops = ['#eef2ff', '#6366f1', '#1e1b4b'];
+  const labels = [
+    { at: 0, text: '0' },
+    { at: 0.5, text: '50' },
+    { at: 1, text: '100' },
+  ];
+  const swatched = ['Alpha', 'Beta'].map((label, i) => ({
+    seriesId: label,
+    label,
+    color: THEME.categorical[i] ?? '#000',
+    symbol: 'rect' as const,
+  }));
+
+  function ramped(over: Partial<LegendModel> = {}, rampOver: Partial<LegendRamp> = {}) {
+    return measureLegend(
+      { position: 'top', entries: [], ramp: { stops, labels, ...rampOver }, ...over },
+      { width: 400, height: 300 },
+      ctx,
+    );
+  }
+
+  it('draws a bar instead of swatches, because a swatch per value would be absurd', () => {
+    const legend = ramped();
+    expect(legend.items).toEqual([]);
+    expect(legend.ramp?.bands.length).toBeGreaterThan(1);
+    expect(legend.size.height).toBeGreaterThan(RAMP_THICKNESS);
+  });
+
+  it('wins over entries, so the marks are never identified two ways at once', () => {
+    const both = measureLegend(
+      { position: 'top', entries: swatched, ramp: { stops, labels } },
+      { width: 400, height: 300 },
+      ctx,
+    );
+    expect(both.ramp).toBeDefined();
+    expect(both.items).toEqual([]);
+  });
+
+  it('tiles exactly: the bands meet edge to edge and fill the bar (SPEC 24.3)', () => {
+    const bands = ramped().ramp?.bands ?? [];
+    const length = ramped().ramp?.length ?? 0;
+    expect(bands[0]?.offset).toBe(0);
+    for (let i = 1; i < bands.length; ++i) {
+      const previous = bands[i - 1] as (typeof bands)[number];
+      expect(bands[i]?.offset).toBe(previous.offset + previous.length);
+    }
+    const last = bands[bands.length - 1] as (typeof bands)[number];
+    expect(last.offset + last.length).toBe(length);
+  });
+
+  it('runs low end first, whichever way it is drawn', () => {
+    const flat = ramped().ramp;
+    const upright = ramped({ position: 'right' }).ramp;
+    expect(flat?.bands[0]?.color).toBe(stops[0]);
+    expect(upright?.vertical).toBe(true);
+    expect(upright?.bands[0]?.color).toBe(stops[0]);
+  });
+
+  it('gives a classed scale one hard-edged band per class, not a blend', () => {
+    const discrete = ramped({}, { discrete: true }).ramp;
+    expect(discrete?.bands.map((band) => band.color)).toEqual(stops);
+  });
+
+  it('keeps both ends, because a ramp labelled at one end is a scale it is not', () => {
+    const crowded = ramped({}, {
+      labels: Array.from({ length: 40 }, (_, i) => ({ at: i / 39, text: `${i * 1000}` })),
+    }).ramp;
+    const ticks = crowded?.ticks ?? [];
+    expect(ticks.length).toBeLessThan(40);
+    expect(ticks[0]?.text).toBe('0');
+    expect(ticks[ticks.length - 1]?.text).toBe('39000');
+  });
+
+  it('splits the bar between the ends rather than dropping one when they collide', () => {
+    const tight = measureLegend(
+      {
+        position: 'top',
+        entries: [],
+        ramp: {
+          stops,
+          labels: [
+            { at: 0, text: 'a very long low label' },
+            { at: 1, text: 'a very long high label' },
+          ],
+        },
+      },
+      { width: 60, height: 300 },
+      ctx,
+    );
+    const ticks = tight.ramp?.ticks ?? [];
+    expect(ticks).toHaveLength(2);
+    expect(ticks[0]?.width).toBe(ticks[1]?.width);
+    expect(ticks[0]?.align).toBe('start');
+    expect(ticks[1]?.align).toBe('end');
+  });
+
+  it('turns the ends inward so neither overhangs the bar', () => {
+    const geometry = ramped().ramp;
+    const ticks = geometry?.ticks ?? [];
+    expect(ticks[0]?.offset).toBe(0);
+    expect(ticks[ticks.length - 1]?.offset).toBe(geometry?.length);
+  });
+
+  it('asks for nothing when there is no room for a bar at all', () => {
+    const none = measureLegend(
+      { position: 'top', entries: [], ramp: { stops, labels } },
+      { width: 0, height: 0 },
+      ctx,
+    );
+    expect(none.size).toEqual({ width: 0, height: 0 });
+    expect(none.ramp?.bands).toEqual([]);
+  });
+
+  it('renders the bar bottom-up when it is upright, which is how a scale reads', () => {
+    const geometry = ramped({ position: 'right' });
+    const box = { x: 10, y: 20, width: 40, height: 200 };
+    const nodes = renderLegend(geometry, box, ctx);
+    const group = nodes[0];
+    const children = group?.kind === 'group' ? group.children : [];
+    const bands = children.filter(
+      (node) => node.kind === 'rect' && node.cls === 'mdv-legend-ramp-band',
+    );
+    const first = bands[0];
+    const last = bands[bands.length - 1];
+    // The low end is the first band and it sits lowest on the screen.
+    expect(first?.kind === 'rect' ? first.y : 0).toBeGreaterThan(last?.kind === 'rect' ? last.y : 0);
+  });
+
+  it('outlines the bar, so a pale low end does not dissolve into the surface', () => {
+    const nodes = renderLegend(ramped(), { x: 0, y: 0, width: 400, height: 40 }, ctx);
+    const group = nodes[0];
+    const children = group?.kind === 'group' ? group.children : [];
+    const outline = children.find((node) => node.cls === 'mdv-legend-ramp');
+    expect(outline?.kind === 'rect' ? outline.stroke?.width : undefined).toBe(
+      THEME.metrics.hairline,
+    );
+  });
+
+  it('names itself for a screen reader even without a title', () => {
+    const nodes = renderLegend(ramped(), { x: 0, y: 0, width: 400, height: 40 }, ctx);
+    const group = nodes[0];
+    expect(group?.kind === 'group' ? group.label : undefined).toBe('Colour scale');
+    expect(group?.kind === 'group' ? group.role : undefined).toBe('group');
+  });
+
+  it('never wears the data colour on its labels (SPEC 11.5)', () => {
+    const nodes = renderLegend(ramped(), { x: 0, y: 0, width: 400, height: 40 }, ctx);
+    const group = nodes[0];
+    const children = group?.kind === 'group' ? group.children : [];
+    const label = children.find((node) => node.cls === 'mdv-legend-ramp-label');
+    expect(label?.kind === 'text' ? label.fill : undefined).toEqual({
+      kind: 'solid',
+      color: THEME.tokens['text-secondary'],
+    });
   });
 });
 

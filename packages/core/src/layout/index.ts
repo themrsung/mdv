@@ -63,7 +63,13 @@ export {
   COLLISION_ROTATION,
 } from './axis.js';
 
-export type { LegendGeometry, LegendItemGeometry } from './legend.js';
+export type {
+  LegendGeometry,
+  LegendItemGeometry,
+  LegendRampBand,
+  LegendRampGeometry,
+  LegendRampTick,
+} from './legend.js';
 export {
   measureLegend,
   renderLegend,
@@ -72,6 +78,8 @@ export {
   ITEM_GAP,
   ROW_GAP,
   LEGEND_GAP,
+  RAMP_LENGTH,
+  RAMP_THICKNESS,
 } from './legend.js';
 
 export type { FrameRequest, BlockFrame } from './frame.js';

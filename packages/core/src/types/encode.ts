@@ -255,6 +255,40 @@ export interface LegendEntry {
 }
 
 /**
+ * One tick on a continuous legend ramp.
+ *
+ * {@link at} is a **fraction of the ramp**, not a data value, so the legend can
+ * be placed and drawn without knowing anything about the scale behind it: 0 is
+ * the low end, 1 the high end, 0.5 the midpoint.
+ */
+export interface LegendRampLabel {
+  /** Position along the ramp, clamped to 0…1. */
+  at: number;
+  /** Already formatted — the chart type owns the number format. */
+  text: string;
+}
+
+/**
+ * A continuous colour ramp, for the scales where a swatch per value would be
+ * absurd (SPEC 8.9: "The legend is a continuous ramp with labelled ends and
+ * midpoint").
+ *
+ * {@link stops} reads low → high and is drawn in the ramp's own direction, so a
+ * chart type never has to know that a vertical ramp puts the high end at the
+ * top. A `quantize`, `quantile` or `threshold` scale sets {@link discrete}: the
+ * bands are then drawn hard-edged, because the classes *are* the meaning and a
+ * blend across a class boundary would misreport it.
+ */
+export interface LegendRamp {
+  /** At least two colours, low end first. */
+  stops: readonly ColorString[];
+  /** Ticks under (horizontal) or beside (vertical) the ramp. */
+  labels: readonly LegendRampLabel[];
+  /** `true` for classed scales: hard edges, one band per class. */
+  discrete?: boolean;
+}
+
+/**
  * What a chart type tells core to draw for the legend. Core owns placement,
  * wrapping and the `maxItems` fold.
  *
@@ -270,6 +304,14 @@ export interface LegendModel {
   /** @defaultValue 12 */
   maxItems?: number;
   entries: LegendEntry[];
+  /**
+   * Draw a continuous ramp instead of swatches (SPEC 8.9).
+   *
+   * Mutually exclusive with {@link entries} in practice — a legend that carried
+   * both would be claiming the marks are identified two ways at once — and the
+   * ramp wins if both are set.
+   */
+  ramp?: LegendRamp;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

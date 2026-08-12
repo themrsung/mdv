@@ -183,6 +183,8 @@ export type {
   LegendEntry,
   LegendModel,
   LegendPosition,
+  LegendRamp,
+  LegendRampLabel,
   LegendSymbol,
   LineMark,
   LinePointMark,
