@@ -15,6 +15,7 @@ import type {
   LegendAttr,
   LegendModel,
   LegendPosition,
+  LegendRamp,
   LegendSymbol,
   PaletteAllocator,
   SeriesDescriptor,
@@ -255,5 +256,37 @@ export function buildLegend(
   if (object?.orient !== undefined) model.orient = object.orient;
   if (object?.columns !== undefined) model.columns = object.columns;
   model.maxItems = object?.maxItems ?? 12;
+  return model;
+}
+
+/**
+ * Build a continuous-ramp legend (SPEC 8.9: "The legend is a continuous ramp
+ * with labelled ends and midpoint").
+ *
+ * Unlike {@link buildLegend}, `auto` here means **yes**. The swatch legend is
+ * overhead for one series because the title already names it; a ramp is the
+ * opposite — it is the only thing on the chart that says what a colour is worth,
+ * and a heatmap without it is a picture of an unlabelled gradient. Only an
+ * explicit `legend: false` removes it.
+ *
+ * `auto` also positions differently: `right`, so the ramp stands vertically
+ * beside the plot. A ramp reads as a scale, and a scale that runs bottom-to-top
+ * matches the value axis a reader has just been looking at.
+ *
+ * @param ramp - stops and labels, low end first. Fewer than two stops is not a
+ * ramp, and returns `undefined` rather than a bar of one colour.
+ */
+export function buildRampLegend(attrs: BlockAttrs, ramp: LegendRamp): LegendModel | undefined {
+  const request: LegendAttr = attrs.legend ?? 'auto';
+  if (request === false) return undefined;
+  if (ramp.stops.length < 2) return undefined;
+
+  const object = typeof request === 'object' ? request : undefined;
+  const requested = typeof request === 'string' ? request : (object?.position ?? 'auto');
+  const position: LegendPosition = requested === 'auto' ? 'right' : requested;
+
+  const model: LegendModel = { position, entries: [], ramp };
+  if (object?.title !== undefined) model.title = object.title;
+  if (object?.orient !== undefined) model.orient = object.orient;
   return model;
 }
