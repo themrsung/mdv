@@ -261,7 +261,7 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('box')).toBe(2);
+    expect(levels.get('heatmap')).toBe(2);
     expect(levels.get('ohlcv')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
@@ -270,12 +270,20 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('drops a name from the list the moment the real module lands', () => {
-    // `histogram` graduated (SPEC 8.7). This list is the *only* thing that
-    // decides whether a name degrades, so a name left on it after its module
-    // arrives would keep drawing the table however complete the module is.
-    expect(UNIMPLEMENTED_TYPES.map((spec) => spec.name)).not.toContain('histogram');
+    // `histogram` graduated (SPEC 8.7) and `box` after it (SPEC 8.8). This list
+    // is the *only* thing that decides whether a name degrades, so a name left
+    // on it after its module arrives would keep drawing the table however
+    // complete the module is.
+    const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
+    expect(names).not.toContain('histogram');
+    expect(names).not.toContain('box');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
+    const drawn = runChart(byName('box'), prices(), {
+      encoding: { x: { field: 'day' }, y: { field: 'close' } },
+    });
+    expect(codesOf(drawn)).toEqual([]);
+    expect(nodesOfKind(drawn.laid.nodes, 'rect').length).toBeGreaterThan(0);
   });
 });

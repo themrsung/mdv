@@ -169,7 +169,6 @@ interface UnimplementedSpec {
  * types that disagree about their own name.
  */
 export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
-  { name: 'box', level: 2, summary: 'a box plot of the distribution' },
   { name: 'funnel', level: 2, summary: 'a funnel of stage-to-stage conversion' },
   { name: 'gantt', level: 3, summary: 'a Gantt chart of the schedule' },
   { name: 'gauge', level: 2, summary: 'a gauge of the value against its range' },

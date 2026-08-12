@@ -14,6 +14,7 @@
 import type { ChartType, ConformanceLevel } from '@mdv/core';
 import { areaChart } from './area.js';
 import { barChart } from './bar.js';
+import { boxChart } from './box.js';
 import { bubbleChart, scatterChart } from './scatter.js';
 import { donutChart, pieChart } from './pie.js';
 import { histogramChart } from './histogram.js';
@@ -24,6 +25,7 @@ import { unimplementedChartTypes } from './unimplemented.js';
 
 export { areaChart } from './area.js';
 export { barChart } from './bar.js';
+export { boxChart } from './box.js';
 export { bubbleChart, scatterChart } from './scatter.js';
 export { donutChart, pieChart } from './pie.js';
 export { histogramChart } from './histogram.js';
@@ -62,7 +64,7 @@ export const LEVEL_1_TYPE_NAMES = [
  * `candlestick`, `radar`, `gauge`, `funnel`, `waterfall`, `treemap`, `sankey`,
  * `sparkline`.
  *
- * `histogram` is drawn (see {@link level2ChartTypes}). The rest are registered
+ * `histogram` and `box` are drawn (see {@link level2ChartTypes}). The rest are registered
  * as known-but-unimplemented: they render their data as a table with `MDV1500`
  * (SPEC 15.2) rather than erroring. `candlestick` resolves through `ohlcv`'s
  * alias, so there are twelve registrations for thirteen names.
@@ -113,7 +115,7 @@ export const level1ChartTypes: readonly ChartType[] = [
  * separately keeps `chartTypesForLevel` honest: a type is in the list for its
  * own level whether it draws or degrades, and this is the set that draws.
  */
-export const level2ChartTypes: readonly ChartType[] = [histogramChart];
+export const level2ChartTypes: readonly ChartType[] = [boxChart, histogramChart];
 
 /**
  * Every built-in chart type, sorted by name.
