@@ -127,7 +127,17 @@ export function resolveTheme(override: ThemeOverride, scheme: ColorScheme, base?
   // ── sequential ────────────────────────────────────────────────────────────
   let sequentialHue = parent.sequential.hue;
   let sequentialSteps: readonly ColorString[] = parent.sequential.steps;
+  /**
+   * Which slot the inherited ramp names, if any (SPEC 11.3) — found by hue,
+   * because {@link Theme} records the ramps and the anchor but not the tie
+   * between them. An author who supplies their own `sequential` breaks the tie:
+   * their ramp is theirs, and `scheme: blue` goes back to meaning the blue slot.
+   */
+  let sequentialName = Object.entries(parent.ramps ?? {}).find(
+    ([, ramp]) => ramp.hue === parent.sequential.hue,
+  )?.[0];
   if (override.sequential !== undefined) {
+    sequentialName = undefined;
     sequentialHue = requireColor(override.sequential.hue, 'sequential.hue');
     const count = override.sequential.steps ?? DEFAULT_SEQUENTIAL_STEPS;
     if (!Number.isFinite(count) || count < 2) {
@@ -182,6 +192,7 @@ export function resolveTheme(override: ThemeOverride, scheme: ColorScheme, base?
     categorical,
     sequentialHue,
     sequentialSteps,
+    ...(sequentialName !== undefined ? { sequentialName } : {}),
     diverging,
     type,
     metrics,

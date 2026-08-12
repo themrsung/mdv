@@ -38,17 +38,15 @@ export const CATEGORICAL_DARK: CategoricalPalette = Object.freeze([
   '#e66767',
 ]);
 
-/** Human-readable hue names for the eight slots, for diagnostics and legends. */
-export const CATEGORICAL_HUE_NAMES: readonly string[] = Object.freeze([
-  'blue',
-  'orange',
-  'aqua',
-  'yellow',
-  'magenta',
-  'green',
-  'violet',
-  'red',
-]);
+/**
+ * Human-readable hue names for the eight slots, for diagnostics and legends.
+ *
+ * Defined in `@mdv/core` and re-exported here: the names index into
+ * {@link CategoricalPalette}, so they belong with the palette contract rather
+ * than with the built-in themes, and `@mdv/charts` resolves `scheme: blue`
+ * against them without taking a dependency on this package.
+ */
+export { CATEGORICAL_HUE_NAMES } from '@mdv/core';
 
 /**
  * The default sequential ramp: **one hue, light → dark**, steps 100 → 700 in

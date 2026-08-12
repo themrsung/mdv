@@ -209,6 +209,28 @@ export const CATEGORICAL_SLOT_COUNT = 8;
  */
 export const ALL_PAIRS_SERIES_CAP = 3;
 
+/**
+ * Human-readable names for the eight categorical slots, index-aligned with
+ * {@link CategoricalPalette}.
+ *
+ * These are part of the palette *contract*, not of any one theme: `scheme: blue`
+ * on a heatmap (SPEC 8.9) has to mean "slot 0's hue, whatever this theme's blue
+ * is", and a diagnostic that says "blue" must be naming the same slot the
+ * document did. Both readings live here so a consumer that has only a
+ * {@link Theme} — `@mdv/charts` does — can perform them without reaching into
+ * `@mdv/themes`.
+ */
+export const CATEGORICAL_HUE_NAMES: readonly string[] = Object.freeze([
+  'blue',
+  'orange',
+  'aqua',
+  'yellow',
+  'magenta',
+  'green',
+  'violet',
+  'red',
+]);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // The theme itself
 // ─────────────────────────────────────────────────────────────────────────────
@@ -228,6 +250,17 @@ export interface Theme {
   readonly categorical: CategoricalPalette;
   readonly sequential: SequentialPalette;
   readonly diverging: DivergingPalette;
+  /**
+   * One sequential ramp per categorical slot, keyed by
+   * {@link CATEGORICAL_HUE_NAMES} — what `scheme: blue` on a heatmap (SPEC 8.9)
+   * resolves against.
+   *
+   * Built **with** the theme and shipped as listed steps, never derived at
+   * render time: a ramp that differs by a rounding mode between two machines is
+   * not a reproducible document (SPEC 24.3). Optional because a theme assembled
+   * by hand may omit it; consumers fall back to {@link sequential} and say so.
+   */
+  readonly ramps?: Readonly<Record<string, SequentialPalette>>;
   /** Always {@link STATUS_PALETTE}; present on the theme so backends need one input. */
   readonly status: StatusPalette;
   readonly marks: MarkSpec;

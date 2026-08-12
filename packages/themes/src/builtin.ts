@@ -13,12 +13,13 @@
  * through the same validator as everything else — see `raiseContrast`.
  */
 
-import { STATUS_PALETTE } from '@mdv/core';
+import { CATEGORICAL_HUE_NAMES, STATUS_PALETTE } from '@mdv/core';
 import type {
   CategoricalPalette,
   ColorScheme,
   ColorString,
   MarkSpec,
+  SequentialPalette,
   Theme,
   ThemeColorTokens,
   ThemeMetricTokens,
@@ -34,7 +35,12 @@ import {
   SCHEME_SURFACE,
   SEQUENTIAL_BLUE,
 } from './palettes.js';
-import { generateDiverging, raiseContrast, sequentialFromSteps } from './ramp.js';
+import {
+  generateDiverging,
+  generateSequential,
+  raiseContrast,
+  sequentialFromSteps,
+} from './ramp.js';
 import { validatePalette } from './validate.js';
 
 /** Names of the built-in themes (SPEC 11.6). */
@@ -127,6 +133,12 @@ export function composeTheme(input: {
   categorical: CategoricalPalette;
   sequentialHue: ColorString;
   sequentialSteps: readonly ColorString[];
+  /**
+   * Which categorical slot the sequential ramp *is* (SPEC 11.3), when it is one
+   * of them. `scheme: <that name>` then resolves to the hand-selected steps
+   * rather than to a generated approximation of the same hue.
+   */
+  sequentialName?: string;
   diverging: { low: ColorString; high: ColorString; mid: ColorString };
   type?: ThemeTypeTokens;
   metrics?: ThemeMetricTokens;
@@ -146,10 +158,44 @@ export function composeTheme(input: {
       input.diverging.mid,
       DIVERGING_STEPS_PER_ARM,
     ),
+    ramps: namedRamps(input, surface),
     status: STATUS_PALETTE,
     marks: MARK_SPEC,
     validation: validatePalette(input.categorical, surface, input.scheme),
   });
+}
+
+/**
+ * One ramp per categorical slot, keyed by hue name, so `scheme: green` on a
+ * heatmap (SPEC 8.9) has listed steps to interpolate between.
+ *
+ * `sequentialName` names the slot the theme's own sequential ramp occupies —
+ * `blue` for every built-in. That slot keeps the hand-selected steps (SPEC 11.3)
+ * instead of a generated approximation of them, which is what makes
+ * `scheme: blue` and no `scheme` at all the same ramp on the built-ins. The
+ * remaining seven are generated from the slot colour, once, here: at render time
+ * a ramp that differs by a rounding mode between two machines is not a
+ * reproducible document (SPEC 24.3).
+ */
+function namedRamps(
+  input: {
+    categorical: CategoricalPalette;
+    sequentialHue: ColorString;
+    sequentialSteps: readonly ColorString[];
+    sequentialName?: string;
+  },
+  surface: ColorString,
+): Readonly<Record<string, SequentialPalette>> {
+  const out: Record<string, SequentialPalette> = {};
+  for (const [i, name] of CATEGORICAL_HUE_NAMES.entries()) {
+    const slot = input.categorical[i];
+    if (slot === undefined) continue;
+    out[name] =
+      name === input.sequentialName
+        ? sequentialFromSteps(input.sequentialHue, input.sequentialSteps, surface)
+        : generateSequential(slot, input.sequentialSteps.length, surface);
+  }
+  return Object.freeze(out);
 }
 
 function lightTheme(): Theme {
@@ -160,6 +206,7 @@ function lightTheme(): Theme {
     categorical: CATEGORICAL_LIGHT,
     sequentialHue: '#3987e5',
     sequentialSteps: SEQUENTIAL_BLUE,
+    sequentialName: 'blue',
     diverging: { ...DIVERGING_ENDS.light, mid: DIVERGING_MID.light },
   });
 }
@@ -172,6 +219,7 @@ function darkTheme(): Theme {
     categorical: CATEGORICAL_DARK,
     sequentialHue: '#3987e5',
     sequentialSteps: SEQUENTIAL_BLUE,
+    sequentialName: 'blue',
     diverging: { ...DIVERGING_ENDS.dark, mid: DIVERGING_MID.dark },
   });
 }
@@ -214,6 +262,7 @@ function printTheme(): Theme {
     categorical: liftPalette(CATEGORICAL_LIGHT, tokens.surface, GRAPHIC_CONTRAST_MIN, 'light'),
     sequentialHue: '#3987e5',
     sequentialSteps: SEQUENTIAL_BLUE,
+    sequentialName: 'blue',
     diverging: { ...DIVERGING_ENDS.light, mid: '#eeeeec' },
   });
 }
@@ -257,6 +306,7 @@ function highContrastTheme(): Theme {
     categorical: liftPalette(CATEGORICAL_LIGHT, tokens.surface, HIGH_CONTRAST_TARGET, 'light'),
     sequentialHue: '#2a78d6',
     sequentialSteps: SEQUENTIAL_BLUE,
+    sequentialName: 'blue',
     diverging: { low: '#1c5cab', high: '#c22a29', mid: '#e8e8e6' },
   });
 }

@@ -62,7 +62,12 @@ export type {
 } from './scene.js';
 
 // Theme (SPEC 11)
-export { ALL_PAIRS_SERIES_CAP, CATEGORICAL_SLOT_COUNT, STATUS_PALETTE } from './theme.js';
+export {
+  ALL_PAIRS_SERIES_CAP,
+  CATEGORICAL_HUE_NAMES,
+  CATEGORICAL_SLOT_COUNT,
+  STATUS_PALETTE,
+} from './theme.js';
 export type {
   CategoricalPalette,
   ColorScheme,
