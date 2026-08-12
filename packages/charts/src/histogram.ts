@@ -36,7 +36,14 @@ import type {
   Table,
 } from '@mdv/core';
 import type { PlannedEncodeResult } from './internal/plan.js';
-import { boolAttr, autoNumberAttr, enumAttr, listAttr, numberAttr } from './internal/attrs.js';
+import {
+  boolAttr,
+  autoNumberAttr,
+  enumAttr,
+  extentAttr,
+  listAttr,
+  numberAttr,
+} from './internal/attrs.js';
 import { axisSpecFor, isDegenerateFrame, makeAxis, rangeToFrame } from './internal/cartesian.js';
 import {
   blockDiagnostic,
@@ -129,26 +136,6 @@ interface BinGrid {
   hi: number;
   step: number;
   count: number;
-}
-
-/** Read a `[min, max]` attribute; `undefined` when absent or not a usable pair. */
-function extentAttr(attrs: BlockAttrs, name: string): [number, number] | undefined {
-  const list = listAttr(attrs, name);
-  if (list.length !== 2) return undefined;
-  const lo = numberOf(list[0]);
-  const hi = numberOf(list[1]);
-  if (lo === undefined || hi === undefined || !(lo < hi)) return undefined;
-  return [lo, hi];
-}
-
-/** Coerce one attribute element to a finite number, or `undefined`. */
-function numberOf(value: unknown): number | undefined {
-  if (isFiniteNumber(value)) return value;
-  if (typeof value === 'string' && value.trim() !== '') {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : undefined;
-  }
-  return undefined;
 }
 
 /** The histogram attributes, resolved (SPEC 8.7). */

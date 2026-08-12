@@ -119,6 +119,33 @@ export function listAttr(attrs: BlockAttrs, name: string): readonly unknown[] {
   return Array.isArray(value) ? value : [value];
 }
 
+/** Coerce one attribute element to a finite number, or `undefined`. */
+export function numberOf(value: unknown): number | undefined {
+  if (isFiniteNumber(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : undefined;
+  }
+  return undefined;
+}
+
+/**
+ * Read a `[min, max]` attribute; `undefined` when absent or not a usable pair.
+ *
+ * An inverted or degenerate pair is *not* usable: `domain: [10, 10]` cannot say
+ * what the middle of the ramp means, and honouring `[10, 0]` would silently
+ * flip the reader's sense of which end is "more" (SPEC 15.2 — fall back to the
+ * data extent rather than draw a lie).
+ */
+export function extentAttr(attrs: BlockAttrs, name: string): [number, number] | undefined {
+  const list = listAttr(attrs, name);
+  if (list.length !== 2) return undefined;
+  const lo = numberOf(list[0]);
+  const hi = numberOf(list[1]);
+  if (lo === undefined || hi === undefined || !(lo < hi)) return undefined;
+  return [lo, hi];
+}
+
 /** Read an object-valued attribute. Arrays are rejected: they are not records. */
 export function recordAttr(
   attrs: BlockAttrs,

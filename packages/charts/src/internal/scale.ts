@@ -430,6 +430,19 @@ export interface BandScaleOptions {
  *
  * An **empty domain** yields zero bandwidth and parks every lookup at the range
  * start, rather than producing `NaN` widths for a chart with no rows.
+ *
+ * `reverse` is applied **at construction as well as in `setRange`**, because
+ * both paths receive the range in frame order and core uses `withRange` — which
+ * goes through the constructor — for every re-range it performs itself. Swapping
+ * in only one of them would have meant a reversed band read the right way round
+ * when a chart type re-ranged it and the wrong way round when core did: the axis
+ * ladder and the marks would have disagreed about which end the first category
+ * sits at.
+ *
+ * A chart type that wants its categories to read top-to-bottom does not need
+ * this flag: {@link rangeDownFrame} hands the range over already flipped, which
+ * is how the horizontal bar chart does it. `reverse` is for a domain that is
+ * built the wrong way round at the source.
  */
 export function createBandScale(options: BandScaleOptions): MutableScale {
   const domain = [...options.domain];
@@ -441,6 +454,11 @@ export function createBandScale(options: BandScaleOptions): MutableScale {
   const padding = clampPadding(options.padding ?? 0.2);
   let r0 = finite(options.range?.[0], 0);
   let r1 = finite(options.range?.[1], 1);
+  if (options.reverse === true) {
+    const swap = r0;
+    r0 = r1;
+    r1 = swap;
+  }
   const labelOf = options.labelOf;
   const formatSpec = options.format;
 
@@ -522,6 +540,12 @@ export function createPointScale(options: BandScaleOptions): MutableScale {
   const padding = clampPadding(options.padding ?? 0.5);
   let r0 = finite(options.range?.[0], 0);
   let r1 = finite(options.range?.[1], 1);
+  // Same construction-time swap as {@link createBandScale}, for the same reason.
+  if (options.reverse === true) {
+    const swap = r0;
+    r0 = r1;
+    r1 = swap;
+  }
   const labelOf = options.labelOf;
   const formatSpec = options.format;
 
