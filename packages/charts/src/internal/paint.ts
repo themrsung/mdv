@@ -11,6 +11,7 @@
  */
 
 import type { ColorString, Font, Paint, SeriesDescriptor, Stroke, Theme } from '@mdv/core';
+import { sampleRamp } from '@mdv/core';
 import { clamp } from './num.js';
 
 /** A flat fill in the given color. */
@@ -167,4 +168,105 @@ export function relativeLuminance(color: ColorString): number {
  */
 export function readableOn(theme: Theme, fill: ColorString): ColorString {
   return relativeLuminance(fill) > 0.45 ? theme.tokens['text-primary'] : '#ffffff';
+}
+
+/**
+ * WCAG contrast between two opaque colors, `1…21`.
+ *
+ * The statistic SPEC 16.4's validator computes, over the luminance
+ * {@link relativeLuminance} already derives for {@link readableOn}. Theme colors
+ * are opaque, so there is nothing to composite first.
+ */
+export function contrastRatio(a: ColorString, b: ColorString): number {
+  const la = relativeLuminance(a);
+  const lb = relativeLuminance(b);
+  return la > lb ? (la + 0.05) / (lb + 0.05) : (lb + 0.05) / (la + 0.05);
+}
+
+/**
+ * The contrast a ramp step must clear against its own surface (SPEC 11.3).
+ *
+ * The same number `@mdv/themes` calls `ORDINAL_RAMP_CONTRAST_MIN` and the same
+ * one SPEC 16.4's validator enforces. It is restated rather than imported
+ * because `@mdv/charts` does not depend on `@mdv/themes` — a chart type is
+ * handed a {@link Theme}, not the machinery that built one.
+ */
+export const ORDINAL_CONTRAST_MIN = 2;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ordinal ramps (SPEC 11.3)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * The band of ramp steps an **ordered set of discrete marks** may use, ordered
+ * nearest the surface first.
+ *
+ * SPEC 11.3 sets the rule these two functions exist to keep:
+ *
+ * > **Ordinal ramps** (discrete ordered marks: funnel stages, tiers) must keep
+ * > the step nearest the surface at ≥ 2:1 — on light, start no lighter than step
+ * > 250 (`#86b6ef`); on dark, go no darker than step 600 (`#184f95`).
+ *
+ * Steps run light → dark, so "away from the surface" is *darker* on a light
+ * scheme and *lighter* on a dark one, and the theme's declared band
+ * (`ordinalFloor` / `ordinalCeiling`) is read from whichever end faces the page.
+ *
+ * That declared index is a **starting hint, not an answer**. `@mdv/themes`
+ * derives it by running exactly this check, but SPEC 11.6 lets an author
+ * hand-write a palette and a hand-written one can declare a floor its own ramp
+ * never earned. SPEC 16.4 is explicit that "palette safety is computed, never
+ * eyeballed" — so it is computed here, on the theme actually in hand, and the
+ * search walks away from the surface until the floor is really cleared. A ramp
+ * where nothing clears it degrades to its single closest step rather than to a
+ * band of marks that all vanish into the page.
+ */
+export function ordinalWindow(theme: Theme): readonly ColorString[] {
+  const ramp = theme.sequential;
+  const steps = ramp.steps;
+  const last = steps.length - 1;
+  if (last < 0) return [ramp.hue];
+
+  const dark = theme.scheme === 'dark';
+  const surface = theme.tokens.surface;
+  const declared = clamp(Math.trunc(dark ? ramp.ordinalCeiling : ramp.ordinalFloor), 0, last);
+  const far = clamp(Math.trunc(dark ? ramp.ordinalFloor : ramp.ordinalCeiling), 0, last);
+  const step = dark ? -1 : 1;
+
+  let near = declared;
+  for (let i = declared; i >= 0 && i <= last; i += step) {
+    const candidate = steps[i];
+    if (candidate === undefined) continue;
+    near = i;
+    if (contrastRatio(candidate, surface) >= ORDINAL_CONTRAST_MIN) break;
+  }
+
+  // The recomputed near step can walk *past* the far end — a ramp whose deep end
+  // is the only thing clearing 2:1 has a band of one.
+  if (dark ? near <= far : near >= far) return [steps[near] ?? ramp.hue];
+
+  const window: ColorString[] = [];
+  for (let i = near; dark ? i >= far : i <= far; i += step) {
+    const color = steps[i];
+    if (color !== undefined) window.push(color);
+  }
+  return window.length > 0 ? window : [ramp.hue];
+}
+
+/**
+ * `count` colors for `count` ordered marks, **deepening away from the surface**.
+ *
+ * The first mark is the one nearest the page and the last is the deepest, which
+ * is the direction the reader already reads as "further along": a funnel's last
+ * stage is its smallest, and a small mark needs the extra contrast anyway.
+ *
+ * Sampling rather than indexing means more marks than steps interpolates
+ * between them instead of repeating a color, and a lone mark takes the deep end
+ * — the same convention `internal/ramp`'s classed scales use for one class.
+ */
+export function ordinalRamp(theme: Theme, count: number): ColorString[] {
+  const window = ordinalWindow(theme);
+  const n = Math.max(0, Math.trunc(count));
+  const out: ColorString[] = [];
+  for (let i = 0; i < n; ++i) out.push(sampleRamp(window, n === 1 ? 1 : i / (n - 1)));
+  return out;
 }

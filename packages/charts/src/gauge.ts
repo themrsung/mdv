@@ -26,7 +26,7 @@
  *    reads across the whole arc." The step chosen is the *nearest the surface*
  *    that still clears the 2:1 floor SPEC 11.3 sets and SPEC 16.4's validator
  *    enforces. The theme's own ordinal band ({@link SequentialPalette.ordinalFloor}
- *    / `ordinalCeiling`) is the starting hint, but the ratio is recomputed here
+ *    / `ordinalCeiling`) is the starting hint, but the ratio is recomputed
  *    rather than taken on trust: a hand-written theme (SPEC 11.6) may declare a
  *    bound it never earned, and a track that vanishes into the page is a gauge
  *    that reads as empty. On the default ramp this lands exactly where SPEC 11.3
@@ -89,7 +89,7 @@ import { arcPath, polar, px, shapePath } from './internal/geometry.js';
 import type { Point } from './internal/geometry.js';
 import { hitRegion, readout } from './internal/hit.js';
 import { clamp, compareNumbers, finite, isFiniteNumber, sum as sumOf } from './internal/num.js';
-import { gridStroke, labelFont, relativeLuminance, solid, tickFont } from './internal/paint.js';
+import { gridStroke, labelFont, ordinalWindow, solid, tickFont } from './internal/paint.js';
 import type { PlannedEncodeResult } from './internal/plan.js';
 import { planOf } from './internal/plan.js';
 import { createContinuousScale } from './internal/scale.js';
@@ -128,16 +128,6 @@ const MAX_ARC_DEGREES = 360;
  * specifications are fixed across every chart type, not re-chosen per type.
  */
 const BAND_RADIUS_RATIO = 0.22;
-
-/**
- * The contrast a ramp step must clear against its own surface (SPEC 11.3).
- *
- * The same number `@mdv/themes` calls `ORDINAL_RAMP_CONTRAST_MIN` and the same
- * one SPEC 16.4's validator enforces. It is restated rather than imported
- * because `@mdv/charts` does not depend on `@mdv/themes` — a chart type is
- * handed a {@link Theme}, not the machinery that built one.
- */
-const ORDINAL_CONTRAST_MIN = 2;
 
 /** Where an end label sits, as a multiple of the tick font's size. */
 const LABEL_GAP_RATIO = 0.5;
@@ -863,19 +853,16 @@ function gaugeTable(
  * > The unfilled track is a **lighter step of the fill's own ramp**, so state
  * > reads across the whole arc.
  *
- * The step is the one nearest the surface that still clears **2:1** against it —
- * `ordinalFloor` on a light scheme, `ordinalCeiling` on a dark one, which is
- * where the search starts. On the built-in blue ramp that lands on step 250
- * (`#86b6ef`, 2.06:1 on `#fcfcfb`) and step 600 (`#184f95`, 2.15:1 on
- * `#1a1a19`) — precisely the two steps SPEC 11.3 names.
+ * The step is the one nearest the surface that still clears **2:1** against it:
+ * the near end of {@link ordinalWindow}, which recomputes the ratio rather than
+ * trusting the theme's declared `ordinalFloor` (SPEC 11.6, 16.4). On the
+ * built-in blue ramp that lands on step 250 (`#86b6ef`, 2.06:1 on `#fcfcfb`) and
+ * step 600 (`#184f95`, 2.15:1 on `#1a1a19`) — precisely the two steps SPEC 11.3
+ * names.
  *
- * The declared index is a **starting hint, not an answer**, and the ratio is
- * recomputed here. `ordinalFloor` is only as good as the theme that set it:
- * `@mdv/themes` derives it by running exactly this check, but SPEC 11.6 lets an
- * author hand-write a palette, and a hand-written one can declare a floor its
- * own ramp does not meet. SPEC 16.4 is explicit that "palette safety is
- * computed, never eyeballed" — so it is computed, on the theme actually in hand,
- * and the search walks away from the surface until the floor is really cleared.
+ * A gauge takes only the near end of that band because it draws **one** ordered
+ * pair, not a series: the track is behind, the fill is in front. A funnel takes
+ * the whole band for the same reason from the other end.
  *
  * The fill is the ramp's **anchor hue**, not a step keyed to the reading: the
  * magnitude is already the arc's length, and encoding it a second time in
@@ -883,47 +870,27 @@ function gaugeTable(
  */
 function rampPaints(theme: Theme): { fill: ColorString; track: ColorString } {
   const ramp = theme.sequential;
-  const steps = ramp.steps;
-  const last = steps.length - 1;
-  if (last < 0) return { fill: ramp.hue, track: ramp.hue };
-
-  const dark = theme.scheme === 'dark';
-  const surface = theme.tokens.surface;
-  const start = clamp(Math.trunc(dark ? ramp.ordinalCeiling : ramp.ordinalFloor), 0, last);
-  // Steps run light → dark, so "away from the surface" is darker on a light
-  // scheme and lighter on a dark one.
-  const step = dark ? -1 : 1;
-
-  let track = steps[start] ?? ramp.hue;
-  for (let i = start; i >= 0 && i <= last; i += step) {
-    const candidate = steps[i];
-    if (candidate === undefined) continue;
-    track = candidate;
-    if (contrastRatio(candidate, surface) >= ORDINAL_CONTRAST_MIN) break;
-  }
+  // The band an ordered set of marks may use, nearest the surface first — the
+  // search, and the recomputation, live in `internal/paint` because a funnel's
+  // stages need exactly the same answer for exactly the same reason.
+  const band = ordinalWindow(theme);
+  const track = band[0] ?? ramp.hue;
 
   let fill = ramp.hue;
   // A theme whose anchor *is* the track step would draw the fill and the track in
   // one colour, and a gauge that reads as full at 10 % is worse than one whose
-  // fill is a shade off its anchor.
+  // fill is a shade off its anchor. The band's far end is the step furthest from
+  // the surface, so it is the step furthest from the track.
   if (fill === track) {
-    const far = clamp(Math.trunc(dark ? ramp.ordinalFloor : ramp.ordinalCeiling), 0, last);
-    fill = steps[far] ?? fill;
+    fill = band[band.length - 1] ?? fill;
+    // A band of one has no far end to reach for; the ramp's own deep end always
+    // has more contrast than a step chosen to sit near the page.
+    if (fill === track) {
+      const steps = ramp.steps;
+      fill = (theme.scheme === 'dark' ? steps[0] : steps[steps.length - 1]) ?? fill;
+    }
   }
   return { fill, track };
-}
-
-/**
- * WCAG contrast between two opaque colours, `1…21`.
- *
- * The statistic SPEC 16.4's validator computes, over the luminance
- * `internal/paint` already derives for {@link readableOn}. Both theme colours
- * are opaque, so there is nothing to composite first.
- */
-function contrastRatio(a: ColorString, b: ColorString): number {
-  const la = relativeLuminance(a);
-  const lb = relativeLuminance(b);
-  return la > lb ? (la + 0.05) / (lb + 0.05) : (lb + 0.05) / (la + 0.05);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
