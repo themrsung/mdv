@@ -68,7 +68,7 @@
 | `render.marks` Mark specifications | 1 | 11.4 | `a11y/keyboard/focus-order`, `a11y/table-view/details`, `data/columns/sequences`, `data/csv/quoted-fields`, `data/datasets/shared-reference`, `data/json/nested-records`, `data/matrix/grid`, `data/mdvx/diagnostics`, `data/mdvx/expressions`, `data/ndjson/stream`, `data/transforms/pipeline`, `data/tsv/simple`, `render/area/stacked`, `render/bar/stacked-percent`, `render/donut/center`, `render/error-cards/unknown-field`, `render/facet/small-multiples`, `render/line/multi-series`, `render/metric/kpi-row`, `render/pie/simple`, `render/scatter/two-measures`, `render/table/enhanced`, `render/theme/custom`, `syntax/directives/containers` |
 | `a11y.names` Accessible names | 1 | 12.1 | `a11y/keyboard/focus-order`, `a11y/table-view/details`, `data/columns/sequences`, `data/csv/quoted-fields`, `data/datasets/shared-reference`, `data/json/nested-records`, `data/matrix/grid`, `data/mdvx/diagnostics`, `data/mdvx/expressions`, `data/ndjson/stream`, `data/transforms/pipeline`, `data/tsv/simple`, `render/area/stacked`, `render/bar/stacked-percent`, `render/donut/center`, `render/error-cards/unknown-field`, `render/facet/small-multiples`, `render/line/multi-series`, `render/metric/kpi-row`, `render/pie/simple`, `render/scatter/two-measures`, `render/table/enhanced`, `render/theme/custom`, `syntax/directives/containers` |
 | `a11y.table-view` The table view | 1 | 12.3 | `a11y/keyboard/focus-order`, `a11y/table-view/details` |
-| `render.error-cards` Error cards | 1 | 14.1 | `data/mdvx/diagnostics`, `render/error-cards/unknown-field` |
+| `render.error-cards` Error cards | 1 | 14.1 | `data/matrix/grid`, `data/mdvx/diagnostics`, `render/error-cards/unknown-field` |
 | `data.json` `json` data | 2 | 6.2.3 | `data/json/nested-records` |
 | `data.ndjson` `ndjson` data | 2 | 6.2.3 | `data/ndjson/stream` |
 | `data.columns` `columns` data | 2 | 6.2.4 | `data/columns/sequences` |
@@ -78,7 +78,7 @@
 | `layout.faceting` Faceting | 2 | 7.6 | `render/facet/small-multiples` |
 | `type.histogram` `histogram` | 2 | 8.7 | **none** |
 | `type.box` `box` | 2 | 8.8 | **none** |
-| `type.heatmap` `heatmap` | 2 | 8.9 | **none** |
+| `type.heatmap` `heatmap` | 2 | 8.9 | `data/matrix/grid` |
 | `type.ohlc` `ohlc` | 2 | 8.10 | **none** |
 | `type.ohlcv` `ohlcv` | 2 | 8.11 | **none** |
 | `type.candlestick` `candlestick` | 2 | 8.11 | **none** |
@@ -103,11 +103,10 @@
 | `data.live` Live data sources | 3 | 16.1 | **none** |
 | `plugin.api` Plugins | 3 | 26 | **none** |
 
-21 requirements up to level 3 are not substantiated by a passing case:
+20 requirements up to level 3 are not substantiated by a passing case:
 
 - `type.histogram` — `histogram`
 - `type.box` — `box`
-- `type.heatmap` — `heatmap`
 - `type.ohlc` — `ohlc`
 - `type.ohlcv` — `ohlcv`
 - `type.candlestick` — `candlestick`
