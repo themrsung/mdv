@@ -88,9 +88,14 @@ body {
   overflow: auto;
 }
 
+/*
+ * The bottom runway lives on `.mdv-surface`, not here: a click below the last
+ * block has to reach the surface's pointer handler to place a caret, and
+ * padding on the pane would swallow it.
+ */
 .mdv-pane--document {
   background: var(--mdv-page);
-  padding: var(--mdv-space-6) var(--mdv-space-5) 40vh;
+  padding: var(--mdv-space-6) var(--mdv-space-5) 0;
 }
 
 .mdv-pane--source {
@@ -377,9 +382,20 @@ body {
 /* The document surface                                                       */
 /* -------------------------------------------------------------------------- */
 
+/*
+ * Sized to the space it is given, not to what it holds.
+ *
+ * A surface only as tall as its content leaves a dead strip below the last
+ * block where clicks hit the pane and no caret lands — in a one-paragraph
+ * document that is the whole window bar one line. `min-height` claims the pane;
+ * the padding keeps a runway so the last line can scroll clear of the bottom
+ * edge, and both are hit-testable by the surface itself.
+ */
 .mdv-surface {
   max-width: var(--mdv-measure);
   margin: 0 auto;
+  min-height: 100%;
+  padding-bottom: 40vh;
 }
 
 /* Every editable container. See the note at the top about `pre-wrap`. */
@@ -488,13 +504,45 @@ body {
   overflow-x: auto;
 }
 
+/*
+ * The info string, in the fence's top-right corner: a quiet label until you
+ * reach for it, a field once you do. A code block is a wall of monospace, so a
+ * control drawn like the code disappears into it and a control drawn like a
+ * form shouts over it — hover and focus are where the affordance is spent.
+ * Right-aligned in both states, because a control that re-aligns its own text
+ * on hover reads as a glitch.
+ */
 .mdv-pre__info {
   position: absolute;
   top: var(--mdv-space-1);
   right: var(--mdv-space-2);
+  z-index: 1;
+  width: 7rem;
+  padding: 0 var(--mdv-space-1);
+  border: var(--mdv-hairline) solid transparent;
+  border-radius: 3px;
+  background: transparent;
   color: var(--mdv-text-muted);
+  font-family: inherit;
   font-size: 11px;
-  user-select: none;
+  text-align: right;
+}
+
+.mdv-pre__info::placeholder {
+  color: transparent;
+}
+
+.mdv-pre__info:hover,
+.mdv-pre__info:focus {
+  border-color: var(--mdv-border);
+  background: var(--mdv-chrome-raised);
+  color: var(--mdv-text-primary);
+  outline: none;
+}
+
+.mdv-pre__info:hover::placeholder,
+.mdv-pre__info:focus::placeholder {
+  color: var(--mdv-text-muted);
 }
 
 .mdv-code-inline,

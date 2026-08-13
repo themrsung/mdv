@@ -26,7 +26,7 @@ import type { NodeId } from './ids.js';
 import { absolute as runsAbsolute, locate } from './inline.js';
 import type { Block, MdvDocument, Run } from './model.js';
 import { isAtomicBlock, isRunBlock, isTextBlock } from './model.js';
-import { allBlocks, findBlock, updateBlock } from './tree.js';
+import { allBlocks, findBlock, leafBlocks, updateBlock } from './tree.js';
 
 /* -------------------------------------------------------------------------- */
 /* Types                                                                       */
@@ -96,6 +96,37 @@ export function caret(at: Point): TextSelection {
 /** A text selection from `anchor` to `focus`. */
 export function range(anchor: Point, focus: Point): TextSelection {
   return { kind: 'text', anchor, focus };
+}
+
+/**
+ * The selection Ctrl/Cmd+A means: everything the caret can reach.
+ *
+ * It runs from the start of the first addressable *leaf* to the end of the
+ * last, which is rarely the first and last block. Lists and quotes keep their
+ * text in leaves, so a document that opens with a list has no addressable
+ * position in its first block at all; a table's last position is its last
+ * cell, not its first. Getting this wrong does not misbehave loudly — it
+ * silently selects a prefix, and the delete that follows leaves debris.
+ *
+ * Atomic blocks (images, visual blocks, thematic breaks, raw passthroughs)
+ * hold no caret position. One leading or trailing atomic block therefore sits
+ * outside the range: `Point` cannot address it, and inventing a document-level
+ * position to cover the case would complicate every command that reads one.
+ * Deletion closes that gap at the other end — `deleteSelection` recognises a
+ * range that covers this much and blanks the page, atomic edges included, so
+ * Ctrl+A Backspace never strands a chart in an otherwise empty document. A
+ * document that is *only* atomic blocks selects its first one as a node, so
+ * Ctrl+A is never a no-op.
+ */
+export function wholeDocument(doc: MdvDocument): Selection | undefined {
+  const blocks = leafBlocks(doc).map((location) => location.block);
+  const first = blocks.find((block) => startOfBlock(block) !== undefined);
+  const last = [...blocks].reverse().find((block) => endOfBlock(block) !== undefined);
+  const anchor = first ? startOfBlock(first) : undefined;
+  const focus = last ? endOfBlock(last) : undefined;
+  if (anchor && focus) return { kind: 'text', anchor, focus };
+  const only = blocks[0];
+  return only ? { kind: 'node', blockId: only.id } : undefined;
 }
 
 /** True when the selection is a zero-width caret. */

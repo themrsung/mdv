@@ -52,16 +52,25 @@ import {
   commands,
   containerLength,
   containerPath,
+  endOfBlock,
   findBlock,
   fromAbsolute,
   isAtomicBlock,
   resolveContainer,
   runsText,
   selectionsEqual,
+  startOfBlock,
   toAbsolute,
+  wholeDocument,
 } from '../../engine/index.js';
 import { BlockView } from '../blocks/BlockView.js';
-import { caretFromPoint, caretRect, linePositionIn, rectAt } from '../dom/caret.js';
+import {
+  blocksByDistanceFrom,
+  caretFromPoint,
+  caretRect,
+  linePositionIn,
+  rectAt,
+} from '../dom/caret.js';
 import type { ElementLike, NodeLike } from '../dom/contract.js';
 import {
   closestContainer,
@@ -69,6 +78,7 @@ import {
   findBlockElement,
   findContainerElement,
 } from '../dom/contract.js';
+import { focusIsControl, isControl } from '../dom/controls.js';
 import { diffText, offsetInContainer, textOf } from '../dom/offsets.js';
 import {
   domSelectionMatches,
@@ -93,6 +103,7 @@ import { SlashMenu } from '../menus/SlashMenu.js';
 import type { SlashItem } from '../menus/slash-items.js';
 import { matchSlashItems } from '../menus/slash-items.js';
 import { useEditorApi } from '../state/store.js';
+import { parkedAfter } from './focus-park.js';
 import type { DropTarget, SurfaceInfo } from './surface-context.js';
 import { SurfaceContext } from './surface-context.js';
 import { useSelectionHighlight } from './useSelectionHighlight.js';
@@ -125,6 +136,25 @@ export function EditorSurface({
   const composingRef = useRef<HTMLElement | null>(null);
   const plainPasteRef = useRef(false);
   const focusInsideRef = useRef(false);
+  const focusOutPendingRef = useRef<Element | null>(null);
+  /*
+   * Set by a press on the surface that did *not* land on a block's control.
+   *
+   * The engine → DOM reconcile refuses to pull focus out of a control, so that
+   * a re-render cannot yank the writer out of a fence's language field on its
+   * first keystroke. That guard is right for a render nobody asked for and
+   * wrong for a click elsewhere on the surface, which is the plainest way there
+   * is of saying "I am done with this field". The press records which of the
+   * two the next reconcile is answering.
+   */
+  const leaveControlRef = useRef(false);
+  /*
+   * Set when focus leaves for something outside the surface that named itself —
+   * the shell's link dialog, in practice. The engine's selection is then the
+   * only true one, and the return writes it back over the caret the browser
+   * supplies. {@link parkedAfter} is the rule; the prose is there.
+   */
+  const parkedRef = useRef(false);
   const crossBlockRef = useRef(false);
   const dragAnchorRef = useRef<Point | null>(null);
   const slashKeyRef = useRef<((key: string, shift: boolean) => boolean) | null>(null);
@@ -137,6 +167,19 @@ export function EditorSurface({
   const [slashAnchor, setSlashAnchor] = useState<DOMRect | null>(null);
 
   const mod = useMemo(() => detectModKey(hostPlatform()), []);
+
+  /*
+   * Answer a `focusout` that named no successor, once the DOM has settled: an
+   * element the user simply left is still in the document, an element a render
+   * replaced is not. Idempotent, because both the render and the microtask that
+   * follow such an event race to call it and either may arrive first.
+   */
+  const settleFocusOut = useCallback((): void => {
+    const losing = focusOutPendingRef.current;
+    if (losing === null) return;
+    focusOutPendingRef.current = null;
+    if (losing.isConnected) focusInsideRef.current = false;
+  }, []);
 
   const bumpGeneration = useCallback((blockId: string) => {
     setGenerations((current) => {
@@ -200,6 +243,84 @@ export function EditorSurface({
     },
     [bumpGeneration, editor],
   );
+
+  /* ---------------------------------------------------------------------- */
+  /* Selection: DOM → engine                                                 */
+  /* ---------------------------------------------------------------------- */
+
+  /**
+   * Read the browser's selection into the engine.
+   *
+   * `selectionchange` is delivered asynchronously, so anything that acts on the
+   * selection in the same task that produced it — a keystroke landing on a
+   * fresh triple-click, a paste, a copy — would otherwise run against the
+   * previous selection. Every such entry point reads the DOM first, so it acts
+   * on what the user can see rather than on what the engine last heard about.
+   */
+  const syncSelectionFromDom = useCallback((): void => {
+    if (composingRef.current !== null) return;
+    // While the engine holds a selection spanning two editing hosts, the
+    // browser's collapsed stand-in must not be read back as the truth.
+    if (crossBlockRef.current) return;
+    // A caret in a block's own control is not a caret in the document; the
+    // browser still reports one near the field, and reading it back would
+    // move the engine's selection to a place the user never clicked.
+    if (focusIsControl(document)) return;
+
+    const root = rootRef.current;
+    if (root === null) return;
+    const domSelection = document.getSelection();
+    if (domSelection === null || domSelection.anchorNode === null) return;
+    if (!root.contains(domSelection.anchorNode)) return;
+
+    const next = readDomSelection(editor.getDocument(), {
+      anchorNode: domSelection.anchorNode as unknown as NodeLike,
+      anchorOffset: domSelection.anchorOffset,
+      focusNode: domSelection.focusNode as unknown as NodeLike | null,
+      focusOffset: domSelection.focusOffset,
+    });
+    if (next === null) return;
+    if (selectionsEqual(next, editor.getSelection())) return;
+    editor.select(next);
+  }, [editor]);
+
+  /**
+   * Write the engine's selection back over the caret a returning focus brought
+   * with it.
+   *
+   * Runs in the `focusin` handler rather than in the engine → DOM reconcile
+   * below, because that reconcile is gated on the surface holding the focus and
+   * so is skipped by exactly the render that closes the dialog. Doing it here
+   * also beats the browser's own `selectionchange`, which is delivered in a
+   * later task and by then reports what this put back.
+   */
+  const restoreParkedSelection = useCallback((): void => {
+    if (composingRef.current !== null) return;
+    const root = rootRef.current;
+    if (root === null) return;
+    if (focusIsControl(document)) return;
+
+    const current = editor.getSelection();
+    if (current.kind !== 'text') return;
+    const target = domTargetFor(root as unknown as NodeLike, editor.getDocument(), current);
+    if (target === null) return;
+    // Two editing hosts: the browser cannot hold that range, and the collapsed
+    // stand-in the reconcile leaves is already in place.
+    if (closestContainer(target.anchor.node) !== closestContainer(target.focus.node)) return;
+
+    const domSelection = document.getSelection();
+    if (domSelection === null) return;
+    try {
+      domSelection.setBaseAndExtent(
+        target.anchor.node as unknown as Node,
+        target.anchor.offset,
+        target.focus.node as unknown as Node,
+        target.focus.offset,
+      );
+    } catch {
+      // A node from a render that has already been replaced.
+    }
+  }, [editor]);
 
   /* ---------------------------------------------------------------------- */
   /* Intent execution                                                        */
@@ -346,6 +467,7 @@ export function EditorSurface({
       const input = event as InputEvent;
       const host = hostOf(input.target);
       if (host === null) return;
+      syncSelectionFromDom();
       const descriptor = describeContainer(host as unknown as ElementLike);
       const inCode =
         descriptor !== null &&
@@ -383,6 +505,7 @@ export function EditorSurface({
       const data = clip.clipboardData;
       if (data === null) return;
       event.preventDefault();
+      syncSelectionFromDom();
 
       const payload = clipboard.readClipboardPayload(data);
       const plain = plainPasteRef.current;
@@ -397,6 +520,7 @@ export function EditorSurface({
 
     const onCopy = (event: Event): void => {
       const clip = event as ClipboardEvent;
+      syncSelectionFromDom();
       const result = clipboard.copySelection(editor.getDocument(), editor.getSelection());
       if (result === null || clip.clipboardData === null) return;
       event.preventDefault();
@@ -461,11 +585,42 @@ export function EditorSurface({
 
     const onFocusIn = (): void => {
       focusInsideRef.current = true;
+      focusOutPendingRef.current = null;
+      const parked = parkedRef.current;
+      parkedRef.current = parkedAfter(parked, 'returned');
+      if (parked) restoreParkedSelection();
     };
+    /*
+     * Losing focus is not the same as losing the caret.
+     *
+     * Changing a block's type swaps the element that holds it — a paragraph
+     * becomes a heading, a heading becomes a quote — and the host the user was
+     * typing in is torn out of the tree mid-render. The browser reports that
+     * exactly as it reports a real blur: `focusout`, no `relatedTarget`,
+     * `activeElement` back on `<body>`. Believing it would strand the caret,
+     * because the effect that puts focus into the replacement is the one gated
+     * on this flag: after a toolbar click the document would look right and be
+     * dead to the keyboard.
+     *
+     * The two cases only differ *after* the commit finishes: an element the
+     * user left is still in the document, an element React replaced is not. So
+     * a `focusout` that names no successor is not answered here — it is parked,
+     * and settled below by whichever runs first, the render that follows or the
+     * microtask that catches the case where no render follows at all.
+     */
     const onFocusOut = (event: Event): void => {
       const next = (event as FocusEvent).relatedTarget;
       if (next instanceof Node && root.contains(next)) return;
-      focusInsideRef.current = false;
+      if (next !== null) {
+        focusOutPendingRef.current = null;
+        focusInsideRef.current = false;
+        parkedRef.current = parkedAfter(parkedRef.current, 'left-for');
+        return;
+      }
+      parkedRef.current = parkedAfter(parkedRef.current, 'left-unknown');
+      const losing = event.target;
+      focusOutPendingRef.current = losing instanceof Element ? losing : null;
+      queueMicrotask(settleFocusOut);
     };
 
     root.addEventListener('beforeinput', onBeforeInput);
@@ -493,47 +648,39 @@ export function EditorSurface({
       root.removeEventListener('focusin', onFocusIn);
       root.removeEventListener('focusout', onFocusOut);
     };
-  }, [applyIntent, editor, reconcile, startIngest]);
+  }, [
+    applyIntent,
+    editor,
+    reconcile,
+    restoreParkedSelection,
+    settleFocusOut,
+    startIngest,
+    syncSelectionFromDom,
+  ]);
 
   /* ---------------------------------------------------------------------- */
-  /* Selection: DOM → engine                                                 */
+  /* Selection: DOM → engine, on the browser's own schedule                  */
   /* ---------------------------------------------------------------------- */
 
   useEffect(() => {
-    const onSelectionChange = (): void => {
-      if (composingRef.current !== null) return;
-      // While the engine holds a selection spanning two editing hosts, the
-      // browser's collapsed stand-in must not be read back as the truth.
-      if (crossBlockRef.current) return;
-
-      const root = rootRef.current;
-      if (root === null) return;
-      const domSelection = document.getSelection();
-      if (domSelection === null || domSelection.anchorNode === null) return;
-      if (!root.contains(domSelection.anchorNode)) return;
-
-      const next = readDomSelection(editor.getDocument(), {
-        anchorNode: domSelection.anchorNode as unknown as NodeLike,
-        anchorOffset: domSelection.anchorOffset,
-        focusNode: domSelection.focusNode as unknown as NodeLike | null,
-        focusOffset: domSelection.focusOffset,
-      });
-      if (next === null) return;
-      if (selectionsEqual(next, editor.getSelection())) return;
-      editor.select(next);
-    };
-
-    document.addEventListener('selectionchange', onSelectionChange);
+    document.addEventListener('selectionchange', syncSelectionFromDom);
     return () => {
-      document.removeEventListener('selectionchange', onSelectionChange);
+      document.removeEventListener('selectionchange', syncSelectionFromDom);
     };
-  }, [editor]);
+  }, [syncSelectionFromDom]);
 
   /* ---------------------------------------------------------------------- */
   /* Selection: engine → DOM                                                 */
   /* ---------------------------------------------------------------------- */
 
   useLayoutEffect(() => {
+    /*
+     * First, because the gate below reads what it decides: a `focusout` parked
+     * by the render that is now committing has to be answered before anything
+     * asks whether the surface still holds the caret.
+     */
+    settleFocusOut();
+
     if (composingRef.current !== null) return;
     const root = rootRef.current;
     if (root === null) return;
@@ -542,6 +689,20 @@ export function EditorSurface({
       crossBlockRef.current = false;
     }
     if (!focusInsideRef.current) return;
+    /*
+     * A control inside a block — the fence's language field, an image's alt box
+     * — holds the caret the user is typing into, while the engine's selection
+     * goes on naming the block that owns it. Reconciling that selection here
+     * would take the focus back out of the field on its first keystroke.
+     *
+     * Unless the writer just pressed somewhere else on the surface: that press
+     * is a request to leave, and it is the only way out of a field in a fence
+     * that ends the document, where the paragraph the click opens is created
+     * after this handler has already run.
+     */
+    const leavingControl = leaveControlRef.current;
+    leaveControlRef.current = false;
+    if (!leavingControl && focusIsControl(document)) return;
 
     if (selection.kind === 'node') {
       const element = findBlockElement(
@@ -608,7 +769,7 @@ export function EditorSurface({
       // A node from a render that has already been replaced. The next revision
       // places it correctly.
     }
-  }, [doc, selection, revision]);
+  }, [doc, selection, revision, settleFocusOut]);
 
   useSelectionHighlight(rootRef, doc, selection, revision);
 
@@ -616,17 +777,130 @@ export function EditorSurface({
   /* Pointer: cross-block selection                                          */
   /* ---------------------------------------------------------------------- */
 
+  /**
+   * Put the browser's focus in the container holding `at`.
+   *
+   * The engine → DOM reconcile runs only while focus is already inside the
+   * surface, and a click answered by {@link caretNearPoint} has had its default
+   * prevented, so nothing has focused anything yet. Without this the caret moves
+   * in the engine and never appears on screen.
+   */
+  const focusPoint = useCallback(
+    (at: Point): void => {
+      const root = rootRef.current;
+      if (root === null) return;
+      const target = domTargetFor(root as unknown as NodeLike, editor.getDocument(), {
+        kind: 'text',
+        anchor: at,
+        focus: at,
+      });
+      if (target === null) return;
+      const host = closestContainer(target.focus.node) as unknown as HTMLElement | null;
+      if (host !== null && host !== document.activeElement) host.focus({ preventScroll: true });
+    },
+    [editor],
+  );
+
+  /**
+   * A caret for a click that missed every block, or `null` if nothing can hold
+   * one. Blocks are tried nearest-first because the closest may be atomic — a
+   * table or an image has no text position to offer.
+   */
+  const caretNearPoint = useCallback(
+    (clientY: number): Point | null => {
+      const root = rootRef.current;
+      if (root === null) return null;
+      const doc = editor.getDocument();
+      for (const candidate of blocksByDistanceFrom(root, clientY)) {
+        const location = findBlock(doc, candidate.blockId);
+        if (location === undefined || isAtomicBlock(location.block)) continue;
+        const at = candidate.below ? endOfBlock(location.block) : startOfBlock(location.block);
+        if (at !== undefined) return at;
+      }
+      return null;
+    },
+    [editor],
+  );
+
+  /**
+   * Answer a click below a document that ends in something uncaretable.
+   *
+   * `caretNearPoint` would put the caret at the *end* of the last block, which
+   * for a table means inside its last cell — and from there no keystroke and no
+   * click reaches the space after the table, because there is no such space.
+   * The writer who clicks under it is asking for a paragraph; give them one.
+   * Returns false when the last block can hold a caret at its end, leaving the
+   * ordinary nearest-block answer to it.
+   *
+   * A code fence is caretable and still qualifies: its end holds a caret that
+   * only ever writes more code, since `Enter` inside a fence means a newline.
+   */
+  const appendPastEnd = useCallback(
+    (clientY: number): boolean => {
+      const root = rootRef.current;
+      if (root === null) return false;
+      const doc = editor.getDocument();
+      const last = doc.blocks[doc.blocks.length - 1];
+      if (last === undefined) return false;
+      if (!isAtomicBlock(last) && last.kind !== 'table' && last.kind !== 'code') return false;
+      const element = findBlockElement(root as unknown as NodeLike, last.id);
+      if (element === null) return false;
+      const rect = (element as unknown as Element).getBoundingClientRect();
+      if (clientY <= rect.bottom) return false;
+      return editor.dispatch(commands.appendParagraph()) !== null;
+    },
+    [editor],
+  );
+
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>): void => {
       if (event.button !== 0) return;
-      const hit = caretFromPoint(event.clientX, event.clientY);
-      if (hit === null) {
+      const onControl = isControl(event.target as unknown as NodeLike);
+      // Recorded on every press, not only the ones that leave: going back into
+      // a field must clear a flag an earlier press set, or the next render
+      // would evict the writer from the field they just returned to.
+      leaveControlRef.current = !onControl && focusIsControl(document);
+      parkedRef.current = parkedAfter(parkedRef.current, 'pressed');
+      // Let a block's own control take the press; the browser focuses it and
+      // the caret the engine holds stays where the writer left it.
+      if (onControl) return;
+
+      /*
+       * The space under the document is answered before the hit test, not
+       * after it, because `caretFromPoint` does not miss the way the padding
+       * suggests: a browser snaps a click below the last block to the nearest
+       * text position, which for a trailing fence is *inside* the fence. Asked
+       * for a caret in the empty space under a code block, it would put one at
+       * the end of the code — the one place the writer is trying to get out of.
+       */
+      if (!event.shiftKey && appendPastEnd(event.clientY)) {
+        event.preventDefault();
         crossBlockRef.current = false;
+        const placed = editor.getSelection();
+        if (placed.kind === 'text') focusPoint(placed.focus);
         return;
       }
-      const at = pointFromDom(editor.getDocument(), hit.node as unknown as NodeLike, hit.offset);
+
+      const hit = caretFromPoint(event.clientX, event.clientY);
+      const at =
+        hit === null
+          ? null
+          : pointFromDom(editor.getDocument(), hit.node as unknown as NodeLike, hit.offset);
       if (at === null) {
+        /*
+         * The click landed in the surface's padding rather than on any text —
+         * below the last block is the common case. A word processor puts the
+         * caret at the nearest end rather than doing nothing, and doing nothing
+         * here is worse than merely unhelpful: in a document whose only block is
+         * an empty paragraph, the sole target is one line tall.
+         */
         crossBlockRef.current = false;
+        const near = caretNearPoint(event.clientY);
+        if (near !== null) {
+          event.preventDefault();
+          editor.select({ kind: 'text', anchor: near, focus: near });
+          focusPoint(near);
+        }
         return;
       }
 
@@ -641,7 +915,7 @@ export function EditorSurface({
       crossBlockRef.current = false;
       dragAnchorRef.current = at;
     },
-    [editor],
+    [appendPastEnd, caretNearPoint, editor, focusPoint],
   );
 
   const onPointerMove = useCallback(
@@ -675,16 +949,31 @@ export function EditorSurface({
   const moveToAdjacentBlock = useCallback(
     (direction: 'previous' | 'next', extend: boolean): boolean => {
       const current = editor.getSelection();
-      if (current.kind !== 'text') return false;
+      /*
+       * Which block the move starts from. A node selection is a whole block, so
+       * it is its own starting point — without this the deliberate way out of an
+       * atomic block (Escape, and the arrow keys) bailed here and the block was
+       * a keyboard trap whose only exit was deleting it.
+       */
+      const from =
+        current.kind === 'text'
+          ? current.focus.blockId
+          : current.kind === 'node'
+            ? current.blockId
+            : null;
+      if (from === null) return false;
+      // A selected block offers no caret to grow a range from, so shift+arrow
+      // leaves it the same way a bare arrow does rather than doing nothing.
+      const extending = extend && current.kind === 'text';
       const document_ = editor.getDocument();
       const neighbour =
         direction === 'previous'
-          ? commands.previousLeaf(document_, current.focus.blockId)
-          : commands.nextLeaf(document_, current.focus.blockId);
+          ? commands.previousLeaf(document_, from)
+          : commands.nextLeaf(document_, from);
       if (neighbour === undefined) return false;
 
       if (isAtomicBlock(neighbour)) {
-        if (extend) return false;
+        if (extending) return false;
         editor.select({ kind: 'node', blockId: neighbour.id });
         return true;
       }
@@ -696,9 +985,9 @@ export function EditorSurface({
       });
       if (container === undefined) return false;
       const at = fromAbsolute(container, direction === 'previous' ? containerLength(container) : 0);
-      crossBlockRef.current = extend;
+      crossBlockRef.current = extending;
       editor.select(
-        extend
+        extending && current.kind === 'text'
           ? { kind: 'text', anchor: current.anchor, focus: at }
           : { kind: 'text', anchor: at, focus: at },
       );
@@ -712,6 +1001,10 @@ export function EditorSurface({
       // Never interfere with a composition: the Enter that accepts a Hangul or
       // Kana candidate must not also split the paragraph.
       if (event.nativeEvent.isComposing || composingRef.current !== null) return;
+
+      // A key can arrive in the same task as the pointer gesture that moved the
+      // caret, before `selectionchange` has been delivered.
+      syncSelectionFromDom();
 
       if (slash !== null) {
         if (event.key === 'Escape') {
@@ -806,6 +1099,15 @@ export function EditorSurface({
         return;
       }
 
+      // Enter on a selected block opens a paragraph after it: the keyboard's
+      // version of clicking the space below the document, and the only way to
+      // keep writing past a chart or a rule that ends one.
+      if (event.key === 'Enter' && current.kind === 'node' && !event.shiftKey) {
+        event.preventDefault();
+        api.run(commands.insertParagraphAfter(current.blockId));
+        return;
+      }
+
       if (event.key === 'Escape') {
         if (current.kind === 'cells') {
           event.preventDefault();
@@ -829,7 +1131,7 @@ export function EditorSurface({
 
       handleArrowKey(event, editor, current, table !== undefined, moveToAdjacentBlock);
     },
-    [api, editor, mod, moveToAdjacentBlock, onShellAction, slash],
+    [api, editor, mod, moveToAdjacentBlock, onShellAction, slash, syncSelectionFromDom],
   );
 
   /* ---------------------------------------------------------------------- */
@@ -1064,29 +1366,15 @@ function placementSelection(doc: MdvDocument, afterBlockId: string | null): Sele
   return { kind: 'text', anchor: at, focus: at };
 }
 
-/** Select every block in the document, first to last. */
+/**
+ * Ctrl/Cmd+A. The range is the engine's to define — a document that opens with
+ * a list or ends with a table has no addressable position in its first or last
+ * *block*, so the endpoints are leaves, and working that out here as well would
+ * be a second implementation to keep in step with deletion.
+ */
 function selectWholeDocument(editor: Editor): void {
-  const doc = editor.getDocument();
-  const first = doc.blocks[0];
-  const last = doc.blocks[doc.blocks.length - 1];
-  if (first === undefined || last === undefined) return;
-
-  const start = resolveContainer(doc, {
-    blockId: first.id,
-    path: first.kind === 'table' ? [0, 0, 0] : [0],
-    offset: 0,
-  });
-  const end = resolveContainer(doc, {
-    blockId: last.id,
-    path: last.kind === 'table' ? [Math.max(0, last.rows.length - 1), 0, 0] : [0],
-    offset: 0,
-  });
-  if (start === undefined || end === undefined) return;
-  editor.select({
-    kind: 'text',
-    anchor: fromAbsolute(start, 0),
-    focus: fromAbsolute(end, containerLength(end)),
-  });
+  const selection = wholeDocument(editor.getDocument());
+  if (selection) editor.select(selection);
 }
 
 /**
@@ -1104,6 +1392,27 @@ function handleArrowKey(
   inTable: boolean,
   moveToAdjacentBlock: (direction: 'previous' | 'next', extend: boolean) => boolean,
 ): void {
+  /*
+   * A selected block has no caret, so it has no first or last line to be at and
+   * nothing to step through: every arrow leaves it. Left and Up go back, Right
+   * and Down go on, which is what the block would do if it were a single wide
+   * character — and what the writer who arrowed *into* it expects when they
+   * carry on in the same direction.
+   */
+  if (current.kind === 'node') {
+    const direction =
+      event.key === 'ArrowUp' || event.key === 'ArrowLeft'
+        ? 'previous'
+        : event.key === 'ArrowDown' || event.key === 'ArrowRight'
+          ? 'next'
+          : null;
+    if (direction === null) return;
+    // Not preventing default when the move fails leaves the browser to scroll,
+    // which is the right answer at the top or bottom of a document.
+    if (moveToAdjacentBlock(direction, event.shiftKey)) event.preventDefault();
+    return;
+  }
+
   if (current.kind !== 'text') return;
 
   const horizontal = event.key === 'ArrowLeft' || event.key === 'ArrowRight';

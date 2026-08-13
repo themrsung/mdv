@@ -177,6 +177,7 @@ export {
   selectionsEqual,
   startOfBlock,
   toAbsolute,
+  wholeDocument,
   writeContainer,
 } from './selection.js';
 

@@ -22,12 +22,14 @@ import {
   comparePoints,
   containerOf,
   containerPath,
+  endOfBlock,
   fromAbsolute,
   orderedPoints,
   requireContainer,
   resolveContainer,
   startOfBlock,
   toAbsolute,
+  wholeDocument,
   writeContainer,
 } from '../selection.js';
 import { allBlocks, findBlock, replaceBlockWith } from '../tree.js';
@@ -243,37 +245,102 @@ export function deleteTextRange(
     next = writeContainer(next, startContainer, normalizeRuns([...head, ...tail]));
     next = removeBlocks(next, [...between, end.blockId]);
   } else {
-    // No merge: each endpoint keeps its own block and only loses its own text.
+    // No merge: each endpoint keeps its own block and only loses its own text —
+    // *unless* the range swallows the block whole. A table selected from its
+    // first cell to its last is deleted; leaving an empty grid behind is what
+    // makes Ctrl+A, Backspace feel broken. Only a block that cannot merge is
+    // treated this way: an emptied paragraph or heading is a real place to put
+    // the caret and keeps the block type the user was working in.
+    const dropStart = !isMergeable(startBlock) && atBlockStart(doc, startBlock, start);
+    const dropEnd = !isMergeable(endBlock) && atBlockEnd(doc, endBlock, end);
+
     builder.splice(addressOf(start), startAbs, runsLength(startContainer.runs), 0);
     builder.splice(addressOf(end), 0, endAbs, 0);
     for (const id of between) builder.drop(id);
 
-    next = writeContainer(next, startContainer, sliceRuns(startContainer.runs, 0, startAbs));
-    if (startBlock.kind === 'table') {
-      next = clearTableTail(next, start);
-    }
-    const endContainerAfter = resolveContainer(next, end);
-    if (endContainerAfter) {
-      next = writeContainer(
+    if (dropStart) {
+      builder.drop(start.blockId);
+      // Both endpoints gone would leave nothing to type into, so the first one
+      // becomes the empty paragraph the deletion has to land in. Reusing its id
+      // keeps ids unique — the block it names no longer exists.
+      next = replaceBlockWith(
         next,
-        endContainerAfter,
-        sliceRuns(endContainerAfter.runs, endAbs, runsLength(endContainerAfter.runs)),
+        start.blockId,
+        dropEnd ? [{ kind: 'paragraph', id: start.blockId, runs: [] }] : [],
       );
+    } else {
+      next = writeContainer(next, startContainer, sliceRuns(startContainer.runs, 0, startAbs));
+      if (startBlock.kind === 'table') {
+        next = clearTableTail(next, start);
+      }
     }
-    if (endBlock.kind === 'table') {
-      next = clearTableHead(next, end);
+
+    if (dropEnd) {
+      builder.drop(end.blockId);
+      next = removeBlocks(next, [end.blockId]);
+    } else {
+      const endContainerAfter = resolveContainer(next, end);
+      if (endContainerAfter) {
+        next = writeContainer(
+          next,
+          endContainerAfter,
+          sliceRuns(endContainerAfter.runs, endAbs, runsLength(endContainerAfter.runs)),
+        );
+      }
+      if (endBlock.kind === 'table') {
+        next = clearTableHead(next, end);
+      }
     }
     next = removeBlocks(next, between);
   }
 
   next = pruneEmptyContainers(next);
-  const caretContainer = resolveContainer(next, start);
-  const caret = caretContainer
-    ? fromAbsolute(caretContainer, Math.min(startAbs, runsLength(caretContainer.runs)))
-    : (startOfBlock(
-        findBlock(next, start.blockId)?.block ?? { kind: 'paragraph', id: start.blockId, runs: [] },
-      ) ?? start);
-  return { doc: next, selection: { kind: 'text', anchor: caret, focus: caret } };
+  // Prefer the position the deletion collapsed to, then the surviving end of
+  // the range, then anywhere at all. `caretNear` closes the last gap: when
+  // nothing left in the document can hold a caret — a lone image or chart — it
+  // selects that block instead, so the next keystroke still has a target.
+  const caret = caretIn(next, start, startAbs) ?? caretAtStartOf(next, end.blockId);
+  return {
+    doc: next,
+    selection: caret ? { kind: 'text', anchor: caret, focus: caret } : caretNear(next, end.blockId),
+  };
+}
+
+/** The caret `abs` characters into the container `at` addresses, if it survived. */
+function caretIn(doc: MdvDocument, at: Point, abs: number): Point | undefined {
+  const container = resolveContainer(doc, at);
+  return container ? fromAbsolute(container, Math.min(abs, runsLength(container.runs))) : undefined;
+}
+
+/** The first position inside `blockId`, if the block is still in the document. */
+function caretAtStartOf(doc: MdvDocument, blockId: NodeId): Point | undefined {
+  const block = findBlock(doc, blockId)?.block;
+  return block ? startOfBlock(block) : undefined;
+}
+
+/** True when `a` and `b` address the same position, however each is spelled. */
+function samePosition(doc: MdvDocument, a: Point, b: Point): boolean {
+  if (a.blockId !== b.blockId) return false;
+  const pathA = containerPath(a);
+  const pathB = containerPath(b);
+  if (pathA.length !== pathB.length) return false;
+  if (!pathA.every((value, index) => value === pathB[index])) return false;
+  const containerA = resolveContainer(doc, a);
+  const containerB = resolveContainer(doc, b);
+  if (!containerA || !containerB) return false;
+  return toAbsolute(containerA, a) === toAbsolute(containerB, b);
+}
+
+/** True when `at` is the first position a caret can hold inside `block`. */
+function atBlockStart(doc: MdvDocument, block: Block, at: Point): boolean {
+  const from = startOfBlock(block);
+  return from !== undefined && samePosition(doc, from, at);
+}
+
+/** True when `at` is the last position a caret can hold inside `block`. */
+function atBlockEnd(doc: MdvDocument, block: Block, at: Point): boolean {
+  const to = endOfBlock(block);
+  return to !== undefined && samePosition(doc, to, at);
 }
 
 /** Clear every cell after the one holding `at`, in row-major order. */
@@ -387,7 +454,7 @@ export function deleteSelection(
 ): EditOutcome | null {
   if (selection.kind === 'text') {
     if (comparePoints(doc, selection.anchor, selection.focus) === 0) return null;
-    return deleteTextRange(doc, selection, builder);
+    return clearWholeDocument(doc, selection, builder) ?? deleteTextRange(doc, selection, builder);
   }
   if (selection.kind === 'cells') {
     return deleteCellRange(doc, selection.tableId, cellRect(selection), builder);
@@ -396,7 +463,42 @@ export function deleteSelection(
   if (!location) return null;
   builder.drop(selection.blockId);
   const next = pruneEmptyContainers(replaceBlockWith(doc, selection.blockId, []));
+  if (next.blocks.length === 0) return blankPage(next, selection.blockId);
   return { doc: next, selection: caretNear(next, selection.blockId) };
+}
+
+/**
+ * Select-all then Backspace — or typing over that selection — means "blank
+ * page", and a blank page keeps nothing: not the heading level of the first
+ * block, and not the images and charts that {@link wholeDocument} cannot
+ * address with a `Point` and would otherwise strand in a document the writer
+ * just emptied. Any narrower range goes through {@link deleteTextRange}, which
+ * does preserve the block the selection started in.
+ */
+function clearWholeDocument(
+  doc: MdvDocument,
+  selection: TextSelection,
+  builder: MappingBuilder,
+): EditOutcome | null {
+  const everything = wholeDocument(doc);
+  if (everything?.kind !== 'text') return null;
+  const [start, end] = orderedPoints(doc, selection);
+  if (!samePosition(doc, start, everything.anchor)) return null;
+  if (!samePosition(doc, end, everything.focus)) return null;
+  const first = doc.blocks[0];
+  if (!first) return null;
+  for (const location of allBlocks(doc)) builder.drop(location.block.id);
+  return blankPage(doc, first.id);
+}
+
+/** An empty paragraph, reusing `id` from a block that is on its way out. */
+function blankPage(doc: MdvDocument, id: NodeId): EditOutcome {
+  const paragraph: Block = { kind: 'paragraph', id, runs: [] };
+  const at: Point = { blockId: id, path: [0], offset: 0 };
+  return {
+    doc: { ...doc, blocks: [paragraph] },
+    selection: { kind: 'text', anchor: at, focus: at },
+  };
 }
 
 /**

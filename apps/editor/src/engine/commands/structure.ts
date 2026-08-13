@@ -156,6 +156,23 @@ export function splitBlock(): Command {
     // an id — which breaks every id-keyed lookup and every UI list key.
     const tail = reassignIds(sliceRuns(container.runs, abs, total), ctx.ids);
 
+    // Enter on an empty quoted paragraph leaves the quote, the way it leaves a
+    // list. Without it a quote is a keyboard trap: every Enter appends another
+    // empty paragraph, which the writer does not serialise, so the keystroke
+    // does nothing a user can see and there is no way back out.
+    if (total === 0 && quoteParentOf(doc, block.id) !== undefined) {
+      const lifted = liftFromQuote(doc, ctx, block.id);
+      if (lifted) {
+        const target = findBlock(lifted, block.id)?.block;
+        const point = target ? startOfBlock(target) : undefined;
+        return {
+          state: { doc: lifted, selection: point ? caret(point) : selection, pendingMarks: null },
+          label: 'outdent',
+          mapPoint: builder.build(lifted),
+        };
+      }
+    }
+
     const item = enclosingListItem(doc, block.id);
     if (item) {
       const found = findListItem(doc, item.itemId);
@@ -335,17 +352,19 @@ export function mergeBackward(): Command {
 
     const quote = quoteParentOf(state.doc, block.id);
     if (quote && siblingsOf(state.doc, { kind: 'blockquote', id: quote })[0]?.id === block.id) {
-      const lifted = unwrapQuote(state.doc, quote);
-      const target = findBlock(lifted, block.id)?.block;
-      const point = target ? startOfBlock(target) : undefined;
-      return {
-        state: {
-          doc: lifted,
-          selection: point ? caret(point) : state.selection,
-          pendingMarks: null,
-        },
-        label: 'block type',
-      };
+      const lifted = liftFromQuote(state.doc, ctx, block.id);
+      if (lifted) {
+        const target = findBlock(lifted, block.id)?.block;
+        const point = target ? startOfBlock(target) : undefined;
+        return {
+          state: {
+            doc: lifted,
+            selection: point ? caret(point) : state.selection,
+            pendingMarks: null,
+          },
+          label: 'block type',
+        };
+      }
     }
 
     const previous = previousLeaf(state.doc, block.id);
@@ -412,10 +431,49 @@ function quoteParentOf(doc: MdvDocument, blockId: NodeId): NodeId | undefined {
   return parent?.kind === 'blockquote' ? parent.id : undefined;
 }
 
-function unwrapQuote(doc: MdvDocument, quoteId: NodeId): MdvDocument {
+/**
+ * Lift a contiguous run of a quote's children out of it.
+ *
+ * The quote is split, not unwrapped: children before the run stay in it,
+ * children after it move into a new quote that follows. Unwrapping the whole
+ * quote instead — which is what "unquote this paragraph" used to do — pulls
+ * out siblings the user never selected, and there is no way to put them back
+ * short of Undo.
+ *
+ * `blockIds` need not be contiguous or ordered; the span from the first to the
+ * last is what moves, because a hole in the middle would have to leave the
+ * quote in two pieces around a block that stays inside, which no gesture in
+ * the UI can express.
+ */
+function liftFromQuote(
+  doc: MdvDocument,
+  ctx: EditContext,
+  ...blockIds: readonly NodeId[]
+): MdvDocument | undefined {
+  const first = blockIds[0];
+  if (first === undefined) return undefined;
+  const quoteId = quoteParentOf(doc, first);
+  if (quoteId === undefined) return undefined;
   const location = findBlock(doc, quoteId);
-  if (location?.block.kind !== 'blockquote') return doc;
-  return replaceBlockWith(doc, quoteId, location.block.children);
+  if (location?.block.kind !== 'blockquote') return undefined;
+  const quote = location.block;
+
+  const indices = blockIds
+    .map((id) => quote.children.findIndex((child) => child.id === id))
+    .filter((index) => index >= 0)
+    .sort((a, b) => a - b);
+  const from = indices[0];
+  const to = indices[indices.length - 1];
+  if (from === undefined || to === undefined) return undefined;
+
+  const before = quote.children.slice(0, from);
+  const lifted = quote.children.slice(from, to + 1);
+  const after = quote.children.slice(to + 1);
+  const replacement: Block[] = [];
+  if (before.length > 0) replacement.push({ ...quote, children: before });
+  replacement.push(...lifted);
+  if (after.length > 0) replacement.push(makeQuote(ctx.ids, after));
+  return replaceBlockWith(doc, quoteId, replacement);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -461,6 +519,37 @@ export function setBlockType(spec: BlockTypeSpec): Command {
     return {
       state: { doc, selection: state.selection, pendingMarks: null },
       label: 'block type',
+    };
+  };
+}
+
+/**
+ * Set a code block's info string — the `ts` in ```` ```ts ````.
+ *
+ * Named rather than folded into {@link setBlockType} because it addresses a
+ * block by id: the control that offers it belongs to the block, not to the
+ * caret, and the writer who is filling it in has left the caret wherever they
+ * were last typing. Trimmed because the info string is a word, and a fence that
+ * serialises with a trailing space round-trips as a different document.
+ *
+ * It coalesces per block, so spelling out `typescript` is one undo step rather
+ * than ten: the field it backs fires on every keystroke, the way every other
+ * inspector field does.
+ */
+export function setCodeInfo(blockId: NodeId, info: string): Command {
+  return (state) => {
+    const block = findBlock(state.doc, blockId)?.block;
+    if (block?.kind !== 'code') return null;
+    const next = info.trim();
+    if (next === block.info) return null;
+    return {
+      state: {
+        doc: replaceBlockWith(state.doc, blockId, [{ ...block, info: next }]),
+        selection: state.selection,
+        pendingMarks: null,
+      },
+      label: 'block type',
+      coalesceKey: `code-info:${blockId}`,
     };
   };
 }
@@ -541,11 +630,14 @@ function toggleQuote(
   const quoteIds = new Set(
     parents.map((parent) => (parent?.kind === 'blockquote' ? parent.id : undefined)),
   );
+  // Everything the selection touches is already in one quote, so the toggle is
+  // an *un*quote — and it applies to the selection, not to the whole quote. The
+  // siblings above and below stay quoted; they were never part of the gesture.
   if (quoteIds.size === 1 && !quoteIds.has(undefined)) {
-    const [quoteId] = [...quoteIds];
-    if (quoteId !== undefined) {
+    const lifted = liftFromQuote(doc, ctx, ...targets.map((block) => block.id));
+    if (lifted) {
       return {
-        state: { doc: unwrapQuote(doc, quoteId), selection: state.selection, pendingMarks: null },
+        state: { doc: lifted, selection: state.selection, pendingMarks: null },
         label: 'block type',
       };
     }
@@ -715,11 +807,18 @@ export function indent(): Command {
   };
 }
 
-/** Outdent every touched list item by one level, innermost first. */
+/**
+ * Outdent every touched list item by one level, innermost first.
+ *
+ * With no list in the selection the same keystroke leaves a blockquote, which
+ * is the only way out of one when the quote is the document's last block. It
+ * still returns `null` when there is nothing to outdent so the keymap lets Tab
+ * fall through to focus movement (WCAG 2.1.2).
+ */
 export function outdent(): Command {
   return (state, ctx) => {
     const items = [...touchedItems(state.doc, state.selection)].reverse();
-    if (items.length === 0) return null;
+    if (items.length === 0) return outdentFromQuote(state, ctx);
     let doc = state.doc;
     let changed = false;
     for (const itemId of items) {
@@ -732,6 +831,37 @@ export function outdent(): Command {
     if (!changed) return null;
     return { state: { doc, selection: state.selection, pendingMarks: null }, label: 'outdent' };
   };
+}
+
+/**
+ * Outdent's blockquote half: lift the touched blocks out of their quotes.
+ *
+ * Blocks are grouped by the quote that holds them, so a selection spanning two
+ * quotes leaves both. A block that is not quoted is ignored rather than
+ * refused — outdenting a mixed selection should do what it can.
+ */
+function outdentFromQuote(state: EditorState, ctx: EditContext): CommandResult | null {
+  const groups = new Map<NodeId, NodeId[]>();
+  for (const block of touchedBlocks(state.doc, state.selection)) {
+    const quoteId = quoteParentOf(state.doc, block.id);
+    if (quoteId === undefined) continue;
+    const group = groups.get(quoteId);
+    if (group) group.push(block.id);
+    else groups.set(quoteId, [block.id]);
+  }
+  if (groups.size === 0) return null;
+
+  let doc = state.doc;
+  let changed = false;
+  for (const ids of groups.values()) {
+    const lifted = liftFromQuote(doc, ctx, ...ids);
+    if (lifted) {
+      doc = lifted;
+      changed = true;
+    }
+  }
+  if (!changed) return null;
+  return { state: { doc, selection: state.selection, pendingMarks: null }, label: 'outdent' };
 }
 
 /** Move one item under its previous sibling. Returns `undefined` if it is first. */

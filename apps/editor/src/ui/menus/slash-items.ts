@@ -161,7 +161,9 @@ export const SLASH_ITEMS: readonly SlashItem[] = [
     keywords: ['mdv', 'donut', 'share', 'visual'],
     effect: fromCommands(() =>
       commands.insertVisualBlock('pie', {
-        header: 'title: Share by region',
+        // `pie` requires both channels; a starter that names only the title
+        // renders a diagnostic instead of a chart. See charts/src/pie.ts.
+        header: 'title: Share by region\ncategory: region\nvalue: revenue',
         data: 'region | revenue\nAPAC   | 4210\nEMEA   | 3180',
       }),
     ),

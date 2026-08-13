@@ -416,6 +416,69 @@ export function insertVisualBlock(type: string, options: InsertVisualOptions = {
   };
 }
 
+/**
+ * Append an empty paragraph after the last block and put the caret in it.
+ *
+ * The command behind clicking the blank space below the document. A table,
+ * image or visual block at the very end of a document has no position after
+ * it — no `Point` addresses one and the arrow keys have nowhere to go — so
+ * without this a document that ends in a table cannot be written past at all.
+ * Refuses when the document already ends in an empty paragraph, so repeated
+ * clicks reuse that paragraph instead of stacking blank ones.
+ */
+export function appendParagraph(): Command {
+  return (state, ctx) => {
+    const blocks = state.doc.blocks;
+    const last = blocks[blocks.length - 1];
+    if (last !== undefined && isEmptyBlock(last)) return null;
+    const block = makeParagraph(ctx.ids);
+    const at = endOfBlock(block);
+    if (at === undefined) return null;
+    return {
+      state: {
+        doc: { ...state.doc, blocks: [...blocks, block] },
+        selection: caret(at),
+        pendingMarks: null,
+      },
+      label: 'insert',
+    };
+  };
+}
+
+/**
+ * Open an empty paragraph directly after `blockId` and put the caret in it.
+ *
+ * What Enter means when a whole block is selected. An atomic block — a rule, an
+ * image, a chart — holds no caret, so the writer who has just inserted one and
+ * wants to keep writing has nowhere to type; this is the keyboard's answer to
+ * the click on the padding that {@link appendParagraph} serves.
+ *
+ * It keeps the block, which is what separates it from
+ * {@link insertBlocksAtSelection}: that one *replaces* what a node selection
+ * covers, and the difference between "write after this" and "replace this" is
+ * the difference between a paragraph and a lost chart.
+ *
+ * Unlike `appendParagraph` it does not refuse next to an empty paragraph,
+ * because the block it follows is addressed explicitly rather than being
+ * whichever block the document happens to end with.
+ */
+export function insertParagraphAfter(blockId: NodeId): Command {
+  return (state, ctx) => {
+    const location = findBlock(state.doc, blockId);
+    if (!location) return null;
+    const block = makeParagraph(ctx.ids);
+    const at = endOfBlock(block);
+    if (at === undefined) return null;
+    // Into the block's own parent, so Enter on an image inside a list item or a
+    // blockquote writes the next paragraph inside that container too.
+    const doc = insertIntoParent(state.doc, location.parent, location.index + 1, [block]);
+    return {
+      state: { doc, selection: caret(at), pendingMarks: null },
+      label: 'insert',
+    };
+  };
+}
+
 /** Insert a thematic break. */
 export function insertThematicBreak(): Command {
   return (state, ctx) => {

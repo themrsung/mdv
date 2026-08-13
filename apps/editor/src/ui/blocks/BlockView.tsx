@@ -10,6 +10,7 @@
 import { memo, useCallback } from 'react';
 import type { PointerEvent as ReactPointerEvent, ReactElement, ReactNode } from 'react';
 import type { Block } from '../../engine/index.js';
+import { commands } from '../../engine/index.js';
 import { toggleTask } from '../commands/local.js';
 import { useEditorApi } from '../state/store.js';
 import { useViewPrefs } from '../state/view-prefs.js';
@@ -121,11 +122,26 @@ function BlockBody({
     case 'code':
       return (
         <pre className="mdv-pre">
-          {block.info === '' ? null : (
-            <span className="mdv-pre__info" contentEditable={false}>
-              {block.info}
-            </span>
-          )}
+          {/*
+           * The info string, as a field rather than a label. It is the only part
+           * of a fence with no caret position of its own — ``` ```ts ``` is not
+           * text in the block — so a writer who could not type here had no way at
+           * all to say what language the code is in, and highlighting, which reads
+           * exactly this, could never be turned on from the editor.
+           */}
+          <input
+            className="mdv-pre__info"
+            contentEditable={false}
+            type="text"
+            value={block.info}
+            aria-label="Code language"
+            placeholder="language"
+            spellCheck={false}
+            autoComplete="off"
+            onChange={(event) => {
+              run(commands.setCodeInfo(block.id, event.target.value));
+            }}
+          />
           <Editable
             key={editableKey}
             tag="code"

@@ -35,6 +35,7 @@ import { detectModKey } from '../input/keymap.js';
 import type { KeyAction } from '../input/keymap.js';
 import type { ImageNotice } from '../input/images.js';
 import { LinkDialog } from '../menus/LinkDialog.js';
+import { caretAfterLink } from '../menus/link-caret.js';
 import { SourcePane } from '../source/SourcePane.js';
 import type { FileHandle } from '../state/files.js';
 import { UNTITLED, openFile, saveText, withMdvExtension } from '../state/files.js';
@@ -255,6 +256,11 @@ export function EditorApp(props: EditorAppProps): ReactElement {
       // adding a second link to a span that already has one would leave both.
       if (activeLink !== null) api.run(commands.toggleMark(activeLink));
       api.run(commands.toggleMark({ type: 'link', href, title }));
+      // The dialog is a trip out of the surface, and the writer comes back to
+      // keep typing the sentence: leave a caret after the words just linked
+      // rather than the range that named them. Read the engine rather than this
+      // render's snapshot — the toggle above has already remapped its selection.
+      api.select(caretAfterLink(api.editor.getDocument(), api.editor.getSelection()));
     },
     [activeLink, api],
   );

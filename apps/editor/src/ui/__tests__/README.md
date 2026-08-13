@@ -28,17 +28,17 @@ trees that happen to match the mapper's assumptions.
 
 ## Not covered here (browser only)
 
-| Area                                                                       | Why Node cannot see it                                                                                                                                                                                                                |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dom/caret.ts` — `caretRect`, `rectAt`, `caretFromPoint`, `linePositionIn` | Client rectangles require layout. `linePositionIn` compares the caret box with the host box to decide whether ↑/↓ leaves the block.                                                                                                   |
-| Slash-menu placement                                                       | `SlashMenu` renders nothing until it has a caret rectangle, and flips above the caret when there is less than 260px below it.                                                                                                         |
-| Selection sync (`EditorSurface`)                                           | Needs a live `contenteditable`, a real `selectionchange`, and a real focus/blur cycle. The offset mapping underneath it _is_ covered here.                                                                                            |
-| IME composition                                                            | `compositionstart`/`update`/`end` and the non-cancelable `beforeinput` that Android soft keyboards send. `intents.ts` covers the decision; only a browser covers the event sequence. `diffText` (the reconciliation) is covered here. |
-| Clipboard and drag-and-drop                                                | `DataTransfer`, `ClipboardEvent`, file drops.                                                                                                                                                                                         |
-| Image ingestion                                                            | `createImageBitmap`, `<canvas>` re-encoding. `input/images.ts` takes the decoder as an `ImageEnvironment`, so its policy is testable; the decoder itself is not.                                                                      |
-| File open/save                                                             | File System Access API, the `<a download>` fallback, `beforeunload`.                                                                                                                                                                  |
-| Theme following                                                            | `matchMedia('(prefers-color-scheme: dark)')` and the `prefers-contrast` / `forced-colors` rules in `styles/app.css`.                                                                                                                  |
-| `styles/app.css`                                                           | Cascade, `white-space: pre-wrap`, focus rings, print rules.                                                                                                                                                                           |
+| Area                                                                                               | Why Node cannot see it                                                                                                                                                                                                                |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dom/caret.ts` — `caretRect`, `rectAt`, `caretFromPoint`, `linePositionIn`, `blocksByDistanceFrom` | Client rectangles require layout. `linePositionIn` compares the caret box with the host box to decide whether ↑/↓ leaves the block. `blocksByDistanceFrom` orders blocks by vertical distance from a click that hit no text.          |
+| Slash-menu placement                                                                               | `SlashMenu` renders nothing until it has a caret rectangle, and flips above the caret when there is less than 260px below it.                                                                                                         |
+| Selection sync (`EditorSurface`)                                                                   | Needs a live `contenteditable`, a real `selectionchange`, and a real focus/blur cycle. The offset mapping underneath it _is_ covered here.                                                                                            |
+| IME composition                                                                                    | `compositionstart`/`update`/`end` and the non-cancelable `beforeinput` that Android soft keyboards send. `intents.ts` covers the decision; only a browser covers the event sequence. `diffText` (the reconciliation) is covered here. |
+| Clipboard and drag-and-drop                                                                        | `DataTransfer`, `ClipboardEvent`, file drops.                                                                                                                                                                                         |
+| Image ingestion                                                                                    | `createImageBitmap`, `<canvas>` re-encoding. `input/images.ts` takes the decoder as an `ImageEnvironment`, so its policy is testable; the decoder itself is not.                                                                      |
+| File open/save                                                                                     | File System Access API, the `<a download>` fallback, `beforeunload`.                                                                                                                                                                  |
+| Theme following                                                                                    | `matchMedia('(prefers-color-scheme: dark)')` and the `prefers-contrast` / `forced-colors` rules in `styles/app.css`.                                                                                                                  |
+| `styles/app.css`                                                                                   | Cascade, `white-space: pre-wrap`, focus rings, print rules.                                                                                                                                                                           |
 
 ## Manual pass
 
@@ -55,6 +55,18 @@ Run `pnpm --filter @mdv/editor dev` and check, at minimum:
 5. Toolbar Bold on a selection — the source pane shows `**…**`.
 6. Save, reload, and accept the recovery banner.
 7. Switch the OS between light and dark with the theme control on _System_.
+8. On a document of one short paragraph, click far below it — in the empty
+   space that is most of the window. The caret lands at the end of that
+   paragraph and typing goes in there. The surface, not the pane, owns that
+   space; if the padding moves back to `.mdv-pane--document` the click hits the
+   pane and nothing happens.
+9. With the caret in a paragraph, click Heading 1 on the toolbar and keep
+   typing without clicking back. The text goes into the heading. Changing the
+   kind swaps the editing host, which the browser reports as a `focusout` with
+   no `relatedTarget` — indistinguishable from a real blur until the render
+   commits, so the surface defers the verdict rather than believing it. Then
+   click the wordmark in the header: focus leaves for good and does _not_ get
+   pulled back by the next Undo.
 
 A synthetic `dispatchEvent(new InputEvent('beforeinput', …))` from the console
 is **not** a substitute for step 1: it leaves the browser's own caret where it

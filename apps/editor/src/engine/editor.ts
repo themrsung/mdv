@@ -41,6 +41,7 @@ import { read } from './io/read.js';
 import { write } from './io/write.js';
 import type { WriteOptions } from './io/write.js';
 import { createIdFactory } from './ids.js';
+import { withMinimumContent } from './builders.js';
 
 /** Everything an observer of the editor can see. */
 export interface EditorSnapshot {
@@ -134,10 +135,22 @@ export interface Editor {
   subscribe(listener: EditorListener): () => void;
 }
 
+/**
+ * Every document the store holds must be editable.
+ *
+ * `read('')` yields zero blocks, which is the honest parse of an empty file but
+ * leaves the surface with no `contenteditable` host: the caret has nowhere to
+ * land, so `New` would produce a document you cannot type into. The paragraph
+ * added here is not serialised, so `toText()` still round-trips to ''.
+ */
+function editable(doc: MdvDocument): MdvDocument {
+  return withMinimumContent(doc, createIdFactory('r'));
+}
+
 /** Create an editor. */
 export function createEditor(options: EditorOptions = {}): Editor {
   const ctx = createContext(options.context ?? {});
-  const doc = options.doc ?? read(options.text ?? '', { ids: createIdFactory('r') });
+  const doc = editable(options.doc ?? read(options.text ?? '', { ids: createIdFactory('r') }));
   const writeOptions = options.write;
 
   let state = options.selection
@@ -197,10 +210,11 @@ export function createEditor(options: EditorOptions = {}): Editor {
 
     setDocument(next, selection) {
       return run((current) => {
-        if (next === current.doc) return null;
-        const target = selection ?? createState(next).selection;
+        const doc = editable(next);
+        if (doc === current.doc) return null;
+        const target = selection ?? createState(doc).selection;
         return {
-          state: { doc: next, selection: normalizeSelection(next, target), pendingMarks: null },
+          state: { doc, selection: normalizeSelection(doc, target), pendingMarks: null },
           label: 'replace',
         };
       });

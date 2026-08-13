@@ -26,6 +26,8 @@ export interface FakeText extends TextLike {
 export interface FakeElement extends ElementLike {
   readonly nodeType: 1;
   readonly tag: string;
+  /** Upper-cased, as a real element reports it: `../dom/controls.ts` reads it. */
+  readonly tagName: string;
   readonly attributes: Record<string, string>;
   parentNode: NodeLike | null;
   readonly childNodes: NodeLike[];
@@ -46,6 +48,7 @@ export function element(
   const node: FakeElement = {
     nodeType: ELEMENT_NODE,
     tag,
+    tagName: tag.toUpperCase(),
     attributes: { ...attributes },
     parentNode: null,
     childNodes: [...children],

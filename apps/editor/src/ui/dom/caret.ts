@@ -7,6 +7,8 @@
  * for mouse selection and for Up/Down arrow behaviour at a block boundary.
  */
 
+import { BLOCK_ATTR } from './contract.js';
+
 /** A DOM position under a screen point. */
 export interface HitPosition {
   readonly node: Node;
@@ -64,6 +66,35 @@ export function rectAt(node: Node, offset: number): DOMRect | null {
   if (node instanceof Element) return node.getBoundingClientRect();
   const parent = node.parentElement;
   return parent === null ? null : parent.getBoundingClientRect();
+}
+
+/** How far a click fell from a block, and on which side. */
+export interface BlockDistance {
+  readonly blockId: string;
+  /** 0 when `clientY` is within the block's box. */
+  readonly distance: number;
+  /** True when the point is below the block, so the caret belongs at its end. */
+  readonly below: boolean;
+}
+
+/**
+ * Every block, ordered by vertical distance from `clientY`, nearest first.
+ *
+ * Used to answer a click that landed in the surface's margins rather than on
+ * any text. The caller walks the list because the nearest block may be one that
+ * cannot hold a caret, like a table or an image.
+ */
+export function blocksByDistanceFrom(root: Element, clientY: number): readonly BlockDistance[] {
+  const found: BlockDistance[] = [];
+  for (const element of root.querySelectorAll(`[${BLOCK_ATTR}]`)) {
+    const blockId = element.getAttribute(BLOCK_ATTR);
+    if (blockId === null) continue;
+    const rect = element.getBoundingClientRect();
+    const distance =
+      clientY < rect.top ? rect.top - clientY : clientY > rect.bottom ? clientY - rect.bottom : 0;
+    found.push({ blockId, distance, below: clientY > rect.top + rect.height / 2 });
+  }
+  return found.sort((a, b) => a.distance - b.distance);
 }
 
 /** The current caret rectangle, or `null` when there is no selection. */

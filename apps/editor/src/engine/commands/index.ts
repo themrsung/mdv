@@ -41,6 +41,7 @@ export {
   previousLeaf,
   selectBlock,
   setBlockType,
+  setCodeInfo,
   splitBlock,
   touchedBlocks,
 } from './structure.js';
@@ -49,10 +50,12 @@ export type { BlockTypeSpec } from './structure.js';
 export { activeMarks, clearMarks, isMarkActive, selectedSpans, toggleMark } from './marks.js';
 
 export {
+  appendParagraph,
   blockPlainText,
   insertBlocksAtSelection,
   insertFragment,
   insertImage,
+  insertParagraphAfter,
   insertTable,
   insertThematicBreak,
   insertVisualBlock,

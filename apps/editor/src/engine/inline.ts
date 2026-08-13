@@ -297,11 +297,13 @@ export function commonMarks(runs: readonly Run[], start: number, end: number): r
 }
 
 /**
- * Marks a collapsed caret at `offset` would inherit: those of the character to
- * the left, falling back to the character to the right at the start of a block.
+ * Marks the character *ending* at `offset` carries — the caret's left side.
+ *
+ * At the start of a block there is no such character, so the one to the right
+ * stands in: typing into an empty paragraph that begins with bold text should
+ * be bold.
  */
-export function marksAt(runs: readonly Run[], offset: number): readonly Mark[] {
-  if (runs.length === 0) return [];
+function leftMarks(runs: readonly Run[], offset: number): readonly Mark[] {
   if (offset <= 0) {
     const first = runs[0];
     return first ? runMarks(first) : [];
@@ -314,6 +316,51 @@ export function marksAt(runs: readonly Run[], offset: number): readonly Mark[] {
     return previous ? runMarks(previous) : runMarks(run);
   }
   return runMarks(run);
+}
+
+/** Marks the character *starting* at `offset` carries — the caret's right side. */
+function rightMarks(runs: readonly Run[], offset: number): readonly Mark[] {
+  let cursor = 0;
+  for (const run of runs) {
+    const end = cursor + run.text.length;
+    // A zero-length run holds no character, so it is neither side of a caret.
+    if (run.text.length > 0 && offset < end) return runMarks(run);
+    cursor = end;
+  }
+  return [];
+}
+
+/**
+ * Marks a collapsed caret at `offset` would inherit.
+ *
+ * Emphasis is *inclusive*: typing at the end of bold text continues it, which
+ * is how a writer adds a word to something they just emboldened. A link is
+ * **not**, and that asymmetry is deliberate. The character after a link is
+ * nearly always punctuation — `[docs](…).` — and absorbing it into the anchor
+ * silently changes both the link text and what the reader clicks. So a link is
+ * inherited only when the caret has the same link on both sides, i.e. when the
+ * caret is genuinely *inside* the anchor rather than resting against its edge.
+ * The rest of the mark set is unaffected: typing after bold-and-linked text
+ * stays bold and stops being a link.
+ *
+ * Deliberate marks still win — `state.pendingMarks`, set by the link command
+ * or by a toggle, is consulted before this function ever runs — so a writer who
+ * asks for a link and then types gets one.
+ */
+export function marksAt(runs: readonly Run[], offset: number): readonly Mark[] {
+  if (runs.length === 0) return [];
+  const inherited = leftMarks(runs, offset);
+  if (!hasMarkType(inherited, 'link')) return inherited;
+  // Both sides, not just the one `leftMarks` reports: at the start of a block
+  // it stands in the right-hand character for the left, which would put the
+  // caret "inside" a leading link when it is in fact in front of it.
+  const before = offset <= 0 ? [] : inherited;
+  const after = rightMarks(runs, offset);
+  const carries = (mark: Mark, side: readonly Mark[]): boolean =>
+    side.some((other) => markEquals(mark, other));
+  return inherited.filter(
+    (mark) => mark.type !== 'link' || (carries(mark, before) && carries(mark, after)),
+  );
 }
 
 /** Deep structural equality for two run lists. */
