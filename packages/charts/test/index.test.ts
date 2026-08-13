@@ -252,7 +252,7 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('borrows the table minimum width, because a table is what gets drawn', () => {
-    expect(byName('heatmap').minWidth).toBe(byName('table').minWidth);
+    expect(byName('treemap').minWidth).toBe(byName('table').minWidth);
   });
 
   it('targets the row, because the row is what is on screen', () => {
@@ -261,7 +261,7 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('heatmap')).toBe(2);
+    expect(levels.get('waterfall')).toBe(2);
     expect(levels.get('ohlcv')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
@@ -270,13 +270,14 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('drops a name from the list the moment the real module lands', () => {
-    // `histogram` graduated (SPEC 8.7) and `box` after it (SPEC 8.8). This list
-    // is the *only* thing that decides whether a name degrades, so a name left
-    // on it after its module arrives would keep drawing the table however
-    // complete the module is.
+    // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
+    // `heatmap` (SPEC 8.9). This list is the *only* thing that decides whether
+    // a name degrades, so a name left on it after its module arrives would keep
+    // drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
     expect(names).not.toContain('histogram');
     expect(names).not.toContain('box');
+    expect(names).not.toContain('heatmap');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
@@ -285,5 +286,22 @@ describe('the stubs stay honest about being stubs', () => {
     });
     expect(codesOf(drawn)).toEqual([]);
     expect(nodesOfKind(drawn.laid.nodes, 'rect').length).toBeGreaterThan(0);
+    const grid = runChart(
+      byName('heatmap'),
+      makeTable(
+        [
+          ['day', 'category'],
+          ['hour', 'category'],
+          ['value', 'number'],
+        ],
+        [
+          ['Mon', 'AM', 1],
+          ['Tue', 'PM', 2],
+        ],
+      ),
+      { encoding: { x: { field: 'day' }, y: { field: 'hour' }, value: { field: 'value' } } },
+    );
+    expect(codesOf(grid)).toEqual([]);
+    expect(nodesOfKind(grid.laid.nodes, 'rect').length).toBeGreaterThan(0);
   });
 });

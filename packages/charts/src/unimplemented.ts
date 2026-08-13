@@ -172,7 +172,6 @@ export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
   { name: 'funnel', level: 2, summary: 'a funnel of stage-to-stage conversion' },
   { name: 'gantt', level: 3, summary: 'a Gantt chart of the schedule' },
   { name: 'gauge', level: 2, summary: 'a gauge of the value against its range' },
-  { name: 'heatmap', level: 2, summary: 'a heatmap of the value across two keys' },
   { name: 'map', level: 3, summary: 'a choropleth or point map' },
   { name: 'network', level: 3, summary: 'a node-link diagram' },
   { name: 'ohlc', level: 2, summary: 'an open-high-low-close price chart' },

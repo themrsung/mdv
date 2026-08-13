@@ -17,6 +17,7 @@ import { barChart } from './bar.js';
 import { boxChart } from './box.js';
 import { bubbleChart, scatterChart } from './scatter.js';
 import { donutChart, pieChart } from './pie.js';
+import { heatmapChart } from './heatmap.js';
 import { histogramChart } from './histogram.js';
 import { lineChart } from './line.js';
 import { metricChart } from './metric.js';
@@ -28,6 +29,7 @@ export { barChart } from './bar.js';
 export { boxChart } from './box.js';
 export { bubbleChart, scatterChart } from './scatter.js';
 export { donutChart, pieChart } from './pie.js';
+export { heatmapChart } from './heatmap.js';
 export { histogramChart } from './histogram.js';
 export { lineChart } from './line.js';
 export { metricChart } from './metric.js';
@@ -115,7 +117,7 @@ export const level1ChartTypes: readonly ChartType[] = [
  * separately keeps `chartTypesForLevel` honest: a type is in the list for its
  * own level whether it draws or degrades, and this is the set that draws.
  */
-export const level2ChartTypes: readonly ChartType[] = [boxChart, histogramChart];
+export const level2ChartTypes: readonly ChartType[] = [boxChart, heatmapChart, histogramChart];
 
 /**
  * Every built-in chart type, sorted by name.
