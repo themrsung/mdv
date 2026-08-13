@@ -250,9 +250,14 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
 
 describe('the stubs stay honest about being stubs', () => {
   it('accepts every channel, so no second misleading diagnostic appears', () => {
-    const stub = byName('radar');
-    const permissive = stub.channels.every((channel) => channel.required !== true);
-    expect(permissive).toBe(true);
+    // Asserted over every stub rather than over one name: a stub graduating to a
+    // real module (`radar` was the example here until SPEC 8.12 landed) must not
+    // silently take the assertion with it.
+    for (const spec of UNIMPLEMENTED_TYPES) {
+      const stub = byName(spec.name);
+      const permissive = stub.channels.every((channel) => channel.required !== true);
+      expect(permissive, spec.name).toBe(true);
+    }
   });
 
   it('borrows the table minimum width, because a table is what gets drawn', () => {
@@ -275,8 +280,8 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('drops a name from the list the moment the real module lands', () => {
     // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
-    // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11) and `waterfall`
-    // (SPEC 8.12). This list is the *only* thing that decides whether
+    // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall` and
+    // `radar` (SPEC 8.12). This list is the *only* thing that decides whether
     // a name degrades, so a name left on it after its module arrives would keep
     // drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
@@ -287,6 +292,7 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('ohlcv');
     expect(names).not.toContain('candlestick');
     expect(names).not.toContain('waterfall');
+    expect(names).not.toContain('radar');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
@@ -315,5 +321,12 @@ describe('the stubs stay honest about being stubs', () => {
     const candles = runChart(byName('ohlc'), prices(), { encoding: { x: { field: 'day' } } });
     expect(codesOf(candles)).toEqual([]);
     expect(nodesOfKind(candles.laid.nodes, 'rect').length).toBeGreaterThan(0);
+    // A radar draws no rectangles at all — its grid, its outlines and its
+    // vertices are paths, lines and circles — so it is asserted on its own marks.
+    const spider = runChart(byName('radar'), prices(), {
+      encoding: { category: { field: 'day' }, value: { field: 'close' } },
+    });
+    expect(codesOf(spider)).toEqual([]);
+    expect(nodesOfKind(spider.laid.nodes, 'circle').length).toBeGreaterThan(0);
   });
 });

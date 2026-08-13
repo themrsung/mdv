@@ -79,6 +79,28 @@ export function chromeStroke(theme: Theme, dashed: boolean): Stroke {
   return stroke;
 }
 
+/**
+ * A gridline or axis rule: **one step off surface, 1 px hairline, solid, never
+ * dashed, recessive** (SPEC 11.4).
+ *
+ * Core owns the gridlines of a cartesian chart, because it owns the axes they
+ * belong to. A polar grid has no {@link AxisModel} to hang off, so the one chart
+ * that has one draws it — and it must draw it to the same specification, which
+ * is why the numbers come from here rather than from that chart.
+ *
+ * @param role - `grid` for a ring or a gridline, `axis` for a spoke or a
+ * baseline: the axis token is the darker of the two, so the line a reader
+ * measures *along* stays distinguishable from the ones they measure *against*.
+ */
+export function gridStroke(theme: Theme, role: 'grid' | 'axis' = 'grid'): Stroke {
+  return {
+    paint: solid(role === 'axis' ? theme.tokens.axis : theme.tokens.grid),
+    width: theme.marks.grid.width,
+    cap: 'butt',
+    join: 'miter',
+  };
+}
+
 /** The base label font. */
 export function labelFont(theme: Theme, scale = 1, weight?: number): Font {
   const font: Font = {

@@ -21,7 +21,7 @@ import type {
   SeriesDescriptor,
   Table,
 } from '@mdv/core';
-import { cell, channelList, findColumn, humaniseColumn } from './table.js';
+import { cell, channelList, findColumn, humaniseColumn, identityKey } from './table.js';
 
 /** The synthetic identity every over-cap series folds into (SPEC 7.4, `MDV3062`). */
 export const OTHER_SERIES_ID = 'Other';
@@ -87,7 +87,7 @@ export function buildSeries(input: BuildSeriesInput): SeriesResolution {
     for (let row = 0; row < table.rows.length; row += 1) {
       const value = cell(table, row, seriesColumn.index);
       if (value === null) continue;
-      const key = value instanceof Date ? value.toISOString() : String(value);
+      const key = identityKey(value);
       if (seen.has(key)) continue;
       seen.add(key);
       identities.push(key);

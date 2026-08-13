@@ -170,6 +170,22 @@ export function channelFormat(
 }
 
 /**
+ * The stable identity of a cell used as a **series** or **category** key.
+ *
+ * A date keys by its ISO instant rather than by `String(date)`, whose text is
+ * locale- and timezone-dependent and would make the same document split into
+ * different series on two machines (SPEC 24.3 rule 3).
+ *
+ * This is deliberately *not* {@link discreteKey}, which keys a date by epoch for
+ * a scale domain. The two must not be swapped: {@link buildSeries} writes this
+ * spelling into `SeriesPlan.matchKey`, so every reader that matches a row to a
+ * series has to compute the key the same way. One function, so they do.
+ */
+export function identityKey(value: Value): string {
+  return value instanceof Date ? value.toISOString() : String(value);
+}
+
+/**
  * Distinct values of a column in **first-appearance order** (SPEC 11.2 rule 1).
  *
  * First-appearance order over the unfiltered table is what makes a series keep
@@ -181,7 +197,7 @@ export function distinctValues(table: Table, columnIndex: number): string[] {
   for (let row = 0; row < table.rows.length; row += 1) {
     const value = cell(table, row, columnIndex);
     if (value === null) continue;
-    const key = value instanceof Date ? value.toISOString() : String(value);
+    const key = identityKey(value);
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(key);

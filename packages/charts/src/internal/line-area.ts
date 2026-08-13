@@ -51,6 +51,7 @@ import {
   channelList,
   findColumn,
   firstChannel,
+  identityKey,
   isQuantitative,
   isTemporal,
 } from './table.js';
@@ -298,9 +299,7 @@ export function encodeLineArea(input: EncodeInput, mode: 'line' | 'area'): Encod
       if (plan === undefined || bucket === undefined) continue;
       if (plan.matchKey !== undefined) {
         if (seriesColumn === undefined) continue;
-        const identity = cell(table, row, seriesColumn.index);
-        const identityKey = identity instanceof Date ? identity.toISOString() : String(identity);
-        if (identityKey !== plan.matchKey) continue;
+        if (identityKey(cell(table, row, seriesColumn.index)) !== plan.matchKey) continue;
       }
       const numeric = cellNumber(cell(table, row, plan.valueColumn));
       const rows: ReadoutRow[] = [
