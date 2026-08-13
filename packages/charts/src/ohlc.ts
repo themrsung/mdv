@@ -145,8 +145,20 @@ interface Period {
 
 /** A computed overlay, ready to draw against the price scale (SPEC 8.11.1). */
 type OverlayPlot =
-  | { readonly kind: 'line'; readonly label: string; readonly color: ColorString; readonly dash: readonly number[] | undefined; readonly values: readonly (number | undefined)[] }
-  | { readonly kind: 'band'; readonly label: string; readonly color: ColorString; readonly upper: readonly (number | undefined)[]; readonly lower: readonly (number | undefined)[] };
+  | {
+      readonly kind: 'line';
+      readonly label: string;
+      readonly color: ColorString;
+      readonly dash: readonly number[] | undefined;
+      readonly values: readonly (number | undefined)[];
+    }
+  | {
+      readonly kind: 'band';
+      readonly label: string;
+      readonly color: ColorString;
+      readonly upper: readonly (number | undefined)[];
+      readonly lower: readonly (number | undefined)[];
+    };
 
 /** A stacked panel below the price panel (SPEC 8.11.2). */
 interface PanelPlot {
@@ -162,7 +174,12 @@ interface PanelPlot {
   readonly barsByDirection: boolean;
   /** The single fill for the bars when `barsByDirection` is false (`volumeColor`). */
   readonly fill?: ColorString;
-  readonly lines: readonly { readonly label: string; readonly color: ColorString; readonly dash: readonly number[] | undefined; readonly values: readonly (number | undefined)[] }[];
+  readonly lines: readonly {
+    readonly label: string;
+    readonly color: ColorString;
+    readonly dash: readonly number[] | undefined;
+    readonly values: readonly (number | undefined)[];
+  }[];
   /** Horizontal guides, e.g. RSI 30/70. */
   readonly guides: readonly number[];
 }
@@ -218,7 +235,11 @@ function itemString(item: Readonly<Record<string, unknown>>, key: string): strin
   return typeof value === 'string' ? value : undefined;
 }
 
-function itemNumber(item: Readonly<Record<string, unknown>>, key: string, fallback: number): number {
+function itemNumber(
+  item: Readonly<Record<string, unknown>>,
+  key: string,
+  fallback: number,
+): number {
   const value = item[key];
   if (isFiniteNumber(value)) return value;
   if (typeof value === 'string') {
@@ -337,11 +358,7 @@ function resolveX(input: EncodeInput): {
 const PRICE_TYPES = ['number', 'integer'] as const;
 
 /** `MDV3000`/`MDV3001` for the five fields a price chart is made of. */
-function validatePrices(
-  block: ResolvedBlock,
-  table: Table,
-  needsVolume: boolean,
-): Diagnostic[] {
+function validatePrices(block: ResolvedBlock, table: Table, needsVolume: boolean): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
   const attrs = block.attrs;
   const keys = needsVolume
@@ -566,11 +583,7 @@ function macd(
 }
 
 /** The series an overlay reads: `close` unless the author names another field. */
-function fieldSeries(
-  periods: readonly Period[],
-  table: Table,
-  field: string | undefined,
-): Sparse {
+function fieldSeries(periods: readonly Period[], table: Table, field: string | undefined): Sparse {
   if (field === undefined) return periods.map((period) => period.close);
   const known: Record<string, (period: Period) => number> = {
     open: (period) => period.open,
@@ -629,7 +642,12 @@ function buildOverlays(
       case 'wma': {
         const period = periodOf(item, 20);
         const source = fieldSeries(periods, table, field);
-        const values = type === 'sma' ? sma(source, period) : type === 'ema' ? ema(source, period) : wma(source, period);
+        const values =
+          type === 'sma'
+            ? sma(source, period)
+            : type === 'ema'
+              ? ema(source, period)
+              : wma(source, period);
         plots.push({ kind: 'line', label: `${type.toUpperCase()} ${period}`, color, dash, values });
         break;
       }
@@ -676,7 +694,13 @@ function buildOverlays(
           break;
         }
         const source = fieldSeries(periods, table, field);
-        plots.push({ kind: 'line', label: itemString(item, 'label') ?? field ?? 'Reference', color, dash, values: source });
+        plots.push({
+          kind: 'line',
+          label: itemString(item, 'label') ?? field ?? 'Reference',
+          color,
+          dash,
+          values: source,
+        });
         break;
       }
       default:
@@ -701,7 +725,12 @@ function rampColor(ramp: SequentialPalette, index: number): ColorString {
 }
 
 /** Volume is its own panel, and always the first one when the type has it. */
-function volumePanel(periods: readonly Period[], byDirection: boolean, fill: ColorString | undefined, label: string): PanelPlot | undefined {
+function volumePanel(
+  periods: readonly Period[],
+  byDirection: boolean,
+  fill: ColorString | undefined,
+  label: string,
+): PanelPlot | undefined {
   const bars = periods.map((period) => period.volume);
   const values = bars.filter((value): value is number => value !== undefined);
   if (values.length === 0) return undefined;
@@ -753,7 +782,14 @@ function buildPanels(
         format: '.0f',
         bars: [],
         barsByDirection: false,
-        lines: [{ label: `RSI ${period}`, color: rampColor(theme.sequential, 0), dash: undefined, values: rsi(closes, period) }],
+        lines: [
+          {
+            label: `RSI ${period}`,
+            color: rampColor(theme.sequential, 0),
+            dash: undefined,
+            values: rsi(closes, period),
+          },
+        ],
         guides,
       });
       continue;
@@ -779,8 +815,18 @@ function buildPanels(
         bars: result.histogram,
         barsByDirection: true,
         lines: [
-          { label: 'MACD', color: rampColor(theme.sequential, 0), dash: undefined, values: result.line },
-          { label: 'Signal', color: rampColor(theme.sequential, 2), dash: [6, 3], values: result.signal },
+          {
+            label: 'MACD',
+            color: rampColor(theme.sequential, 0),
+            dash: undefined,
+            values: result.line,
+          },
+          {
+            label: 'Signal',
+            color: rampColor(theme.sequential, 2),
+            dash: [6, 3],
+            values: result.signal,
+          },
         ],
         guides: [0],
       });
@@ -803,7 +849,10 @@ function emptyResult(input: EncodeInput, series: readonly SeriesDescriptor[]): O
   return {
     marks: [],
     series,
-    scales: { x: createBandScale({ domain: [] }), y: createContinuousScale('linear', { domain: [0, 1] }) },
+    scales: {
+      x: createBandScale({ domain: [] }),
+      y: createContinuousScale('linear', { domain: [0, 1] }),
+    },
     axes: [],
     a11yTable: empty,
     state: DEFAULT_PLAN,
@@ -882,7 +931,10 @@ function priceChart(options: {
       const bodyWidth = isFiniteNumber(rawBody) ? Math.max(1, rawBody) : undefined;
       const up = colorAttr(attrs, 'upColor', theme.status.good);
       const down = colorAttr(attrs, 'downColor', theme.status.critical);
-      const xFormat = channelFormat(x.channel === undefined ? undefined : firstChannel(block.encoding, 'x'), xBound.column);
+      const xFormat = channelFormat(
+        x.channel === undefined ? undefined : firstChannel(block.encoding, 'x'),
+        xBound.column,
+      );
       const priceFormat = priceFormatOf(attrs, fields.close.column);
 
       // ── Periods ──────────────────────────────────────────────────────────
@@ -943,7 +995,9 @@ function priceChart(options: {
             );
       const requested = buildPanels(attrs, periods, table, theme, panel);
       const panels =
-        options.withVolume && panel !== undefined && !requested.some((entry) => entry.kind === 'volume')
+        options.withVolume &&
+        panel !== undefined &&
+        !requested.some((entry) => entry.kind === 'volume')
           ? [panel, ...requested]
           : requested;
 
@@ -1079,7 +1133,12 @@ function priceChart(options: {
       const hits: ChartHitRegion[] = [];
       const xScale = encoded.scales.x;
       const priceScale = encoded.scales.y;
-      if (xScale === undefined || priceScale === undefined || isDegenerateFrame(frame) || plan.periods.length === 0) {
+      if (
+        xScale === undefined ||
+        priceScale === undefined ||
+        isDegenerateFrame(frame) ||
+        plan.periods.length === 0
+      ) {
         return { nodes, hits };
       }
 
@@ -1122,7 +1181,8 @@ function priceChart(options: {
           const cx = centres[i];
           const hi = overlay.upper[i];
           const lo = overlay.lower[i];
-          if (cx === undefined || !Number.isFinite(cx) || hi === undefined || lo === undefined) continue;
+          if (cx === undefined || !Number.isFinite(cx) || hi === undefined || lo === undefined)
+            continue;
           const top = priceScale.scale(hi);
           const bottom = priceScale.scale(lo);
           if (top === undefined || bottom === undefined) continue;
@@ -1149,7 +1209,12 @@ function priceChart(options: {
         const lowY = priceScale.scale(period.low);
         const openY = priceScale.scale(period.open);
         const closeY = priceScale.scale(period.close);
-        if (highY === undefined || lowY === undefined || openY === undefined || closeY === undefined) {
+        if (
+          highY === undefined ||
+          lowY === undefined ||
+          openY === undefined ||
+          closeY === undefined
+        ) {
           continue;
         }
         const stroke = lineStroke(ctx.theme, color, plan.wickWidth);
@@ -1230,7 +1295,15 @@ function priceChart(options: {
       for (const overlay of plan.overlays) {
         if (overlay.kind !== 'line') continue;
         nodes.push(
-          ...polyline(overlay.values, centres, priceScale, ctx, overlay.color, overlay.dash, 'mdv-overlay mdv-overlay-line'),
+          ...polyline(
+            overlay.values,
+            centres,
+            priceScale,
+            ctx,
+            overlay.color,
+            overlay.dash,
+            'mdv-overlay mdv-overlay-line',
+          ),
         );
       }
 
@@ -1310,9 +1383,12 @@ function polyline(
         kind: 'path',
         id: ctx.ids.next('overlay'),
         cls,
-        d: run.length === 1
-          ? [moveTo(run[0]?.x ?? 0, run[0]?.y ?? 0), lineTo(run[0]?.x ?? 0, run[0]?.y ?? 0)]
-          : run.flatMap((point, i) => (i === 0 ? [moveTo(point.x, point.y)] : [lineTo(point.x, point.y)])),
+        d:
+          run.length === 1
+            ? [moveTo(run[0]?.x ?? 0, run[0]?.y ?? 0), lineTo(run[0]?.x ?? 0, run[0]?.y ?? 0)]
+            : run.flatMap((point, i) =>
+                i === 0 ? [moveTo(point.x, point.y)] : [lineTo(point.x, point.y)],
+              ),
         stroke: lineStroke(ctx.theme, color, 1.5, dash),
       });
     }
@@ -1376,7 +1452,13 @@ function drawPanel(
     if (y === undefined) continue;
     const period = plan.periods[i];
     const color = panel.barsByDirection
-      ? (panel.kind === 'macd' ? (value >= 0 ? plan.up : plan.down) : period?.direction === 'down' ? plan.down : plan.up)
+      ? panel.kind === 'macd'
+        ? value >= 0
+          ? plan.up
+          : plan.down
+        : period?.direction === 'down'
+          ? plan.down
+          : plan.up
       : (panel.fill ?? ctx.theme.tokens.grid);
     const top = Math.min(y, zero);
     const height = Math.max(1, Math.abs(zero - y));
@@ -1394,7 +1476,15 @@ function drawPanel(
 
   for (const line of panel.lines) {
     nodes.push(
-      ...polyline(line.values, centres, scale, ctx, line.color, line.dash, `mdv-panel-line mdv-panel-${panel.kind}`),
+      ...polyline(
+        line.values,
+        centres,
+        scale,
+        ctx,
+        line.color,
+        line.dash,
+        `mdv-panel-line mdv-panel-${panel.kind}`,
+      ),
     );
   }
 

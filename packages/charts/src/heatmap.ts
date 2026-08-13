@@ -73,7 +73,12 @@ import {
   rangeDownFrame,
   rangeToFrame,
 } from './internal/cartesian.js';
-import { blockDiagnostic, incompatibleField, missingChannel, unknownEnum } from './internal/diagnostics.js';
+import {
+  blockDiagnostic,
+  incompatibleField,
+  missingChannel,
+  unknownEnum,
+} from './internal/diagnostics.js';
 import {
   buildA11yTable,
   composeDescription,
@@ -321,7 +326,8 @@ function readOptions(input: EncodeInput): HeatmapOptions {
   // "Discretises a continuous ramp" (SPEC 8.9). `bins` on a scale that is
   // already classed is its class count; on a sequential ramp it is a request to
   // band it, which is what `quantize` is.
-  const kind: ColorScaleKind = bins !== undefined && requested === 'sequential' ? 'quantize' : requested;
+  const kind: ColorScaleKind =
+    bins !== undefined && requested === 'sequential' ? 'quantize' : requested;
   const { label, labelFormat } = readCellLabel(rawAttr(attrs, 'cellLabel'));
   return {
     kind,

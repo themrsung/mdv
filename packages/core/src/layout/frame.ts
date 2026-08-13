@@ -241,7 +241,8 @@ export function computeFrame(request: FrameRequest): BlockFrame {
         };
   const afterReserved: Rect =
     reservedInsets === undefined ? afterLegend : insetRect(afterLegend, reservedInsets);
-  const reservedFrames = reservedInsets && reservedBands(afterLegend, afterReserved, reservedInsets);
+  const reservedFrames =
+    reservedInsets && reservedBands(afterLegend, afterReserved, reservedInsets);
 
   // ── Axes, by iteration ──────────────────────────────────────────────────────
   let plot = afterReserved;
@@ -303,7 +304,12 @@ function reservedBands(outer: Rect, inner: Rect, insets: Insets): ReservedFrames
     bands.left = { x: outer.x, y: inner.y, width: insets.left, height: inner.height };
   }
   if (insets.right > 0) {
-    bands.right = { x: inner.x + inner.width, y: inner.y, width: insets.right, height: inner.height };
+    bands.right = {
+      x: inner.x + inner.width,
+      y: inner.y,
+      width: insets.right,
+      height: inner.height,
+    };
   }
   return bands;
 }

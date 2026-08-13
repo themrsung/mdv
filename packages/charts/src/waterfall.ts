@@ -321,10 +321,7 @@ export const waterfallChart: ChartType<BarMark> = {
     const categoryChannel = firstChannelOf(block.encoding, ['category', 'x', 'label']);
     if (categoryChannel?.field === undefined) {
       diagnostics.push(missingChannel(block, 'category', 'the step each bar names'));
-    } else if (
-      findColumn(table, categoryChannel.field) === undefined &&
-      table.fields.length > 0
-    ) {
+    } else if (findColumn(table, categoryChannel.field) === undefined && table.fields.length > 0) {
       diagnostics.push(
         blockDiagnostic(
           'MDV3000',
@@ -337,9 +334,7 @@ export const waterfallChart: ChartType<BarMark> = {
 
     const valueChannel = firstChannelOf(block.encoding, ['value', 'y']);
     if (valueChannel?.field === undefined) {
-      diagnostics.push(
-        missingChannel(block, 'value', 'the signed change each step contributes'),
-      );
+      diagnostics.push(missingChannel(block, 'value', 'the signed change each step contributes'));
     } else {
       const bound = bindField(table, valueChannel);
       if (bound === undefined) {
@@ -412,8 +407,7 @@ export const waterfallChart: ChartType<BarMark> = {
     let dropped = 0;
     for (let row = 0; row < table.rows.length; row += 1) {
       const label = formatValue(cell(table, row, categoryBound.index), categoryFormat);
-      const isTotal =
-        totalColumn !== undefined && marksTotal(cell(table, row, totalColumn.index));
+      const isTotal = totalColumn !== undefined && marksTotal(cell(table, row, totalColumn.index));
       if (isTotal) {
         entries.push({
           label,
@@ -636,7 +630,11 @@ export const waterfallChart: ChartType<BarMark> = {
       const nodeId = ctx.ids.next('bar');
       // The rounding sits on the end the step travelled to, which for a total is
       // the same rule a bar follows against its baseline (SPEC 11.4).
-      const radii = clampRadii(barRadii(plan.corner, true, entry.end >= entry.start), width, height);
+      const radii = clampRadii(
+        barRadii(plan.corner, true, entry.end >= entry.start),
+        width,
+        height,
+      );
       nodes.push({
         kind: 'rect',
         id: nodeId,

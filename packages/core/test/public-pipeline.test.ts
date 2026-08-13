@@ -235,7 +235,12 @@ describe('SPEC Appendix E — the worked example', () => {
 
     const codes: string[] = [];
     const ctx = createLayoutContext(resolved, block!, (d) => codes.push(d.code));
-    const scene = layoutBlock(block!, { width: 800, height: 300 }, ctx, registryFromPlugins(CONFIG));
+    const scene = layoutBlock(
+      block!,
+      { width: 800, height: 300 },
+      ctx,
+      registryFromPlugins(CONFIG),
+    );
 
     // A notice naming the type, a real table underneath it, and an SVG: the
     // block degrades, and is neither dropped nor turned into an error card.

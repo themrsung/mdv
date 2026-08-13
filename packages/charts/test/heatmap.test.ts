@@ -411,11 +411,7 @@ describe('heatmap: the ramp (SPEC 8.9, 11.3)', () => {
 
   it('labels the ends and the middle of a continuous ramp', () => {
     const run = runChart(heatmapChart, grid(), { encoding: XYV });
-    expect(run.encoded.legend?.ramp?.labels.map((label) => label.text)).toEqual([
-      '1',
-      '3.5',
-      '6',
-    ]);
+    expect(run.encoded.legend?.ramp?.labels.map((label) => label.text)).toEqual(['1', '3.5', '6']);
   });
 
   it('labels the cuts of a classed ramp', () => {
@@ -672,8 +668,12 @@ describe('heatmap: hit regions (SPEC 12.4)', () => {
 
   it('covers the cell it answers for', () => {
     const run = runChart(heatmapChart, grid(), { encoding: XYV, frame: GRID_FRAME });
-    expect([run.laid.hits[0]?.x, run.laid.hits[0]?.y, run.laid.hits[0]?.w, run.laid.hits[0]?.h])
-      .toEqual([1, 1, 118, 98]);
+    expect([
+      run.laid.hits[0]?.x,
+      run.laid.hits[0]?.y,
+      run.laid.hits[0]?.w,
+      run.laid.hits[0]?.h,
+    ]).toEqual([1, 1, 118, 98]);
   });
 
   it('reads out both keys and the measure, the measure emphasised', () => {
