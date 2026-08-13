@@ -17,6 +17,7 @@ import { barChart } from './bar.js';
 import { boxChart } from './box.js';
 import { bubbleChart, scatterChart } from './scatter.js';
 import { donutChart, pieChart } from './pie.js';
+import { gaugeChart } from './gauge.js';
 import { heatmapChart } from './heatmap.js';
 import { histogramChart } from './histogram.js';
 import { lineChart } from './line.js';
@@ -32,6 +33,8 @@ export { barChart } from './bar.js';
 export { boxChart } from './box.js';
 export { bubbleChart, scatterChart } from './scatter.js';
 export { donutChart, pieChart } from './pie.js';
+export { gaugeChart } from './gauge.js';
+export type { GaugeEncodeResult } from './gauge.js';
 export { heatmapChart } from './heatmap.js';
 export { histogramChart } from './histogram.js';
 export { lineChart } from './line.js';
@@ -73,8 +76,8 @@ export const LEVEL_1_TYPE_NAMES = [
  * `candlestick`, `radar`, `gauge`, `funnel`, `waterfall`, `treemap`, `sankey`,
  * `sparkline`.
  *
- * `box`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar` and `waterfall` are
- * drawn (see
+ * `box`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar` and
+ * `waterfall` are drawn (see
  * {@link level2ChartTypes}). The rest are registered as known-but-unimplemented:
  * they render their data as a table with `MDV1500` (SPEC 15.2) rather than
  * erroring. `candlestick` resolves through `ohlc`'s alias, so there are twelve
@@ -128,6 +131,7 @@ export const level1ChartTypes: readonly ChartType[] = [
  */
 export const level2ChartTypes: readonly ChartType[] = [
   boxChart,
+  gaugeChart,
   heatmapChart,
   histogramChart,
   ohlcChart,

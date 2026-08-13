@@ -20,7 +20,7 @@ import {
   createUnimplementedChartType,
   level1ChartTypes,
 } from '../src/index.js';
-import { codesOf, makeTable, nodesOfKind, nonFiniteNumbers, runChart } from './harness.js';
+import { attrsOf, codesOf, makeTable, nodesOfKind, nonFiniteNumbers, runChart } from './harness.js';
 
 /** A hand-built OHLC table — the data a Level 2 document would bring. */
 function prices() {
@@ -271,7 +271,6 @@ describe('the stubs stay honest about being stubs', () => {
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
     expect(levels.get('funnel')).toBe(2);
-    expect(levels.get('gauge')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
@@ -280,10 +279,10 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('drops a name from the list the moment the real module lands', () => {
     // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
-    // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall` and
-    // `radar` (SPEC 8.12). This list is the *only* thing that decides whether
-    // a name degrades, so a name left on it after its module arrives would keep
-    // drawing the table however complete the module is.
+    // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall`,
+    // `radar` and `gauge` (SPEC 8.12). This list is the *only* thing that
+    // decides whether a name degrades, so a name left on it after its module
+    // arrives would keep drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
     expect(names).not.toContain('histogram');
     expect(names).not.toContain('box');
@@ -293,6 +292,7 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('candlestick');
     expect(names).not.toContain('waterfall');
     expect(names).not.toContain('radar');
+    expect(names).not.toContain('gauge');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
@@ -328,5 +328,14 @@ describe('the stubs stay honest about being stubs', () => {
     });
     expect(codesOf(spider)).toEqual([]);
     expect(nodesOfKind(spider.laid.nodes, 'circle').length).toBeGreaterThan(0);
+    // A gauge draws no rectangles either: its track and its fill are annular
+    // sectors. One row keeps it silent — many rows are a reading, not a shape,
+    // and the reduction is reported (`MDV3050`), which is its own test.
+    const dial = runChart(byName('gauge'), prices(), {
+      encoding: { value: { field: 'close' } },
+      attrs: attrsOf({ max: 100 }),
+    });
+    expect(codesOf(dial)).toEqual(['MDV3050']);
+    expect(nodesOfKind(dial.laid.nodes, 'path').length).toBeGreaterThan(0);
   });
 });
