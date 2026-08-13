@@ -265,12 +265,13 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('targets the row, because the row is what is on screen', () => {
-    expect(byName('funnel').family).toBe('mark');
+    expect(byName('sankey').family).toBe('mark');
   });
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('funnel')).toBe(2);
+    expect(levels.get('treemap')).toBe(2);
+    expect(levels.get('sankey')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
@@ -280,7 +281,7 @@ describe('the stubs stay honest about being stubs', () => {
   it('drops a name from the list the moment the real module lands', () => {
     // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
     // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall`,
-    // `radar` and `gauge` (SPEC 8.12). This list is the *only* thing that
+    // `radar`, `gauge` and `funnel` (SPEC 8.12). This list is the *only* thing that
     // decides whether a name degrades, so a name left on it after its module
     // arrives would keep drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
@@ -293,6 +294,7 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('waterfall');
     expect(names).not.toContain('radar');
     expect(names).not.toContain('gauge');
+    expect(names).not.toContain('funnel');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);

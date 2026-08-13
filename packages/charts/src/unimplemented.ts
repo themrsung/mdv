@@ -165,14 +165,13 @@ interface UnimplementedSpec {
  * Every Level 2 and Level 3 type in SPEC 16.1 this reader does not draw, sorted
  * by name.
  *
- * `box`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar` and
- * `waterfall` are absent because they are drawn for real; `candlestick` is
+ * `box`, `funnel`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar`
+ * and `waterfall` are absent because they are drawn for real; `candlestick` is
  * absent because SPEC 8.11 makes it an **alias** of `ohlc`, and the registry
  * resolves aliases, so registering it separately would produce two types that
  * disagree about their own name.
  */
 export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
-  { name: 'funnel', level: 2, summary: 'a funnel of stage-to-stage conversion' },
   { name: 'gantt', level: 3, summary: 'a Gantt chart of the schedule' },
   { name: 'map', level: 3, summary: 'a choropleth or point map' },
   { name: 'network', level: 3, summary: 'a node-link diagram' },
