@@ -34,6 +34,7 @@ import { loadExternal, type FetchSecurity } from './data/fetch.js';
 import type { FormatContext } from './data/format.js';
 import { effectiveLimits } from './data/limits.js';
 import type { SectionOptions } from './data/parse-section.js';
+import type { MatrixFields } from './data/table-format.js';
 import { parseIso8601, type TimeZoneSpec } from './data/temporal.js';
 import {
   DATASET_BLOCK,
@@ -191,7 +192,12 @@ export function collectDatasets(doc: MdvDocument, diag: DiagCollector): Collecte
     }
 
     const request = blockRequest(block, index, declarations, scoped, range);
-    if (request.reference === `@${inlineDatasetId(index)}`) {
+    // Reader options belong to a section; a block that turned out to carry none
+    // (the last declaration is `implicit`) keeps `header:`/`columns:` for itself.
+    if (
+      request.reference === `@${inlineDatasetId(index)}` &&
+      declarations[declarations.length - 1]?.implicit !== true
+    ) {
       addSectionOptions(sectionOptions, inlineDatasetId(index), block.attrs);
     }
     blocks.push(request);
@@ -212,7 +218,32 @@ function addSectionOptions(into: Record<string, SectionOptions>, id: string, att
   if (Array.isArray(columns) && columns.every((name) => typeof name === 'string')) {
     section.columns = columns as readonly string[];
   }
+  const matrixFields = matrixFieldsFrom(attrs);
+  if (matrixFields !== undefined) section.matrixFields = matrixFields;
   if (Object.keys(section).length > 0) into[id] = section;
+}
+
+/**
+ * Name a `matrix` section's three columns after the block's own axes.
+ *
+ * The row key is the `y` axis and the column key is the `x` axis, which is the
+ * mapping SPEC 8.9 uses when it calls the matrix form equivalent to the long
+ * form. Only a complete, distinct set of names is taken: a partial rename would
+ * leave the author guessing which half of the grid answers to which spelling.
+ */
+function matrixFieldsFrom(attrs: AttrMap): MatrixFields | undefined {
+  const [row, column, value] = ['y', 'x', 'value'].map((name) => fieldNameOf(attrs[name]));
+  if (row === undefined || column === undefined || value === undefined) return undefined;
+  if (new Set([row, column, value]).size !== 3) return undefined;
+  return [row, column, value];
+}
+
+/** The field an axis attribute names, whether written bare or as a mapping. */
+function fieldNameOf(value: AttrValue | undefined): string | undefined {
+  if (typeof value === 'string') return value.length > 0 ? value : undefined;
+  if (!isMap(value)) return undefined;
+  const field = value['field'];
+  return typeof field === 'string' && field.length > 0 ? field : undefined;
 }
 
 function isMap(value: AttrValue | undefined): value is AttrMap {
@@ -275,6 +306,22 @@ function blockRequest(
   // Anything else the block carries is its own dataset, registered under a
   // synthetic id so one code path prepares every table.
   const id = inlineDatasetId(index);
+
+  // A block with no section, no `src:` and no `from:` carries no data, and the
+  // reader options are not its attributes to spend. `format:` is the clearest
+  // case: it selects the data-section syntax (SPEC 6.2) *for a data section*,
+  // but on a `metric` it is the number format (SPEC 8.13), and a tile stating
+  // one number should not be told its `"$~s"` is an unknown data format.
+  if (section === undefined && typeof src !== 'string' && block.attrs['from'] === undefined) {
+    declarations.push({ id, origin: 'inline', range, implicit: true });
+    return {
+      block,
+      index,
+      reference: `@${id}`,
+      ...(transform !== undefined ? { transform } : {}),
+    };
+  }
+
   const declaration: DatasetDeclaration = {
     id,
     origin: 'inline',

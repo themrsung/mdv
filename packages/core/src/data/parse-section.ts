@@ -17,7 +17,12 @@ import type { DiagCollector } from './diag.js';
 import { parseJson, parseNdjson } from './json.js';
 import { isBlank, splitLines } from './raw.js';
 import type { ParsedData } from './raw.js';
-import { parseMatrix, parseTableFormat } from './table-format.js';
+import {
+  DEFAULT_MATRIX_FIELDS,
+  parseMatrix,
+  parseTableFormat,
+  type MatrixFields,
+} from './table-format.js';
 
 /** Formats available at each conformance level (SPEC 6.2, SPEC 16.1). */
 export const LEVEL_1_FORMATS: readonly ConcreteFormat[] = Object.freeze(['table', 'csv', 'tsv']);
@@ -33,6 +38,11 @@ export interface SectionOptions {
   /** `columns:` for a JSON array of arrays (SPEC 6.2.3). */
   columns?: readonly string[] | undefined;
   maxFlattenDepth?: number | undefined;
+  /**
+   * Names for the three columns a `matrix` section synthesises (SPEC 6.2.5),
+   * taken from the block's own `y`/`x`/`value` when it names them.
+   */
+  matrixFields?: MatrixFields | undefined;
   /** The level in force; a Level 2 format below it is still read, with a note. */
   level?: ConformanceLevel | undefined;
 }
@@ -114,7 +124,7 @@ function read(
     case 'columns':
       return parseColumns(raw, diag);
     case 'matrix':
-      return parseMatrix(raw, diag);
+      return parseMatrix(raw, diag, options.matrixFields ?? DEFAULT_MATRIX_FIELDS);
     default:
       return { fields: [], rows: [] };
   }

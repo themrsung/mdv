@@ -159,10 +159,15 @@ function prepareNode(node: DatasetNode, ctx: NodeContext, cache: TableCache): vo
     return;
   }
 
-  diag.emit('MDV2100', {
-    message: `Dataset \`${node.id}\` has no data`,
-    detail: 'Declare a data section, a `from:` dataset, or a `src:` (SPEC 6.3).',
-  });
+  // A block that carried nothing asked for nothing: it gets an empty table and
+  // no complaint. A *declared* dataset with no data is an author error, because
+  // the only reason to declare one is for something to read it.
+  if (node.implicit !== true) {
+    diag.emit('MDV2100', {
+      message: `Dataset \`${node.id}\` has no data`,
+      detail: 'Declare a data section, a `from:` dataset, or a `src:` (SPEC 6.3).',
+    });
+  }
   node.table = emptyTable();
   node.state = 'ready';
 }

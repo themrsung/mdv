@@ -35,8 +35,13 @@ import type { Range as MdvRange } from '@mdv/parser';
 /** A document with no MDV block: one info diagnostic, at offset 0. */
 const PLAIN = '# Hello\n\nNothing to see.\n';
 
-/** A block with no data section: MDV2100, a *warning*, so `strict` can bite. */
-const EMPTY_BLOCK = '```mdv\ntype: bar\nx: a\ny: b\n```\n';
+/**
+ * A *declared* dataset with no data: MDV2100, a *warning*, so `strict` can bite.
+ *
+ * A visual block with no data section would not do — the dataset it gets is
+ * implicit (SPEC 6.3), so it raises nothing at the data stage.
+ */
+const EMPTY_BLOCK = '```mdv dataset\nid: sales\n```\n';
 
 const URI = 'file:///a.mdv';
 

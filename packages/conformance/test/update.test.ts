@@ -125,13 +125,13 @@ describe('what an update mints', () => {
 
   it('mints diagnostics as the fingerprints the runner compares', async () => {
     const temp = await fresh();
-    await temp.addCase('syntax/bar/no-data', {
+    await temp.addCase('syntax/dataset/no-data', {
       meta: pinning('diagnostics'),
       source: NO_DATA_CASE,
     });
 
     await updateCorpus(temp.root);
-    const text = await read(temp, 'syntax/bar/no-data', GOLDEN_FILE_OF.diagnostics);
+    const text = await read(temp, 'syntax/dataset/no-data', GOLDEN_FILE_OF.diagnostics);
 
     expect(JSON.parse(text ?? 'null')).toEqual([
       expect.objectContaining({ code: 'MDV2100', severity: 'warning' }),

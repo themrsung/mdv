@@ -14,8 +14,9 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { builtinChartTypes } from '@mdv/charts';
+import { builtinChartTypes, unimplementedChartTypes } from '@mdv/charts';
 import { toSvgString } from '@mdv/render-svg';
+import { getBuiltinTheme } from '@mdv/themes';
 import {
   Mdv,
   createLayoutContext,
@@ -51,10 +52,17 @@ const SOURCE = appendixE();
  * `builtinChartTypes` rather than `chartTypesForLevel(2)`: the stubs for the
  * types this build does not draw turn "unknown block type" into a table that
  * names the type and the level it needs (SPEC 15.2), which is what the worked
- * example's `ohlcv` and `heatmap` blocks should produce today.
+ * example's `ohlcv` block should produce today.
+ *
+ * The theme is the real one from `@mdv/themes`, not core's fallback. Core has no
+ * colour engine, so its fallback carries no per-hue ramps and the example's
+ * `scheme: blue` (SPEC 8.9) would degrade to the theme sequential with an
+ * `MDV1502`. That is the honest answer for a host that skips `@mdv/themes`, and
+ * the wrong one to measure the specification's own example against.
  */
 const CONFIG: MdvConfig = {
   plugins: [{ name: 'builtins', version: '0.0.0', chartTypes: builtinChartTypes }],
+  theme: getBuiltinTheme('default'),
   svg: toSvgString,
 };
 
@@ -185,21 +193,30 @@ describe('SPEC Appendix E — the worked example', () => {
     const resolved = await resolve(parse(SOURCE), CONFIG);
     const registry = registryFromPlugins(CONFIG);
 
-    for (const name of ['ohlcv', 'heatmap']) {
-      const block = resolved.blocks.find((b) => b.blockType === name);
-      expect(block, name).toBeDefined();
-      if (block === undefined) continue;
+    // Which names degrade is read off the build, not written down here: the
+    // stub list shrinks as modules land, and a hard-coded copy would either go
+    // stale or, worse, keep passing by asserting the old answer.
+    const stubbed = new Set(unimplementedChartTypes.map((type) => type.name));
 
+    for (const block of resolved.blocks) {
+      const name = block.blockType;
       const codes: string[] = [];
       const ctx = createLayoutContext(resolved, block, (d) => codes.push(d.code));
       const scene = layoutBlock(block, { width: 800, height: 300 }, ctx, registry);
 
       // SPEC 15.2: a Level 2 type in a build that cannot draw it becomes a table
-      // with a notice, never an error and never a dropped block.
-      expect(codes, name).toContain('MDV1500');
+      // with a notice, never an error and never a dropped block. A type this
+      // build *does* draw must not carry the notice — the degradation path and
+      // the real renderer are mutually exclusive, per block.
+      expect(codes.includes('MDV1500'), name).toBe(stubbed.has(name));
       expect(scene.a11y?.table?.rows.length ?? 0, name).toBeGreaterThan(0);
       expect(toSvgString(scene).startsWith('<svg'), name).toBe(true);
     }
+
+    // The example is only evidence of degradation while it still contains a
+    // type this build stubs; when that stops being true, SPEC 15.2 needs a
+    // fixture of its own rather than a silently vacuous loop.
+    expect(resolved.blocks.some((b) => stubbed.has(b.blockType))).toBe(true);
   });
 });
 

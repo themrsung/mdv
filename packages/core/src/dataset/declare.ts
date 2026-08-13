@@ -47,6 +47,8 @@ export interface DatasetDeclaration {
   transform?: TransformPipeline | undefined;
   show?: 'none' | 'table' | undefined;
   range?: Range | undefined;
+  /** The block carried no data at all; see {@link DatasetNode.implicit}. */
+  implicit?: boolean | undefined;
 }
 
 /**
@@ -106,6 +108,7 @@ function toNode(declaration: DatasetDeclaration): DatasetNode {
     ...(declaration.transform !== undefined ? { transform: declaration.transform } : {}),
     ...(declaration.show !== undefined ? { show: declaration.show } : {}),
     ...(declaration.range !== undefined ? { range: declaration.range } : {}),
+    ...(declaration.implicit === true ? { implicit: true } : {}),
   };
 }
 

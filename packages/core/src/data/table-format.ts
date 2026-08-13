@@ -118,16 +118,34 @@ export function parseTableFormat(input: string, _diag: DiagCollector): ParsedDat
   return align === undefined ? { fields, rows } : { fields, rows, align };
 }
 
+/** The long-table column names a matrix section produces, in order. */
+export type MatrixFields = readonly [row: string, column: string, value: string];
+
+/** The names SPEC 6.2.5 gives the three synthesised columns. */
+export const DEFAULT_MATRIX_FIELDS: MatrixFields = ['row', 'column', 'value'];
+
 /**
  * Parse a `matrix` data section (SPEC 6.2.5).
  *
  * The first row is the column key, the first column of each row is the row key,
  * and the result is the three-field long table (`row`, `column`, `value`) the
  * encoder actually receives.
+ *
+ * A block that names its axes renames the three columns to match, because SPEC
+ * 8.9 says the matrix form is *equivalent* to the long form it shows beside it —
+ * and equivalence has to survive channel resolution, where a bare `x: hour` is a
+ * field reference only if `hour` is a column (SPEC 7.1.2). Left as `row` and
+ * `column` the same document would silently read `hour` as a constant. Nothing
+ * changes for a section with no encoding to borrow names from, which is the
+ * shape §6.2.5 itself documents.
  */
-export function parseMatrix(input: string, diag: DiagCollector): ParsedData {
+export function parseMatrix(
+  input: string,
+  diag: DiagCollector,
+  fields: MatrixFields = DEFAULT_MATRIX_FIELDS,
+): ParsedData {
   const grid = parseTableFormat(input, diag);
-  if (grid.fields.length === 0) return { fields: ['row', 'column', 'value'], rows: [] };
+  if (grid.fields.length === 0) return { fields: [...fields], rows: [] };
 
   const columnKeys = grid.fields.slice(1);
   const rows: RawCell[][] = [];
@@ -137,5 +155,5 @@ export function parseMatrix(input: string, diag: DiagCollector): ParsedData {
       rows.push([rowKey, columnKeys[c] as string, line[c + 1] ?? null]);
     }
   }
-  return { fields: ['row', 'column', 'value'], rows };
+  return { fields: [...fields], rows };
 }

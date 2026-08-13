@@ -127,14 +127,17 @@ A case with no visual block still parses, round-trips and resolves.
 `;
 
 /**
- * A chart with no data section. Resolves to exactly one diagnostic, which makes
- * it the stable target for a `diagnostics.json` golden — a case that pins its
- * *diagnostics* pins nothing about the renderer, so the test does not have to
- * reproduce an SVG to exercise a passing golden comparison.
+ * A *declared* dataset with no data. Resolves to exactly one diagnostic, which
+ * makes it the stable target for a `diagnostics.json` golden — a case that pins
+ * its *diagnostics* pins nothing about the renderer, so the test does not have
+ * to reproduce an SVG to exercise a passing golden comparison.
+ *
+ * A visual block with no data section would not do: it raises nothing at the
+ * data stage (the dataset it gets is implicit, SPEC 6.3) and two `MDV3000`s at
+ * the encode stage instead, which is three fingerprints and a chart contract.
  */
-export const NO_DATA_CASE = `\`\`\`mdv bar
-x: region
-y: revenue
+export const NO_DATA_CASE = `\`\`\`mdv dataset
+id: sales
 \`\`\`
 `;
 

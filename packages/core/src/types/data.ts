@@ -297,6 +297,16 @@ export interface DatasetNode {
   range?: Range;
   /** `show: table` renders the dataset as an enhanced table at its location. */
   show?: 'none' | 'table';
+  /**
+   * Synthesised for a visual block that carried no data of its own (SPEC 6.3).
+   *
+   * A block always gets a dataset so that one code path prepares every table,
+   * but a block with no data section, no `from:` and no `src:` is not an empty
+   * dataset — it is a block that needs none, and `MDV2100` would be noise. A
+   * `metric` states its number outright; whether a block that *does* need rows
+   * can draw without them is its own contract to report (`MDV3000`).
+   */
+  implicit?: boolean;
 }
 
 /**
