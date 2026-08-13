@@ -219,6 +219,7 @@ export type {
   LayoutA11yOptions,
   LayoutContext,
   Rect,
+  ReservedFrames,
   Size,
   TextMetrics,
 } from './layout.js';

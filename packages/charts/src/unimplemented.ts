@@ -155,18 +155,20 @@ interface UnimplementedSpec {
   readonly name: string;
   /** The conformance level that must be implemented before this type appears. */
   readonly level: ConformanceLevel;
-  /** Alternative spellings, e.g. `candlestick` → `ohlcv` (SPEC 16.1). */
+  /** Alternative spellings the registry should resolve to this type (SPEC 16.1). */
   readonly aliases?: readonly string[];
   /** One clause naming what the reader would have drawn, for the diagnostic. */
   readonly summary: string;
 }
 
 /**
- * Every Level 2 and Level 3 type in SPEC 16.1, sorted by name.
+ * Every Level 2 and Level 3 type in SPEC 16.1 this reader does not draw, sorted
+ * by name.
  *
- * `candlestick` is not an entry: SPEC 16.1 makes it an **alias** of `ohlcv`, and
- * the registry resolves aliases, so registering it separately would produce two
- * types that disagree about their own name.
+ * `box`, `heatmap`, `histogram`, `ohlc` and `ohlcv` are absent because they are
+ * drawn for real; `candlestick` is absent because SPEC 8.11 makes it an
+ * **alias** of `ohlc`, and the registry resolves aliases, so registering it
+ * separately would produce two types that disagree about their own name.
  */
 export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
   { name: 'funnel', level: 2, summary: 'a funnel of stage-to-stage conversion' },
@@ -174,13 +176,6 @@ export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
   { name: 'gauge', level: 2, summary: 'a gauge of the value against its range' },
   { name: 'map', level: 3, summary: 'a choropleth or point map' },
   { name: 'network', level: 3, summary: 'a node-link diagram' },
-  { name: 'ohlc', level: 2, summary: 'an open-high-low-close price chart' },
-  {
-    name: 'ohlcv',
-    level: 2,
-    aliases: ['candlestick'],
-    summary: 'a candlestick price-and-volume chart',
-  },
   { name: 'radar', level: 2, summary: 'a radar chart across the axes' },
   { name: 'sankey', level: 2, summary: 'a Sankey diagram of the flows' },
   { name: 'sparkline', level: 2, summary: 'an inline sparkline' },

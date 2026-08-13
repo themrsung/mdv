@@ -227,10 +227,17 @@ export function layoutBlock(
   // object literal of the fields core happens to care about would drop `state`,
   // `a11yTable`, `boundColumns`, `droppedRows` and `reserved` — and every chart
   // would silently fall back to its defaults, with no type error and no
-  // diagnostic. Only `scales` and `axes` are core's to replace.
+  // diagnostic. Only `scales`, `axes` and `reservedFrames` are core's to write:
+  // the last of those is the answer to `encoded.reserved`, which a type cannot
+  // work out for itself because the axes are measured after the reservation.
   const blockAxes = frame.axes.map((geometry) => geometry.model);
   const scales = rerangeBundle(encoded.scales, encoded.axes, blockAxes, frame.plot);
-  const forLayout: EncodeResult = { ...encoded, scales, axes: blockAxes };
+  const forLayout: EncodeResult = {
+    ...encoded,
+    scales,
+    axes: blockAxes,
+    ...(frame.reservedFrames === undefined ? {} : { reservedFrames: frame.reservedFrames }),
+  };
 
   // ── Faceting (SPEC 7.6) ─────────────────────────────────────────────────────
   const plan = faceted

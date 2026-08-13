@@ -16,7 +16,7 @@
 
 import type { BlockAttrs } from '../types/attrs.js';
 import type { AxisModel, LegendModel } from '../types/encode.js';
-import type { Insets, LayoutContext, Rect, Size } from '../types/layout.js';
+import type { Insets, LayoutContext, Rect, ReservedFrames, Size } from '../types/layout.js';
 import type { SceneNode } from '../types/scene.js';
 import type { Reporter } from '../encode/report.js';
 import type { AxisGeometry } from './axis.js';
@@ -71,6 +71,8 @@ export interface BlockFrame {
   content: Rect;
   /** The plot rectangle handed to the chart type. */
   plot: Rect;
+  /** Where {@link FrameRequest.reserved} landed, for the type that asked. */
+  reservedFrames: ReservedFrames | undefined;
   /** Where the legend box was placed, when there is one. */
   legendBox: Rect | undefined;
   legend: LegendGeometry | undefined;
@@ -228,15 +230,18 @@ export function computeFrame(request: FrameRequest): BlockFrame {
 
   // ── Chart-reserved space ────────────────────────────────────────────────────
   const reserved = request.reserved;
-  const afterReserved: Rect =
+  const reservedInsets: Insets | undefined =
     reserved === undefined
-      ? afterLegend
-      : insetRect(afterLegend, {
+      ? undefined
+      : {
           top: Math.max(0, reserved.top ?? 0),
           right: Math.max(0, reserved.right ?? 0),
           bottom: Math.max(0, reserved.bottom ?? 0),
           left: Math.max(0, reserved.left ?? 0),
-        });
+        };
+  const afterReserved: Rect =
+    reservedInsets === undefined ? afterLegend : insetRect(afterLegend, reservedInsets);
+  const reservedFrames = reservedInsets && reservedBands(afterLegend, afterReserved, reservedInsets);
 
   // ── Axes, by iteration ──────────────────────────────────────────────────────
   let plot = afterReserved;
@@ -265,6 +270,7 @@ export function computeFrame(request: FrameRequest): BlockFrame {
     outer,
     content,
     plot,
+    reservedFrames,
     legendBox,
     legend,
     axes,
@@ -272,6 +278,34 @@ export function computeFrame(request: FrameRequest): BlockFrame {
     compact,
     padding: padding ?? DEFAULT_PADDING,
   };
+}
+
+/**
+ * The four bands between the box a reservation was taken out of and what was
+ * left of it.
+ *
+ * Each band spans the *outer* box along its own edge, so the corners belong to
+ * the vertical bands — a chart reserving both `bottom` and `left` gets a full
+ * width volume pane and a left gutter that stops above it. Zero-width edges are
+ * omitted rather than returned empty, so `frames.bottom !== undefined` is a
+ * usable test for "I asked and I got it".
+ */
+function reservedBands(outer: Rect, inner: Rect, insets: Insets): ReservedFrames {
+  const bands: ReservedFrames = {};
+  if (insets.top > 0) {
+    bands.top = { x: outer.x, y: outer.y, width: outer.width, height: insets.top };
+  }
+  if (insets.bottom > 0) {
+    const y = inner.y + inner.height;
+    bands.bottom = { x: outer.x, y, width: outer.width, height: insets.bottom };
+  }
+  if (insets.left > 0) {
+    bands.left = { x: outer.x, y: inner.y, width: insets.left, height: inner.height };
+  }
+  if (insets.right > 0) {
+    bands.right = { x: inner.x + inner.width, y: inner.y, width: insets.right, height: inner.height };
+  }
+  return bands;
 }
 
 /** Measure every axis against a candidate plot rectangle. */

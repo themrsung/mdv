@@ -104,17 +104,22 @@ North,120
       expect(await covers(TREEMAP, { checks: ['render'] })).toContain('data.csv');
     });
 
-    it('does not claim the alias either, since `ohlc` and `candlestick` are two ids', async () => {
+    it('claims the spelling the author wrote, since `ohlc` and `candlestick` are two ids', async () => {
       const CANDLESTICK = `\`\`\`mdv candlestick
 x: date
 ---
 date,open,high,low,close
 2026-01-02,1,2,0,1
+2026-01-03,1,3,1,2
 \`\`\`
 `;
       const ids = await covers(CANDLESTICK, { checks: ['render'] });
 
-      expect(ids).not.toContain('type.candlestick');
+      // `candlestick` is an alias of `ohlc` and both now draw, so the block is
+      // evidence for the requirement it is written as and for no other. Were
+      // the pair still stubbed, neither id would appear: the stub list is
+      // flattened over aliases precisely so an alias cannot smuggle in a claim.
+      expect(ids).toContain('type.candlestick');
       expect(ids).not.toContain('type.ohlc');
     });
 

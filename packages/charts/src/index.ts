@@ -21,6 +21,7 @@ import { heatmapChart } from './heatmap.js';
 import { histogramChart } from './histogram.js';
 import { lineChart } from './line.js';
 import { metricChart } from './metric.js';
+import { ohlcChart, ohlcvChart } from './ohlc.js';
 import { tableChart } from './table.js';
 import { unimplementedChartTypes } from './unimplemented.js';
 
@@ -33,6 +34,7 @@ export { heatmapChart } from './heatmap.js';
 export { histogramChart } from './histogram.js';
 export { lineChart } from './line.js';
 export { metricChart } from './metric.js';
+export { ohlcChart, ohlcvChart } from './ohlc.js';
 export { tableChart } from './table.js';
 export {
   UNIMPLEMENTED_TYPES,
@@ -66,10 +68,11 @@ export const LEVEL_1_TYPE_NAMES = [
  * `candlestick`, `radar`, `gauge`, `funnel`, `waterfall`, `treemap`, `sankey`,
  * `sparkline`.
  *
- * `histogram` and `box` are drawn (see {@link level2ChartTypes}). The rest are registered
- * as known-but-unimplemented: they render their data as a table with `MDV1500`
- * (SPEC 15.2) rather than erroring. `candlestick` resolves through `ohlcv`'s
- * alias, so there are twelve registrations for thirteen names.
+ * `box`, `heatmap`, `histogram`, `ohlc` and `ohlcv` are drawn (see
+ * {@link level2ChartTypes}). The rest are registered as known-but-unimplemented:
+ * they render their data as a table with `MDV1500` (SPEC 15.2) rather than
+ * erroring. `candlestick` resolves through `ohlc`'s alias, so there are twelve
+ * registrations for thirteen names.
  */
 export const LEVEL_2_TYPE_NAMES = [
   'box',
@@ -117,7 +120,13 @@ export const level1ChartTypes: readonly ChartType[] = [
  * separately keeps `chartTypesForLevel` honest: a type is in the list for its
  * own level whether it draws or degrades, and this is the set that draws.
  */
-export const level2ChartTypes: readonly ChartType[] = [boxChart, heatmapChart, histogramChart];
+export const level2ChartTypes: readonly ChartType[] = [
+  boxChart,
+  heatmapChart,
+  histogramChart,
+  ohlcChart,
+  ohlcvChart,
+];
 
 /**
  * Every built-in chart type, sorted by name.

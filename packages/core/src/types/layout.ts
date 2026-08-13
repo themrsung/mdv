@@ -26,6 +26,26 @@ export interface Rect {
   height: number;
 }
 
+/**
+ * Where the space a chart type reserved actually landed, in scene coordinates.
+ *
+ * `EncodeResult.reserved` is a *request*, in pixels per edge; this is the
+ * *answer*, one rectangle per edge that was asked for. A type that reserves
+ * space and is never told where it went cannot draw into it — it knows the plot
+ * rectangle, but the reserved band is separated from the plot by whatever the
+ * axes took, which is measured after the reservation and never reported.
+ *
+ * An edge that was not reserved is `undefined`. The rectangles abut the plot's
+ * enclosing box, not the plot: for `bottom`, the band sits below the x-axis
+ * labels, because core insets the reservation before it measures the axes.
+ */
+export interface ReservedFrames {
+  top?: Rect;
+  right?: Rect;
+  bottom?: Rect;
+  left?: Rect;
+}
+
 /** Padding or margins, in CSS pixels (SPEC 8.1 `padding`). */
 export interface Insets {
   top: number;

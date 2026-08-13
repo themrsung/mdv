@@ -126,7 +126,7 @@ describe('heatmap: the grid (SPEC 8.9)', () => {
 
   it('names the three bound columns', () => {
     const run = runChart(heatmapChart, grid(), { encoding: XYV });
-    expect(run.encoded.boundColumns.map((column) => column.name)).toEqual([
+    expect(run.encoded.boundColumns?.map((column) => column.name)).toEqual([
       'day',
       'hour',
       'value',

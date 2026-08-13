@@ -81,7 +81,7 @@ import type {
   ScaleBundle,
   SeriesDescriptor,
 } from './types/encode.js';
-import type { LayoutContext, Rect } from './types/layout.js';
+import type { LayoutContext, Rect, ReservedFrames } from './types/layout.js';
 import type { ResolvedBlock } from './types/resolved.js';
 import type { A11yTable, Def, HitRegion, SceneNode } from './types/scene.js';
 import type { ColorString, Theme } from './types/theme.js';
@@ -252,6 +252,17 @@ export interface EncodeResult<M extends Mark = Mark> {
    * it before computing the frame handed to `layout`.
    */
   reserved?: { top?: number; right?: number; bottom?: number; left?: number };
+  /**
+   * Where that space ended up. **Core writes this on the way into `layout`;
+   * `encode` never sets it** — at encode time the block size is not known.
+   *
+   * Reserving space without being told where it landed is not enough to draw
+   * into it: `layout` is handed the plot rectangle, and the reserved band is
+   * separated from the plot by whatever the axes measured out to, which happens
+   * after the reservation. So the request goes up in `reserved` and the answer
+   * comes back down here, on the same object.
+   */
+  reservedFrames?: ReservedFrames;
   /**
    * Opaque per-type state, carried from `encode` to `layout` untouched.
    *

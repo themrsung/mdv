@@ -211,13 +211,17 @@ function addBlocks(doc: ResolvedDocument, add: (id: string) => void): void {
  * The spellings that resolve to a table-rendering stub (SPEC 15.2).
  *
  * Read off the stubs this build registers rather than written out again here:
- * the day `box` grows a real implementation its entry leaves
+ * the day `sankey` grows a real implementation its entry leaves
  * {@link unimplementedChartTypes}, and the requirement starts being credited
  * without anyone having to remember this file — which is exactly how
- * `type.histogram` began being credited when SPEC 8.7 landed. Aliases are
- * included because
- * `type.candlestick` and `type.ohlc` are separate requirements and a block is
- * spelled whichever way its author wrote it.
+ * `type.histogram` began being credited when SPEC 8.7 landed, and
+ * `type.ohlc` when SPEC 8.10 did.
+ *
+ * Aliases are flattened in because a block is spelled whichever way its author
+ * wrote it, and each spelling is its own requirement: `type.candlestick` and
+ * `type.ohlc` are two ids, so a stub reached through an alias must not credit
+ * either. No stub carries an alias today; the flattening is what keeps that
+ * from mattering when one does.
  */
 const STUBBED: ReadonlySet<string> = new Set(
   unimplementedChartTypes.flatMap((type) => [type.name, ...(type.aliases ?? [])]),

@@ -134,9 +134,13 @@ describe('the built-in list', () => {
     }
   });
 
-  it('resolves `candlestick` through `ohlcv` rather than registering it twice', () => {
+  it('resolves `candlestick` through `ohlc` rather than registering it twice', () => {
+    // SPEC 8.11: `candlestick` is an alias of `ohlc` with `style: candle`, and
+    // `ohlcv` is the one that adds the volume panel. Hanging the alias off
+    // `ohlcv` instead would make `candlestick` require a volume column.
     expect(builtinChartTypes.find((type) => type.name === 'candlestick')).toBeUndefined();
-    expect(byName('ohlcv').aliases).toEqual(['candlestick']);
+    expect(byName('ohlc').aliases).toEqual(['candlestick']);
+    expect(byName('ohlcv').aliases).toBeUndefined();
   });
 });
 
@@ -262,7 +266,7 @@ describe('the stubs stay honest about being stubs', () => {
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
     expect(levels.get('waterfall')).toBe(2);
-    expect(levels.get('ohlcv')).toBe(2);
+    expect(levels.get('gauge')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
@@ -278,6 +282,9 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('histogram');
     expect(names).not.toContain('box');
     expect(names).not.toContain('heatmap');
+    expect(names).not.toContain('ohlc');
+    expect(names).not.toContain('ohlcv');
+    expect(names).not.toContain('candlestick');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
@@ -303,5 +310,8 @@ describe('the stubs stay honest about being stubs', () => {
     );
     expect(codesOf(grid)).toEqual([]);
     expect(nodesOfKind(grid.laid.nodes, 'rect').length).toBeGreaterThan(0);
+    const candles = runChart(byName('ohlc'), prices(), { encoding: { x: { field: 'day' } } });
+    expect(codesOf(candles)).toEqual([]);
+    expect(nodesOfKind(candles.laid.nodes, 'rect').length).toBeGreaterThan(0);
   });
 });

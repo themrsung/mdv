@@ -51,8 +51,9 @@ const SOURCE = appendixE();
  *
  * `builtinChartTypes` rather than `chartTypesForLevel(2)`: the stubs for the
  * types this build does not draw turn "unknown block type" into a table that
- * names the type and the level it needs (SPEC 15.2), which is what the worked
- * example's `ohlcv` block should produce today.
+ * names the type and the level it needs (SPEC 15.2). The worked example no
+ * longer contains such a type — `ohlcv` draws as of SPEC 8.11 — so the stubs
+ * matter here only as the guarantee that a future example cannot fail outright.
  *
  * The theme is the real one from `@mdv/themes`, not core's fallback. Core has no
  * colour engine, so its fallback carries no per-hue ramps and the example's
@@ -213,10 +214,35 @@ describe('SPEC Appendix E — the worked example', () => {
       expect(toSvgString(scene).startsWith('<svg'), name).toBe(true);
     }
 
-    // The example is only evidence of degradation while it still contains a
-    // type this build stubs; when that stops being true, SPEC 15.2 needs a
-    // fixture of its own rather than a silently vacuous loop.
-    expect(resolved.blocks.some((b) => stubbed.has(b.blockType))).toBe(true);
+    // Every type the example uses is now drawn, so the loop above is evidence
+    // that the notice stays *off* the real renderers. The degradation itself
+    // needs a fixture of its own — the next test — rather than a vacuous loop.
+    expect(resolved.blocks.every((b) => !stubbed.has(b.blockType))).toBe(true);
+  });
+
+  it('turns a type this build does not draw into a table with a notice', async () => {
+    // Read the type off the build rather than naming one: `ohlcv` used to be
+    // the example's stub and is not any more, and whichever name is written
+    // here would go the same way. The first stub in the list is as good as any;
+    // a stub accepts every channel, so one generic two-column table serves.
+    const stub = unimplementedChartTypes[0];
+    expect(stub, 'this build draws everything — SPEC 15.2 has nothing left to test').toBeDefined();
+
+    const source = `\`\`\`mdv ${stub!.name}\nx: label\ny: value\n---\nlabel,value\nA,1\nB,2\n\`\`\`\n`;
+    const resolved = await resolve(parse(source), CONFIG);
+    const [block] = resolved.blocks;
+    expect(block, stub!.name).toBeDefined();
+
+    const codes: string[] = [];
+    const ctx = createLayoutContext(resolved, block!, (d) => codes.push(d.code));
+    const scene = layoutBlock(block!, { width: 800, height: 300 }, ctx, registryFromPlugins(CONFIG));
+
+    // A notice naming the type, a real table underneath it, and an SVG: the
+    // block degrades, and is neither dropped nor turned into an error card.
+    expect(codes).toContain('MDV1500');
+    expect(scene.a11y?.table?.rows.length ?? 0).toBeGreaterThan(0);
+    expect(toSvgString(scene).startsWith('<svg')).toBe(true);
+    expect(resolved.diagnostics.filter((d) => d.severity === 'error')).toEqual([]);
   });
 });
 
