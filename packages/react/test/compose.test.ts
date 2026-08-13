@@ -33,8 +33,10 @@ describe('the resolved document', () => {
   it('normalised the encoding to the object form (SPEC 7.1.2)', () => {
     expect(doc.blocks[0]?.encoding.x).toEqual({ field: 'quarter' });
     expect(doc.blocks[0]?.encoding.y).toEqual({ field: 'revenue' });
-    // The channels are gone from the attribute map.
-    expect(doc.blocks[0]?.attrs['x']).toBeUndefined();
+    // Lifted, not moved: `@mdv/core` leaves the channel on the attribute map as
+    // well, and a chart type that reads a constant off `attrs` — `metric`'s
+    // literal `value:` — needs it there.
+    expect(doc.blocks[0]?.attrs['x']).toBe('quarter');
   });
 
   it('carries the front matter and a fully defaulted config (SPEC 25)', () => {

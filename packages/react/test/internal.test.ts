@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { BlockAttrs } from '@mdv/core';
+import { encodingFromAttrs } from '@mdv/core';
 import { contentHash, hashString } from '../src/internal/hash.js';
 import { BUILTIN_DEFAULTS, cascade, mergeAttrs, splitAttrs } from '../src/internal/cascade.js';
 import { DEFAULT_HEIGHT, resolveBlockSize } from '../src/internal/size.js';
@@ -151,6 +152,34 @@ describe('splitting attributes from channels (SPEC 7.1)', () => {
   it('reads a bare number or boolean on a channel as a constant', () => {
     const { encoding } = splitAttrs({ size: 12 });
     expect(encoding.size).toEqual({ value: 12 });
+  });
+
+  it('lifts a channel without moving it — the attribute survives too', () => {
+    const { attrs, encoding } = splitAttrs({ x: 'quarter', y: 'revenue' });
+    expect(attrs['x']).toBe('quarter');
+    expect(attrs['y']).toBe('revenue');
+    expect(encoding.x).toEqual({ field: 'quarter' });
+  });
+
+  it('keeps a literal `value` on attrs, which is where `metric` reads it (SPEC 8.13)', () => {
+    const { attrs, encoding } = splitAttrs({
+      label: 'Monthly recurring revenue',
+      value: 1284000,
+      format: '$~s',
+    });
+    expect(attrs['value']).toBe(1284000);
+    expect(attrs['label']).toBe('Monthly recurring revenue');
+    // The constant form is still a channel, but it binds no field: a chart type
+    // that only looked at `encoding` would see nothing to read.
+    expect(encoding.value).toEqual({ value: 1284000 });
+  });
+
+  it('splits the way `@mdv/core` cascades — same keys on attrs', () => {
+    const merged = { title: 'T', x: 'quarter', y: ['a', 'b'], stack: 'normal' } as const;
+    const { attrs } = splitAttrs({ ...merged });
+    const core = encodingFromAttrs({ ...merged } as never, new Set(['quarter', 'a', 'b']));
+    expect(Object.keys(attrs).sort()).toEqual(Object.keys(merged).sort());
+    expect(Object.keys(core).sort()).toEqual(['x', 'y']);
   });
 });
 

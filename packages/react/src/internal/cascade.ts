@@ -49,15 +49,23 @@ const CHANNEL_NAMES: ReadonlySet<string> = new Set<ChannelName>([
   'column',
 ]);
 
-/**
- * Channel names that are **also** block attributes and must stay in both places.
+/*
+ * A channel is **lifted** into `encoding`, never **moved** there: the key stays
+ * on `attrs` as well. That is what `@mdv/core` does — `cascadeAttrs` returns the
+ * whole merged map and `encodingFromAttrs` copies the channel keys out of it —
+ * and the two have to agree, because the same block resolved by the two paths
+ * must produce the same diagnostics.
  *
+ * Several readers depend on the attribute surviving:
+ *
+ * - `metric` reads a literal `value: 1284000` off `attrs` (SPEC 8.13); as a
+ *   channel it is `{value: 1284000}` with no `field`, which is not a binding,
+ *   so moving it would make every literal stat tile fail `MDV3000`.
  * - `row`/`column` drive faceting, which `layoutBlock` reads off `attrs`
  *   (SPEC 7.6) while a chart type may read the channel.
  * - `tooltip` is `boolean | string[]` as an attribute (SPEC 8.1) and a field list
  *   as a channel (SPEC 7.5). `tooltip: false` is only ever the attribute.
  */
-const DUAL_ROLE: ReadonlySet<string> = new Set(['row', 'column', 'tooltip']);
 
 /** Keys that are structurally a mapping and therefore merge deeply. */
 function isMapping(value: unknown): value is AttrMap {
@@ -166,7 +174,8 @@ export interface SplitAttrs {
  * Unknown keys stay on `attrs`: `BlockAttrs` has an index signature precisely so
  * a chart type's own attributes (`stack`, `barWidth`, `bins`) survive to
  * validation, and `x-*` extensions are collected separately and never
- * interpreted (SPEC 15.1).
+ * interpreted (SPEC 15.1). Channel keys stay on `attrs` too — see the note above
+ * `CHANNEL_NAMES`: the split lifts them into `encoding`, it does not move them.
  */
 export function splitAttrs(merged: AttrMap): SplitAttrs {
   const attrs: Record<string, unknown> = {};
@@ -189,7 +198,6 @@ export function splitAttrs(merged: AttrMap): SplitAttrs {
       const channelForm =
         key === 'tooltip' && typeof value === 'boolean' ? undefined : toChannels(value);
       if (channelForm !== undefined) encoding[key] = channelForm;
-      if (!DUAL_ROLE.has(key)) continue;
     }
 
     attrs[key] = value;
