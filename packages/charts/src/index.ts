@@ -24,6 +24,7 @@ import { metricChart } from './metric.js';
 import { ohlcChart, ohlcvChart } from './ohlc.js';
 import { tableChart } from './table.js';
 import { unimplementedChartTypes } from './unimplemented.js';
+import { waterfallChart } from './waterfall.js';
 
 export { areaChart } from './area.js';
 export { barChart } from './bar.js';
@@ -41,6 +42,7 @@ export {
   createUnimplementedChartType,
   unimplementedChartTypes,
 } from './unimplemented.js';
+export { waterfallChart } from './waterfall.js';
 
 export type { Annotation } from './internal/annotations.js';
 
@@ -68,7 +70,7 @@ export const LEVEL_1_TYPE_NAMES = [
  * `candlestick`, `radar`, `gauge`, `funnel`, `waterfall`, `treemap`, `sankey`,
  * `sparkline`.
  *
- * `box`, `heatmap`, `histogram`, `ohlc` and `ohlcv` are drawn (see
+ * `box`, `heatmap`, `histogram`, `ohlc`, `ohlcv` and `waterfall` are drawn (see
  * {@link level2ChartTypes}). The rest are registered as known-but-unimplemented:
  * they render their data as a table with `MDV1500` (SPEC 15.2) rather than
  * erroring. `candlestick` resolves through `ohlc`'s alias, so there are twelve
@@ -126,6 +128,7 @@ export const level2ChartTypes: readonly ChartType[] = [
   histogramChart,
   ohlcChart,
   ohlcvChart,
+  waterfallChart,
 ];
 
 /**

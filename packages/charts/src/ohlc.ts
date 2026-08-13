@@ -60,7 +60,15 @@ import {
   presentationOf,
   viewColumn,
 } from './internal/a11y.js';
-import { boolAttr, enumAttr, listAttr, numberAttr, rawAttr, stringAttr } from './internal/attrs.js';
+import {
+  boolAttr,
+  colorAttr,
+  enumAttr,
+  listAttr,
+  numberAttr,
+  rawAttr,
+  stringAttr,
+} from './internal/attrs.js';
 import { axisSpecFor, isDegenerateFrame, makeAxis, rangeToFrame } from './internal/cartesian.js';
 import { blockDiagnostic, incompatibleField, missingChannel } from './internal/diagnostics.js';
 import { extentOf, resolveDomain } from './internal/domain.js';
@@ -254,12 +262,6 @@ function priceFormatOf(attrs: BlockAttrs, column: Column | undefined): string | 
     return `,.${digits}f`;
   }
   return column?.format;
-}
-
-/** A color attribute, falling back to a status role (SPEC 11.3.1). */
-function colorAttr(attrs: BlockAttrs, name: string, fallback: ColorString): ColorString {
-  const value = stringAttr(attrs, name);
-  return value === undefined ? fallback : (value as ColorString);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

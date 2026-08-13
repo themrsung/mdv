@@ -9,7 +9,7 @@
  * block (SPEC 14.1, SPEC 15.2 "unknown enum value → default, `MDV1502`").
  */
 
-import type { BlockAttrs } from '@mdv/core';
+import type { BlockAttrs, ColorString } from '@mdv/core';
 import { isFiniteNumber } from './num.js';
 
 /** Read a per-type attribute as `unknown`, or `undefined` when absent. */
@@ -70,6 +70,19 @@ export function autoNumberAttr(
 export function stringAttr(attrs: BlockAttrs, name: string): string | undefined {
   const value = rawAttr(attrs, name);
   return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * Read a color attribute, falling back to a status role (SPEC 11.3.1).
+ *
+ * The cast is the honest one: `ColorString` is a branded string and an author's
+ * `up-color: rebeccapurple` is a string like any other. Nothing here validates
+ * the color — an unparseable one lands in the SVG and the browser drops it,
+ * which is the same degradation the rest of the paint path takes.
+ */
+export function colorAttr(attrs: BlockAttrs, name: string, fallback: ColorString): ColorString {
+  const value = stringAttr(attrs, name);
+  return value === undefined ? fallback : (value as ColorString);
 }
 
 /**
