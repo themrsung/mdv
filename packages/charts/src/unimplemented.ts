@@ -13,10 +13,10 @@
  * 1. **Leave the type unregistered.** `registry.get(name)` returns `undefined`,
  *    and core is responsible for the notice and the table. This works, but core
  *    cannot say anything true about the type beyond its spelling — it does not
- *    know whether `sankey` is a real MDV type the reader is too low a level for,
- *    or a typo for `snakey`, or a plugin the user forgot to load.
+ *    know whether `gantt` is a real MDV type the reader is too low a level for,
+ *    or a typo for `gnatt`, or a plugin the user forgot to load.
  * 2. **Register a type that knows it is unimplemented.** The registry then
- *    answers `has('sankey') === true`, the diagnostic can name the *conformance
+ *    answers `has('gantt') === true`, the diagnostic can name the *conformance
  *    level* the author's document actually requires, and — critically — the
  *    block still flows through the ordinary encode/layout seam, so it gets the
  *    real enhanced-table renderer, the real `a11yTable`, the real hit regions
@@ -25,7 +25,7 @@
  * This module implements (2). Every Level 2 and Level 3 type in SPEC 16.1 is
  * registered here as a stub whose `encode` emits `MDV1500` and then delegates to
  * `table`'s encoder, and whose `layout` is `table`'s layout verbatim. The result
- * is that upgrading `sankey` from "known" to "drawn" later is purely additive:
+ * is that upgrading `sparkline` from "known" to "drawn" later is purely additive:
  * delete its entry from {@link UNIMPLEMENTED_TYPES}, add the real module, and
  * every other seam is unchanged.
  *
@@ -176,7 +176,6 @@ export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
   { name: 'gantt', level: 3, summary: 'a Gantt chart of the schedule' },
   { name: 'map', level: 3, summary: 'a choropleth or point map' },
   { name: 'network', level: 3, summary: 'a node-link diagram' },
-  { name: 'sankey', level: 2, summary: 'a Sankey diagram of the flows' },
   { name: 'sparkline', level: 2, summary: 'an inline sparkline' },
 ];
 

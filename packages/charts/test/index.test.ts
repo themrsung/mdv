@@ -163,9 +163,14 @@ describe('chartTypesForLevel', () => {
 });
 
 describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
-  const run = runChart(byName('sankey'), prices(), { attrs: { title: 'Flows' } });
+  // `gantt` rather than a Level 2 stub on purpose. Every name on this list is
+  // one module away from graduating — `sankey` was the example here until SPEC
+  // 8.12 drew it — and a suite that has to be rewritten each time a chart lands
+  // stops being read. Level 3 is the far end of SPEC 16.1, so `gantt` will be a
+  // stub for as long as the degradation seam has anything to prove.
+  const run = runChart(byName('gantt'), prices(), { attrs: { title: 'Schedule' } });
 
-  it('warns rather than failing, so a Level 2 document stays readable', () => {
+  it('warns rather than failing, so a Level 3 document stays readable', () => {
     expect(codesOf(run)).toEqual(['MDV1500']);
   });
 
@@ -178,12 +183,12 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
 
   it('names the type and the level the document actually needs', () => {
     const message = run.diagnostics[0]?.message ?? '';
-    expect(message).toContain('sankey');
-    expect(message).toContain('Level 2');
+    expect(message).toContain('gantt');
+    expect(message).toContain('Level 3');
   });
 
   it('says what a capable reader would have drawn', () => {
-    expect(run.diagnostics[0]?.detail).toContain('Sankey diagram of the flows');
+    expect(run.diagnostics[0]?.detail).toContain('Gantt chart of the schedule');
   });
 
   it('draws the real table, not a placeholder', () => {
@@ -202,16 +207,16 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
 
   it('leads its description with the notice, then describes the table', () => {
     expect(run.description).toBe(
-      'Shown as a table: this reader does not implement the `sankey` block type. ' +
+      'Shown as a table: this reader does not implement the `gantt` block type. ' +
         'Table. 2 rows across 5 columns: Day, Open, High, Low, Close.',
     );
   });
 
   it('does not complain about the attributes of the type it is standing in for', () => {
-    // `table`'s own validate would report `nodeWidth` as an unknown column; that
+    // `table`'s own validate would report `barHeight` as an unknown column; that
     // would bury the one diagnostic that matters under a dozen that do not.
-    const fussy = runChart(byName('sankey'), prices(), {
-      attrs: { nodeWidth: 12, linkOpacity: 0.4 },
+    const fussy = runChart(byName('gantt'), prices(), {
+      attrs: { barHeight: 12, milestoneSize: 8 },
     });
     expect(codesOf(fussy)).toEqual(['MDV1500']);
   });
@@ -226,7 +231,7 @@ describe('unimplemented types degrade to a table (SPEC 15.2)', () => {
   });
 
   it('degrades cleanly on an empty table too', () => {
-    const empty = runChart(byName('sankey'), makeTable([], []), {});
+    const empty = runChart(byName('gantt'), makeTable([], []), {});
     expect(codesOf(empty)).toEqual(['MDV1500']);
     expect(empty.laid.nodes).toEqual([]);
   });
@@ -265,12 +270,11 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('targets the row, because the row is what is on screen', () => {
-    expect(byName('sankey').family).toBe('mark');
+    expect(byName('gantt').family).toBe('mark');
   });
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('sankey')).toBe(2);
     expect(levels.get('sparkline')).toBe(2);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
@@ -280,7 +284,7 @@ describe('the stubs stay honest about being stubs', () => {
   it('drops a name from the list the moment the real module lands', () => {
     // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
     // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall`,
-    // `radar`, `gauge`, `funnel` and `treemap` (SPEC 8.12). This list is the *only*
+    // `radar`, `gauge`, `funnel`, `treemap` and `sankey` (SPEC 8.12). This list is the *only*
     // thing that decides whether a name degrades, so a name left on it after its
     // module arrives would keep drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
@@ -295,6 +299,7 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('gauge');
     expect(names).not.toContain('funnel');
     expect(names).not.toContain('treemap');
+    expect(names).not.toContain('sankey');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);

@@ -391,6 +391,24 @@ export function formatValue(value: unknown, spec?: string): string {
 }
 
 /**
+ * What a cell is called when the name is its **identity** — a category, a node,
+ * a parent reference — or `undefined` when it names nothing.
+ *
+ * Deliberately not {@link formatValue}. That one answers a display question and
+ * renders a missing cell as `—`, because a table view has to put something in
+ * the gap. A chart that keyed off it would take the dash at its word: every row
+ * that forgot to say anything would pile up into one tile or one band called
+ * `—`, sized by their total, sitting in the picture as if the author had written
+ * a category by that name. A row with no key has no identity, and the caller
+ * drops it and counts it among `droppedRows` like any other unusable row.
+ */
+export function keyValue(value: unknown, spec?: string): string | undefined {
+  if (value === null || value === undefined) return undefined;
+  const text = formatValue(value, spec);
+  return text === '' ? undefined : text;
+}
+
+/**
  * Expand a `labelFormat` template such as
  * `"{category}: {value:,.0f} ({percent:.0%})"` (SPEC 8.5).
  *

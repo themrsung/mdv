@@ -110,7 +110,7 @@ import {
   humaniseColumn,
   isQuantitative,
 } from './internal/table.js';
-import { formatNumber, formatValue } from './internal/format.js';
+import { formatNumber, keyValue } from './internal/format.js';
 import { composeDescription, countPhrase, presentationOf, subjectPhrase } from './internal/a11y.js';
 import { px } from './internal/geometry.js';
 
@@ -598,8 +598,8 @@ export const treemapChart: ChartType<NodeMark> = {
 
     let dropped = 0;
     for (let row = 0; row < table.rows.length; row += 1) {
-      const key = formatValue(cell(table, row, categoryBound.index), categoryFormat);
-      if (key === '') {
+      const key = keyValue(cell(table, row, categoryBound.index), categoryFormat);
+      if (key === undefined) {
         dropped += 1;
         continue;
       }
@@ -616,8 +616,10 @@ export const treemapChart: ChartType<NodeMark> = {
       node.own += numeric;
       if (node.ownRow === undefined) node.ownRow = row;
       if (parentColumn !== undefined && node.parentKey === undefined) {
-        const parentKey = formatValue(cell(table, row, parentColumn.index), parentFormat);
-        if (parentKey !== '' && parentKey !== key) node.parentKey = parentKey;
+        // A row with no parent is top-level, which is a fact about it, not a
+        // group of its own: `undefined` here leaves it where it already is.
+        const parentKey = keyValue(cell(table, row, parentColumn.index), parentFormat);
+        if (parentKey !== undefined && parentKey !== key) node.parentKey = parentKey;
       }
     }
 

@@ -25,6 +25,7 @@ import { lineChart } from './line.js';
 import { metricChart } from './metric.js';
 import { ohlcChart, ohlcvChart } from './ohlc.js';
 import { radarChart } from './radar.js';
+import { sankeyChart } from './sankey.js';
 import { tableChart } from './table.js';
 import { treemapChart } from './treemap.js';
 import { unimplementedChartTypes } from './unimplemented.js';
@@ -45,6 +46,8 @@ export { metricChart } from './metric.js';
 export { ohlcChart, ohlcvChart } from './ohlc.js';
 export { radarChart } from './radar.js';
 export type { RadarEncodeResult } from './radar.js';
+export { sankeyChart } from './sankey.js';
+export type { SankeyEncodeResult } from './sankey.js';
 export { tableChart } from './table.js';
 export { treemapChart } from './treemap.js';
 export type { TreemapEncodeResult } from './treemap.js';
@@ -82,7 +85,7 @@ export const LEVEL_1_TYPE_NAMES = [
  * `sparkline`.
  *
  * `box`, `funnel`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar`,
- * `treemap` and `waterfall` are drawn (see
+ * `sankey`, `treemap` and `waterfall` are drawn (see
  * {@link level2ChartTypes}). The rest are registered as known-but-unimplemented:
  * they render their data as a table with `MDV1500` (SPEC 15.2) rather than
  * erroring. `candlestick` resolves through `ohlc`'s alias, so there are twelve
@@ -143,6 +146,7 @@ export const level2ChartTypes: readonly ChartType[] = [
   ohlcChart,
   ohlcvChart,
   radarChart,
+  sankeyChart,
   treemapChart,
   waterfallChart,
 ];

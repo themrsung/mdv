@@ -509,6 +509,37 @@ describe('treemap degradation (SPEC 15.2, 6.5)', () => {
     expect(planOf(run).tiles.map((tile) => tile.label)).toEqual(['Power', 'Travel']);
   });
 
+  it('does not turn a missing category into a tile called "—"', () => {
+    // `formatValue` renders an empty cell as an em dash because a table view has
+    // to put something in the gap. Keying off that would collect every unnamed
+    // row into one tile named after the dash, sized by their total.
+    const run = runTreemap(
+      makeTable(FLAT_FIELDS, [
+        ['Power', 100],
+        [null, 40],
+        ['Rent', 200],
+      ]),
+    );
+    expect(planOf(run).tiles.map((tile) => tile.label)).toEqual(['Power', 'Rent']);
+    expect(run.encoded.droppedRows).toBe(1);
+    expect(planOf(run).total).toBe(300);
+  });
+
+  it('leaves a row with no parent at the top level, not in a group called "—"', () => {
+    const run = runTreemap(
+      makeTable(NESTED_FIELDS, [
+        ['Power', 'Fixed', 50],
+        ['Rent', null, 150],
+      ]),
+      { attrs: attrsOf({ parent: 'group' }) },
+    );
+    expect(planOf(run).tiles.map((tile) => [tile.label, tile.depth])).toEqual([
+      ['Rent', 0],
+      ['Fixed', 0],
+      ['Power', 1],
+    ]);
+  });
+
   it('survives a table with columns but no rows', () => {
     const run = runTreemap(noRows(FLAT_FIELDS));
     expect(run.laid.nodes).toEqual([]);
