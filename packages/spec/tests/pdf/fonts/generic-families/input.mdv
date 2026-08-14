@@ -1,0 +1,33 @@
+---
+mdv: "1.0"
+title: Generic families
+lang: en
+pdf:
+  pageSize: A6
+  margin: { top: 12mm, right: 12mm, bottom: 12mm, left: 12mm }
+---
+
+# Faces
+
+The print theme names one family for everything, so the sans stack and the
+monospace stack are the only two a document can reach without embedding a font
+of its own. Four faces come out of the first stack and the styles applied to
+it, and the code font is the second.
+
+Body text is regular. **Bold is a different face, not a heavier stroke.**
+*Italic is oblique, because the standard 14 has no true italic for a sans
+face.* ***Both at once resolves to one face rather than two passes.***
+
+`Inline code` is monospace, and **`bold inline code`** is the bold cut of it.
+A heading is bold, which is why the title above is not the face this sentence
+is set in.
+
+```ts
+const face = 'Courier';
+	// A tab is four spaces wide before it reaches the encoder.
+```
+
+## What WinAnsi cannot hold
+
+A codepoint outside the encoding is drawn as `?` and reported once, rather
+than silently dropped: 文 is not a character this font can encode.

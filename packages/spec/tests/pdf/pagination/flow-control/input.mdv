@@ -1,0 +1,55 @@
+---
+mdv: "1.0"
+title: Flow control
+pdf:
+  pageSize: A6
+  margin: { top: 10mm, right: 10mm, bottom: 10mm, left: 10mm }
+  widows: 2
+  orphans: 2
+---
+
+# Flow control
+
+The page is small so that the rules fire on a document short enough to read.
+Everything below is a paginator decision, and the trace is where each one
+becomes visible.
+
+## Widows and orphans
+
+Two lines of a paragraph are kept together at a boundary, so a single line is
+never stranded at the foot of one page or carried alone to the top of the next.
+This paragraph runs long on purpose: it has to straddle a break for the rule to
+have anything to do, and a shorter one would pass by never being tested.
+
+:::mdv-page{break=avoid}
+### Kept together
+
+| Plan | Price |
+| --- | --- |
+| Team | $19 |
+| Business | $49 |
+:::
+
+:::mdv-page{break=before}
+:::
+
+## After a forced break
+
+A visual block is atomic: it moves to the next page rather than splitting, and
+the heading above it goes with it.
+
+```mdv bar
+title: Weekly signups
+desc: A bar chart of signups for four weeks, rising from 1204 to 1502.
+x: week
+y: signups
+---
+week,signups
+W-31,1204
+W-32,1388
+W-33,1291
+W-34,1502
+```
+
+:::mdv-page{break=after}
+:::

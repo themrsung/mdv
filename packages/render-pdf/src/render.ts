@@ -263,6 +263,15 @@ class Renderer {
     const body: O.PdfOp[] = [];
     const decorations: O.PdfOp[] = [];
 
+    // A line is one text object (`BT … ET` below), so the font and the fill
+    // colour persist from one run to the next. A line of prose is a dozen runs
+    // that all share both, and re-selecting them per word is a `Tf` and an `rg`
+    // per word in every content stream and every operator trace (SPEC 28.10).
+    // Both trackers start empty on each line because what precedes the line is
+    // not ours to assume: a rule or a cell background sets `rg` between lines.
+    let font: string | undefined;
+    let fill: string | undefined;
+
     for (const placed of line.runs) {
       if (placed.run.text === '') continue;
       const key = fontKeyOf(placed.font);
@@ -274,12 +283,18 @@ class Renderer {
       const color = this.#rgb(placed.color);
       const x = xPt + placed.xPt;
       const y = baseline + this.#riseOf(placed);
-      body.push(
-        O.setFont(resource, placed.font.size),
-        O.fillColor(color.r, color.g, color.b),
-        O.textMatrix([1, 0, 0, 1, x, y]),
-        O.showText(placed.run.text, resource),
-      );
+
+      const wantFont = `${resource} ${String(placed.font.size)}`;
+      if (wantFont !== font) {
+        body.push(O.setFont(resource, placed.font.size));
+        font = wantFont;
+      }
+      const wantFill = `${String(color.r)} ${String(color.g)} ${String(color.b)}`;
+      if (wantFill !== fill) {
+        body.push(O.fillColor(color.r, color.g, color.b));
+        fill = wantFill;
+      }
+      body.push(O.textMatrix([1, 0, 0, 1, x, y]), O.showText(placed.run.text, resource));
 
       const linked = placed.run.href !== undefined || placed.run.dest !== undefined;
       const rule = (offset: number): void => {

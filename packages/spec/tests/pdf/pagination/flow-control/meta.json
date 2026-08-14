@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "pdf",
+    "pagination",
+    "mdv-page"
+  ],
+  "note": "SPEC 28.3, 28.4: widow/orphan control, an atomic visual block, break=avoid over a table, and a marker break at the end of a document that must not produce a blank page.",
+  "pin": [
+    "ast",
+    "pdf"
+  ]
+}

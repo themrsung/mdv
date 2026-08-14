@@ -1,0 +1,66 @@
+---
+mdv: "1.0"
+title: Page model
+subtitle: Geometry, running heads, and numbering
+author: MDV Conformance
+date: "2026-01-31"
+lang: en
+pdf:
+  pageSize: ["140mm", "100mm"]
+  margin: { top: 12mm, right: 30pt, bottom: 0.5in, left: 30pt }
+  header:
+    left: "{title}"
+    center: "{chapter}"
+    right: "{subtitle}"
+  footer:
+    left: "{author}"
+    center: "{date}"
+    right: "{page} of {pages}"
+  headerOnFirstPage: false
+  numbering: { start: 3, style: roman, restartAt: h1 }
+  toc: { depth: 2, title: On these pages, pageBreakAfter: true }
+---
+
+# The box
+
+A page is a box inside a box. The outer one is the sheet, given here as an
+explicit pair rather than a paper name, and the inner one is what is left after
+the margins are taken off each edge.
+
+## Four units, four edges
+
+The four margins are written in four different units on purpose: millimetres,
+points, and inches all have to arrive at the same measure, and an edge that
+quietly fell back to a default would move every line on every page.
+
+## What the running heads say
+
+The header is off on the first page and on from the second, so the first page
+of a document is not stamped like a continuation of something. Each slot is
+interpolated once per page and drawn as an artifact, outside the structure
+tree, because a running head is furniture rather than content.
+
+# The second chapter
+
+Page numbering restarts here, which is the whole point of naming a level: the
+count is a property of the chapter, not of the sheet, and the footer has to
+follow it. Roman numerals are spelled out from a table rather than asked of the
+host locale, so this document numbers its pages the same way everywhere.
+
+## A table of contents comes first
+
+The contents are emitted ahead of the body and take a break after themselves,
+so the body opens on a page of its own. Entries go two levels deep, which is
+why the third-level heading below is absent from the list above.
+
+### Not in the contents
+
+Depth is a promise about the list, not about the document. This heading is
+still a heading, still bookmarked, and still in the structure tree; it is only
+missing from the page the reader was given to navigate by.
+
+## The last of it
+
+The final paragraph exists so that the second chapter is long enough to need a
+page the first one did not, and so the total in the footer is a number that had
+to be counted rather than guessed.

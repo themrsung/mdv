@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "pdf",
+    "tagging",
+    "structure-tree"
+  ],
+  "pin": [
+    "ast",
+    "pdf"
+  ],
+  "note": "SPEC 28.8: the tagged structure tree. Every construct that owns a tag appears once — headings, lists nested two deep, a list inside a block quote, table header and data cells, a figure with a caption and alt text, a callout label as H6, a code block, a link annotation, and a footnote body as Note."
+}

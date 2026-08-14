@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "pdf",
+    "page-model"
+  ],
+  "note": "SPEC 28.2: an explicit page size, margins in three units, header and footer interpolation with headerOnFirstPage off, roman numbering that starts at 3 and restarts at h1, and a two-level table of contents that breaks after itself.",
+  "pin": [
+    "ast",
+    "pdf"
+  ]
+}

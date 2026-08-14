@@ -1,0 +1,58 @@
+---
+mdv: "1.0"
+title: Structure tree
+lang: en
+pdf:
+  pageSize: A6
+  margin: { top: 12mm, right: 12mm, bottom: 12mm, left: 12mm }
+---
+
+# Tagging
+
+A paragraph is a `P`, and a [link](https://example.org/spec) is both an
+annotation on the page and a `Link` in the tree.[^why]
+
+## Lists
+
+- An item is an `LI` wrapping an `LBody` wrapping a `P`.
+- Nesting opens a second `L` rather than a second document.
+
+> A quoted list is an `L` inside a `BlockQuote`:
+>
+> 1. First.
+> 2. Second.
+
+## Cells
+
+| Tag | Means |
+| --- | --- |
+| TH | Heading cell |
+| TD | Data cell |
+
+:::mdv-figure{caption="One Figure, carrying the alt text the chart was given." id=fig-tags}
+
+```mdv bar
+title: Tags per page
+desc: A bar chart of tag counts on the first two pages, 12 then 9.
+x: page
+y: tags
+---
+page,tags
+1,12
+2,9
+```
+
+:::
+
+:::mdv-callout{type=note title="Labels are printed"}
+
+The label of a callout is an `H6`, because status is never colour alone.
+
+:::
+
+```ts
+const tag = 'Code';
+```
+
+[^why]: A footnote body is a `Note`, set at the foot of the page that
+    references it.

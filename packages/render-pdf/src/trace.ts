@@ -7,6 +7,7 @@
  * which is the only way a passing fixture can mean anything about the file.
  */
 
+import { standardFontName } from './fonts.js';
 import { argToTrace } from './ops.js';
 import type { PdfBuild } from './document.js';
 import type { StructElement } from './render.js';
@@ -17,6 +18,14 @@ export interface PdfOperation {
   args: readonly (number | string)[];
 }
 
+/** A font resource name and the face the page allocated it for. */
+export interface PdfFontTrace {
+  /** Resource name, e.g. `F0`. */
+  resource: string;
+  /** The `BaseFont` the writer embeds for it, e.g. `Helvetica-Oblique`. */
+  base: string;
+}
+
 /** A normalised operator trace for one page. */
 export interface PdfPageTrace {
   pageIndex: number;
@@ -25,6 +34,15 @@ export interface PdfPageTrace {
   operations: readonly PdfOperation[];
   /** Resource names referenced by the page, sorted. */
   resources: readonly string[];
+  /**
+   * The face behind every font resource, in allocation order.
+   *
+   * `resources` alone cannot catch a swapped face. Pools are per page, so `F1`
+   * means whatever that page reached for second, and a regression that resolved
+   * a run to Courier where it used to resolve to Helvetica would leave the rest
+   * of the trace identical — same names, same widths only by luck (SPEC 11.1).
+   */
+  fonts: readonly PdfFontTrace[];
 }
 
 /** A flattened structure tree entry. */
@@ -62,6 +80,10 @@ export function buildTrace(build: PdfBuild): PdfTrace {
       args: operation.args.map(argToTrace),
     })),
     resources: page.pool.names(),
+    fonts: page.pool.fonts.map(({ resource, key }) => ({
+      resource,
+      base: standardFontName(key) as string,
+    })),
   }));
 
   const structure: PdfStructTrace[] = [];

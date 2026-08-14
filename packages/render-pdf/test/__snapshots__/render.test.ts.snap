@@ -4,6 +4,16 @@ exports[`operator trace (SPEC 28.10) > matches the recorded trace for a small do
 {
   "pages": [
     {
+      "fonts": [
+        {
+          "base": "Helvetica-Bold",
+          "resource": "F0",
+        },
+        {
+          "base": "Helvetica",
+          "resource": "F1",
+        },
+      ],
       "height": 842,
       "operations": [
         {
@@ -114,21 +124,6 @@ exports[`operator trace (SPEC 28.10) > matches the recorded trace for a small do
         },
         {
           "args": [
-            "/F1",
-            9.75,
-          ],
-          "op": "Tf",
-        },
-        {
-          "args": [
-            0.067,
-            0.078,
-            0.094,
-          ],
-          "op": "rg",
-        },
-        {
-          "args": [
             1,
             0,
             0,
@@ -143,21 +138,6 @@ exports[`operator trace (SPEC 28.10) > matches the recorded trace for a small do
             "(short )",
           ],
           "op": "Tj",
-        },
-        {
-          "args": [
-            "/F1",
-            9.75,
-          ],
-          "op": "Tf",
-        },
-        {
-          "args": [
-            0.067,
-            0.078,
-            0.094,
-          ],
-          "op": "rg",
         },
         {
           "args": [

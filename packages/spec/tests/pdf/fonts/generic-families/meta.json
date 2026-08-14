@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "pdf",
+    "fonts",
+    "encoding"
+  ],
+  "pin": [
+    "ast",
+    "pdf"
+  ],
+  "note": "SPEC 11.1, 28.6: the standard-14 faces a document can reach through the print theme. The theme names one sans stack and one monospace stack, so the reachable faces are Helvetica in its four cuts and Courier in two; the trace pins the face each resource name was allocated for, the four-space tab, and the `?` an unencodable codepoint is drawn as. The MDV5100 that accompanies that `?` is an export diagnostic, which this corpus cannot pin — `diagnostics.json` holds the resolve stage only."
+}
