@@ -1,0 +1,35 @@
+---
+mdv: "1.0"
+title: Where the sessions go
+---
+
+# Where the sessions go
+
+Two hops, acyclic, and every node conserves what flows through it. The columns
+are a longest path and `align: justify` anchors both ends, which is what puts
+the three exits in one column instead of scattering them by depth.
+
+```mdv sankey
+title: Sessions by source and outcome
+source: from
+target: to
+value: sessions
+nodeWidth: 12
+nodePadding: 8
+align: justify
+format: table
+---
+from      | to        | sessions
+Organic   | Product   |    18240
+Organic   | Docs      |     8110
+Direct    | Product   |    12470
+Direct    | Docs      |     3060
+Referral  | Product   |     4980
+Referral  | Docs      |     2210
+Paid      | Product   |     6320
+Paid      | Docs      |     1140
+Product   | Signed up |    21880
+Product   | Bounced   |    20130
+Docs      | Signed up |     3410
+Docs      | Bounced   |    11120
+```

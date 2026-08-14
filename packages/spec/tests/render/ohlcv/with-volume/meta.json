@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "ohlcv",
+    "temporal",
+    "overlay"
+  ],
+  "note": "SPEC 8.11: volume panel shares the x-axis only; SMA overlay is computed.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

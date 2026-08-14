@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "treemap",
+    "part-to-whole",
+    "hierarchy"
+  ],
+  "note": "SPEC 8.12: `parent` is a field; groups without rows of their own are created.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

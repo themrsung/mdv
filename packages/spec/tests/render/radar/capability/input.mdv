@@ -1,0 +1,35 @@
+---
+mdv: "1.0"
+title: Capability review, two releases
+---
+
+# Capability review, two releases
+
+Six axes, a fixed order, and a shared 0–5 scale, which is the only arrangement
+in which the enclosed areas mean anything. The comparison the shape makes is
+that 2.0 gained on accessibility and documentation and gave up nothing.
+
+```mdv radar
+title: Platform capability review
+category: capability
+value: score
+series: release
+maxValue: 5
+gridShape: polygon
+fill: true
+format: table
+---
+capability    | release | score
+Throughput    | v1.4    |   3.1
+Latency       | v1.4    |   3.6
+Accessibility | v1.4    |   2.2
+Docs          | v1.4    |   2.8
+Security      | v1.4    |   3.9
+Extensibility | v1.4    |   3.0
+Throughput    | v2.0    |   3.4
+Latency       | v2.0    |   3.7
+Accessibility | v2.0    |   4.4
+Docs          | v2.0    |   4.1
+Security      | v2.0    |   4.0
+Extensibility | v2.0    |   3.5
+```

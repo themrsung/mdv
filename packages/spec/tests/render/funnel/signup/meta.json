@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "funnel",
+    "part-to-whole"
+  ],
+  "note": "SPEC 8.12: ordered nested stages; drop-off is stated, not inferred.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

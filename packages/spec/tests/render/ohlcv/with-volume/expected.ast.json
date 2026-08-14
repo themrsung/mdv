@@ -1,0 +1,430 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            60,
+            90
+          ],
+          "type": "text",
+          "value": "Price and volume on one x-axis"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        58,
+        90
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            92,
+            480
+          ],
+          "type": "text",
+          "value": "Volume gets its own panel below the price, sharing the x-axis and nothing else.\nOverlaid on a shared y it would be the dual-axis anti-pattern in its most common\ndisguise; stacked, the two measures stay comparable to themselves. The volume\nbars are tinted by the period's own direction, and the five-session moving\naverage is computed by the reader from the same numbers the table carries."
+        }
+      ],
+      "position": [
+        92,
+        480
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "table",
+        "overlay": [
+          {
+            "period": 5,
+            "type": "sma"
+          }
+        ],
+        "precision": 2,
+        "title": "ACME — daily with volume",
+        "type": "ohlcv",
+        "volumeColor": "direction",
+        "volumeHeight": 0.25,
+        "x": "date"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 22,
+            "offset": 639
+          },
+          "start": {
+            "column": 9,
+            "line": 22,
+            "offset": 634
+          }
+        },
+        "overlay": {
+          "end": {
+            "column": 27,
+            "line": 21,
+            "offset": 625
+          },
+          "start": {
+            "column": 3,
+            "line": 21,
+            "offset": 601
+          }
+        },
+        "overlay[0]": {
+          "end": {
+            "column": 27,
+            "line": 21,
+            "offset": 625
+          },
+          "start": {
+            "column": 5,
+            "line": 21,
+            "offset": 603
+          }
+        },
+        "overlay[0].period": {
+          "end": {
+            "column": 26,
+            "line": 21,
+            "offset": 624
+          },
+          "start": {
+            "column": 25,
+            "line": 21,
+            "offset": 623
+          }
+        },
+        "overlay[0].type": {
+          "end": {
+            "column": 15,
+            "line": 21,
+            "offset": 613
+          },
+          "start": {
+            "column": 12,
+            "line": 21,
+            "offset": 610
+          }
+        },
+        "precision": {
+          "end": {
+            "column": 13,
+            "line": 19,
+            "offset": 589
+          },
+          "start": {
+            "column": 12,
+            "line": 19,
+            "offset": 588
+          }
+        },
+        "title": {
+          "end": {
+            "column": 32,
+            "line": 15,
+            "offset": 526
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 502
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 14,
+            "offset": 494
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 489
+          }
+        },
+        "volumeColor": {
+          "end": {
+            "column": 23,
+            "line": 18,
+            "offset": 576
+          },
+          "start": {
+            "column": 14,
+            "line": 18,
+            "offset": 567
+          }
+        },
+        "volumeHeight": {
+          "end": {
+            "column": 19,
+            "line": 17,
+            "offset": 553
+          },
+          "start": {
+            "column": 15,
+            "line": 17,
+            "offset": 549
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 16,
+            "offset": 534
+          },
+          "start": {
+            "column": 4,
+            "line": 16,
+            "offset": 530
+          }
+        }
+      },
+      "blockType": "ohlcv",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 53,
+          "line": 34,
+          "offset": 1226
+        },
+        "start": {
+          "column": 1,
+          "line": 24,
+          "offset": 644
+        }
+      },
+      "level": 2,
+      "position": [
+        482,
+        1230
+      ],
+      "raw": {
+        "data": "date       |  open |  high |   low | close |  volume\n2026-08-03 | 41.20 | 42.05 | 40.90 | 41.85 | 1284000\n2026-08-04 | 41.90 | 42.40 | 41.10 | 41.30 | 1642000\n2026-08-05 | 41.35 | 41.60 | 39.80 | 40.05 | 2410000\n2026-08-06 | 40.10 | 41.75 | 40.00 | 41.60 | 1988000\n2026-08-07 | 41.65 | 42.20 | 41.40 | 42.10 | 1146000\n2026-08-10 | 42.05 | 43.15 | 41.95 | 43.00 | 1732000\n2026-08-11 | 43.10 | 43.40 | 42.30 | 42.55 | 1394000\n2026-08-12 | 42.50 | 42.85 | 41.70 | 41.90 | 1208000\n2026-08-13 | 41.95 | 42.60 | 41.85 | 42.45 |  976000\n2026-08-14 | 42.50 | 43.80 | 42.40 | 43.65 | 2065000\n",
+        "fence": "```",
+        "header": "title: ACME — daily with volume\nx: date\nvolumeHeight: 0.25\nvolumeColor: direction\nprecision: 2\noverlay:\n  - {type: sma, period: 5}\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 35,
+          "offset": 1230
+        },
+        "start": {
+          "column": 1,
+          "line": 14,
+          "offset": 482
+        }
+      },
+      "raw": "date       |  open |  high |   low | close |  volume\n2026-08-03 | 41.20 | 42.05 | 40.90 | 41.85 | 1284000\n2026-08-04 | 41.90 | 42.40 | 41.10 | 41.30 | 1642000\n2026-08-05 | 41.35 | 41.60 | 39.80 | 40.05 | 2410000\n2026-08-06 | 40.10 | 41.75 | 40.00 | 41.60 | 1988000\n2026-08-07 | 41.65 | 42.20 | 41.40 | 42.10 | 1146000\n2026-08-10 | 42.05 | 43.15 | 41.95 | 43.00 | 1732000\n2026-08-11 | 43.10 | 43.40 | 42.30 | 42.55 | 1394000\n2026-08-12 | 42.50 | 42.85 | 41.70 | 41.90 | 1208000\n2026-08-13 | 41.95 | 42.60 | 41.85 | 42.45 |  976000\n2026-08-14 | 42.50 | 43.80 | 42.40 | 43.65 | 2065000\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "date",
+            "type": "date"
+          },
+          {
+            "inferred": true,
+            "name": "open",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "high",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "low",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "close",
+            "type": "number"
+          },
+          {
+            "inferred": true,
+            "name": "volume",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            {},
+            41.2,
+            42.05,
+            40.9,
+            41.85,
+            1284000
+          ],
+          [
+            {},
+            41.9,
+            42.4,
+            41.1,
+            41.3,
+            1642000
+          ],
+          [
+            {},
+            41.35,
+            41.6,
+            39.8,
+            40.05,
+            2410000
+          ],
+          [
+            {},
+            40.1,
+            41.75,
+            40,
+            41.6,
+            1988000
+          ],
+          [
+            {},
+            41.65,
+            42.2,
+            41.4,
+            42.1,
+            1146000
+          ],
+          [
+            {},
+            42.05,
+            43.15,
+            41.95,
+            43,
+            1732000
+          ],
+          [
+            {},
+            43.1,
+            43.4,
+            42.3,
+            42.55,
+            1394000
+          ],
+          [
+            {},
+            42.5,
+            42.85,
+            41.7,
+            41.9,
+            1208000
+          ],
+          [
+            {},
+            41.95,
+            42.6,
+            41.85,
+            42.45,
+            976000
+          ],
+          [
+            {},
+            42.5,
+            43.8,
+            42.4,
+            43.65,
+            2065000
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 38,
+          "line": 3,
+          "offset": 52
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 56
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Price and volume on one x-axis"
+  },
+  "position": [
+    0,
+    1231
+  ],
+  "type": "root"
+}

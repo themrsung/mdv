@@ -1,0 +1,32 @@
+---
+mdv: "1.0"
+title: ARR bridge, FY26
+---
+
+# ARR bridge, FY26
+
+A subtotal is arithmetic, not an observation: a row flagged by `total` is drawn
+from the baseline to the running total as the steps above it left it, and its
+own value cell is not read. So only the closing balance is flagged. The opening
+balance is the walk's first step — a rise from zero — because a bridge that
+began at a subtotal would begin at nothing. Connectors carry the running balance
+between bars so the walk is legible as one continuous quantity, and direction
+uses the status palette because increase and decrease are a fixed vocabulary of
+two, never palette slots.
+
+```mdv waterfall
+title: ARR bridge (thousands)
+category: step
+value: delta
+total: subtotal
+connector: true
+format: table
+---
+step          | delta | subtotal
+Opening ARR   | 18400 | false
+New business  |  5240 | false
+Expansion     |  2180 | false
+Contraction   |  -940 | false
+Churn         | -1610 | false
+Closing ARR   | 23270 | true
+```

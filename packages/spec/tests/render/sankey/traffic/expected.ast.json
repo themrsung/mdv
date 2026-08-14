@@ -1,0 +1,383 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            51,
+            72
+          ],
+          "type": "text",
+          "value": "Where the sessions go"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        49,
+        72
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            74,
+            176
+          ],
+          "type": "text",
+          "value": "Two hops, acyclic, and every node conserves what flows through it. The columns\nare a longest path and "
+        },
+        {
+          "position": [
+            176,
+            192
+          ],
+          "type": "inlineCode",
+          "value": "align: justify"
+        },
+        {
+          "position": [
+            192,
+            297
+          ],
+          "type": "text",
+          "value": " anchors both ends, which is what puts\nthe three exits in one column instead of scattering them by depth."
+        }
+      ],
+      "position": [
+        74,
+        297
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "align": "justify",
+        "format": "table",
+        "nodePadding": 8,
+        "nodeWidth": 12,
+        "source": "from",
+        "target": "to",
+        "title": "Sessions by source and outcome",
+        "type": "sankey",
+        "value": "sessions"
+      },
+      "attrsPosition": {
+        "align": {
+          "end": {
+            "column": 15,
+            "line": 19,
+            "offset": 434
+          },
+          "start": {
+            "column": 8,
+            "line": 19,
+            "offset": 427
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 20,
+            "offset": 448
+          },
+          "start": {
+            "column": 9,
+            "line": 20,
+            "offset": 443
+          }
+        },
+        "nodePadding": {
+          "end": {
+            "column": 15,
+            "line": 18,
+            "offset": 419
+          },
+          "start": {
+            "column": 14,
+            "line": 18,
+            "offset": 418
+          }
+        },
+        "nodeWidth": {
+          "end": {
+            "column": 14,
+            "line": 17,
+            "offset": 404
+          },
+          "start": {
+            "column": 12,
+            "line": 17,
+            "offset": 402
+          }
+        },
+        "source": {
+          "end": {
+            "column": 13,
+            "line": 14,
+            "offset": 363
+          },
+          "start": {
+            "column": 9,
+            "line": 14,
+            "offset": 359
+          }
+        },
+        "target": {
+          "end": {
+            "column": 11,
+            "line": 15,
+            "offset": 374
+          },
+          "start": {
+            "column": 9,
+            "line": 15,
+            "offset": 372
+          }
+        },
+        "title": {
+          "end": {
+            "column": 38,
+            "line": 13,
+            "offset": 350
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 320
+          }
+        },
+        "type": {
+          "end": {
+            "column": 14,
+            "line": 12,
+            "offset": 312
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 306
+          }
+        },
+        "value": {
+          "end": {
+            "column": 16,
+            "line": 16,
+            "offset": 390
+          },
+          "start": {
+            "column": 8,
+            "line": 16,
+            "offset": 382
+          }
+        }
+      },
+      "blockType": "sankey",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 33,
+          "line": 34,
+          "offset": 881
+        },
+        "start": {
+          "column": 1,
+          "line": 22,
+          "offset": 453
+        }
+      },
+      "level": 2,
+      "position": [
+        299,
+        885
+      ],
+      "raw": {
+        "data": "from      | to        | sessions\nOrganic   | Product   |    18240\nOrganic   | Docs      |     8110\nDirect    | Product   |    12470\nDirect    | Docs      |     3060\nReferral  | Product   |     4980\nReferral  | Docs      |     2210\nPaid      | Product   |     6320\nPaid      | Docs      |     1140\nProduct   | Signed up |    21880\nProduct   | Bounced   |    20130\nDocs      | Signed up |     3410\nDocs      | Bounced   |    11120\n",
+        "fence": "```",
+        "header": "title: Sessions by source and outcome\nsource: from\ntarget: to\nvalue: sessions\nnodeWidth: 12\nnodePadding: 8\nalign: justify\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 35,
+          "offset": 885
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 299
+        }
+      },
+      "raw": "from      | to        | sessions\nOrganic   | Product   |    18240\nOrganic   | Docs      |     8110\nDirect    | Product   |    12470\nDirect    | Docs      |     3060\nReferral  | Product   |     4980\nReferral  | Docs      |     2210\nPaid      | Product   |     6320\nPaid      | Docs      |     1140\nProduct   | Signed up |    21880\nProduct   | Bounced   |    20130\nDocs      | Signed up |     3410\nDocs      | Bounced   |    11120\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "from",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "to",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "sessions",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "Organic",
+            "Product",
+            18240
+          ],
+          [
+            "Organic",
+            "Docs",
+            8110
+          ],
+          [
+            "Direct",
+            "Product",
+            12470
+          ],
+          [
+            "Direct",
+            "Docs",
+            3060
+          ],
+          [
+            "Referral",
+            "Product",
+            4980
+          ],
+          [
+            "Referral",
+            "Docs",
+            2210
+          ],
+          [
+            "Paid",
+            "Product",
+            6320
+          ],
+          [
+            "Paid",
+            "Docs",
+            1140
+          ],
+          [
+            "Product",
+            "Signed up",
+            21880
+          ],
+          [
+            "Product",
+            "Bounced",
+            20130
+          ],
+          [
+            "Docs",
+            "Signed up",
+            3410
+          ],
+          [
+            "Docs",
+            "Bounced",
+            11120
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 29,
+          "line": 3,
+          "offset": 43
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 47
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Where the sessions go"
+  },
+  "position": [
+    0,
+    886
+  ],
+  "type": "root"
+}

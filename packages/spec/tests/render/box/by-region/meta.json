@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "box",
+    "distribution"
+  ],
+  "note": "SPEC 8.8: raw observations, Tukey whiskers, outliers drawn by rule.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

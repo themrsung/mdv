@@ -1,0 +1,51 @@
+---
+mdv: "1.0"
+title: Response time distribution
+---
+
+# Response time distribution
+
+The mean is 268 ms and the median is 205 ms, and neither number is the finding.
+The finding is the second cluster past 400 ms: a distinct population of slow
+requests that a summary statistic averages away and only a distribution shows.
+Bars touch because the axis is continuous, and the two long tail rows are real
+requests, not noise to be trimmed.
+
+```mdv histogram
+title: Request latency
+x: ms
+bins: 12
+format: table
+---
+  ms
+ 118
+ 132
+ 141
+ 147
+ 152
+ 158
+ 163
+ 168
+ 172
+ 176
+ 181
+ 186
+ 190
+ 197
+ 205
+ 214
+ 226
+ 238
+ 402
+ 418
+ 431
+ 447
+ 458
+ 470
+ 486
+ 499
+ 512
+ 528
+ 640
+ 712
+```

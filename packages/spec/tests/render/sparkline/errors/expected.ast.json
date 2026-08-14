@@ -1,0 +1,421 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            47,
+            64
+          ],
+          "type": "text",
+          "value": "Errors per minute"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        45,
+        64
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            66,
+            358
+          ],
+          "type": "text",
+          "value": "Chromeless by contract: no axes, no legend, no tooltip, and no hit regions to\nhover. The shape sits beside a number some other element already states, and\nevery point — both band bounds included — is still in the table view, because\nremoving the ruler is not permission to remove the numbers."
+        }
+      ],
+      "position": [
+        66,
+        358
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "band": {
+          "lower": "low",
+          "upper": "high"
+        },
+        "curve": "monotone",
+        "format": "table",
+        "height": 48,
+        "points": "extremes",
+        "title": "Errors per minute, last 20 minutes",
+        "type": "sparkline",
+        "y": "errors"
+      },
+      "attrsPosition": {
+        "band": {
+          "end": {
+            "column": 32,
+            "line": 16,
+            "offset": 460
+          },
+          "start": {
+            "column": 7,
+            "line": 16,
+            "offset": 435
+          }
+        },
+        "band.lower": {
+          "end": {
+            "column": 18,
+            "line": 16,
+            "offset": 446
+          },
+          "start": {
+            "column": 15,
+            "line": 16,
+            "offset": 443
+          }
+        },
+        "band.upper": {
+          "end": {
+            "column": 31,
+            "line": 16,
+            "offset": 459
+          },
+          "start": {
+            "column": 27,
+            "line": 16,
+            "offset": 455
+          }
+        },
+        "curve": {
+          "end": {
+            "column": 16,
+            "line": 17,
+            "offset": 476
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 468
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 20,
+            "offset": 518
+          },
+          "start": {
+            "column": 9,
+            "line": 20,
+            "offset": 513
+          }
+        },
+        "height": {
+          "end": {
+            "column": 11,
+            "line": 19,
+            "offset": 504
+          },
+          "start": {
+            "column": 9,
+            "line": 19,
+            "offset": 502
+          }
+        },
+        "points": {
+          "end": {
+            "column": 17,
+            "line": 18,
+            "offset": 493
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 485
+          }
+        },
+        "title": {
+          "end": {
+            "column": 42,
+            "line": 14,
+            "offset": 418
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 384
+          }
+        },
+        "type": {
+          "end": {
+            "column": 17,
+            "line": 13,
+            "offset": 376
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 367
+          }
+        },
+        "y": {
+          "end": {
+            "column": 10,
+            "line": 15,
+            "offset": 428
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 422
+          }
+        }
+      },
+      "blockType": "sparkline",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 20,
+          "line": 42,
+          "offset": 942
+        },
+        "start": {
+          "column": 1,
+          "line": 22,
+          "offset": 523
+        }
+      },
+      "level": 2,
+      "position": [
+        360,
+        946
+      ],
+      "raw": {
+        "data": "errors | low | high\n     4 |   2 |    7\n     6 |   3 |   10\n     5 |   2 |    9\n     9 |   5 |   14\n    12 |   8 |   17\n    11 |   7 |   16\n    18 |  13 |   24\n    24 |  18 |   31\n    31 |  24 |   39\n    27 |  20 |   35\n    19 |  13 |   26\n    14 |   9 |   20\n    11 |   7 |   16\n     9 |   5 |   14\n     8 |   4 |   13\n     6 |   3 |   11\n     7 |   3 |   12\n     5 |   2 |    9\n     4 |   2 |    8\n     3 |   1 |    7\n",
+        "fence": "```",
+        "header": "title: Errors per minute, last 20 minutes\ny: errors\nband: {lower: low, upper: high}\ncurve: monotone\npoints: extremes\nheight: 48\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 43,
+          "offset": 946
+        },
+        "start": {
+          "column": 1,
+          "line": 13,
+          "offset": 360
+        }
+      },
+      "raw": "errors | low | high\n     4 |   2 |    7\n     6 |   3 |   10\n     5 |   2 |    9\n     9 |   5 |   14\n    12 |   8 |   17\n    11 |   7 |   16\n    18 |  13 |   24\n    24 |  18 |   31\n    31 |  24 |   39\n    27 |  20 |   35\n    19 |  13 |   26\n    14 |   9 |   20\n    11 |   7 |   16\n     9 |   5 |   14\n     8 |   4 |   13\n     6 |   3 |   11\n     7 |   3 |   12\n     5 |   2 |    9\n     4 |   2 |    8\n     3 |   1 |    7\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "errors",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "low",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "high",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            4,
+            2,
+            7
+          ],
+          [
+            6,
+            3,
+            10
+          ],
+          [
+            5,
+            2,
+            9
+          ],
+          [
+            9,
+            5,
+            14
+          ],
+          [
+            12,
+            8,
+            17
+          ],
+          [
+            11,
+            7,
+            16
+          ],
+          [
+            18,
+            13,
+            24
+          ],
+          [
+            24,
+            18,
+            31
+          ],
+          [
+            31,
+            24,
+            39
+          ],
+          [
+            27,
+            20,
+            35
+          ],
+          [
+            19,
+            13,
+            26
+          ],
+          [
+            14,
+            9,
+            20
+          ],
+          [
+            11,
+            7,
+            16
+          ],
+          [
+            9,
+            5,
+            14
+          ],
+          [
+            8,
+            4,
+            13
+          ],
+          [
+            6,
+            3,
+            11
+          ],
+          [
+            7,
+            3,
+            12
+          ],
+          [
+            5,
+            2,
+            9
+          ],
+          [
+            4,
+            2,
+            8
+          ],
+          [
+            3,
+            1,
+            7
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 25,
+          "line": 3,
+          "offset": 39
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 43
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Errors per minute"
+  },
+  "position": [
+    0,
+    947
+  ],
+  "type": "root"
+}

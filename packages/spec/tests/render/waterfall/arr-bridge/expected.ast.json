@@ -1,0 +1,327 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            46,
+            62
+          ],
+          "type": "text",
+          "value": "ARR bridge, FY26"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        44,
+        62
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            64,
+            127
+          ],
+          "type": "text",
+          "value": "A subtotal is arithmetic, not an observation: a row flagged by "
+        },
+        {
+          "position": [
+            127,
+            134
+          ],
+          "type": "inlineCode",
+          "value": "total"
+        },
+        {
+          "position": [
+            134,
+            642
+          ],
+          "type": "text",
+          "value": " is drawn\nfrom the baseline to the running total as the steps above it left it, and its\nown value cell is not read. So only the closing balance is flagged. The opening\nbalance is the walk's first step — a rise from zero — because a bridge that\nbegan at a subtotal would begin at nothing. Connectors carry the running balance\nbetween bars so the walk is legible as one continuous quantity, and direction\nuses the status palette because increase and decrease are a fixed vocabulary of\ntwo, never palette slots."
+        }
+      ],
+      "position": [
+        64,
+        642
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "step",
+        "connector": true,
+        "format": "table",
+        "title": "ARR bridge (thousands)",
+        "total": "subtotal",
+        "type": "waterfall",
+        "value": "delta"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 15,
+            "line": 19,
+            "offset": 705
+          },
+          "start": {
+            "column": 11,
+            "line": 19,
+            "offset": 701
+          }
+        },
+        "connector": {
+          "end": {
+            "column": 16,
+            "line": 22,
+            "offset": 750
+          },
+          "start": {
+            "column": 12,
+            "line": 22,
+            "offset": 746
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 23,
+            "offset": 764
+          },
+          "start": {
+            "column": 9,
+            "line": 23,
+            "offset": 759
+          }
+        },
+        "title": {
+          "end": {
+            "column": 30,
+            "line": 18,
+            "offset": 690
+          },
+          "start": {
+            "column": 8,
+            "line": 18,
+            "offset": 668
+          }
+        },
+        "total": {
+          "end": {
+            "column": 16,
+            "line": 21,
+            "offset": 734
+          },
+          "start": {
+            "column": 8,
+            "line": 21,
+            "offset": 726
+          }
+        },
+        "type": {
+          "end": {
+            "column": 17,
+            "line": 17,
+            "offset": 660
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 651
+          }
+        },
+        "value": {
+          "end": {
+            "column": 13,
+            "line": 20,
+            "offset": 718
+          },
+          "start": {
+            "column": 8,
+            "line": 20,
+            "offset": 713
+          }
+        }
+      },
+      "blockType": "waterfall",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 29,
+          "line": 31,
+          "offset": 980
+        },
+        "start": {
+          "column": 1,
+          "line": 25,
+          "offset": 769
+        }
+      },
+      "level": 2,
+      "position": [
+        644,
+        984
+      ],
+      "raw": {
+        "data": "step          | delta | subtotal\nOpening ARR   | 18400 | false\nNew business  |  5240 | false\nExpansion     |  2180 | false\nContraction   |  -940 | false\nChurn         | -1610 | false\nClosing ARR   | 23270 | true\n",
+        "fence": "```",
+        "header": "title: ARR bridge (thousands)\ncategory: step\nvalue: delta\ntotal: subtotal\nconnector: true\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 32,
+          "offset": 984
+        },
+        "start": {
+          "column": 1,
+          "line": 17,
+          "offset": 644
+        }
+      },
+      "raw": "step          | delta | subtotal\nOpening ARR   | 18400 | false\nNew business  |  5240 | false\nExpansion     |  2180 | false\nContraction   |  -940 | false\nChurn         | -1610 | false\nClosing ARR   | 23270 | true\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "step",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "delta",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "subtotal",
+            "type": "boolean"
+          }
+        ],
+        "rows": [
+          [
+            "Opening ARR",
+            18400,
+            false
+          ],
+          [
+            "New business",
+            5240,
+            false
+          ],
+          [
+            "Expansion",
+            2180,
+            false
+          ],
+          [
+            "Contraction",
+            -940,
+            false
+          ],
+          [
+            "Churn",
+            -1610,
+            false
+          ],
+          [
+            "Closing ARR",
+            23270,
+            true
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 24,
+          "line": 3,
+          "offset": 38
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 42
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "ARR bridge, FY26"
+  },
+  "position": [
+    0,
+    985
+  ],
+  "type": "root"
+}

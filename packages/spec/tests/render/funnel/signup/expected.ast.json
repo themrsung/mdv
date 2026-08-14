@@ -1,0 +1,296 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            44,
+            58
+          ],
+          "type": "text",
+          "value": "Sign-up funnel"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        42,
+        58
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            60,
+            316
+          ],
+          "type": "text",
+          "value": "The stages are ordered and each one is a subset of the one above it, which is\nwhat makes the shape honest. The drop-offs are printed because the reader's\nactual question — where do we lose them — is a subtraction the chart would\notherwise leave them to do."
+        }
+      ],
+      "position": [
+        60,
+        316
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "step",
+        "format": "table",
+        "orientation": "vertical",
+        "showDropoff": true,
+        "title": "Sign-up, last 30 days",
+        "type": "funnel",
+        "value": "users"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 15,
+            "line": 15,
+            "offset": 375
+          },
+          "start": {
+            "column": 11,
+            "line": 15,
+            "offset": 371
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 19,
+            "offset": 442
+          },
+          "start": {
+            "column": 9,
+            "line": 19,
+            "offset": 437
+          }
+        },
+        "orientation": {
+          "end": {
+            "column": 22,
+            "line": 17,
+            "offset": 410
+          },
+          "start": {
+            "column": 14,
+            "line": 17,
+            "offset": 402
+          }
+        },
+        "showDropoff": {
+          "end": {
+            "column": 18,
+            "line": 18,
+            "offset": 428
+          },
+          "start": {
+            "column": 14,
+            "line": 18,
+            "offset": 424
+          }
+        },
+        "title": {
+          "end": {
+            "column": 29,
+            "line": 14,
+            "offset": 360
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 339
+          }
+        },
+        "type": {
+          "end": {
+            "column": 14,
+            "line": 13,
+            "offset": 331
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 325
+          }
+        },
+        "value": {
+          "end": {
+            "column": 13,
+            "line": 16,
+            "offset": 388
+          },
+          "start": {
+            "column": 8,
+            "line": 16,
+            "offset": 383
+          }
+        }
+      },
+      "blockType": "funnel",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 26,
+          "line": 26,
+          "offset": 602
+        },
+        "start": {
+          "column": 1,
+          "line": 21,
+          "offset": 447
+        }
+      },
+      "level": 2,
+      "position": [
+        318,
+        606
+      ],
+      "raw": {
+        "data": "step              | users\nVisited           | 48210\nStarted sign-up   | 21440\nVerified email    | 15980\nCompleted profile | 11220\nActivated         |  8710\n",
+        "fence": "```",
+        "header": "title: Sign-up, last 30 days\ncategory: step\nvalue: users\norientation: vertical\nshowDropoff: true\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 27,
+          "offset": 606
+        },
+        "start": {
+          "column": 1,
+          "line": 13,
+          "offset": 318
+        }
+      },
+      "raw": "step              | users\nVisited           | 48210\nStarted sign-up   | 21440\nVerified email    | 15980\nCompleted profile | 11220\nActivated         |  8710\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "step",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "users",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "Visited",
+            48210
+          ],
+          [
+            "Started sign-up",
+            21440
+          ],
+          [
+            "Verified email",
+            15980
+          ],
+          [
+            "Completed profile",
+            11220
+          ],
+          [
+            "Activated",
+            8710
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 22,
+          "line": 3,
+          "offset": 36
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 40
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Sign-up funnel"
+  },
+  "position": [
+    0,
+    607
+  ],
+  "type": "root"
+}

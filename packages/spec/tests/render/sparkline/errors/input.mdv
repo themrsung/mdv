@@ -1,0 +1,43 @@
+---
+mdv: "1.0"
+title: Errors per minute
+---
+
+# Errors per minute
+
+Chromeless by contract: no axes, no legend, no tooltip, and no hit regions to
+hover. The shape sits beside a number some other element already states, and
+every point — both band bounds included — is still in the table view, because
+removing the ruler is not permission to remove the numbers.
+
+```mdv sparkline
+title: Errors per minute, last 20 minutes
+y: errors
+band: {lower: low, upper: high}
+curve: monotone
+points: extremes
+height: 48
+format: table
+---
+errors | low | high
+     4 |   2 |    7
+     6 |   3 |   10
+     5 |   2 |    9
+     9 |   5 |   14
+    12 |   8 |   17
+    11 |   7 |   16
+    18 |  13 |   24
+    24 |  18 |   31
+    31 |  24 |   39
+    27 |  20 |   35
+    19 |  13 |   26
+    14 |   9 |   20
+    11 |   7 |   16
+     9 |   5 |   14
+     8 |   4 |   13
+     6 |   3 |   11
+     7 |   3 |   12
+     5 |   2 |    9
+     4 |   2 |    8
+     3 |   1 |    7
+```

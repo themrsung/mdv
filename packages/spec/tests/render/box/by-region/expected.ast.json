@@ -1,0 +1,372 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            58,
+            86
+          ],
+          "type": "text",
+          "value": "Time to first byte by region"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        56,
+        86
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            88,
+            299
+          ],
+          "type": "text",
+          "value": "Three distributions side by side, from raw observations rather than\npre-computed summaries. The whiskers are Tukey's, so the one point drawn beyond\nthe amer whisker is an outlier by a stated rule and not by eye."
+        }
+      ],
+      "position": [
+        88,
+        299
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "table",
+        "outliers": true,
+        "title": "Time to first byte",
+        "type": "box",
+        "whisker": "tukey",
+        "x": "region",
+        "y": "ms"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 18,
+            "offset": 397
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 392
+          }
+        },
+        "outliers": {
+          "end": {
+            "column": 15,
+            "line": 17,
+            "offset": 383
+          },
+          "start": {
+            "column": 11,
+            "line": 17,
+            "offset": 379
+          }
+        },
+        "title": {
+          "end": {
+            "column": 26,
+            "line": 13,
+            "offset": 337
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 319
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 12,
+            "offset": 311
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 308
+          }
+        },
+        "whisker": {
+          "end": {
+            "column": 15,
+            "line": 16,
+            "offset": 368
+          },
+          "start": {
+            "column": 10,
+            "line": 16,
+            "offset": 363
+          }
+        },
+        "x": {
+          "end": {
+            "column": 10,
+            "line": 14,
+            "offset": 347
+          },
+          "start": {
+            "column": 4,
+            "line": 14,
+            "offset": 341
+          }
+        },
+        "y": {
+          "end": {
+            "column": 6,
+            "line": 15,
+            "offset": 353
+          },
+          "start": {
+            "column": 4,
+            "line": 15,
+            "offset": 351
+          }
+        }
+      },
+      "blockType": "box",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 13,
+          "line": 44,
+          "offset": 726
+        },
+        "start": {
+          "column": 1,
+          "line": 20,
+          "offset": 402
+        }
+      },
+      "level": 2,
+      "position": [
+        301,
+        730
+      ],
+      "raw": {
+        "data": "region |  ms\namer   |  78\namer   |  84\namer   |  89\namer   |  92\namer   |  96\namer   | 101\namer   | 108\namer   | 214\nemea   |  96\nemea   | 102\nemea   | 107\nemea   | 111\nemea   | 115\nemea   | 119\nemea   | 126\nemea   | 134\napac   | 142\napac   | 151\napac   | 158\napac   | 164\napac   | 170\napac   | 177\napac   | 186\napac   | 198\n",
+        "fence": "```",
+        "header": "title: Time to first byte\nx: region\ny: ms\nwhisker: tukey\noutliers: true\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 45,
+          "offset": 730
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 301
+        }
+      },
+      "raw": "region |  ms\namer   |  78\namer   |  84\namer   |  89\namer   |  92\namer   |  96\namer   | 101\namer   | 108\namer   | 214\nemea   |  96\nemea   | 102\nemea   | 107\nemea   | 111\nemea   | 115\nemea   | 119\nemea   | 126\nemea   | 134\napac   | 142\napac   | 151\napac   | 158\napac   | 164\napac   | 170\napac   | 177\napac   | 186\napac   | 198\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "region",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "ms",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "amer",
+            78
+          ],
+          [
+            "amer",
+            84
+          ],
+          [
+            "amer",
+            89
+          ],
+          [
+            "amer",
+            92
+          ],
+          [
+            "amer",
+            96
+          ],
+          [
+            "amer",
+            101
+          ],
+          [
+            "amer",
+            108
+          ],
+          [
+            "amer",
+            214
+          ],
+          [
+            "emea",
+            96
+          ],
+          [
+            "emea",
+            102
+          ],
+          [
+            "emea",
+            107
+          ],
+          [
+            "emea",
+            111
+          ],
+          [
+            "emea",
+            115
+          ],
+          [
+            "emea",
+            119
+          ],
+          [
+            "emea",
+            126
+          ],
+          [
+            "emea",
+            134
+          ],
+          [
+            "apac",
+            142
+          ],
+          [
+            "apac",
+            151
+          ],
+          [
+            "apac",
+            158
+          ],
+          [
+            "apac",
+            164
+          ],
+          [
+            "apac",
+            170
+          ],
+          [
+            "apac",
+            177
+          ],
+          [
+            "apac",
+            186
+          ],
+          [
+            "apac",
+            198
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 36,
+          "line": 3,
+          "offset": 50
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 54
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Time to first byte by region"
+  },
+  "position": [
+    0,
+    731
+  ],
+  "type": "root"
+}

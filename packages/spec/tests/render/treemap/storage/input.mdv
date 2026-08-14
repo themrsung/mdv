@@ -1,0 +1,33 @@
+---
+mdv: "1.0"
+title: Storage by team and bucket
+---
+
+# Storage by team and bucket
+
+The hierarchy is a field, not nested data: `parent` names a column, and the
+three team rows are never written because a parent cell that names no row of its
+own creates the group anyway. Each branch takes one hue and every tile under it
+wears the same one, so a reader tracks a team by colour and reads its
+subdivision from the gaps.
+
+```mdv treemap
+title: Object storage (TB)
+category: bucket
+value: tb
+parent: team
+tile: squarify
+labelMinArea: 900
+format: table
+---
+bucket          | team      |   tb
+media-originals | Platform  | 41.2
+media-derived   | Platform  | 18.7
+build-cache     | Platform  |  9.4
+event-archive   | Analytics | 33.8
+warehouse-cold  | Analytics | 22.1
+notebooks       | Analytics |  4.6
+session-replays | Product   | 15.3
+exports         | Product   |  6.9
+attachments     | Product   |  3.2
+```

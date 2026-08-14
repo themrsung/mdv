@@ -1,0 +1,447 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            64,
+            98
+          ],
+          "type": "text",
+          "value": "Availability against the objective"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        62,
+        98
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            100,
+            404
+          ],
+          "type": "text",
+          "value": "A gauge is a one-number form, so this is one number: the quarter's attainment,\nsat in the band it landed in. The range is declared rather than derived, because\nan availability gauge scaled to its own data would put 99.94 halfway up an arc\nand say nothing about the objective it is being measured against."
+        }
+      ],
+      "position": [
+        100,
+        404
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "format": "table",
+        "max": 100,
+        "min": 99,
+        "showValue": true,
+        "thresholds": [
+          {
+            "at": 99,
+            "label": "Breaching",
+            "status": "critical"
+          },
+          {
+            "at": 99.5,
+            "label": "At risk",
+            "status": "warning"
+          },
+          {
+            "at": 99.9,
+            "label": "Meeting objective",
+            "status": "good"
+          }
+        ],
+        "title": "Availability, FY26 Q2 (%)",
+        "type": "gauge",
+        "value": "attainment"
+      },
+      "attrsPosition": {
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 23,
+            "offset": 680
+          },
+          "start": {
+            "column": 9,
+            "line": 23,
+            "offset": 675
+          }
+        },
+        "max": {
+          "end": {
+            "column": 9,
+            "line": 17,
+            "offset": 486
+          },
+          "start": {
+            "column": 6,
+            "line": 17,
+            "offset": 483
+          }
+        },
+        "min": {
+          "end": {
+            "column": 8,
+            "line": 16,
+            "offset": 477
+          },
+          "start": {
+            "column": 6,
+            "line": 16,
+            "offset": 475
+          }
+        },
+        "showValue": {
+          "end": {
+            "column": 16,
+            "line": 18,
+            "offset": 502
+          },
+          "start": {
+            "column": 12,
+            "line": 18,
+            "offset": 498
+          }
+        },
+        "thresholds": {
+          "end": {
+            "column": 55,
+            "line": 22,
+            "offset": 666
+          },
+          "start": {
+            "column": 3,
+            "line": 20,
+            "offset": 517
+          }
+        },
+        "thresholds[0]": {
+          "end": {
+            "column": 49,
+            "line": 20,
+            "offset": 563
+          },
+          "start": {
+            "column": 5,
+            "line": 20,
+            "offset": 519
+          }
+        },
+        "thresholds[0].at": {
+          "end": {
+            "column": 12,
+            "line": 20,
+            "offset": 526
+          },
+          "start": {
+            "column": 10,
+            "line": 20,
+            "offset": 524
+          }
+        },
+        "thresholds[0].label": {
+          "end": {
+            "column": 48,
+            "line": 20,
+            "offset": 562
+          },
+          "start": {
+            "column": 39,
+            "line": 20,
+            "offset": 553
+          }
+        },
+        "thresholds[0].status": {
+          "end": {
+            "column": 30,
+            "line": 20,
+            "offset": 544
+          },
+          "start": {
+            "column": 22,
+            "line": 20,
+            "offset": 536
+          }
+        },
+        "thresholds[1]": {
+          "end": {
+            "column": 48,
+            "line": 21,
+            "offset": 611
+          },
+          "start": {
+            "column": 5,
+            "line": 21,
+            "offset": 568
+          }
+        },
+        "thresholds[1].at": {
+          "end": {
+            "column": 14,
+            "line": 21,
+            "offset": 577
+          },
+          "start": {
+            "column": 10,
+            "line": 21,
+            "offset": 573
+          }
+        },
+        "thresholds[1].label": {
+          "end": {
+            "column": 47,
+            "line": 21,
+            "offset": 610
+          },
+          "start": {
+            "column": 40,
+            "line": 21,
+            "offset": 603
+          }
+        },
+        "thresholds[1].status": {
+          "end": {
+            "column": 31,
+            "line": 21,
+            "offset": 594
+          },
+          "start": {
+            "column": 24,
+            "line": 21,
+            "offset": 587
+          }
+        },
+        "thresholds[2]": {
+          "end": {
+            "column": 55,
+            "line": 22,
+            "offset": 666
+          },
+          "start": {
+            "column": 5,
+            "line": 22,
+            "offset": 616
+          }
+        },
+        "thresholds[2].at": {
+          "end": {
+            "column": 14,
+            "line": 22,
+            "offset": 625
+          },
+          "start": {
+            "column": 10,
+            "line": 22,
+            "offset": 621
+          }
+        },
+        "thresholds[2].label": {
+          "end": {
+            "column": 54,
+            "line": 22,
+            "offset": 665
+          },
+          "start": {
+            "column": 37,
+            "line": 22,
+            "offset": 648
+          }
+        },
+        "thresholds[2].status": {
+          "end": {
+            "column": 28,
+            "line": 22,
+            "offset": 639
+          },
+          "start": {
+            "column": 24,
+            "line": 22,
+            "offset": 635
+          }
+        },
+        "title": {
+          "end": {
+            "column": 33,
+            "line": 14,
+            "offset": 451
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 426
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 13,
+            "offset": 418
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 413
+          }
+        },
+        "value": {
+          "end": {
+            "column": 18,
+            "line": 15,
+            "offset": 469
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 459
+          }
+        }
+      },
+      "blockType": "gauge",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 6,
+          "line": 26,
+          "offset": 701
+        },
+        "start": {
+          "column": 1,
+          "line": 25,
+          "offset": 685
+        }
+      },
+      "level": 2,
+      "position": [
+        406,
+        705
+      ],
+      "raw": {
+        "data": "attainment\n99.94\n",
+        "fence": "```",
+        "header": "title: Availability, FY26 Q2 (%)\nvalue: attainment\nmin: 99\nmax: 100\nshowValue: true\nthresholds:\n  - {at: 99, status: critical, label: Breaching}\n  - {at: 99.5, status: warning, label: At risk}\n  - {at: 99.9, status: good, label: Meeting objective}\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 27,
+          "offset": 705
+        },
+        "start": {
+          "column": 1,
+          "line": 13,
+          "offset": 406
+        }
+      },
+      "raw": "attainment\n99.94\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "attainment",
+            "type": "number"
+          }
+        ],
+        "rows": [
+          [
+            99.94
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 42,
+          "line": 3,
+          "offset": 56
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 60
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Availability against the objective"
+  },
+  "position": [
+    0,
+    706
+  ],
+  "type": "root"
+}

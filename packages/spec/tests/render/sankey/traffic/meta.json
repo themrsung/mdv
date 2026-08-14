@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "sankey",
+    "flow"
+  ],
+  "note": "SPEC 8.12: acyclic two-hop flow, conserved at every node, justified columns.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

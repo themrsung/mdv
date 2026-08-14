@@ -1,0 +1,13 @@
+{
+  "level": 2,
+  "tags": [
+    "candlestick",
+    "ohlc",
+    "temporal"
+  ],
+  "note": "SPEC 8.10: candlestick is an ohlc alias; hollow bodies double-encode direction.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

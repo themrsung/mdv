@@ -1,0 +1,335 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            56,
+            82
+          ],
+          "type": "text",
+          "value": "Response time distribution"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        54,
+        82
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            84,
+            433
+          ],
+          "type": "text",
+          "value": "The mean is 268 ms and the median is 205 ms, and neither number is the finding.\nThe finding is the second cluster past 400 ms: a distinct population of slow\nrequests that a summary statistic averages away and only a distribution shows.\nBars touch because the axis is continuous, and the two long tail rows are real\nrequests, not noise to be trimmed."
+        }
+      ],
+      "position": [
+        84,
+        433
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "bins": 12,
+        "format": "table",
+        "title": "Request latency",
+        "type": "histogram",
+        "x": "ms"
+      },
+      "attrsPosition": {
+        "bins": {
+          "end": {
+            "column": 9,
+            "line": 17,
+            "offset": 489
+          },
+          "start": {
+            "column": 7,
+            "line": 17,
+            "offset": 487
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 18,
+            "offset": 503
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 498
+          }
+        },
+        "title": {
+          "end": {
+            "column": 23,
+            "line": 15,
+            "offset": 474
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 459
+          }
+        },
+        "type": {
+          "end": {
+            "column": 17,
+            "line": 14,
+            "offset": 451
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 442
+          }
+        },
+        "x": {
+          "end": {
+            "column": 6,
+            "line": 16,
+            "offset": 480
+          },
+          "start": {
+            "column": 4,
+            "line": 16,
+            "offset": 478
+          }
+        }
+      },
+      "blockType": "histogram",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 5,
+          "line": 50,
+          "offset": 662
+        },
+        "start": {
+          "column": 1,
+          "line": 20,
+          "offset": 508
+        }
+      },
+      "level": 2,
+      "position": [
+        435,
+        666
+      ],
+      "raw": {
+        "data": "  ms\n 118\n 132\n 141\n 147\n 152\n 158\n 163\n 168\n 172\n 176\n 181\n 186\n 190\n 197\n 205\n 214\n 226\n 238\n 402\n 418\n 431\n 447\n 458\n 470\n 486\n 499\n 512\n 528\n 640\n 712\n",
+        "fence": "```",
+        "header": "title: Request latency\nx: ms\nbins: 12\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 51,
+          "offset": 666
+        },
+        "start": {
+          "column": 1,
+          "line": 14,
+          "offset": 435
+        }
+      },
+      "raw": "  ms\n 118\n 132\n 141\n 147\n 152\n 158\n 163\n 168\n 172\n 176\n 181\n 186\n 190\n 197\n 205\n 214\n 226\n 238\n 402\n 418\n 431\n 447\n 458\n 470\n 486\n 499\n 512\n 528\n 640\n 712\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "ms",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            118
+          ],
+          [
+            132
+          ],
+          [
+            141
+          ],
+          [
+            147
+          ],
+          [
+            152
+          ],
+          [
+            158
+          ],
+          [
+            163
+          ],
+          [
+            168
+          ],
+          [
+            172
+          ],
+          [
+            176
+          ],
+          [
+            181
+          ],
+          [
+            186
+          ],
+          [
+            190
+          ],
+          [
+            197
+          ],
+          [
+            205
+          ],
+          [
+            214
+          ],
+          [
+            226
+          ],
+          [
+            238
+          ],
+          [
+            402
+          ],
+          [
+            418
+          ],
+          [
+            431
+          ],
+          [
+            447
+          ],
+          [
+            458
+          ],
+          [
+            470
+          ],
+          [
+            486
+          ],
+          [
+            499
+          ],
+          [
+            512
+          ],
+          [
+            528
+          ],
+          [
+            640
+          ],
+          [
+            712
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 34,
+          "line": 3,
+          "offset": 48
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 52
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Response time distribution"
+  },
+  "position": [
+    0,
+    667
+  ],
+  "type": "root"
+}

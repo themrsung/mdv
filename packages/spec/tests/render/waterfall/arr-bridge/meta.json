@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "waterfall",
+    "change"
+  ],
+  "note": "SPEC 8.12: `total` marks subtotal rows; direction uses the status palette.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

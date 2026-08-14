@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "radar",
+    "comparison"
+  ],
+  "note": "SPEC 8.12: six axes in a stable order on one shared scale.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "sparkline",
+    "chromeless"
+  ],
+  "note": "SPEC 8.12: no axes, no legend, no hit regions; the band bounds reach the table view.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

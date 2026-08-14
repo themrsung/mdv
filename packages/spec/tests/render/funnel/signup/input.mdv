@@ -1,0 +1,27 @@
+---
+mdv: "1.0"
+title: Sign-up funnel
+---
+
+# Sign-up funnel
+
+The stages are ordered and each one is a subset of the one above it, which is
+what makes the shape honest. The drop-offs are printed because the reader's
+actual question — where do we lose them — is a subtraction the chart would
+otherwise leave them to do.
+
+```mdv funnel
+title: Sign-up, last 30 days
+category: step
+value: users
+orientation: vertical
+showDropoff: true
+format: table
+---
+step              | users
+Visited           | 48210
+Started sign-up   | 21440
+Verified email    | 15980
+Completed profile | 11220
+Activated         |  8710
+```

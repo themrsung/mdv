@@ -1,0 +1,367 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            61,
+            92
+          ],
+          "type": "text",
+          "value": "Capability review, two releases"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        59,
+        92
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            94,
+            321
+          ],
+          "type": "text",
+          "value": "Six axes, a fixed order, and a shared 0–5 scale, which is the only arrangement\nin which the enclosed areas mean anything. The comparison the shape makes is\nthat 2.0 gained on accessibility and documentation and gave up nothing."
+        }
+      ],
+      "position": [
+        94,
+        321
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "capability",
+        "fill": true,
+        "format": "table",
+        "gridShape": "polygon",
+        "maxValue": 5,
+        "series": "release",
+        "title": "Platform capability review",
+        "type": "radar",
+        "value": "score"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 21,
+            "line": 14,
+            "offset": 390
+          },
+          "start": {
+            "column": 11,
+            "line": 14,
+            "offset": 380
+          }
+        },
+        "fill": {
+          "end": {
+            "column": 11,
+            "line": 19,
+            "offset": 461
+          },
+          "start": {
+            "column": 7,
+            "line": 19,
+            "offset": 457
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 20,
+            "offset": 475
+          },
+          "start": {
+            "column": 9,
+            "line": 20,
+            "offset": 470
+          }
+        },
+        "gridShape": {
+          "end": {
+            "column": 19,
+            "line": 18,
+            "offset": 450
+          },
+          "start": {
+            "column": 12,
+            "line": 18,
+            "offset": 443
+          }
+        },
+        "maxValue": {
+          "end": {
+            "column": 12,
+            "line": 17,
+            "offset": 431
+          },
+          "start": {
+            "column": 11,
+            "line": 17,
+            "offset": 430
+          }
+        },
+        "series": {
+          "end": {
+            "column": 16,
+            "line": 16,
+            "offset": 419
+          },
+          "start": {
+            "column": 9,
+            "line": 16,
+            "offset": 412
+          }
+        },
+        "title": {
+          "end": {
+            "column": 34,
+            "line": 13,
+            "offset": 369
+          },
+          "start": {
+            "column": 8,
+            "line": 13,
+            "offset": 343
+          }
+        },
+        "type": {
+          "end": {
+            "column": 13,
+            "line": 12,
+            "offset": 335
+          },
+          "start": {
+            "column": 8,
+            "line": 12,
+            "offset": 330
+          }
+        },
+        "value": {
+          "end": {
+            "column": 13,
+            "line": 15,
+            "offset": 403
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 398
+          }
+        }
+      },
+      "blockType": "radar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 32,
+          "line": 34,
+          "offset": 895
+        },
+        "start": {
+          "column": 1,
+          "line": 22,
+          "offset": 480
+        }
+      },
+      "level": 2,
+      "position": [
+        323,
+        899
+      ],
+      "raw": {
+        "data": "capability    | release | score\nThroughput    | v1.4    |   3.1\nLatency       | v1.4    |   3.6\nAccessibility | v1.4    |   2.2\nDocs          | v1.4    |   2.8\nSecurity      | v1.4    |   3.9\nExtensibility | v1.4    |   3.0\nThroughput    | v2.0    |   3.4\nLatency       | v2.0    |   3.7\nAccessibility | v2.0    |   4.4\nDocs          | v2.0    |   4.1\nSecurity      | v2.0    |   4.0\nExtensibility | v2.0    |   3.5\n",
+        "fence": "```",
+        "header": "title: Platform capability review\ncategory: capability\nvalue: score\nseries: release\nmaxValue: 5\ngridShape: polygon\nfill: true\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 35,
+          "offset": 899
+        },
+        "start": {
+          "column": 1,
+          "line": 12,
+          "offset": 323
+        }
+      },
+      "raw": "capability    | release | score\nThroughput    | v1.4    |   3.1\nLatency       | v1.4    |   3.6\nAccessibility | v1.4    |   2.2\nDocs          | v1.4    |   2.8\nSecurity      | v1.4    |   3.9\nExtensibility | v1.4    |   3.0\nThroughput    | v2.0    |   3.4\nLatency       | v2.0    |   3.7\nAccessibility | v2.0    |   4.4\nDocs          | v2.0    |   4.1\nSecurity      | v2.0    |   4.0\nExtensibility | v2.0    |   3.5\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "capability",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "release",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "score",
+            "type": "number"
+          }
+        ],
+        "rows": [
+          [
+            "Throughput",
+            "v1.4",
+            3.1
+          ],
+          [
+            "Latency",
+            "v1.4",
+            3.6
+          ],
+          [
+            "Accessibility",
+            "v1.4",
+            2.2
+          ],
+          [
+            "Docs",
+            "v1.4",
+            2.8
+          ],
+          [
+            "Security",
+            "v1.4",
+            3.9
+          ],
+          [
+            "Extensibility",
+            "v1.4",
+            3
+          ],
+          [
+            "Throughput",
+            "v2.0",
+            3.4
+          ],
+          [
+            "Latency",
+            "v2.0",
+            3.7
+          ],
+          [
+            "Accessibility",
+            "v2.0",
+            4.4
+          ],
+          [
+            "Docs",
+            "v2.0",
+            4.1
+          ],
+          [
+            "Security",
+            "v2.0",
+            4
+          ],
+          [
+            "Extensibility",
+            "v2.0",
+            3.5
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 39,
+          "line": 3,
+          "offset": 53
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 57
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Capability review, two releases"
+  },
+  "position": [
+    0,
+    900
+  ],
+  "type": "root"
+}

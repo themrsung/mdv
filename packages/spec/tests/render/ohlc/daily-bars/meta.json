@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "ohlc",
+    "temporal"
+  ],
+  "note": "SPEC 8.10: tick bars, ordinal-time axis, weekends collapsed.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

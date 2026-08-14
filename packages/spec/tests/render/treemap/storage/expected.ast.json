@@ -1,0 +1,355 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            56,
+            82
+          ],
+          "type": "text",
+          "value": "Storage by team and bucket"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        54,
+        82
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            84,
+            127
+          ],
+          "type": "text",
+          "value": "The hierarchy is a field, not nested data: "
+        },
+        {
+          "position": [
+            127,
+            135
+          ],
+          "type": "inlineCode",
+          "value": "parent"
+        },
+        {
+          "position": [
+            135,
+            417
+          ],
+          "type": "text",
+          "value": " names a column, and the\nthree team rows are never written because a parent cell that names no row of its\nown creates the group anyway. Each branch takes one hue and every tile under it\nwears the same one, so a reader tracks a team by colour and reads its\nsubdivision from the gaps."
+        }
+      ],
+      "position": [
+        84,
+        417
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "category": "bucket",
+        "format": "table",
+        "labelMinArea": 900,
+        "parent": "team",
+        "tile": "squarify",
+        "title": "Object storage (TB)",
+        "type": "treemap",
+        "value": "tb"
+      },
+      "attrsPosition": {
+        "category": {
+          "end": {
+            "column": 17,
+            "line": 16,
+            "offset": 477
+          },
+          "start": {
+            "column": 11,
+            "line": 16,
+            "offset": 471
+          }
+        },
+        "format": {
+          "end": {
+            "column": 14,
+            "line": 21,
+            "offset": 547
+          },
+          "start": {
+            "column": 9,
+            "line": 21,
+            "offset": 542
+          }
+        },
+        "labelMinArea": {
+          "end": {
+            "column": 18,
+            "line": 20,
+            "offset": 533
+          },
+          "start": {
+            "column": 15,
+            "line": 20,
+            "offset": 530
+          }
+        },
+        "parent": {
+          "end": {
+            "column": 13,
+            "line": 18,
+            "offset": 500
+          },
+          "start": {
+            "column": 9,
+            "line": 18,
+            "offset": 496
+          }
+        },
+        "tile": {
+          "end": {
+            "column": 15,
+            "line": 19,
+            "offset": 515
+          },
+          "start": {
+            "column": 7,
+            "line": 19,
+            "offset": 507
+          }
+        },
+        "title": {
+          "end": {
+            "column": 27,
+            "line": 15,
+            "offset": 460
+          },
+          "start": {
+            "column": 8,
+            "line": 15,
+            "offset": 441
+          }
+        },
+        "type": {
+          "end": {
+            "column": 15,
+            "line": 14,
+            "offset": 433
+          },
+          "start": {
+            "column": 8,
+            "line": 14,
+            "offset": 426
+          }
+        },
+        "value": {
+          "end": {
+            "column": 10,
+            "line": 17,
+            "offset": 487
+          },
+          "start": {
+            "column": 8,
+            "line": 17,
+            "offset": 485
+          }
+        }
+      },
+      "blockType": "treemap",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 35,
+          "line": 32,
+          "offset": 901
+        },
+        "start": {
+          "column": 1,
+          "line": 23,
+          "offset": 552
+        }
+      },
+      "level": 2,
+      "position": [
+        419,
+        905
+      ],
+      "raw": {
+        "data": "bucket          | team      |   tb\nmedia-originals | Platform  | 41.2\nmedia-derived   | Platform  | 18.7\nbuild-cache     | Platform  |  9.4\nevent-archive   | Analytics | 33.8\nwarehouse-cold  | Analytics | 22.1\nnotebooks       | Analytics |  4.6\nsession-replays | Product   | 15.3\nexports         | Product   |  6.9\nattachments     | Product   |  3.2\n",
+        "fence": "```",
+        "header": "title: Object storage (TB)\ncategory: bucket\nvalue: tb\nparent: team\ntile: squarify\nlabelMinArea: 900\nformat: table\n"
+      },
+      "type": "mdvBlock"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "format": "table",
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 33,
+          "offset": 905
+        },
+        "start": {
+          "column": 1,
+          "line": 14,
+          "offset": 419
+        }
+      },
+      "raw": "bucket          | team      |   tb\nmedia-originals | Platform  | 41.2\nmedia-derived   | Platform  | 18.7\nbuild-cache     | Platform  |  9.4\nevent-archive   | Analytics | 33.8\nwarehouse-cold  | Analytics | 22.1\nnotebooks       | Analytics |  4.6\nsession-replays | Product   | 15.3\nexports         | Product   |  6.9\nattachments     | Product   |  3.2\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "bucket",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "team",
+            "type": "category"
+          },
+          {
+            "inferred": true,
+            "name": "tb",
+            "type": "number"
+          }
+        ],
+        "rows": [
+          [
+            "media-originals",
+            "Platform",
+            41.2
+          ],
+          [
+            "media-derived",
+            "Platform",
+            18.7
+          ],
+          [
+            "build-cache",
+            "Platform",
+            9.4
+          ],
+          [
+            "event-archive",
+            "Analytics",
+            33.8
+          ],
+          [
+            "warehouse-cold",
+            "Analytics",
+            22.1
+          ],
+          [
+            "notebooks",
+            "Analytics",
+            4.6
+          ],
+          [
+            "session-replays",
+            "Product",
+            15.3
+          ],
+          [
+            "exports",
+            "Product",
+            6.9
+          ],
+          [
+            "attachments",
+            "Product",
+            3.2
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "title": {
+        "end": {
+          "column": 34,
+          "line": 3,
+          "offset": 48
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 4,
+        "offset": 52
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Storage by team and bucket"
+  },
+  "position": [
+    0,
+    906
+  ],
+  "type": "root"
+}

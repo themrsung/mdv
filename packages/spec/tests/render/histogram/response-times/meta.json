@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "histogram",
+    "distribution"
+  ],
+  "note": "SPEC 8.7: bins touch on a continuous axis; the second mode is the reading.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}

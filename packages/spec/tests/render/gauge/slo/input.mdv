@@ -1,0 +1,27 @@
+---
+mdv: "1.0"
+title: Availability against the objective
+---
+
+# Availability against the objective
+
+A gauge is a one-number form, so this is one number: the quarter's attainment,
+sat in the band it landed in. The range is declared rather than derived, because
+an availability gauge scaled to its own data would put 99.94 halfway up an arc
+and say nothing about the objective it is being measured against.
+
+```mdv gauge
+title: Availability, FY26 Q2 (%)
+value: attainment
+min: 99
+max: 100
+showValue: true
+thresholds:
+  - {at: 99, status: critical, label: Breaching}
+  - {at: 99.5, status: warning, label: At risk}
+  - {at: 99.9, status: good, label: Meeting objective}
+format: table
+---
+attainment
+99.94
+```

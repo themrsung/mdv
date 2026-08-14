@@ -1,0 +1,45 @@
+---
+mdv: "1.0"
+title: Time to first byte by region
+---
+
+# Time to first byte by region
+
+Three distributions side by side, from raw observations rather than
+pre-computed summaries. The whiskers are Tukey's, so the one point drawn beyond
+the amer whisker is an outlier by a stated rule and not by eye.
+
+```mdv box
+title: Time to first byte
+x: region
+y: ms
+whisker: tukey
+outliers: true
+format: table
+---
+region |  ms
+amer   |  78
+amer   |  84
+amer   |  89
+amer   |  92
+amer   |  96
+amer   | 101
+amer   | 108
+amer   | 214
+emea   |  96
+emea   | 102
+emea   | 107
+emea   | 111
+emea   | 115
+emea   | 119
+emea   | 126
+emea   | 134
+apac   | 142
+apac   | 151
+apac   | 158
+apac   | 164
+apac   | 170
+apac   | 177
+apac   | 186
+apac   | 198
+```

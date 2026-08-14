@@ -1,0 +1,12 @@
+{
+  "level": 2,
+  "tags": [
+    "gauge",
+    "threshold"
+  ],
+  "note": "SPEC 8.13: one number in a declared range; thresholds name the bands.",
+  "pin": [
+    "ast",
+    "svg"
+  ]
+}
