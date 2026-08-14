@@ -56,10 +56,7 @@ export function identitiesFromSeriesColumn(table: Table, field: string): SeriesI
  * `source`, so it is one identity holding one slot — a sankey node is the same
  * colour at both ends of its ribbon.
  */
-export function identitiesFromColumns(
-  table: Table,
-  fields: readonly string[],
-): SeriesIdentity[] {
+export function identitiesFromColumns(table: Table, fields: readonly string[]): SeriesIdentity[] {
   const seen = new Set<string>();
   const out: SeriesIdentity[] = [];
   for (const field of fields) {

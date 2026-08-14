@@ -16,7 +16,7 @@ import {
   MdvErrorCard,
   MdvProvider,
   diagnosticFromError,
-} from '../src/index.js';
+} from '../src/auto.js';
 import { MALFORMED, UNKNOWN_TYPE } from './fixtures.js';
 
 const render = (source: string, onDiagnostics?: (d: readonly Diagnostic[]) => void): string =>

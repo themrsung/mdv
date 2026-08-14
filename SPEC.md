@@ -2554,6 +2554,32 @@ import { MdvDocument, MdvBlock, MdvProvider } from '@mdv/react';
 />
 ```
 
+**Two entry points.** `@mdv/react` registers **no** chart type. A host names the
+types it draws and pays for those only:
+
+```tsx
+import { MdvProvider } from '@mdv/react';
+import { createChartRegistry } from '@mdv/core';
+import { barChart, lineChart, areaChart } from '@mdv/charts';
+
+<MdvProvider registry={createChartRegistry([barChart, lineChart, areaChart])}>
+  …
+</MdvProvider>
+```
+
+`@mdv/react/auto` is the same binding with every type in
+[§8](#8-chart-catalog) already registered, for hosts that render documents they
+have not seen:
+
+```tsx
+import { MdvProvider, MdvDocument } from '@mdv/react/auto';
+```
+
+The split is what makes the first bundle budget in [§24.1](#241-budgets)
+different from the second. A block whose type is not registered is not an error:
+it degrades to its table under [§5.6](#56-degradation), and the two entries are
+otherwise identical in behaviour and exports.
+
 ## 22.2 Hooks
 
 ```ts
@@ -2654,11 +2680,38 @@ Measured on a 2020-class laptop (4-core, no GPU acceleration assumed), median of
 | Resize reflow, 20 visible blocks | ≤ 50 ms |
 | Incremental update, one attribute changed | ≤ 5 ms |
 | PDF export, 50-page document | ≤ 3 s |
-| Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area` | ≤ 65 KB gzipped |
-| Bundle: every Level 2 chart type | ≤ 140 KB gzipped |
+| Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area` | ≤ 175 KB gzipped |
+| Bundle: every Level 2 chart type | ≤ 225 KB gzipped |
 
 Budgets are enforced by `perf/` fixtures in CI; a regression beyond 10 % fails
 the build.
+
+The two bundle figures were 65 KB and 140 KB until there was a build to weigh,
+and both were wrong about what a reader contains rather than about how large
+this one had grown. A reader that renders `.mdv` carries a CommonMark + GFM
+parser and a YAML parser, because [§4](#4-base-syntax) and
+[§5.3](#53-header-section) require both. Those two are about a third of the
+minified bytes on their own — `yaml` at 95 KB and the `micromark`/`mdast` set at
+78 KB, against 358 KB for every `@mdv/*` package in the bundle put together. No
+amount of shrinking MDV's own code reaches 65 KB from there, so the old number
+was not a target that had been missed; it was an omission.
+
+The revised numbers are the measured build plus a few per cent, which leaves the
+10 % rule above as the thing that catches a regression. They are ceilings to
+push down on, not room to spend. The two largest reductions still on the table
+are a YAML subset parser for block headers, since a header is a flat map of
+scalars and lists and needs none of the anchors, tags or multi-document handling
+that most of those 95 KB implement; and per-type channel signatures, so that a
+three-type bundle stops carrying the signature table for every type in
+[§8](#8-chart-catalog).
+
+The gap between the two rows is the point of measuring them separately, and it
+exists only because `@mdv/react` registers no chart type. The main entry starts
+with an empty registry, so the first row carries exactly the three types it
+names. `@mdv/react/auto` ([§22.1](#221-components)) registers all twenty, which
+is the same set the second row weighs. Before that split the first row imported
+the binding and got all twenty with it, so both rows bundled identical content
+and measured the same 219 KB — the first row was measuring the second one.
 
 ## 24.2 Techniques
 

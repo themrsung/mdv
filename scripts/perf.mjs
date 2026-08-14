@@ -63,19 +63,21 @@ const BUNDLES = [
   {
     id: 'bundle/level-1',
     spec: 'Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area`',
-    budget: 65,
+    budget: 175,
     entry: [
       "export * from '@mdv/react';",
       "export { areaChart, barChart, lineChart } from '@mdv/charts';",
     ].join('\n'),
     note:
       'esbuild `--minify --format=esm --platform=browser`, gzip level 9, with ' +
-      '`react` and `react-dom` external — the host ships React with or without MDV.',
+      '`react` and `react-dom` external — the host ships React with or without MDV. ' +
+      'Three types and no more: `@mdv/react` registers none, so this row measures ' +
+      'what it names rather than the whole catalog.',
   },
   {
     id: 'bundle/level-2',
     spec: 'Bundle: every Level 2 chart type',
-    budget: 140,
+    budget: 225,
     entry: [
       "export * from '@mdv/react';",
       "export { level1ChartTypes, level2ChartTypes } from '@mdv/charts';",

@@ -24,7 +24,6 @@ import {
 import type { ChartTypeRegistry, ColorScheme, MdvConfig, TextMetrics, Theme } from '@mdv/core';
 import { createChartRegistry } from '@mdv/core';
 import { createTableMetrics } from '@mdv/core/metrics/index.js';
-import { builtinChartTypes } from '@mdv/charts';
 import { getBuiltinTheme, isBuiltinThemeName, resolveColorScheme, resolveTheme } from '@mdv/themes';
 import { createCaches, type Caches } from './internal/pipeline.js';
 import { DEFAULT_WIDTH } from './internal/size.js';
@@ -99,9 +98,27 @@ export interface MdvProviderProps {
   /** Configuration shared by every descendant document and block. */
   config?: MdvConfig;
   /**
-   * The chart types available to descendants. Defaults to every built-in.
+   * The chart types available to descendants. **Defaults to none.**
    *
-   * Supply a narrowed registry to keep a bundle small, or an extended one to add
+   * ```tsx
+   * import { MdvProvider } from '@mdv/react/auto';        // all twenty types
+   *
+   * import { MdvProvider } from '@mdv/react';             // or pick your own
+   * import { createChartRegistry } from '@mdv/core';
+   * import { barChart, lineChart } from '@mdv/charts';
+   * <MdvProvider registry={createChartRegistry([barChart, lineChart])} />
+   * ```
+   *
+   * The empty default is what makes SPEC 24.1's first bundle row — core, this
+   * binding and *three* chart types — a number a consumer can reach. A default
+   * of `builtinChartTypes` would name all twenty from a module every consumer
+   * loads, so no bundler could drop any of them and SPEC 17.2's "tree-shakeable
+   * per type" would be true of `@mdv/charts` and false of every React app: 50 KB
+   * gzipped of pie geometry and sankey layout in a bundle that draws bars.
+   *
+   * Nothing is silently missing, because an unregistered type is already a
+   * specified outcome: it degrades to a table with `MDV1500`, which names the
+   * type and lists what *is* registered (SPEC 15.2). Extend the registry to add
    * a plugin type (SPEC 26.2).
    */
   registry?: ChartTypeRegistry;
@@ -212,8 +229,9 @@ export function MdvProvider(props: MdvProviderProps): ReactElement {
   const config = props.config ?? EMPTY_CONFIG;
 
   // The registry is stateful (it can be extended and frozen), so it is created
-  // once per provider rather than per render.
-  const defaultRegistry = useMemo(() => createChartRegistry(builtinChartTypes), []);
+  // once per provider rather than per render. Empty unless one is passed — see
+  // `MdvProviderProps.registry`, and `@mdv/react/auto` for the built-in set.
+  const defaultRegistry = useMemo(() => createChartRegistry(), []);
   const defaultMetrics = useMemo(() => createTableMetrics(), []);
   const ownCaches = useMemo(() => createCaches(), []);
   const caches = props.caches ?? ownCaches;
@@ -289,14 +307,19 @@ export function MdvProvider(props: MdvProviderProps): ReactElement {
  * A standalone `<MdvBlock/>` must work with no ceremony (SPEC 22.1 shows exactly
  * that), so the fallback is real rather than a throw — but it is built with
  * `useMemo` inside the calling component, so it is still not shared state.
+ *
+ * @param fallbackRegistry Chart types for the private runtime, used only when
+ * there is no provider above. This is how `@mdv/react/auto` seeds a lone block
+ * with the built-ins without a second runtime implementation to keep in step.
+ * A provider, if there is one, always wins: its registry is the document's.
  */
-export function useMdvRuntime(): MdvRuntime {
+export function useMdvRuntime(fallbackRegistry?: ChartTypeRegistry): MdvRuntime {
   const parent = useContext(RuntimeContext);
   const prefersDark = usePrefersDark();
 
   const registry = useMemo(
-    () => (parent === undefined ? createChartRegistry(builtinChartTypes) : undefined),
-    [parent],
+    () => (parent === undefined ? (fallbackRegistry ?? createChartRegistry()) : undefined),
+    [parent, fallbackRegistry],
   );
   const metrics = useMemo(
     () => (parent === undefined ? createTableMetrics() : undefined),
@@ -311,7 +334,7 @@ export function useMdvRuntime(): MdvRuntime {
       config: EMPTY_CONFIG,
       theme,
       colorScheme,
-      registry: registry ?? createChartRegistry(builtinChartTypes),
+      registry: registry ?? createChartRegistry(),
       metrics: metrics ?? createTableMetrics(),
       caches: caches ?? createCaches(),
       prefersDark,

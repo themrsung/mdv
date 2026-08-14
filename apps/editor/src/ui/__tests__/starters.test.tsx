@@ -12,13 +12,13 @@
  * chart's channel contract rejects it. So each starter's commands are run
  * through the engine exactly as the menu runs them, the document is serialised
  * the way the Source pane serialises it, and the result goes through the same
- * `@mdv/react` render the preview uses — where a failure is an error card
+ * `@mdv/react/auto` render the preview uses — where a failure is an error card
  * rather than an exception (SPEC 14.1: a bad block never takes out a document).
  */
 
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { MdvDocument, MdvProvider } from '@mdv/react';
+import { MdvDocument, MdvProvider } from '@mdv/react/auto';
 import { editorFor, source } from '../../engine/__tests__/helpers.js';
 import { SLASH_ITEMS, type SlashItem } from '../menus/slash-items.js';
 

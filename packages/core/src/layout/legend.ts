@@ -184,7 +184,13 @@ export function measureLegend(
   if (vertical) {
     let y = titleHeight;
     for (const { entry, width, labelWidth } of measured) {
-      items.push({ entry, x: 0, y, width: Math.min(width, maxWidth), labelWidth: budget(labelWidth) });
+      items.push({
+        entry,
+        x: 0,
+        y,
+        width: Math.min(width, maxWidth),
+        labelWidth: budget(labelWidth),
+      });
       boxWidth = Math.max(boxWidth, Math.min(width, maxWidth));
       y += rowHeight + ROW_GAP;
     }

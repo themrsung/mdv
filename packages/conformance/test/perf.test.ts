@@ -433,7 +433,9 @@ describe('the committed corpus (SPEC 24.1)', () => {
 describe('renderPerfReport', () => {
   it('writes one table row per measurement, quoting the spec cell', () => {
     const text = renderPerfReport([measurement()], HOST);
-    expect(text).toContain('| Operation (SPEC 24.1) | Measured shape | Budget | Median | Verdict |');
+    expect(text).toContain(
+      '| Operation (SPEC 24.1) | Measured shape | Budget | Median | Verdict |',
+    );
     expect(text).toContain(
       '| Parse 100 KB document (≈50 blocks) | 101 KB, 50 blocks | ≤ 30 ms | 12.50 ms | within budget |',
     );
@@ -473,11 +475,15 @@ describe('renderPerfReport', () => {
   });
 
   it('lists every substitution under its own heading', () => {
-    const noted = measurement({ note: 'measured through the SVG backend; there is no canvas yet.' });
+    const noted = measurement({
+      note: 'measured through the SVG backend; there is no canvas yet.',
+    });
     const text = renderPerfReport([noted], HOST);
     expect(text).toContain('## What these numbers leave out');
     expect(text).toContain('there is no canvas yet.');
-    expect(renderPerfReport([measurement()], HOST)).not.toContain('## What these numbers leave out');
+    expect(renderPerfReport([measurement()], HOST)).not.toContain(
+      '## What these numbers leave out',
+    );
   });
 
   it('names the host the numbers came from', () => {

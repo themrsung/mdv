@@ -7,15 +7,17 @@
  * A picture the editor invented would be worse than no picture, because the
  * author would trust it.
  *
- * `@mdv/react` is loaded with a dynamic `import()`, which does two things at
+ * The binding is loaded with a dynamic `import()`, which does two things at
  * once: the chart stack — core, charts, render-svg, themes — lands in its own
  * chunk instead of the editor's, and a binding that is not ready yet cannot
  * stop the editor from loading. When it throws, the boundary below says so in
  * plain words and the source editor beside it keeps working.
  *
- * At the time of writing `@mdv/react` is a stub whose components throw
- * `not implemented`, so that is the branch users will see. The moment the
- * package is real, this file needs no change.
+ * The entry is `@mdv/react/auto`, the one that registers every built-in chart
+ * type (SPEC 16.1). An editor is the case `/auto` exists for: the author may
+ * type any of the twenty at any moment, so there is no set to narrow to, and
+ * the bundle argument for naming types by hand (SPEC 24.1) does not apply to a
+ * chunk that is only fetched once a visual block is on screen.
  */
 
 import { Component, lazy, Suspense, useCallback, useState } from 'react';
@@ -36,7 +38,7 @@ interface PreviewProps {
 let bindingUnavailable: string | null = null;
 
 const LazyPreview = lazy(async () => {
-  const module = await import('@mdv/react');
+  const module = await import('@mdv/react/auto');
   const { MdvProvider, MdvDocument } = module;
   return {
     default: function Preview({ source, scheme }: PreviewProps): ReactElement {

@@ -13,7 +13,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup, renderToString } from 'react-dom/server';
 import { StrictMode } from 'react';
-import { MdvBlock, MdvDocument, MdvProvider, createCaches } from '../src/index.js';
+import { MdvBlock, MdvDocument, MdvProvider, createCaches } from '../src/auto.js';
 import { EXTERNAL, GOOD } from './fixtures.js';
 
 describe('there is no DOM in this environment', () => {

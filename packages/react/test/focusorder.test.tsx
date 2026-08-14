@@ -22,7 +22,7 @@ import { createChartRegistry } from '@mdv/core';
 import { layoutBlock, makeLayoutContext } from '@mdv/core/layout/index.js';
 import { createTableMetrics } from '@mdv/core/metrics/index.js';
 import { builtinChartTypes } from '@mdv/charts';
-import { MdvDocument, MdvProvider, composeSync } from '../src/index.js';
+import { MdvDocument, MdvProvider, composeSync } from '../src/auto.js';
 import { GOOD, TWO_BLOCKS, indexOfTag, tags } from './fixtures.js';
 
 function render(source: string): string {
