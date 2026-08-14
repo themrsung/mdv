@@ -87,8 +87,15 @@ describe('coverageOf', () => {
      * A stub renders the data as a table and says so. The case passes — that
      * is what graceful degradation *means* — so coverage is collected from it,
      * and the one id it must not collect is the type that was never drawn.
+     *
+     * `gantt` is the specimen because it is Level 3 and this reader is not
+     * going to draw it soon. Any type here has a shelf life: the day a type is
+     * implemented, `type.<name>` *should* start being credited, and this test
+     * would start failing for the happiest of reasons. When that day comes for
+     * `gantt`, move the specimen rather than teaching {@link coverageOf} to
+     * keep lying about it.
      */
-    const TREEMAP = `\`\`\`mdv treemap
+    const GANTT = `\`\`\`mdv gantt
 x: revenue
 ---
 region,revenue
@@ -97,11 +104,11 @@ North,120
 `;
 
     it('does not claim a type that came out as a table', async () => {
-      expect(await covers(TREEMAP, { checks: ['render'] })).not.toContain('type.treemap');
+      expect(await covers(GANTT, { checks: ['render'] })).not.toContain('type.gantt');
     });
 
     it('still credits what the document really did show', async () => {
-      expect(await covers(TREEMAP, { checks: ['render'] })).toContain('data.csv');
+      expect(await covers(GANTT, { checks: ['render'] })).toContain('data.csv');
     });
 
     it('claims the spelling the author wrote, since `ohlc` and `candlestick` are two ids', async () => {
