@@ -1,0 +1,1058 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            549,
+            556
+          ],
+          "type": "text",
+          "value": "The box"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        547,
+        556
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            558,
+            749
+          ],
+          "type": "text",
+          "value": "A page is a box inside a box. The outer one is the sheet, given here as an\nexplicit pair rather than a paper name, and the inner one is what is left after\nthe margins are taken off each edge."
+        }
+      ],
+      "position": [
+        558,
+        749
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            754,
+            776
+          ],
+          "type": "text",
+          "value": "Four units, four edges"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        751,
+        776
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            778,
+            999
+          ],
+          "type": "text",
+          "value": "The four margins are written in four different units on purpose: millimetres,\npoints, and inches all have to arrive at the same measure, and an edge that\nquietly fell back to a default would move every line on every page."
+        }
+      ],
+      "position": [
+        778,
+        999
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1004,
+            1030
+          ],
+          "type": "text",
+          "value": "What the running heads say"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        1001,
+        1030
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1032,
+            1323
+          ],
+          "type": "text",
+          "value": "The header is off on the first page and on from the second, so the first page\nof a document is not stamped like a continuation of something. Each slot is\ninterpolated once per page and drawn as an artifact, outside the structure\ntree, because a running head is furniture rather than content."
+        }
+      ],
+      "position": [
+        1032,
+        1323
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1327,
+            1345
+          ],
+          "type": "text",
+          "value": "The second chapter"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        1325,
+        1345
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1347,
+            1653
+          ],
+          "type": "text",
+          "value": "Page numbering restarts here, which is the whole point of naming a level: the\ncount is a property of the chapter, not of the sheet, and the footer has to\nfollow it. Roman numerals are spelled out from a table rather than asked of the\nhost locale, so this document numbers its pages the same way everywhere."
+        }
+      ],
+      "position": [
+        1347,
+        1653
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1658,
+            1689
+          ],
+          "type": "text",
+          "value": "A table of contents comes first"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        1655,
+        1689
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1691,
+            1910
+          ],
+          "type": "text",
+          "value": "The contents are emitted ahead of the body and take a break after themselves,\nso the body opens on a page of its own. Entries go two levels deep, which is\nwhy the third-level heading below is absent from the list above."
+        }
+      ],
+      "position": [
+        1691,
+        1910
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1916,
+            1935
+          ],
+          "type": "text",
+          "value": "Not in the contents"
+        }
+      ],
+      "depth": 3,
+      "position": [
+        1912,
+        1935
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            1937,
+            2149
+          ],
+          "type": "text",
+          "value": "Depth is a promise about the list, not about the document. This heading is\nstill a heading, still bookmarked, and still in the structure tree; it is only\nmissing from the page the reader was given to navigate by."
+        }
+      ],
+      "position": [
+        1937,
+        2149
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            2154,
+            2168
+          ],
+          "type": "text",
+          "value": "The last of it"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        2151,
+        2168
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            2170,
+            2363
+          ],
+          "type": "text",
+          "value": "The final paragraph exists so that the second chapter is long enough to need a\npage the first one did not, and so the total in the footer is a number that had\nto be counted rather than guessed."
+        }
+      ],
+      "position": [
+        2170,
+        2363
+      ],
+      "type": "paragraph"
+    }
+  ],
+  "datasets": {},
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "author": {
+        "end": {
+          "column": 7,
+          "line": 5,
+          "offset": 88
+        },
+        "start": {
+          "column": 1,
+          "line": 5,
+          "offset": 82
+        }
+      },
+      "date": {
+        "end": {
+          "column": 5,
+          "line": 6,
+          "offset": 110
+        },
+        "start": {
+          "column": 1,
+          "line": 6,
+          "offset": 106
+        }
+      },
+      "lang": {
+        "end": {
+          "column": 5,
+          "line": 7,
+          "offset": 129
+        },
+        "start": {
+          "column": 1,
+          "line": 7,
+          "offset": 125
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 4,
+          "line": 8,
+          "offset": 137
+        },
+        "start": {
+          "column": 1,
+          "line": 8,
+          "offset": 134
+        }
+      },
+      "pdf.footer": {
+        "end": {
+          "column": 9,
+          "line": 15,
+          "offset": 320
+        },
+        "start": {
+          "column": 3,
+          "line": 15,
+          "offset": 314
+        }
+      },
+      "pdf.footer.center": {
+        "end": {
+          "column": 11,
+          "line": 17,
+          "offset": 353
+        },
+        "start": {
+          "column": 5,
+          "line": 17,
+          "offset": 347
+        }
+      },
+      "pdf.footer.left": {
+        "end": {
+          "column": 9,
+          "line": 16,
+          "offset": 330
+        },
+        "start": {
+          "column": 5,
+          "line": 16,
+          "offset": 326
+        }
+      },
+      "pdf.footer.right": {
+        "end": {
+          "column": 10,
+          "line": 18,
+          "offset": 373
+        },
+        "start": {
+          "column": 5,
+          "line": 18,
+          "offset": 368
+        }
+      },
+      "pdf.header": {
+        "end": {
+          "column": 9,
+          "line": 11,
+          "offset": 242
+        },
+        "start": {
+          "column": 3,
+          "line": 11,
+          "offset": 236
+        }
+      },
+      "pdf.header.center": {
+        "end": {
+          "column": 11,
+          "line": 13,
+          "offset": 274
+        },
+        "start": {
+          "column": 5,
+          "line": 13,
+          "offset": 268
+        }
+      },
+      "pdf.header.left": {
+        "end": {
+          "column": 9,
+          "line": 12,
+          "offset": 252
+        },
+        "start": {
+          "column": 5,
+          "line": 12,
+          "offset": 248
+        }
+      },
+      "pdf.header.right": {
+        "end": {
+          "column": 10,
+          "line": 14,
+          "offset": 297
+        },
+        "start": {
+          "column": 5,
+          "line": 14,
+          "offset": 292
+        }
+      },
+      "pdf.headerOnFirstPage": {
+        "end": {
+          "column": 20,
+          "line": 19,
+          "offset": 414
+        },
+        "start": {
+          "column": 3,
+          "line": 19,
+          "offset": 397
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 9,
+          "line": 10,
+          "offset": 178
+        },
+        "start": {
+          "column": 3,
+          "line": 10,
+          "offset": 172
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 43,
+          "line": 10,
+          "offset": 212
+        },
+        "start": {
+          "column": 37,
+          "line": 10,
+          "offset": 206
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 56,
+          "line": 10,
+          "offset": 225
+        },
+        "start": {
+          "column": 52,
+          "line": 10,
+          "offset": 221
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 29,
+          "line": 10,
+          "offset": 198
+        },
+        "start": {
+          "column": 24,
+          "line": 10,
+          "offset": 193
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 16,
+          "line": 10,
+          "offset": 185
+        },
+        "start": {
+          "column": 13,
+          "line": 10,
+          "offset": 182
+        }
+      },
+      "pdf.numbering": {
+        "end": {
+          "column": 12,
+          "line": 20,
+          "offset": 433
+        },
+        "start": {
+          "column": 3,
+          "line": 20,
+          "offset": 424
+        }
+      },
+      "pdf.numbering.restartAt": {
+        "end": {
+          "column": 49,
+          "line": 20,
+          "offset": 470
+        },
+        "start": {
+          "column": 40,
+          "line": 20,
+          "offset": 461
+        }
+      },
+      "pdf.numbering.start": {
+        "end": {
+          "column": 21,
+          "line": 20,
+          "offset": 442
+        },
+        "start": {
+          "column": 16,
+          "line": 20,
+          "offset": 437
+        }
+      },
+      "pdf.numbering.style": {
+        "end": {
+          "column": 31,
+          "line": 20,
+          "offset": 452
+        },
+        "start": {
+          "column": 26,
+          "line": 20,
+          "offset": 447
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 11,
+          "line": 9,
+          "offset": 149
+        },
+        "start": {
+          "column": 3,
+          "line": 9,
+          "offset": 141
+        }
+      },
+      "pdf.toc": {
+        "end": {
+          "column": 6,
+          "line": 21,
+          "offset": 482
+        },
+        "start": {
+          "column": 3,
+          "line": 21,
+          "offset": 479
+        }
+      },
+      "pdf.toc.depth": {
+        "end": {
+          "column": 15,
+          "line": 21,
+          "offset": 491
+        },
+        "start": {
+          "column": 10,
+          "line": 21,
+          "offset": 486
+        }
+      },
+      "pdf.toc.pageBreakAfter": {
+        "end": {
+          "column": 57,
+          "line": 21,
+          "offset": 533
+        },
+        "start": {
+          "column": 43,
+          "line": 21,
+          "offset": 519
+        }
+      },
+      "pdf.toc.title": {
+        "end": {
+          "column": 25,
+          "line": 21,
+          "offset": 501
+        },
+        "start": {
+          "column": 20,
+          "line": 21,
+          "offset": 496
+        }
+      },
+      "subtitle": {
+        "end": {
+          "column": 9,
+          "line": 4,
+          "offset": 41
+        },
+        "start": {
+          "column": 1,
+          "line": 4,
+          "offset": 33
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "author": {
+        "end": {
+          "column": 24,
+          "line": 5,
+          "offset": 105
+        },
+        "start": {
+          "column": 9,
+          "line": 5,
+          "offset": 90
+        }
+      },
+      "date": {
+        "end": {
+          "column": 19,
+          "line": 6,
+          "offset": 124
+        },
+        "start": {
+          "column": 7,
+          "line": 6,
+          "offset": 112
+        }
+      },
+      "lang": {
+        "end": {
+          "column": 9,
+          "line": 7,
+          "offset": 133
+        },
+        "start": {
+          "column": 7,
+          "line": 7,
+          "offset": 131
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 1,
+          "line": 22,
+          "offset": 542
+        },
+        "start": {
+          "column": 3,
+          "line": 9,
+          "offset": 141
+        }
+      },
+      "pdf.footer": {
+        "end": {
+          "column": 1,
+          "line": 19,
+          "offset": 395
+        },
+        "start": {
+          "column": 5,
+          "line": 16,
+          "offset": 326
+        }
+      },
+      "pdf.footer.center": {
+        "end": {
+          "column": 21,
+          "line": 17,
+          "offset": 363
+        },
+        "start": {
+          "column": 13,
+          "line": 17,
+          "offset": 355
+        }
+      },
+      "pdf.footer.left": {
+        "end": {
+          "column": 21,
+          "line": 16,
+          "offset": 342
+        },
+        "start": {
+          "column": 11,
+          "line": 16,
+          "offset": 332
+        }
+      },
+      "pdf.footer.right": {
+        "end": {
+          "column": 31,
+          "line": 18,
+          "offset": 394
+        },
+        "start": {
+          "column": 12,
+          "line": 18,
+          "offset": 375
+        }
+      },
+      "pdf.header": {
+        "end": {
+          "column": 1,
+          "line": 15,
+          "offset": 312
+        },
+        "start": {
+          "column": 5,
+          "line": 12,
+          "offset": 248
+        }
+      },
+      "pdf.header.center": {
+        "end": {
+          "column": 24,
+          "line": 13,
+          "offset": 287
+        },
+        "start": {
+          "column": 13,
+          "line": 13,
+          "offset": 276
+        }
+      },
+      "pdf.header.left": {
+        "end": {
+          "column": 20,
+          "line": 12,
+          "offset": 263
+        },
+        "start": {
+          "column": 11,
+          "line": 12,
+          "offset": 254
+        }
+      },
+      "pdf.header.right": {
+        "end": {
+          "column": 24,
+          "line": 14,
+          "offset": 311
+        },
+        "start": {
+          "column": 12,
+          "line": 14,
+          "offset": 299
+        }
+      },
+      "pdf.headerOnFirstPage": {
+        "end": {
+          "column": 27,
+          "line": 19,
+          "offset": 421
+        },
+        "start": {
+          "column": 22,
+          "line": 19,
+          "offset": 416
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 64,
+          "line": 10,
+          "offset": 233
+        },
+        "start": {
+          "column": 11,
+          "line": 10,
+          "offset": 180
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 50,
+          "line": 10,
+          "offset": 219
+        },
+        "start": {
+          "column": 45,
+          "line": 10,
+          "offset": 214
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 62,
+          "line": 10,
+          "offset": 231
+        },
+        "start": {
+          "column": 58,
+          "line": 10,
+          "offset": 227
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 35,
+          "line": 10,
+          "offset": 204
+        },
+        "start": {
+          "column": 31,
+          "line": 10,
+          "offset": 200
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 22,
+          "line": 10,
+          "offset": 191
+        },
+        "start": {
+          "column": 18,
+          "line": 10,
+          "offset": 187
+        }
+      },
+      "pdf.numbering": {
+        "end": {
+          "column": 55,
+          "line": 20,
+          "offset": 476
+        },
+        "start": {
+          "column": 14,
+          "line": 20,
+          "offset": 435
+        }
+      },
+      "pdf.numbering.restartAt": {
+        "end": {
+          "column": 53,
+          "line": 20,
+          "offset": 474
+        },
+        "start": {
+          "column": 51,
+          "line": 20,
+          "offset": 472
+        }
+      },
+      "pdf.numbering.start": {
+        "end": {
+          "column": 24,
+          "line": 20,
+          "offset": 445
+        },
+        "start": {
+          "column": 23,
+          "line": 20,
+          "offset": 444
+        }
+      },
+      "pdf.numbering.style": {
+        "end": {
+          "column": 38,
+          "line": 20,
+          "offset": 459
+        },
+        "start": {
+          "column": 33,
+          "line": 20,
+          "offset": 454
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 31,
+          "line": 9,
+          "offset": 169
+        },
+        "start": {
+          "column": 13,
+          "line": 9,
+          "offset": 151
+        }
+      },
+      "pdf.pageSize[0]": {
+        "end": {
+          "column": 21,
+          "line": 9,
+          "offset": 159
+        },
+        "start": {
+          "column": 14,
+          "line": 9,
+          "offset": 152
+        }
+      },
+      "pdf.pageSize[1]": {
+        "end": {
+          "column": 30,
+          "line": 9,
+          "offset": 168
+        },
+        "start": {
+          "column": 23,
+          "line": 9,
+          "offset": 161
+        }
+      },
+      "pdf.toc": {
+        "end": {
+          "column": 65,
+          "line": 21,
+          "offset": 541
+        },
+        "start": {
+          "column": 8,
+          "line": 21,
+          "offset": 484
+        }
+      },
+      "pdf.toc.depth": {
+        "end": {
+          "column": 18,
+          "line": 21,
+          "offset": 494
+        },
+        "start": {
+          "column": 17,
+          "line": 21,
+          "offset": 493
+        }
+      },
+      "pdf.toc.pageBreakAfter": {
+        "end": {
+          "column": 63,
+          "line": 21,
+          "offset": 539
+        },
+        "start": {
+          "column": 59,
+          "line": 21,
+          "offset": 535
+        }
+      },
+      "pdf.toc.title": {
+        "end": {
+          "column": 41,
+          "line": 21,
+          "offset": 517
+        },
+        "start": {
+          "column": 27,
+          "line": 21,
+          "offset": 503
+        }
+      },
+      "subtitle": {
+        "end": {
+          "column": 49,
+          "line": 4,
+          "offset": 81
+        },
+        "start": {
+          "column": 11,
+          "line": 4,
+          "offset": 43
+        }
+      },
+      "title": {
+        "end": {
+          "column": 18,
+          "line": 3,
+          "offset": 32
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "author": "MDV Conformance",
+    "date": "2026-01-31",
+    "extra": {},
+    "lang": "en",
+    "mdv": "1.0",
+    "pdf": {
+      "footer": {
+        "center": "{date}",
+        "left": "{author}",
+        "right": "{page} of {pages}"
+      },
+      "header": {
+        "center": "{chapter}",
+        "left": "{title}",
+        "right": "{subtitle}"
+      },
+      "headerOnFirstPage": false,
+      "margin": {
+        "bottom": "0.5in",
+        "left": "30pt",
+        "right": "30pt",
+        "top": "12mm"
+      },
+      "numbering": {
+        "restartAt": "h1",
+        "start": 3,
+        "style": "roman"
+      },
+      "pageSize": [
+        "140mm",
+        "100mm"
+      ],
+      "toc": {
+        "depth": 2,
+        "pageBreakAfter": true,
+        "title": "On these pages"
+      }
+    },
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 22,
+        "offset": 545
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "subtitle": "Geometry, running heads, and numbering",
+    "title": "Page model"
+  },
+  "position": [
+    0,
+    2364
+  ],
+  "type": "root"
+}

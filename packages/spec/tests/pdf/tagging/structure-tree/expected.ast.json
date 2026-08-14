@@ -1,0 +1,1132 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            136,
+            143
+          ],
+          "type": "text",
+          "value": "Tagging"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        134,
+        143
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            145,
+            162
+          ],
+          "type": "text",
+          "value": "A paragraph is a "
+        },
+        {
+          "position": [
+            162,
+            165
+          ],
+          "type": "inlineCode",
+          "value": "P"
+        },
+        {
+          "position": [
+            165,
+            173
+          ],
+          "type": "text",
+          "value": ", and a "
+        },
+        {
+          "children": [
+            {
+              "position": [
+                174,
+                178
+              ],
+              "type": "text",
+              "value": "link"
+            }
+          ],
+          "position": [
+            173,
+            205
+          ],
+          "title": null,
+          "type": "link",
+          "url": "https://example.org/spec"
+        },
+        {
+          "position": [
+            205,
+            246
+          ],
+          "type": "text",
+          "value": " is both an\nannotation on the page and a "
+        },
+        {
+          "position": [
+            246,
+            252
+          ],
+          "type": "inlineCode",
+          "value": "Link"
+        },
+        {
+          "position": [
+            252,
+            265
+          ],
+          "type": "text",
+          "value": " in the tree."
+        },
+        {
+          "identifier": "why",
+          "label": "why",
+          "position": [
+            265,
+            271
+          ],
+          "type": "footnoteReference"
+        }
+      ],
+      "position": [
+        145,
+        271
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            276,
+            281
+          ],
+          "type": "text",
+          "value": "Lists"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        273,
+        281
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "checked": null,
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    285,
+                    299
+                  ],
+                  "type": "text",
+                  "value": "An item is an "
+                },
+                {
+                  "position": [
+                    299,
+                    303
+                  ],
+                  "type": "inlineCode",
+                  "value": "LI"
+                },
+                {
+                  "position": [
+                    303,
+                    316
+                  ],
+                  "type": "text",
+                  "value": " wrapping an "
+                },
+                {
+                  "position": [
+                    316,
+                    323
+                  ],
+                  "type": "inlineCode",
+                  "value": "LBody"
+                },
+                {
+                  "position": [
+                    323,
+                    335
+                  ],
+                  "type": "text",
+                  "value": " wrapping a "
+                },
+                {
+                  "position": [
+                    335,
+                    338
+                  ],
+                  "type": "inlineCode",
+                  "value": "P"
+                },
+                {
+                  "position": [
+                    338,
+                    339
+                  ],
+                  "type": "text",
+                  "value": "."
+                }
+              ],
+              "position": [
+                285,
+                339
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "position": [
+            283,
+            339
+          ],
+          "spread": false,
+          "type": "listItem"
+        },
+        {
+          "checked": null,
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    342,
+                    365
+                  ],
+                  "type": "text",
+                  "value": "Nesting opens a second "
+                },
+                {
+                  "position": [
+                    365,
+                    368
+                  ],
+                  "type": "inlineCode",
+                  "value": "L"
+                },
+                {
+                  "position": [
+                    368,
+                    399
+                  ],
+                  "type": "text",
+                  "value": " rather than a second document."
+                }
+              ],
+              "position": [
+                342,
+                399
+              ],
+              "type": "paragraph"
+            }
+          ],
+          "position": [
+            340,
+            399
+          ],
+          "spread": false,
+          "type": "listItem"
+        }
+      ],
+      "ordered": false,
+      "position": [
+        283,
+        399
+      ],
+      "spread": false,
+      "start": null,
+      "type": "list"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "position": [
+                403,
+                423
+              ],
+              "type": "text",
+              "value": "A quoted list is an "
+            },
+            {
+              "position": [
+                423,
+                426
+              ],
+              "type": "inlineCode",
+              "value": "L"
+            },
+            {
+              "position": [
+                426,
+                436
+              ],
+              "type": "text",
+              "value": " inside a "
+            },
+            {
+              "position": [
+                436,
+                448
+              ],
+              "type": "inlineCode",
+              "value": "BlockQuote"
+            },
+            {
+              "position": [
+                448,
+                449
+              ],
+              "type": "text",
+              "value": ":"
+            }
+          ],
+          "position": [
+            403,
+            449
+          ],
+          "type": "paragraph"
+        },
+        {
+          "children": [
+            {
+              "checked": null,
+              "children": [
+                {
+                  "children": [
+                    {
+                      "position": [
+                        457,
+                        463
+                      ],
+                      "type": "text",
+                      "value": "First."
+                    }
+                  ],
+                  "position": [
+                    457,
+                    463
+                  ],
+                  "type": "paragraph"
+                }
+              ],
+              "position": [
+                454,
+                463
+              ],
+              "spread": false,
+              "type": "listItem"
+            },
+            {
+              "checked": null,
+              "children": [
+                {
+                  "children": [
+                    {
+                      "position": [
+                        469,
+                        476
+                      ],
+                      "type": "text",
+                      "value": "Second."
+                    }
+                  ],
+                  "position": [
+                    469,
+                    476
+                  ],
+                  "type": "paragraph"
+                }
+              ],
+              "position": [
+                466,
+                476
+              ],
+              "spread": false,
+              "type": "listItem"
+            }
+          ],
+          "ordered": true,
+          "position": [
+            454,
+            476
+          ],
+          "spread": false,
+          "start": 1,
+          "type": "list"
+        }
+      ],
+      "position": [
+        401,
+        476
+      ],
+      "type": "blockquote"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            481,
+            486
+          ],
+          "type": "text",
+          "value": "Cells"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        478,
+        486
+      ],
+      "type": "heading"
+    },
+    {
+      "align": [
+        null,
+        null
+      ],
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    490,
+                    493
+                  ],
+                  "type": "text",
+                  "value": "Tag"
+                }
+              ],
+              "position": [
+                488,
+                494
+              ],
+              "type": "tableCell"
+            },
+            {
+              "children": [
+                {
+                  "position": [
+                    496,
+                    501
+                  ],
+                  "type": "text",
+                  "value": "Means"
+                }
+              ],
+              "position": [
+                494,
+                503
+              ],
+              "type": "tableCell"
+            }
+          ],
+          "position": [
+            488,
+            503
+          ],
+          "type": "tableRow"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    520,
+                    522
+                  ],
+                  "type": "text",
+                  "value": "TH"
+                }
+              ],
+              "position": [
+                518,
+                523
+              ],
+              "type": "tableCell"
+            },
+            {
+              "children": [
+                {
+                  "position": [
+                    525,
+                    537
+                  ],
+                  "type": "text",
+                  "value": "Heading cell"
+                }
+              ],
+              "position": [
+                523,
+                539
+              ],
+              "type": "tableCell"
+            }
+          ],
+          "position": [
+            518,
+            539
+          ],
+          "type": "tableRow"
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    542,
+                    544
+                  ],
+                  "type": "text",
+                  "value": "TD"
+                }
+              ],
+              "position": [
+                540,
+                545
+              ],
+              "type": "tableCell"
+            },
+            {
+              "children": [
+                {
+                  "position": [
+                    547,
+                    556
+                  ],
+                  "type": "text",
+                  "value": "Data cell"
+                }
+              ],
+              "position": [
+                545,
+                558
+              ],
+              "type": "tableCell"
+            }
+          ],
+          "position": [
+            540,
+            558
+          ],
+          "type": "tableRow"
+        }
+      ],
+      "position": [
+        488,
+        558
+      ],
+      "type": "table"
+    },
+    {
+      "attrs": {
+        "caption": "One Figure, carrying the alt text the chart was given.",
+        "id": "fig-tags"
+      },
+      "attrsPosition": {
+        "caption": {
+          "end": {
+            "column": 79,
+            "line": 32,
+            "offset": 638
+          },
+          "start": {
+            "column": 23,
+            "line": 32,
+            "offset": 582
+          }
+        },
+        "id": {
+          "end": {
+            "column": 91,
+            "line": 32,
+            "offset": 650
+          },
+          "start": {
+            "column": 83,
+            "line": 32,
+            "offset": 642
+          }
+        }
+      },
+      "children": [
+        {
+          "attrs": {
+            "desc": "A bar chart of tag counts on the first two pages, 12 then 9.",
+            "title": "Tags per page",
+            "type": "bar",
+            "x": "page",
+            "y": "tags"
+          },
+          "attrsPosition": {
+            "desc": {
+              "end": {
+                "column": 67,
+                "line": 36,
+                "offset": 751
+              },
+              "start": {
+                "column": 7,
+                "line": 36,
+                "offset": 691
+              }
+            },
+            "title": {
+              "end": {
+                "column": 21,
+                "line": 35,
+                "offset": 684
+              },
+              "start": {
+                "column": 8,
+                "line": 35,
+                "offset": 671
+              }
+            },
+            "type": {
+              "end": {
+                "column": 11,
+                "line": 34,
+                "offset": 663
+              },
+              "start": {
+                "column": 8,
+                "line": 34,
+                "offset": 660
+              }
+            },
+            "x": {
+              "end": {
+                "column": 8,
+                "line": 37,
+                "offset": 759
+              },
+              "start": {
+                "column": 4,
+                "line": 37,
+                "offset": 755
+              }
+            },
+            "y": {
+              "end": {
+                "column": 8,
+                "line": 38,
+                "offset": 767
+              },
+              "start": {
+                "column": 4,
+                "line": 38,
+                "offset": 763
+              }
+            }
+          },
+          "blockType": "bar",
+          "data": {
+            "datasetId": "#block-0",
+            "key": "#block-0||"
+          },
+          "dataPosition": {
+            "end": {
+              "column": 4,
+              "line": 42,
+              "offset": 790
+            },
+            "start": {
+              "column": 1,
+              "line": 40,
+              "offset": 772
+            }
+          },
+          "level": 1,
+          "position": [
+            653,
+            794
+          ],
+          "raw": {
+            "data": "page,tags\n1,12\n2,9\n",
+            "fence": "```",
+            "header": "title: Tags per page\ndesc: A bar chart of tag counts on the first two pages, 12 then 9.\nx: page\ny: tags\n"
+          },
+          "type": "mdvBlock"
+        }
+      ],
+      "kind": "container",
+      "name": "mdv-figure",
+      "position": [
+        560,
+        799
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "attrs": {
+        "title": "Labels are printed",
+        "type": "note"
+      },
+      "attrsPosition": {
+        "title": {
+          "end": {
+            "column": 52,
+            "line": 47,
+            "offset": 852
+          },
+          "start": {
+            "column": 32,
+            "line": 47,
+            "offset": 832
+          }
+        },
+        "type": {
+          "end": {
+            "column": 25,
+            "line": 47,
+            "offset": 825
+          },
+          "start": {
+            "column": 21,
+            "line": 47,
+            "offset": 821
+          }
+        }
+      },
+      "children": [
+        {
+          "children": [
+            {
+              "position": [
+                855,
+                884
+              ],
+              "type": "text",
+              "value": "The label of a callout is an "
+            },
+            {
+              "position": [
+                884,
+                888
+              ],
+              "type": "inlineCode",
+              "value": "H6"
+            },
+            {
+              "position": [
+                888,
+                927
+              ],
+              "type": "text",
+              "value": ", because status is never colour alone."
+            }
+          ],
+          "position": [
+            855,
+            927
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "kind": "container",
+      "name": "mdv-callout",
+      "position": [
+        801,
+        932
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "lang": "ts",
+      "meta": null,
+      "position": [
+        934,
+        963
+      ],
+      "type": "code",
+      "value": "const tag = 'Code';"
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "position": [
+                973,
+                994
+              ],
+              "type": "text",
+              "value": "A footnote body is a "
+            },
+            {
+              "position": [
+                994,
+                1000
+              ],
+              "type": "inlineCode",
+              "value": "Note"
+            },
+            {
+              "position": [
+                1000,
+                1053
+              ],
+              "type": "text",
+              "value": ", set at the foot of the page that\nreferences it."
+            }
+          ],
+          "position": [
+            973,
+            1053
+          ],
+          "type": "paragraph"
+        }
+      ],
+      "identifier": "why",
+      "label": "why",
+      "position": [
+        965,
+        1053
+      ],
+      "type": "footnoteDefinition"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 43,
+          "offset": 794
+        },
+        "start": {
+          "column": 1,
+          "line": 34,
+          "offset": 653
+        }
+      },
+      "raw": "page,tags\n1,12\n2,9\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "page",
+            "type": "integer"
+          },
+          {
+            "inferred": true,
+            "name": "tags",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            1,
+            12
+          ],
+          [
+            2,
+            9
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "lang": {
+        "end": {
+          "column": 5,
+          "line": 4,
+          "offset": 41
+        },
+        "start": {
+          "column": 1,
+          "line": 4,
+          "offset": 37
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 4,
+          "line": 5,
+          "offset": 49
+        },
+        "start": {
+          "column": 1,
+          "line": 5,
+          "offset": 46
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 9,
+          "line": 7,
+          "offset": 74
+        },
+        "start": {
+          "column": 3,
+          "line": 7,
+          "offset": 68
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 43,
+          "line": 7,
+          "offset": 108
+        },
+        "start": {
+          "column": 37,
+          "line": 7,
+          "offset": 102
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 55,
+          "line": 7,
+          "offset": 120
+        },
+        "start": {
+          "column": 51,
+          "line": 7,
+          "offset": 116
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 29,
+          "line": 7,
+          "offset": 94
+        },
+        "start": {
+          "column": 24,
+          "line": 7,
+          "offset": 89
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 16,
+          "line": 7,
+          "offset": 81
+        },
+        "start": {
+          "column": 13,
+          "line": 7,
+          "offset": 78
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 11,
+          "line": 6,
+          "offset": 61
+        },
+        "start": {
+          "column": 3,
+          "line": 6,
+          "offset": 53
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "lang": {
+        "end": {
+          "column": 9,
+          "line": 4,
+          "offset": 45
+        },
+        "start": {
+          "column": 7,
+          "line": 4,
+          "offset": 43
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 1,
+          "line": 8,
+          "offset": 129
+        },
+        "start": {
+          "column": 3,
+          "line": 6,
+          "offset": 53
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 63,
+          "line": 7,
+          "offset": 128
+        },
+        "start": {
+          "column": 11,
+          "line": 7,
+          "offset": 76
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 49,
+          "line": 7,
+          "offset": 114
+        },
+        "start": {
+          "column": 45,
+          "line": 7,
+          "offset": 110
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 61,
+          "line": 7,
+          "offset": 126
+        },
+        "start": {
+          "column": 57,
+          "line": 7,
+          "offset": 122
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 35,
+          "line": 7,
+          "offset": 100
+        },
+        "start": {
+          "column": 31,
+          "line": 7,
+          "offset": 96
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 22,
+          "line": 7,
+          "offset": 87
+        },
+        "start": {
+          "column": 18,
+          "line": 7,
+          "offset": 83
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 15,
+          "line": 6,
+          "offset": 65
+        },
+        "start": {
+          "column": 13,
+          "line": 6,
+          "offset": 63
+        }
+      },
+      "title": {
+        "end": {
+          "column": 22,
+          "line": 3,
+          "offset": 36
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "lang": "en",
+    "mdv": "1.0",
+    "pdf": {
+      "margin": {
+        "bottom": "12mm",
+        "left": "12mm",
+        "right": "12mm",
+        "top": "12mm"
+      },
+      "pageSize": "A6"
+    },
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 8,
+        "offset": 132
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Structure tree"
+  },
+  "position": [
+    0,
+    1054
+  ],
+  "type": "root"
+}

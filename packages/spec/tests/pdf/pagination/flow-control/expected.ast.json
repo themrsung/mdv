@@ -1,0 +1,804 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            150,
+            162
+          ],
+          "type": "text",
+          "value": "Flow control"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        148,
+        162
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            164,
+            331
+          ],
+          "type": "text",
+          "value": "The page is small so that the rules fire on a document short enough to read.\nEverything below is a paginator decision, and the trace is where each one\nbecomes visible."
+        }
+      ],
+      "position": [
+        164,
+        331
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            336,
+            354
+          ],
+          "type": "text",
+          "value": "Widows and orphans"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        333,
+        354
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            356,
+            666
+          ],
+          "type": "text",
+          "value": "Two lines of a paragraph are kept together at a boundary, so a single line is\nnever stranded at the foot of one page or carried alone to the top of the next.\nThis paragraph runs long on purpose: it has to straddle a break for the rule to\nhave anything to do, and a shorter one would pass by never being tested."
+        }
+      ],
+      "position": [
+        356,
+        666
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "break": "avoid"
+      },
+      "attrsPosition": {
+        "break": {
+          "end": {
+            "column": 24,
+            "line": 24,
+            "offset": 691
+          },
+          "start": {
+            "column": 19,
+            "line": 24,
+            "offset": 686
+          }
+        }
+      },
+      "children": [
+        {
+          "children": [
+            {
+              "position": [
+                697,
+                710
+              ],
+              "type": "text",
+              "value": "Kept together"
+            }
+          ],
+          "depth": 3,
+          "position": [
+            693,
+            710
+          ],
+          "type": "heading"
+        },
+        {
+          "align": [
+            null,
+            null
+          ],
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "position": [
+                        714,
+                        718
+                      ],
+                      "type": "text",
+                      "value": "Plan"
+                    }
+                  ],
+                  "position": [
+                    712,
+                    719
+                  ],
+                  "type": "tableCell"
+                },
+                {
+                  "children": [
+                    {
+                      "position": [
+                        721,
+                        726
+                      ],
+                      "type": "text",
+                      "value": "Price"
+                    }
+                  ],
+                  "position": [
+                    719,
+                    728
+                  ],
+                  "type": "tableCell"
+                }
+              ],
+              "position": [
+                712,
+                728
+              ],
+              "type": "tableRow"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "position": [
+                        745,
+                        749
+                      ],
+                      "type": "text",
+                      "value": "Team"
+                    }
+                  ],
+                  "position": [
+                    743,
+                    750
+                  ],
+                  "type": "tableCell"
+                },
+                {
+                  "children": [
+                    {
+                      "position": [
+                        752,
+                        755
+                      ],
+                      "type": "text",
+                      "value": "$19"
+                    }
+                  ],
+                  "position": [
+                    750,
+                    757
+                  ],
+                  "type": "tableCell"
+                }
+              ],
+              "position": [
+                743,
+                757
+              ],
+              "type": "tableRow"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "position": [
+                        760,
+                        768
+                      ],
+                      "type": "text",
+                      "value": "Business"
+                    }
+                  ],
+                  "position": [
+                    758,
+                    769
+                  ],
+                  "type": "tableCell"
+                },
+                {
+                  "children": [
+                    {
+                      "position": [
+                        771,
+                        774
+                      ],
+                      "type": "text",
+                      "value": "$49"
+                    }
+                  ],
+                  "position": [
+                    769,
+                    776
+                  ],
+                  "type": "tableCell"
+                }
+              ],
+              "position": [
+                758,
+                776
+              ],
+              "type": "tableRow"
+            }
+          ],
+          "position": [
+            712,
+            776
+          ],
+          "type": "table"
+        }
+      ],
+      "kind": "container",
+      "name": "mdv-page",
+      "position": [
+        668,
+        780
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "attrs": {
+        "break": "before"
+      },
+      "attrsPosition": {
+        "break": {
+          "end": {
+            "column": 25,
+            "line": 33,
+            "offset": 806
+          },
+          "start": {
+            "column": 19,
+            "line": 33,
+            "offset": 800
+          }
+        }
+      },
+      "children": [],
+      "kind": "container",
+      "name": "mdv-page",
+      "position": [
+        782,
+        811
+      ],
+      "type": "mdvDirective"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            816,
+            836
+          ],
+          "type": "text",
+          "value": "After a forced break"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        813,
+        836
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            838,
+            951
+          ],
+          "type": "text",
+          "value": "A visual block is atomic: it moves to the next page rather than splitting, and\nthe heading above it goes with it."
+        }
+      ],
+      "position": [
+        838,
+        951
+      ],
+      "type": "paragraph"
+    },
+    {
+      "attrs": {
+        "desc": "A bar chart of signups for four weeks, rising from 1204 to 1502.",
+        "title": "Weekly signups",
+        "type": "bar",
+        "x": "week",
+        "y": "signups"
+      },
+      "attrsPosition": {
+        "desc": {
+          "end": {
+            "column": 71,
+            "line": 43,
+            "offset": 1056
+          },
+          "start": {
+            "column": 7,
+            "line": 43,
+            "offset": 992
+          }
+        },
+        "title": {
+          "end": {
+            "column": 22,
+            "line": 42,
+            "offset": 985
+          },
+          "start": {
+            "column": 8,
+            "line": 42,
+            "offset": 971
+          }
+        },
+        "type": {
+          "end": {
+            "column": 11,
+            "line": 41,
+            "offset": 963
+          },
+          "start": {
+            "column": 8,
+            "line": 41,
+            "offset": 960
+          }
+        },
+        "x": {
+          "end": {
+            "column": 8,
+            "line": 44,
+            "offset": 1064
+          },
+          "start": {
+            "column": 4,
+            "line": 44,
+            "offset": 1060
+          }
+        },
+        "y": {
+          "end": {
+            "column": 11,
+            "line": 45,
+            "offset": 1075
+          },
+          "start": {
+            "column": 4,
+            "line": 45,
+            "offset": 1068
+          }
+        }
+      },
+      "blockType": "bar",
+      "data": {
+        "datasetId": "#block-0",
+        "key": "#block-0||"
+      },
+      "dataPosition": {
+        "end": {
+          "column": 10,
+          "line": 51,
+          "offset": 1132
+        },
+        "start": {
+          "column": 1,
+          "line": 47,
+          "offset": 1080
+        }
+      },
+      "level": 1,
+      "position": [
+        953,
+        1136
+      ],
+      "raw": {
+        "data": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+        "fence": "```",
+        "header": "title: Weekly signups\ndesc: A bar chart of signups for four weeks, rising from 1204 to 1502.\nx: week\ny: signups\n"
+      },
+      "type": "mdvBlock"
+    },
+    {
+      "attrs": {
+        "break": "after"
+      },
+      "attrsPosition": {
+        "break": {
+          "end": {
+            "column": 24,
+            "line": 54,
+            "offset": 1161
+          },
+          "start": {
+            "column": 19,
+            "line": 54,
+            "offset": 1156
+          }
+        }
+      },
+      "children": [],
+      "kind": "container",
+      "name": "mdv-page",
+      "position": [
+        1138,
+        1166
+      ],
+      "type": "mdvDirective"
+    }
+  ],
+  "datasets": {
+    "#block-0": {
+      "id": "#block-0",
+      "origin": "inline",
+      "range": {
+        "end": {
+          "column": 4,
+          "line": 52,
+          "offset": 1136
+        },
+        "start": {
+          "column": 1,
+          "line": 41,
+          "offset": 953
+        }
+      },
+      "raw": "week,signups\nW-31,1204\nW-32,1388\nW-33,1291\nW-34,1502\n",
+      "state": "ready",
+      "table": {
+        "fields": [
+          {
+            "inferred": true,
+            "name": "week",
+            "type": "string"
+          },
+          {
+            "inferred": true,
+            "name": "signups",
+            "type": "integer"
+          }
+        ],
+        "rows": [
+          [
+            "W-31",
+            1204
+          ],
+          [
+            "W-32",
+            1388
+          ],
+          [
+            "W-33",
+            1291
+          ],
+          [
+            "W-34",
+            1502
+          ]
+        ]
+      }
+    }
+  },
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 4,
+          "line": 4,
+          "offset": 38
+        },
+        "start": {
+          "column": 1,
+          "line": 4,
+          "offset": 35
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 9,
+          "line": 6,
+          "offset": 63
+        },
+        "start": {
+          "column": 3,
+          "line": 6,
+          "offset": 57
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 43,
+          "line": 6,
+          "offset": 97
+        },
+        "start": {
+          "column": 37,
+          "line": 6,
+          "offset": 91
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 55,
+          "line": 6,
+          "offset": 109
+        },
+        "start": {
+          "column": 51,
+          "line": 6,
+          "offset": 105
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 29,
+          "line": 6,
+          "offset": 83
+        },
+        "start": {
+          "column": 24,
+          "line": 6,
+          "offset": 78
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 16,
+          "line": 6,
+          "offset": 70
+        },
+        "start": {
+          "column": 13,
+          "line": 6,
+          "offset": 67
+        }
+      },
+      "pdf.orphans": {
+        "end": {
+          "column": 10,
+          "line": 8,
+          "offset": 139
+        },
+        "start": {
+          "column": 3,
+          "line": 8,
+          "offset": 132
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 11,
+          "line": 5,
+          "offset": 50
+        },
+        "start": {
+          "column": 3,
+          "line": 5,
+          "offset": 42
+        }
+      },
+      "pdf.widows": {
+        "end": {
+          "column": 9,
+          "line": 7,
+          "offset": 126
+        },
+        "start": {
+          "column": 3,
+          "line": 7,
+          "offset": 120
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 1,
+          "line": 9,
+          "offset": 143
+        },
+        "start": {
+          "column": 3,
+          "line": 5,
+          "offset": 42
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 63,
+          "line": 6,
+          "offset": 117
+        },
+        "start": {
+          "column": 11,
+          "line": 6,
+          "offset": 65
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 49,
+          "line": 6,
+          "offset": 103
+        },
+        "start": {
+          "column": 45,
+          "line": 6,
+          "offset": 99
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 61,
+          "line": 6,
+          "offset": 115
+        },
+        "start": {
+          "column": 57,
+          "line": 6,
+          "offset": 111
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 35,
+          "line": 6,
+          "offset": 89
+        },
+        "start": {
+          "column": 31,
+          "line": 6,
+          "offset": 85
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 22,
+          "line": 6,
+          "offset": 76
+        },
+        "start": {
+          "column": 18,
+          "line": 6,
+          "offset": 72
+        }
+      },
+      "pdf.orphans": {
+        "end": {
+          "column": 13,
+          "line": 8,
+          "offset": 142
+        },
+        "start": {
+          "column": 12,
+          "line": 8,
+          "offset": 141
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 15,
+          "line": 5,
+          "offset": 54
+        },
+        "start": {
+          "column": 13,
+          "line": 5,
+          "offset": 52
+        }
+      },
+      "pdf.widows": {
+        "end": {
+          "column": 12,
+          "line": 7,
+          "offset": 129
+        },
+        "start": {
+          "column": 11,
+          "line": 7,
+          "offset": 128
+        }
+      },
+      "title": {
+        "end": {
+          "column": 20,
+          "line": 3,
+          "offset": 34
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "mdv": "1.0",
+    "pdf": {
+      "margin": {
+        "bottom": "10mm",
+        "left": "10mm",
+        "right": "10mm",
+        "top": "10mm"
+      },
+      "orphans": 2,
+      "pageSize": "A6",
+      "widows": 2
+    },
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 9,
+        "offset": 146
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Flow control"
+  },
+  "position": [
+    0,
+    1167
+  ],
+  "type": "root"
+}

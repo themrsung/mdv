@@ -1,0 +1,521 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "position": [
+            138,
+            143
+          ],
+          "type": "text",
+          "value": "Faces"
+        }
+      ],
+      "depth": 1,
+      "position": [
+        136,
+        143
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            145,
+            412
+          ],
+          "type": "text",
+          "value": "The print theme names one family for everything, so the sans stack and the\nmonospace stack are the only two a document can reach without embedding a font\nof its own. Four faces come out of the first stack and the styles applied to\nit, and the code font is the second."
+        }
+      ],
+      "position": [
+        145,
+        412
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            414,
+            436
+          ],
+          "type": "text",
+          "value": "Body text is regular. "
+        },
+        {
+          "children": [
+            {
+              "position": [
+                438,
+                485
+              ],
+              "type": "text",
+              "value": "Bold is a different face, not a heavier stroke."
+            }
+          ],
+          "position": [
+            436,
+            487
+          ],
+          "type": "strong"
+        },
+        {
+          "position": [
+            487,
+            488
+          ],
+          "type": "text",
+          "value": "\n"
+        },
+        {
+          "children": [
+            {
+              "position": [
+                489,
+                567
+              ],
+              "type": "text",
+              "value": "Italic is oblique, because the standard 14 has no true italic for a sans\nface."
+            }
+          ],
+          "position": [
+            488,
+            568
+          ],
+          "type": "emphasis"
+        },
+        {
+          "position": [
+            568,
+            569
+          ],
+          "type": "text",
+          "value": " "
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "position": [
+                    572,
+                    629
+                  ],
+                  "type": "text",
+                  "value": "Both at once resolves to one face rather than two passes."
+                }
+              ],
+              "position": [
+                570,
+                631
+              ],
+              "type": "strong"
+            }
+          ],
+          "position": [
+            569,
+            632
+          ],
+          "type": "emphasis"
+        }
+      ],
+      "position": [
+        414,
+        632
+      ],
+      "type": "paragraph"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            634,
+            647
+          ],
+          "type": "inlineCode",
+          "value": "Inline code"
+        },
+        {
+          "position": [
+            647,
+            666
+          ],
+          "type": "text",
+          "value": " is monospace, and "
+        },
+        {
+          "children": [
+            {
+              "position": [
+                668,
+                686
+              ],
+              "type": "inlineCode",
+              "value": "bold inline code"
+            }
+          ],
+          "position": [
+            666,
+            688
+          ],
+          "type": "strong"
+        },
+        {
+          "position": [
+            688,
+            800
+          ],
+          "type": "text",
+          "value": " is the bold cut of it.\nA heading is bold, which is why the title above is not the face this sentence\nis set in."
+        }
+      ],
+      "position": [
+        634,
+        800
+      ],
+      "type": "paragraph"
+    },
+    {
+      "lang": "ts",
+      "meta": null,
+      "position": [
+        802,
+        896
+      ],
+      "type": "code",
+      "value": "const face = 'Courier';\n\t// A tab is four spaces wide before it reaches the encoder."
+    },
+    {
+      "children": [
+        {
+          "position": [
+            901,
+            925
+          ],
+          "type": "text",
+          "value": "What WinAnsi cannot hold"
+        }
+      ],
+      "depth": 2,
+      "position": [
+        898,
+        925
+      ],
+      "type": "heading"
+    },
+    {
+      "children": [
+        {
+          "position": [
+            927,
+            972
+          ],
+          "type": "text",
+          "value": "A codepoint outside the encoding is drawn as "
+        },
+        {
+          "position": [
+            972,
+            975
+          ],
+          "type": "inlineCode",
+          "value": "?"
+        },
+        {
+          "position": [
+            975,
+            1067
+          ],
+          "type": "text",
+          "value": " and reported once, rather\nthan silently dropped: 文 is not a character this font can encode."
+        }
+      ],
+      "position": [
+        927,
+        1067
+      ],
+      "type": "paragraph"
+    }
+  ],
+  "datasets": {},
+  "diagnostics": [],
+  "frontmatter": {
+    "attrsKeyPosition": {
+      "lang": {
+        "end": {
+          "column": 5,
+          "line": 4,
+          "offset": 43
+        },
+        "start": {
+          "column": 1,
+          "line": 4,
+          "offset": 39
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 4,
+          "line": 2,
+          "offset": 7
+        },
+        "start": {
+          "column": 1,
+          "line": 2,
+          "offset": 4
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 4,
+          "line": 5,
+          "offset": 51
+        },
+        "start": {
+          "column": 1,
+          "line": 5,
+          "offset": 48
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 9,
+          "line": 7,
+          "offset": 76
+        },
+        "start": {
+          "column": 3,
+          "line": 7,
+          "offset": 70
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 43,
+          "line": 7,
+          "offset": 110
+        },
+        "start": {
+          "column": 37,
+          "line": 7,
+          "offset": 104
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 55,
+          "line": 7,
+          "offset": 122
+        },
+        "start": {
+          "column": 51,
+          "line": 7,
+          "offset": 118
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 29,
+          "line": 7,
+          "offset": 96
+        },
+        "start": {
+          "column": 24,
+          "line": 7,
+          "offset": 91
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 16,
+          "line": 7,
+          "offset": 83
+        },
+        "start": {
+          "column": 13,
+          "line": 7,
+          "offset": 80
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 11,
+          "line": 6,
+          "offset": 63
+        },
+        "start": {
+          "column": 3,
+          "line": 6,
+          "offset": 55
+        }
+      },
+      "title": {
+        "end": {
+          "column": 6,
+          "line": 3,
+          "offset": 20
+        },
+        "start": {
+          "column": 1,
+          "line": 3,
+          "offset": 15
+        }
+      }
+    },
+    "attrsPosition": {
+      "lang": {
+        "end": {
+          "column": 9,
+          "line": 4,
+          "offset": 47
+        },
+        "start": {
+          "column": 7,
+          "line": 4,
+          "offset": 45
+        }
+      },
+      "mdv": {
+        "end": {
+          "column": 11,
+          "line": 2,
+          "offset": 14
+        },
+        "start": {
+          "column": 6,
+          "line": 2,
+          "offset": 9
+        }
+      },
+      "pdf": {
+        "end": {
+          "column": 1,
+          "line": 8,
+          "offset": 131
+        },
+        "start": {
+          "column": 3,
+          "line": 6,
+          "offset": 55
+        }
+      },
+      "pdf.margin": {
+        "end": {
+          "column": 63,
+          "line": 7,
+          "offset": 130
+        },
+        "start": {
+          "column": 11,
+          "line": 7,
+          "offset": 78
+        }
+      },
+      "pdf.margin.bottom": {
+        "end": {
+          "column": 49,
+          "line": 7,
+          "offset": 116
+        },
+        "start": {
+          "column": 45,
+          "line": 7,
+          "offset": 112
+        }
+      },
+      "pdf.margin.left": {
+        "end": {
+          "column": 61,
+          "line": 7,
+          "offset": 128
+        },
+        "start": {
+          "column": 57,
+          "line": 7,
+          "offset": 124
+        }
+      },
+      "pdf.margin.right": {
+        "end": {
+          "column": 35,
+          "line": 7,
+          "offset": 102
+        },
+        "start": {
+          "column": 31,
+          "line": 7,
+          "offset": 98
+        }
+      },
+      "pdf.margin.top": {
+        "end": {
+          "column": 22,
+          "line": 7,
+          "offset": 89
+        },
+        "start": {
+          "column": 18,
+          "line": 7,
+          "offset": 85
+        }
+      },
+      "pdf.pageSize": {
+        "end": {
+          "column": 15,
+          "line": 6,
+          "offset": 67
+        },
+        "start": {
+          "column": 13,
+          "line": 6,
+          "offset": 65
+        }
+      },
+      "title": {
+        "end": {
+          "column": 24,
+          "line": 3,
+          "offset": 38
+        },
+        "start": {
+          "column": 8,
+          "line": 3,
+          "offset": 22
+        }
+      }
+    },
+    "extra": {},
+    "lang": "en",
+    "mdv": "1.0",
+    "pdf": {
+      "margin": {
+        "bottom": "12mm",
+        "left": "12mm",
+        "right": "12mm",
+        "top": "12mm"
+      },
+      "pageSize": "A6"
+    },
+    "range": {
+      "end": {
+        "column": 4,
+        "line": 8,
+        "offset": 134
+      },
+      "start": {
+        "column": 1,
+        "line": 1,
+        "offset": 0
+      }
+    },
+    "title": "Generic families"
+  },
+  "position": [
+    0,
+    1068
+  ],
+  "type": "root"
+}
