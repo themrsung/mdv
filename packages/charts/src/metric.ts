@@ -35,6 +35,8 @@ import type {
   TextMark,
 } from '@mdv/core';
 import type { PlannedEncodeResult } from './internal/plan.js';
+import type { DeltaTone } from './internal/delta.js';
+import { GOOD_DIRECTIONS, defaultDeltaFormat, deltaTone } from './internal/delta.js';
 import { blockDiagnostic, unknownEnum } from './internal/diagnostics.js';
 import { cell, cellNumber, findColumn, firstChannelOf } from './internal/table.js';
 import { finite, sum as sumOf } from './internal/num.js';
@@ -54,15 +56,11 @@ const TREND_POINTS = 12;
 type TileSize = 'normal' | 'hero';
 const TILE_SIZES: readonly TileSize[] = ['normal', 'hero'];
 
-/** `goodDirection` (SPEC 8.13). */
-type GoodDirection = 'up' | 'down' | 'none';
-const GOOD_DIRECTIONS: readonly GoodDirection[] = ['up', 'down', 'none'];
-
 /** Everything `layout` needs. */
 interface MetricPlan {
   label: string | undefined;
   value: string;
-  delta: { text: string; tone: 'good' | 'critical' | 'neutral' } | undefined;
+  delta: { text: string; tone: DeltaTone } | undefined;
   deltaOf: string | undefined;
   trend: number[];
   size: TileSize;
@@ -181,11 +179,10 @@ export const metricChart: ChartType<Mark> = {
 
     let delta: MetricPlan['delta'];
     if (deltaValue !== undefined && Number.isFinite(deltaValue)) {
-      const deltaFormat =
-        stringAttr(attrs, 'deltaFormat') ?? (Math.abs(deltaValue) <= 1 ? '+.1%' : '+,.0f');
+      const deltaFormat = stringAttr(attrs, 'deltaFormat') ?? defaultDeltaFormat(deltaValue);
       delta = {
         text: formatNumber(deltaValue, deltaFormat),
-        tone: toneFor(deltaValue, goodDirection),
+        tone: deltaTone(deltaValue, goodDirection),
       };
     }
     if (deltaValue !== undefined && Number.isFinite(deltaValue) && deltaOf === undefined) {
@@ -468,18 +465,10 @@ function resolveTrend(input: EncodeInput): number[] {
   return values.slice(-TREND_POINTS);
 }
 
-/** Direction × `goodDirection` (SPEC 8.13). */
-function toneFor(delta: number, goodDirection: GoodDirection): 'good' | 'critical' | 'neutral' {
-  if (delta === 0 || goodDirection === 'none') return 'neutral';
-  const rose = delta > 0;
-  if (goodDirection === 'up') return rose ? 'good' : 'critical';
-  return rose ? 'critical' : 'good';
-}
-
 /** The status color for a delta; neutral deltas stay in a text token. */
 function deltaColor(
   status: Readonly<Record<'good' | 'warning' | 'serious' | 'critical', ColorString>>,
-  tone: 'good' | 'critical' | 'neutral',
+  tone: DeltaTone,
   neutral: ColorString,
 ): ColorString {
   if (tone === 'good') return status.good;

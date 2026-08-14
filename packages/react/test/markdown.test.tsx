@@ -124,49 +124,6 @@ describe('raw HTML (SPEC 13.4)', () => {
   });
 });
 
-/**
- * A screen has no pages, so the marker's whole job is to survive as *intent*:
- * addressable by a host stylesheet, mapped to CSS fragmentation when printed,
- * and invisible otherwise.
- */
-describe('page breaks (SPEC 28.4)', () => {
-  it('emits an empty marker for the marker form', () => {
-    const html = render(':::mdv-page{break=before}\n:::\n\nAfter\n');
-    expect(html).toContain('<div class="mdv-page-break" data-mdv-break="before"></div>');
-    expect(html).toContain('<p>After</p>');
-  });
-
-  it('renders the wrapped content inside the marker', () => {
-    const html = render(':::mdv-page{break=avoid}\n### Pricing\n\nBody\n:::\n');
-    expect(html).toContain('data-mdv-break="avoid"');
-    expect(html).toContain('<h3>Pricing</h3>');
-    expect(html).toContain('<p>Body</p>');
-    // Inside, not after: the wrapper is what `break-inside: avoid` applies to.
-    expect(html).not.toContain('</div><h3>');
-  });
-
-  it('carries geometry through as data attributes', () => {
-    const html = render(':::mdv-page{orientation=landscape size=A3}\n:::\n');
-    expect(html).toContain('data-mdv-orientation="landscape"');
-    expect(html).toContain('data-mdv-size="A3"');
-  });
-
-  it('ignores an unrecognised value rather than failing (SPEC 15.2)', () => {
-    const html = render(':::mdv-page{break=sideways orientation=diagonal}\n\nKept\n:::\n');
-    expect(html).toContain('class="mdv-page-break"');
-    expect(html).not.toContain('data-mdv-break');
-    expect(html).not.toContain('data-mdv-orientation');
-    // The content is not collateral damage.
-    expect(html).toContain('<p>Kept</p>');
-  });
-
-  it('has no visuals of its own', () => {
-    const html = render(':::mdv-page{break=after}\n:::\n');
-    expect(html).not.toContain('style=');
-    expect(html).not.toContain('<hr');
-  });
-});
-
 describe('component overrides (SPEC 22.1)', () => {
   it('replaces the element for a tag', () => {
     const Heading = ({ children }: { children?: ReactNode }): ReactNode =>

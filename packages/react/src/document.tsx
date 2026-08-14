@@ -30,6 +30,7 @@ import { useMdv, type MdvStatus, type UseMdvResult } from './hooks/useMdv.js';
 import { MdvBlockView } from './blockview.js';
 import { MdvErrorCard } from './errorcard.js';
 import { renderMarkdown, type ComponentOverrides, type MdastNode } from './markdown.js';
+import { numberDocument, type BlockFacts } from './internal/numbering.js';
 import { REACT_CLASS_NAMES as CLS } from './stylesheet.js';
 
 /** Props for {@link MdvDocument}. */
@@ -68,6 +69,26 @@ export interface MdvDocumentProps {
 
 const NO_COMPONENTS: ComponentOverrides = Object.freeze({});
 const NO_DIAGNOSTICS: readonly Diagnostic[] = Object.freeze([]);
+
+/** A front-matter scalar, when it is a string and nothing else. */
+function asString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * What the numbering pre-pass needs from a resolved block: the anchor, the
+ * caption that decides whether it is numbered at all, and the title the anchor
+ * falls back to. Deliberately three fields and not the block — numbering is a
+ * pure function of the document's shape, and must not depend on layout.
+ */
+function facts(block: ResolvedBlock | undefined): BlockFacts | undefined {
+  if (block === undefined) return undefined;
+  return {
+    id: block.id,
+    caption: asString(block.attrs.caption),
+    title: asString(block.attrs.title),
+  };
+}
 
 /**
  * Merge layout diagnostics into the resolve diagnostics.
@@ -111,6 +132,29 @@ export function MdvDocument(props: MdvDocumentProps): ReactElement {
     for (const block of doc?.blocks ?? []) map.set(block.node, block);
     return map;
   }, [doc]);
+
+  // The numbering pre-pass (SPEC 9.1, 28.7). A figure's number and a
+  // `:mdv-ref[]`'s target are facts about the *whole* document, so they cannot be
+  // discovered by a walk that has only reached the node needing them: they are
+  // counted once, ahead of the walk, exactly as the PDF flow builder counts them.
+  const numbering = useMemo(() => {
+    if (doc === undefined) return undefined;
+    const numberingAttrs = doc.frontmatter?.numbering;
+    const options =
+      typeof numberingAttrs === 'object' && numberingAttrs !== null
+        ? {
+            restartAt: asString(numberingAttrs['restartAt']),
+            figureWord: asString(numberingAttrs['figureWord']),
+          }
+        : {};
+    // A `dataset` block is data, not a visual: it draws nothing (SPEC 6.3) and so
+    // must not consume a figure number. `byNode` holds the visuals alone, which
+    // is what makes the lookup the filter as well.
+    return numberDocument(doc.ast.children as unknown as readonly MdastNode[], {
+      ...options,
+      blocks: (node) => facts(byNode.get(node as unknown as MdvBlockNode)),
+    });
+  }, [doc, byNode]);
 
   // Layout diagnostics, accumulated per block. A ref plus a version counter
   // rather than state per block: a scroll that mounts twenty blocks must not
@@ -198,10 +242,19 @@ export function MdvDocument(props: MdvDocumentProps): ReactElement {
   const body = useMemo<ReactNode[]>(() => {
     if (doc === undefined) return [];
     return renderMarkdown(
-      { components, renderBlock, renderError },
+      {
+        components,
+        renderBlock,
+        renderError,
+        ...(numbering !== undefined ? { numbering } : {}),
+        // The directives read the datasets the document already resolved:
+        // `:mdv-value[@sales.revenue.sum]` and the chart beside it are then the
+        // same claim, not two numbers that can disagree (SPEC 9.2).
+        data: doc.datasets,
+      },
       doc.ast.children as unknown as readonly MdastNode[],
     );
-  }, [doc, components, renderBlock, renderError]);
+  }, [doc, components, renderBlock, renderError, numbering]);
 
   const lang = props.lang ?? doc?.frontmatter?.lang;
   const className =

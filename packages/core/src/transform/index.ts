@@ -44,6 +44,7 @@ import { applyBin, applyPivot, applyUnpivot } from './reshape.js';
 import { applyWindow } from './window.js';
 
 export type { TransformContext } from './context.js';
+export { aggregateColumn } from './aggregate.js';
 export { cloneTable, typeOfValues } from './context.js';
 export { compareValues, groupKey, stableSort, tupleKey } from './order.js';
 

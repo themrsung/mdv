@@ -22,29 +22,22 @@
  * The node types are read structurally rather than through `@types/mdast`: this
  * package does not depend on the mdast typings, and the shapes it reads are
  * fixed by CommonMark.
+ *
+ * The MDV directives that appear in the middle of a document are the other half
+ * of the same renderer, and live in `directives.tsx`. The two share their
+ * structural readers through `internal/mdast.ts`, and this file hands that one
+ * {@link renderChildren} so the recursion stays here.
  */
 
 import { createElement, Fragment, type ReactElement, type ReactNode } from 'react';
 import { sanitiseUrl } from '@mdv/render-svg';
+import { renderDirective, type DirectiveContext } from './directives.js';
+import { bool, host, kids, num, str, type MdastNode } from './internal/mdast.js';
 
-/** A node as this renderer reads it: a tag plus whatever mdast put on it. */
-export interface MdastNode {
-  type: string;
-  [key: string]: unknown;
-}
-
-/**
- * Overrides for the Markdown elements the document renders, keyed by tag name:
- * `{ h2: Heading, a: Link }`.
- *
- * The value is any React component type. Typed as `unknown` on the public
- * surface so a consumer is not forced to import React's component types.
- */
-export type ComponentOverrides = Readonly<Record<string, unknown>>;
+export type { ComponentOverrides, MdastNode } from './internal/mdast.js';
 
 /** Everything the walk needs to carry. */
-export interface MarkdownContext {
-  components: ComponentOverrides;
+export interface MarkdownContext extends DirectiveContext {
   /** Rendered in place of an `mdvBlock` node. */
   renderBlock: (node: MdastNode, key: string) => ReactNode;
   /** Rendered in place of an `mdvError` node. */
@@ -52,53 +45,8 @@ export interface MarkdownContext {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Structural readers
-// ─────────────────────────────────────────────────────────────────────────────
-
-function str(node: MdastNode, key: string): string | undefined {
-  const value = node[key];
-  return typeof value === 'string' ? value : undefined;
-}
-
-function num(node: MdastNode, key: string): number | undefined {
-  const value = node[key];
-  return typeof value === 'number' ? value : undefined;
-}
-
-function bool(node: MdastNode, key: string): boolean | undefined {
-  const value = node[key];
-  return typeof value === 'boolean' ? value : undefined;
-}
-
-function kids(node: MdastNode): readonly MdastNode[] {
-  const value = node['children'];
-  if (!Array.isArray(value)) return [];
-  return value.filter((child): child is MdastNode => typeof child === 'object' && child !== null);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Elements
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Create `tag`, honouring an override.
- *
- * An override receives the same props the built-in would, so a `Heading` that
- * wants the level reads `children` and knows its own tag from which key it was
- * registered under.
- */
-function host(
-  ctx: MarkdownContext,
-  tag: string,
-  props: Record<string, unknown>,
-  children: ReactNode,
-): ReactElement {
-  const override = ctx.components[tag];
-  const type = (override ?? tag) as string;
-  return children === null || children === undefined
-    ? createElement(type as never, props as never)
-    : createElement(type as never, props as never, children);
-}
 
 /** `true` for a URL that leaves the document (SPEC 13.3). */
 function isExternal(href: string): boolean {
@@ -111,44 +59,6 @@ function alignClass(align: unknown): string | undefined {
   if (align === 'center') return 'mdv-align-center';
   if (align === 'left') return 'mdv-align-left';
   return undefined;
-}
-
-/** One attribute of a directive, as a string. Absent beats malformed. */
-function attr(node: MdastNode, key: string): string | undefined {
-  const attrs = node['attrs'];
-  if (typeof attrs !== 'object' || attrs === null) return undefined;
-  const value = (attrs as Record<string, unknown>)[key];
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
-  return undefined;
-}
-
-/** An attribute restricted to a closed set; anything else is ignored (SPEC 15.2). */
-function oneOf(value: string | undefined, allowed: readonly string[]): string | undefined {
-  return value !== undefined && allowed.includes(value) ? value : undefined;
-}
-
-/**
- * `:::mdv-page` — a marker with no visuals of its own (SPEC 28.4).
- *
- * A screen has no pages, so an embedded document must not grow a rule the
- * embedder never asked for. What survives is the *intent*, in attributes a host
- * stylesheet can act on, and — under `@media print` — the CSS fragmentation
- * properties they map to, so printing the HTML agrees with exporting the PDF.
- * In the wrapping form the children render inside the marker, which is what
- * makes `break=avoid` expressible as `break-inside: avoid`.
- */
-function pageBreak(ctx: MarkdownContext, node: MdastNode, key: string): ReactElement {
-  const props: Record<string, unknown> = { key, className: 'mdv-page-break' };
-  const kind = oneOf(attr(node, 'break'), ['before', 'after', 'avoid']);
-  const orientation = oneOf(attr(node, 'orientation'), ['portrait', 'landscape']);
-  const size = attr(node, 'size');
-  if (kind !== undefined) props['data-mdv-break'] = kind;
-  if (orientation !== undefined) props['data-mdv-orientation'] = orientation;
-  if (size !== undefined) props['data-mdv-size'] = size;
-  const children = kids(node);
-  if (children.length === 0) return host(ctx, 'div', props, null);
-  return host(ctx, 'div', props, renderChildren(ctx, node, key));
 }
 
 /** Render a node's children as a fragment-safe array. */
@@ -177,10 +87,7 @@ export function renderNode(ctx: MarkdownContext, node: MdastNode, key: string): 
     case 'mdvError':
       return ctx.renderError(node, key);
     case 'mdvDirective':
-      if (str(node, 'name') === 'mdv-page') return pageBreak(ctx, node, key);
-      // An unknown directive renders its content as ordinary content and is an
-      // info diagnostic, never an error (SPEC 15.2).
-      return createElement(Fragment, { key }, ...renderChildren(ctx, node, key));
+      return renderDirective(ctx, node, key, renderChildren);
 
     // ── Leaves ───────────────────────────────────────────────────────────────
     case 'text':

@@ -75,6 +75,12 @@ export type { VisibleOptions } from './hooks/useVisible.js';
 export { renderMarkdown, renderNode } from './markdown.js';
 export type { ComponentOverrides, MarkdownContext, MdastNode } from './markdown.js';
 
+// ── Directives (SPEC 9.1, 9.2) ───────────────────────────────────────────────
+export { renderDirective } from './directives.js';
+export type { DirectiveContext, RenderChildren } from './directives.js';
+export { numberDocument, refLabel } from './internal/numbering.js';
+export type { BlockFacts, DocumentNumbering, NumberingOptions } from './internal/numbering.js';
+
 // ── Styling (SPEC 22.4) ──────────────────────────────────────────────────────
 export { CLASS_NAMES, REACT_CLASS_NAMES, reactStylesheet, stylesheet } from './stylesheet.js';
 

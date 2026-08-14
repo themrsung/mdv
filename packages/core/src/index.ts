@@ -118,6 +118,13 @@ export type { ConcreteFormat } from './data/detect.js';
 export { detectFormat } from './data/detect.js';
 
 /**
+ * Anchors and counters (SPEC 9.2, 28.2), for the same reason once more: the PDF
+ * exporter and the React renderer both number figures, and a `:mdv-ref[]` that
+ * resolves to different text in the two is a bug the type system cannot see.
+ */
+export { counterLabel, restartLevel, slugify, uniqueSlug } from './numbering.js';
+
+/**
  * The stages `resolve()` below is assembled from, exported because the pipeline
  * is not always driven end to end: an editor re-runs stage 2 on every keystroke
  * but stage 6 only on a resize, and a CLI that lints wants the cascade without

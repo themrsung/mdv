@@ -43,6 +43,7 @@ import type {
   Table as MdTable,
 } from '@mdv/parser';
 import type { ResolvedBlock, ResolvedDocument } from '@mdv/core';
+import { counterLabel as labelOf, restartLevel, slugify, uniqueSlug } from '@mdv/core';
 import type { TextRun } from './text.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -243,32 +244,13 @@ function blockPdfAttrs(block: ResolvedBlock): {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * GitHub-style slug, minus the Unicode-aware lowercasing.
- *
- * `toLowerCase()` without an argument uses the *default* case mapping, not the
- * host locale, so it is deterministic (SPEC 24.3 rule 3); `toLocaleLowerCase`
- * would not be — in `tr`, `I` lowercases to `ı`.
+ * The slug rules moved to `@mdv/core` when the React renderer needed the same
+ * anchors: two implementations of "what does this heading link to" is two
+ * answers waiting to diverge. Re-exported here because it was part of this
+ * package's surface before the move, and a consumer should not have to care
+ * which side of the boundary it ended up on.
  */
-export function slugify(text: string): string {
-  const base = text
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    .trim()
-    .replace(/\s+/g, '-');
-  return base === '' ? 'section' : base;
-}
-
-/** Make `name` unique within `seen`, appending `-1`, `-2`, … as GitHub does. */
-function unique(name: string, seen: Map<string, number>): string {
-  const used = seen.get(name);
-  if (used === undefined) {
-    seen.set(name, 0);
-    return name;
-  }
-  const next = used + 1;
-  seen.set(name, next);
-  return `${name}-${next}`;
-}
+export { slugify } from '@mdv/core';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Inline content
@@ -539,7 +521,7 @@ function emitHeading(node: Heading, ctx: Ctx, frame: Frame): void {
   const runs = inlineRuns(node.children, ctx, {});
   const text = runsText(runs);
   const level = clampLevel(node.depth);
-  const id = unique(slugify(text), ctx.slugs);
+  const id = uniqueSlug(slugify(text), ctx.slugs);
   if (level <= ctx.restartAt) {
     ctx.sectionCounter += 1;
     ctx.figureCounter = 0;
@@ -708,9 +690,12 @@ function emitTable(node: MdTable, ctx: Ctx, frame: Frame): void {
 function counterLabel(ctx: Ctx, kind: 'figure' | 'table'): string {
   const n = kind === 'figure' ? ctx.figureCounter : ctx.tableCounter;
   const word = kind === 'figure' ? ctx.labels.figure : ctx.labels.table;
-  return ctx.restartAt > 0 && ctx.sectionCounter > 0
-    ? `${word} ${ctx.sectionCounter}.${n}`
-    : `${word} ${n}`;
+  return labelOf(word, n, sectionPrefix(ctx));
+}
+
+/** The section number to prefix a counter with, or `0` when there is none. */
+function sectionPrefix(ctx: Ctx): number {
+  return ctx.restartAt > 0 ? ctx.sectionCounter : 0;
 }
 
 function emitVisual(node: MdvBlock, ctx: Ctx, frame: Frame): void {
@@ -809,12 +794,9 @@ function emitDirective(node: MdvDirective, ctx: Ctx, frame: Frame): void {
       const word = attrString(node.attrs, 'label') ?? ctx.labels.figure;
       ctx.figureCounter += 1;
       const n = ctx.figureCounter;
-      const label =
-        ctx.restartAt > 0 && ctx.sectionCounter > 0
-          ? `${word} ${ctx.sectionCounter}.${n}`
-          : `${word} ${n}`;
+      const label = labelOf(word, n, sectionPrefix(ctx));
       const group = `fig-${n}`;
-      const anchor = id ?? unique(slugify(label), ctx.slugs);
+      const anchor = id ?? uniqueSlug(slugify(label), ctx.slugs);
       ctx.targets.set(anchor, { name: anchor, label });
       const inner: Frame = { ...frame, group };
       const start = ctx.items.length;
@@ -934,7 +916,6 @@ export interface FlowOptions {
  * dropped (front matter, link definitions), and nothing throws on content.
  */
 export function buildFlow(doc: ResolvedDocument, options: FlowOptions = {}): FlowDocument {
-  const restartMatch = /^h([1-6])$/.exec(options.restartAt ?? '');
   const blocks = new Map<MdvBlock, ResolvedBlock>();
   for (const block of doc.blocks) blocks.set(block.node, block);
 
@@ -949,7 +930,7 @@ export function buildFlow(doc: ResolvedDocument, options: FlowOptions = {}): Flo
     pendingRefs: [],
     blocks,
     keepCounter: 0,
-    restartAt: restartMatch === null ? 0 : Number.parseInt(restartMatch[1] ?? '1', 10),
+    restartAt: restartLevel(options.restartAt),
     sectionCounter: 0,
     figureCounter: 0,
     tableCounter: 0,

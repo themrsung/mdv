@@ -64,6 +64,55 @@ export { waterfallChart } from './waterfall.js';
 export type { Annotation } from './internal/annotations.js';
 
 /**
+ * Sparkline geometry, shared with the renderers (SPEC 9.2).
+ *
+ * `:mdv-spark[1,4,2,8]` is a chart drawn inside a sentence: no axes, no legend,
+ * no `chart` block, and — in the React renderer — no encode pass at all, since
+ * the numbers are written in the directive rather than read from a dataset. It
+ * still has to place its points exactly where the `sparkline` chart type places
+ * them, or the inline strip and the block chart of the same data would disagree
+ * about what "flat" looks like. Exporting the primitives is what makes that
+ * agreement structural rather than a coincidence of two similar loops.
+ */
+export { parseSeries, sparkExtent, sparkPoints, sparkX, sparkY } from './internal/spark.js';
+export type { SparkStrip } from './internal/spark.js';
+
+/**
+ * The deterministic formatter, shared with the renderers (SPEC 9.2, 24.3).
+ *
+ * `:mdv-metric[1284000]{format="$~s"}` and `:mdv-value[@sales.revenue.sum]` are
+ * numbers printed in a sentence, and the sentence must agree with the tile
+ * beside it down to the last digit — including which digit is last. That is a
+ * property of *this* formatter and not of the platform's: SPEC 24.3 requires
+ * byte-identical output for the same input, so the whole thing is hand-rolled
+ * rather than delegated to `Intl`, whose rounding and grouping move with the ICU
+ * version. A renderer that reached for `toLocaleString()` instead would produce
+ * a document whose prose and charts disagree on some machines and not others.
+ */
+export {
+  expandTemplate,
+  formatDate,
+  formatNumber,
+  formatValue,
+  humanise,
+  keyValue,
+  parseNumberFormat,
+} from './internal/format.js';
+export type { NumberFormatSpec } from './internal/format.js';
+
+/**
+ * The delta rules, shared with the renderers (SPEC 8.13, 9.2, 16.2).
+ *
+ * `:mdv-delta[-0.03]{goodDirection=down}` in a sentence and a `metric` tile with
+ * the same `delta` are one claim written twice, and they have to spell the
+ * number the same way and call the same direction good. Exporting the rules is
+ * what makes the sentence and the tile beside it structurally unable to
+ * disagree — see `internal/delta.ts` for why the tone stops short of the colour.
+ */
+export { GOOD_DIRECTIONS, defaultDeltaFormat, deltaTone } from './internal/delta.js';
+export type { DeltaTone, GoodDirection } from './internal/delta.js';
+
+/**
  * Level 1 types (SPEC 16.1): `bar`, `line`, `area`, `pie`, `donut`, `scatter`,
  * `table`, `metric`.
  *

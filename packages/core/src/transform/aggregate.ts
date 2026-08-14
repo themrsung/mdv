@@ -184,6 +184,54 @@ export function applyAggregate(
   return { fields, rows };
 }
 
+/**
+ * One number out of one column — the arithmetic behind `:mdv-value[]` (SPEC 9.2).
+ *
+ * `:mdv-value[@sales.revenue.sum]` asks for a single cell of an aggregate that
+ * has no grouping, no output column and no place to put a diagnostic: it is read
+ * during a Markdown walk, not a pipeline run. Rather than let the React and PDF
+ * renderers each write their own `sum`, this exposes the reducer the pipeline
+ * already uses, so the sentence and the chart beside it cannot disagree.
+ *
+ * `undefined` — not `null` — for an unknown field or an unspelled operator, so
+ * the caller can tell "the author asked for something that is not there" (render
+ * the source text, SPEC 15.2) from "the column aggregated to nothing" (`null`,
+ * an empty column, which prints as an em dash like any other missing value).
+ *
+ * Non-numeric cells under a numeric operator are ignored exactly as they are in
+ * the pipeline, but silently: the walk has no diagnostic sink, and `MDV2502` is
+ * already emitted by whichever `aggregate` step the author wrote deliberately.
+ *
+ * @param table - the resolved table, already through its pipeline
+ * @param field - the column name, as spelled in the reference
+ * @param op - `sum`, `mean`, `median`, `min`, `max`, `first`, `last`, `stddev`,
+ *   `count`, or a percentile spelled `p50`, `p95`, `p99.9`
+ */
+export function aggregateColumn(table: Table, field: string, op: string): Value | undefined {
+  const at = fieldIndex(table.fields).get(field);
+  if (at === undefined) return undefined;
+
+  const aggregation = aggregationFor(at, field, op);
+  if (aggregation === undefined) return undefined;
+
+  // The set is a sink for `MDV2502`, which has nowhere to go from here.
+  return reduce(aggregation, table.rows, new Set<string>());
+}
+
+/** Resolve an operator name to the aggregation {@link reduce} expects. */
+function aggregationFor(at: number, field: string, op: string): Aggregation | undefined {
+  if (op === 'count') return { name: op, at: undefined, op: 'count' };
+
+  const canonical = CANONICAL_OPS.find((name) => name === op);
+  if (canonical !== undefined) return { name: op, at, op: canonical, input: field };
+
+  const match = PERCENTILE_KEY.exec(op);
+  if (match === null) return undefined;
+  const p = Number(match[1]);
+  if (!Number.isFinite(p) || p < 0 || p > 100) return undefined;
+  return { name: op, at, op: 'percentile', p, input: field };
+}
+
 /** The declared output type of one aggregation. */
 function outputType(aggregation: Aggregation, table: Table): DataType {
   switch (aggregation.op) {

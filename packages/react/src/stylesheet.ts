@@ -9,9 +9,15 @@
  * tooltip, the crosshair, the focus ring and the live region. This file adds
  * only what exists in the React binding and nowhere else — the document flow,
  * the block wrapper, the virtualisation placeholder, the table view of SPEC 12.3,
- * the HTML error card of SPEC 14 and the page-break marker of SPEC 28.4. Every
- * rule is scoped under `.mdv-root`, and there is not one element selector that
- * is not.
+ * the HTML error card of SPEC 14, the page-break marker of SPEC 28.4 and the
+ * directives of SPEC 9.1 and 9.2, which have no SVG half at all. Every rule is
+ * scoped under `.mdv-root`, and there is not one element selector that is not.
+ *
+ * Directive status colour comes from three hooks — `--mdv-good-ink`,
+ * `--mdv-warn-ink` and `--mdv-error-ink` — each falling back to its
+ * `STATUS_PALETTE` value (SPEC 11.3.1), so a callout, a badge and a delta agree
+ * with the arrow a chart draws for the same news. Hue is never the only signal:
+ * every one of them ships an icon or a word beside it (SPEC 16.2).
  *
  * Nothing here is emitted as an inline `style` attribute anywhere in the
  * package. `style-src 'self' 'nonce-…'` blocks inline style *attributes* as well
@@ -48,6 +54,32 @@ export const REACT_CLASS_NAMES = Object.freeze({
   alignLeft: 'mdv-align-left',
   alignRight: 'mdv-align-right',
   alignCenter: 'mdv-align-center',
+
+  // ── Directives (SPEC 9.1, 9.2) ─────────────────────────────────────────────
+  // Named after the construct that emits them, so a rule in an embedder's
+  // override sheet can be traced back to the `:::mdv-…` an author wrote.
+  figure: 'mdv-figure',
+  figureCaption: 'mdv-figure-caption',
+  callout: 'mdv-callout',
+  calloutHead: 'mdv-callout-head',
+  calloutIcon: 'mdv-callout-icon',
+  tabs: 'mdv-tabs',
+  tabList: 'mdv-tab-list',
+  tab: 'mdv-tab',
+  tabPanel: 'mdv-tab-panel',
+  tabTitle: 'mdv-tab-title',
+  details: 'mdv-details',
+  detailsSummary: 'mdv-details-summary',
+  grid: 'mdv-grid',
+  columns: 'mdv-columns',
+  ref: 'mdv-ref',
+  value: 'mdv-value',
+  metric: 'mdv-metric',
+  delta: 'mdv-delta',
+  deltaArrow: 'mdv-delta-arrow',
+  badge: 'mdv-badge',
+  badgeIcon: 'mdv-badge-icon',
+  spark: 'mdv-spark',
 });
 
 /** Every class name the two packages emit together. */
@@ -90,9 +122,99 @@ font-weight:600;color:var(--mdv-error-ink,#d03b3b)}
 background:var(--mdv-page);border-radius:var(--mdv-radius);\
 font-family:var(--mdv-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);\
 font-size:calc(var(--mdv-font-size) * 0.92);white-space:pre;color:var(--mdv-text-secondary)}
+.mdv-root .mdv-figure{display:block;margin:1em 0;max-width:100%}
+.mdv-root .mdv-figure-caption{margin:6px 0 0;color:var(--mdv-text-secondary);\
+font-size:calc(var(--mdv-font-size) * 0.92)}
+.mdv-root .mdv-callout{--mdv-callout-ink:var(--mdv-text-muted);display:block;box-sizing:border-box;\
+margin:1em 0;padding:8px 12px;background:var(--mdv-surface);\
+border:var(--mdv-hairline) solid var(--mdv-border);border-left:3px solid var(--mdv-callout-ink);\
+border-radius:var(--mdv-radius)}
+.mdv-root .mdv-callout[data-mdv-callout=tip]{--mdv-callout-ink:var(--mdv-good-ink,#0ca30c)}
+.mdv-root .mdv-callout[data-mdv-callout=warning]{--mdv-callout-ink:var(--mdv-warn-ink,#fab219)}
+.mdv-root .mdv-callout[data-mdv-callout=danger]{--mdv-callout-ink:var(--mdv-error-ink,#d03b3b)}
+.mdv-root .mdv-callout>:last-child{margin-bottom:0}
+.mdv-root .mdv-callout-head{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;\
+margin:0 0 4px;font-weight:600}
+.mdv-root .mdv-callout-icon{flex:none;font-weight:700;color:var(--mdv-callout-ink)}
+.mdv-root .mdv-tabs{display:block;margin:1em 0}
+.mdv-root .mdv-tab-list{display:flex;flex-wrap:wrap;gap:2px;\
+border-bottom:var(--mdv-hairline) solid var(--mdv-border)}
+.mdv-root .mdv-tab{appearance:none;-webkit-appearance:none;margin:0 0 -1px;padding:4px 10px;\
+font:inherit;color:var(--mdv-text-secondary);background:none;border:0;\
+border-bottom:2px solid transparent;cursor:pointer}
+.mdv-root .mdv-tab[aria-selected=true]{font-weight:600;color:var(--mdv-text-primary);\
+border-bottom-color:var(--mdv-text-primary)}
+.mdv-root .mdv-tab:focus-visible{outline:var(--mdv-ring) solid var(--mdv-text-primary);\
+outline-offset:calc(-1 * var(--mdv-ring))}
+.mdv-root .mdv-tab-panel{padding-top:8px}
+.mdv-root .mdv-tab-panel:focus-visible{outline:var(--mdv-ring) solid var(--mdv-text-primary);\
+outline-offset:var(--mdv-ring)}
+.mdv-root .mdv-tab-title{margin:0 0 4px;font-weight:600}
+.mdv-root .mdv-details{display:block;box-sizing:border-box;margin:1em 0;padding:8px 12px;\
+background:var(--mdv-surface);border:var(--mdv-hairline) solid var(--mdv-border);\
+border-radius:var(--mdv-radius)}
+.mdv-root .mdv-details>:last-child{margin-bottom:0}
+.mdv-root .mdv-details-summary{cursor:default;min-height:24px;font-weight:600;\
+border-radius:var(--mdv-radius)}
+.mdv-root .mdv-details-summary:focus-visible{outline:var(--mdv-ring) solid var(--mdv-text-primary);\
+outline-offset:var(--mdv-ring)}
+.mdv-root .mdv-details[open] .mdv-details-summary{margin-bottom:6px}
+.mdv-root .mdv-grid{display:grid;margin:1em 0;gap:var(--mdv-directive-gap,12px);\
+grid-template-columns:repeat(2,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-cols="1"]{grid-template-columns:minmax(0,1fr)}
+.mdv-root .mdv-grid[data-mdv-cols="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-cols="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-cols="4"]{grid-template-columns:repeat(4,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-cols="5"]{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-cols="6"]{grid-template-columns:repeat(6,minmax(0,1fr))}
+.mdv-root .mdv-grid[data-mdv-align=start]{align-items:start}
+.mdv-root .mdv-grid[data-mdv-align=center]{align-items:center}
+.mdv-root .mdv-grid[data-mdv-align=end]{align-items:end}
+.mdv-root .mdv-grid[data-mdv-align=stretch]{align-items:stretch}
+.mdv-root .mdv-grid>*{min-width:0}
+.mdv-root .mdv-columns{display:block;margin:1em 0;column-gap:var(--mdv-directive-gap,24px);\
+column-count:2}
+.mdv-root .mdv-columns[data-mdv-count="1"]{column-count:1}
+.mdv-root .mdv-columns[data-mdv-count="2"]{column-count:2}
+.mdv-root .mdv-columns[data-mdv-count="3"]{column-count:3}
+.mdv-root .mdv-columns[data-mdv-count="4"]{column-count:4}
+.mdv-root .mdv-columns[data-mdv-count="5"]{column-count:5}
+.mdv-root .mdv-columns[data-mdv-count="6"]{column-count:6}
+.mdv-root .mdv-columns>*{break-inside:avoid}
+@media (max-width:640px){\
+.mdv-root .mdv-grid[data-mdv-cols]{grid-template-columns:minmax(0,1fr)}\
+.mdv-root .mdv-columns[data-mdv-count]{column-count:1}}
+.mdv-root .mdv-ref{text-decoration:underline;text-underline-offset:2px}
+.mdv-root .mdv-value,.mdv-root .mdv-metric{font-variant-numeric:tabular-nums}
+.mdv-root .mdv-ref[data-mdv-unresolved],.mdv-root .mdv-value[data-mdv-unresolved]{\
+font-family:var(--mdv-mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace);\
+color:var(--mdv-error-ink,#d03b3b);text-decoration:none}
+.mdv-root .mdv-delta{white-space:nowrap;font-variant-numeric:tabular-nums;\
+color:var(--mdv-text-secondary)}
+.mdv-root .mdv-delta[data-mdv-tone=good]{color:var(--mdv-good-ink,#0ca30c)}
+.mdv-root .mdv-delta[data-mdv-tone=critical]{color:var(--mdv-error-ink,#d03b3b)}
+.mdv-root .mdv-delta[data-mdv-tone=neutral]{color:var(--mdv-text-secondary)}
+.mdv-root .mdv-delta-arrow{margin-right:2px;font-size:0.85em}
+.mdv-root .mdv-badge{--mdv-badge-ink:var(--mdv-text-muted);display:inline-flex;gap:4px;\
+align-items:baseline;vertical-align:baseline;padding:0 6px;white-space:nowrap;\
+font-size:calc(var(--mdv-font-size) * 0.85);line-height:1.6;\
+border:var(--mdv-hairline) solid var(--mdv-badge-ink);border-radius:999px}
+.mdv-root .mdv-badge[data-mdv-badge=tip]{--mdv-badge-ink:var(--mdv-good-ink,#0ca30c)}
+.mdv-root .mdv-badge[data-mdv-badge=warning]{--mdv-badge-ink:var(--mdv-warn-ink,#fab219)}
+.mdv-root .mdv-badge[data-mdv-badge=danger]{--mdv-badge-ink:var(--mdv-error-ink,#d03b3b)}
+.mdv-root .mdv-badge-icon{flex:none;font-weight:700;color:var(--mdv-badge-ink)}
+.mdv-root .mdv-spark{display:inline-block;width:4em;height:1em;vertical-align:-0.15em;\
+overflow:visible;fill:none;stroke:currentColor;stroke-width:1;stroke-linecap:round;\
+stroke-linejoin:round}
+.mdv-root .mdv-spark rect{fill:currentColor;stroke:none}
 @media (forced-colors:active){.mdv-root .mdv-error-card{border-color:CanvasText}\
-.mdv-root .mdv-error-code{color:CanvasText}}
+.mdv-root .mdv-error-code{color:CanvasText}\
+.mdv-root .mdv-callout,.mdv-root .mdv-details,.mdv-root .mdv-badge{border-color:CanvasText}\
+.mdv-root .mdv-callout-icon,.mdv-root .mdv-badge-icon,.mdv-root .mdv-delta,\
+.mdv-root .mdv-ref[data-mdv-unresolved],.mdv-root .mdv-value[data-mdv-unresolved]{color:CanvasText}\
+.mdv-root .mdv-tab[aria-selected=true]{border-bottom-color:CanvasText}}
 @media print{\
+.mdv-root .mdv-figure,.mdv-root .mdv-callout,.mdv-root .mdv-details{break-inside:avoid}\
 .mdv-root .mdv-page-break[data-mdv-break=before]{page-break-before:always;break-before:page}\
 .mdv-root .mdv-page-break[data-mdv-break=after]{page-break-after:always;break-after:page}\
 .mdv-root .mdv-page-break[data-mdv-break=avoid]{page-break-inside:avoid;break-inside:avoid}}
