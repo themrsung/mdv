@@ -1,0 +1,22 @@
+---
+mdv: "1.0"
+title: Incremental update, one attribute changed
+---
+
+# Signups by source
+
+```mdv bar
+title: Signups by source
+x: source
+y: signups
+series: plan
+height: 320
+---
+source  | plan  | signups
+search  | free  |     482
+search  | pro   |     140
+social  | free  |     344
+social  | pro   |      96
+direct  | free  |     530
+direct  | pro   |     181
+```

@@ -1,0 +1,28 @@
+---
+mdv: "1.0"
+title: PDF export, 50-page document
+---
+
+## Monthly review
+
+Every section is a heading, a paragraph and a chart, which is roughly a page of
+print (SPEC 28). The harness repeats the body until the export reaches the length
+SPEC 24.1 names.
+
+```mdv line
+title: Active accounts
+x: month
+y: accounts
+series: tier
+height: 360
+---
+month   | tier  | accounts
+2024-01 | free  |      482
+2024-01 | paid  |      414
+2024-02 | free  |      530
+2024-02 | paid  |      441
+2024-03 | free  |      498
+2024-03 | paid  |      470
+2024-04 | free  |      640
+2024-04 | paid  |      602
+```

@@ -1,0 +1,31 @@
+---
+mdv: "1.0"
+title: First contentful chart in a 50-block document
+---
+
+## Quarterly performance
+
+The reader sees the first chart long before the fiftieth. What this case measures
+is that promise: resolve the whole document, then lay out and render block one.
+
+```mdv area
+title: Bookings by channel
+x: quarter
+y: bookings
+series: channel
+height: 320
+---
+quarter | channel | bookings
+Q1      | direct  |      482
+Q1      | partner |      414
+Q1      | self    |      344
+Q2      | direct  |      530
+Q2      | partner |      441
+Q2      | self    |      360
+Q3      | direct  |      498
+Q3      | partner |      470
+Q3      | self    |      434
+Q4      | direct  |      640
+Q4      | partner |      602
+Q4      | self    |      651
+```

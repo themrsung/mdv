@@ -1,0 +1,7 @@
+{
+  "operation": "parse",
+  "spec": "Parse 1 MB document",
+  "budget": 250,
+  "repeat": 500,
+  "rows": 85
+}

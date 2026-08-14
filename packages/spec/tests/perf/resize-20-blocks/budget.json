@@ -1,0 +1,7 @@
+{
+  "operation": "resize-reflow",
+  "spec": "Resize reflow, 20 visible blocks",
+  "budget": 50,
+  "repeat": 20,
+  "rows": 24
+}

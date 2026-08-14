@@ -1,0 +1,7 @@
+{
+  "operation": "first-chart",
+  "spec": "First contentful chart, 50-block document",
+  "budget": 100,
+  "repeat": 50,
+  "rows": 24
+}

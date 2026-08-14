@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "interaction"],
+  "note": "SPEC 24.1: one hover frame on a crosshair chart (SPEC 7.5). The pointer walks sixteen positions across the plot so no frame can be answered from the previous frame's state."
+}

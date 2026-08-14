@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "area"],
+  "note": "SPEC 24.1: first contentful chart, ≤ 100 ms after parse. The timed region is the document's resolve plus one block's layout and render — the work between a parsed AST and the first thing on screen."
+}

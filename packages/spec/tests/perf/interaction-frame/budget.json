@@ -1,0 +1,6 @@
+{
+  "operation": "interaction-frame",
+  "spec": "Interaction frame (hover, crosshair)",
+  "budget": 8,
+  "rows": 600
+}

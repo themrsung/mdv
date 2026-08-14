@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "parse"],
+  "note": "SPEC 24.1 parse budget. The harness grows this body to ~50 blocks of ~60 rows before timing stage 1; no goldens, because the measured document is generated and pinning it would commit 100 KB nobody can review."
+}

@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "layout"],
+  "note": "SPEC 24.1: resize reflow over 20 visible blocks. Every block is re-laid out and re-serialised at the new width; the DOM patch that would follow is not measured, because this package has no DOM."
+}

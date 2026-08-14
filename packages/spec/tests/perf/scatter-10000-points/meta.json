@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "scatter"],
+  "note": "SPEC 24.1: layout + render of a 10 000-point scatter. The spec measures canvas; this build has no canvas backend, so the render is the SVG string backend and PERF.md says so beside the number."
+}

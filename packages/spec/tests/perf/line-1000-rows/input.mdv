@@ -1,0 +1,25 @@
+---
+mdv: "1.0"
+title: Prepare, encode and layout a 1 000-row line chart
+---
+
+# Latency by service
+
+```mdv line
+title: p95 latency by service
+x: t
+y: ms
+series: service
+height: 400
+---
+t | service | ms
+1 | api     | 118
+2 | worker  |  94
+3 | edge    |  62
+4 | api     | 131
+5 | worker  | 102
+6 | edge    |  58
+7 | api     | 126
+8 | worker  |  88
+9 | edge    |  71
+```

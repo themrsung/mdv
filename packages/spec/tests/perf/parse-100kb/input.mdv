@@ -1,0 +1,32 @@
+---
+mdv: "1.0"
+title: Parse budget, 100 KB
+---
+
+## Regional revenue
+
+Each section of this document is one heading, one paragraph and one chart. The
+committed copy holds a single section; the perf harness repeats the body until
+the document reaches the shape SPEC 24.1 names, so the file stays reviewable.
+
+```mdv bar
+title: Revenue by region
+x: month
+y: revenue
+series: region
+height: 320
+---
+month   | region | revenue
+2024-01 | APAC   |     482
+2024-01 | EMEA   |     414
+2024-01 | AMER   |     344
+2024-02 | APAC   |     530
+2024-02 | EMEA   |     441
+2024-02 | AMER   |     360
+2024-03 | APAC   |     498
+2024-03 | EMEA   |     470
+2024-03 | AMER   |     434
+2024-04 | APAC   |     640
+2024-04 | EMEA   |     602
+2024-04 | AMER   |     651
+```

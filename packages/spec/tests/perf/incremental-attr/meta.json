@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "update"],
+  "note": "SPEC 24.1: one attribute changed. `legend` flips between `right` and `none` on alternate runs — an attribute that changes the layout rather than only the paint, so the number is not flattered by an early exit."
+}

@@ -1,0 +1,32 @@
+---
+mdv: "1.0"
+title: Parse budget, 1 MB
+---
+
+## Regional revenue
+
+A million bytes of document is the size at which a naive parser starts to feel
+slow: it is roughly a book, or a year of dashboards in one file. The committed
+copy holds one section and the harness repeats it.
+
+```mdv bar
+title: Revenue by region
+x: month
+y: revenue
+series: region
+height: 320
+---
+month   | region | revenue
+2024-01 | APAC   |     482
+2024-01 | EMEA   |     414
+2024-01 | AMER   |     344
+2024-02 | APAC   |     530
+2024-02 | EMEA   |     441
+2024-02 | AMER   |     360
+2024-03 | APAC   |     498
+2024-03 | EMEA   |     470
+2024-03 | AMER   |     434
+2024-04 | APAC   |     640
+2024-04 | EMEA   |     602
+2024-04 | AMER   |     651
+```

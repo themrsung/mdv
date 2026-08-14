@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "parse"],
+  "note": "SPEC 24.1 parse budget at 1 MB. Same body as perf/parse-100kb, repeated ten times as often; stage 1 only, so this case measures the parser and nothing downstream of it."
+}

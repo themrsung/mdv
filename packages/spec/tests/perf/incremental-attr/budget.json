@@ -1,0 +1,6 @@
+{
+  "operation": "incremental-update",
+  "spec": "Incremental update, one attribute changed",
+  "budget": 5,
+  "rows": 60
+}

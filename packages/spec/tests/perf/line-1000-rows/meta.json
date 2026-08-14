@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "line"],
+  "note": "SPEC 24.1: prepare + encode + layout of a 1 000-row line chart. Grown to 1 000 rows over three series; parse happens outside the timed region, because the budget names stages 4 through 6."
+}

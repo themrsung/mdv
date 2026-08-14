@@ -1,0 +1,7 @@
+{
+  "operation": "pdf-export",
+  "spec": "PDF export, 50-page document",
+  "budget": 3000,
+  "repeat": 40,
+  "rows": 24
+}

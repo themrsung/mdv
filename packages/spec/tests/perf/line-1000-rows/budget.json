@@ -1,0 +1,6 @@
+{
+  "operation": "prepare-encode-layout",
+  "spec": "Prepare + encode + layout, 1 000-row line chart",
+  "budget": 8,
+  "rows": 1000
+}

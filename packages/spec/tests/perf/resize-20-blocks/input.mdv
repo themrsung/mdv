@@ -1,0 +1,23 @@
+---
+mdv: "1.0"
+title: Resize reflow, 20 visible blocks
+---
+
+## Utilisation
+
+A reflow is every visible block laid out again at the new width and repainted.
+The width alternates between runs, so nothing can be answered from a cache.
+
+```mdv bar
+title: Utilisation by team
+x: team
+y: hours
+height: 300
+---
+team      | hours
+platform  |   482
+data      |   414
+growth    |   344
+infra     |   530
+design    |   441
+```

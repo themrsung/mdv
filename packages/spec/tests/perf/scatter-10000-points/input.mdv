@@ -1,0 +1,23 @@
+---
+mdv: "1.0"
+title: Layout and render a 10 000-point scatter
+---
+
+# Response time against payload size
+
+```mdv scatter
+title: Response time against payload size
+x: bytes
+y: ms
+height: 400
+---
+bytes | ms
+  120 |  14
+  240 |  22
+  360 |  19
+  480 |  31
+  600 |  27
+  720 |  44
+  840 |  38
+  960 |  52
+```

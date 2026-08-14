@@ -1,0 +1,25 @@
+---
+mdv: "1.0"
+title: Interaction frame
+---
+
+# Throughput
+
+```mdv line
+title: Requests per second
+x: t
+y: rps
+series: region
+height: 400
+---
+t | region | rps
+1 | apac   | 118
+2 | emea   |  94
+3 | amer   |  62
+4 | apac   | 131
+5 | emea   | 102
+6 | amer   |  58
+7 | apac   | 126
+8 | emea   |  88
+9 | amer   |  71
+```

@@ -1,0 +1,5 @@
+{
+  "level": 1,
+  "tags": ["perf", "pdf"],
+  "note": "SPEC 24.1: PDF export of a 50-page document. Exported through the direct exporter with the standard 14 faces and the print theme, which is the same context the corpus pins expected.pdf.json with (SPEC 28.5)."
+}
