@@ -50,6 +50,7 @@ export type { SeriesIdentity, SeriesDescriptorOptions } from './series.js';
 export {
   identitiesFromSeriesColumn,
   identitiesFromFields,
+  identitiesFromColumns,
   seriesIdentities,
   buildSeriesDescriptors,
   findSeries,

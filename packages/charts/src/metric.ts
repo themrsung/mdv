@@ -43,7 +43,7 @@ import { finite, sum as sumOf } from './internal/num.js';
 import { curvePath, px } from './internal/geometry.js';
 import { sparkPoints } from './internal/spark.js';
 import { enumAttr, numberAttr, listAttr, rawAttr, stringAttr } from './internal/attrs.js';
-import { formatNumber } from './internal/format.js';
+import { formatNumber, numberFormatAttr } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
 import { labelFont, lineStroke, solid } from './internal/paint.js';
 import { planOf } from './internal/plan.js';
@@ -151,7 +151,9 @@ export const metricChart: ChartType<Mark> = {
     // data-section syntax that `BlockAttrs.format` is typed as (SPEC 6.2). The
     // two share a name in the attribute bag, so this reads the raw string and
     // never touches the typed field. Reported upstream; see the summary.
-    const format = stringAttr(attrs, 'format');
+    // A metric with an inline table writes `format: table` meaning the *other*
+    // sense, and spending it here would print the word after the number.
+    const format = numberFormatAttr(stringAttr(attrs, 'format'));
     const numericValue = resolveValue(input);
     const valueText = numericValue === undefined ? '—' : formatNumber(numericValue, format);
 

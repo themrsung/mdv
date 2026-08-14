@@ -152,6 +152,12 @@ function createPieType(name: 'pie' | 'donut', defaultInner: number): ChartType<A
     // The mark is the hit target; no crosshair, and the hovered slice lifts.
     family: 'mark',
     channels: CHANNELS,
+    // A pie's entity is its slice, so colour is keyed on the category column,
+    // not on a series (SPEC 11.2 rule 1).
+    colorIdentityFields: (block) => {
+      const field = firstChannelOf(block.encoding, ['category', 'x', 'label'])?.field;
+      return field === undefined ? [] : [field];
+    },
     defaultEncoding: {},
     defaults: {
       innerRadius: defaultInner,

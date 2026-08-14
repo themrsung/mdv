@@ -44,6 +44,34 @@ export function identitiesFromSeriesColumn(table: Table, field: string): SeriesI
   return out;
 }
 
+/**
+ * Identities for a type that colours by category, not by series.
+ *
+ * The distinct values of the columns given, unioned in first-appearance order
+ * across the columns in the order given. A sankey passes its `source` and
+ * `target` columns and gets one identity per node, whichever end introduced
+ * it; a pie passes its category column and gets one per slice.
+ *
+ * A value appearing in more than one column keeps the first column as its
+ * `source`, so it is one identity holding one slot — a sankey node is the same
+ * colour at both ends of its ribbon.
+ */
+export function identitiesFromColumns(
+  table: Table,
+  fields: readonly string[],
+): SeriesIdentity[] {
+  const seen = new Set<string>();
+  const out: SeriesIdentity[] = [];
+  for (const field of fields) {
+    for (const identity of identitiesFromSeriesColumn(table, field)) {
+      if (seen.has(identity.id)) continue;
+      seen.add(identity.id);
+      out.push(identity);
+    }
+  }
+  return out;
+}
+
 /** Identities for wide form: one per bound field, in the author's order. */
 export function identitiesFromFields(table: Table, fields: readonly string[]): SeriesIdentity[] {
   const seen = new Set<string>();

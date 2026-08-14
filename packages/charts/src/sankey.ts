@@ -453,6 +453,13 @@ export const sankeyChart: ChartType<LinkMark> = {
   level: 2,
   family: 'mark',
   channels: CHANNELS,
+  // A sankey's entity is its node, and a node is named by the `source` and
+  // `target` *attributes* — a node reached from either end is one identity
+  // holding one slot, so a ribbon is the same colour at both ends.
+  colorIdentityFields: (block) =>
+    [stringAttr(block.attrs, 'source'), stringAttr(block.attrs, 'target')].filter(
+      (field): field is string => field !== undefined,
+    ),
   defaultEncoding: {},
   defaults: {
     nodeWidth: DEFAULT_NODE_WIDTH,

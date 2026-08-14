@@ -57,6 +57,16 @@ export interface LegendItemGeometry {
   x: number;
   y: number;
   width: number;
+  /**
+   * Ellipsis budget for the label, in px — carried, never re-derived.
+   *
+   * Subtracting the swatch back out of {@link width} would not round-trip in
+   * binary floating point, and a budget a single ULP under the width it was
+   * built from crops a label that exactly fits: `Web` survived while `Hot`
+   * came out as a bare `…`. The budget is the same number the label was
+   * measured at, so an unclamped label always fits its own budget.
+   */
+  labelWidth: number;
 }
 
 /** One drawn band of a ramp, positioned along it. */
@@ -160,8 +170,12 @@ export function measureLegend(
 
   const measured = folded.entries.map((entry) => {
     const labelWidth = measureWidth(entry.label, font, ctx.metrics);
-    return { entry, width: SWATCH_SIZE + SWATCH_GAP + labelWidth };
+    return { entry, labelWidth, width: SWATCH_SIZE + SWATCH_GAP + labelWidth };
   });
+
+  /** The label budget once the row is clamped to `maxWidth`. */
+  const budget = (labelWidth: number): number =>
+    Math.min(labelWidth, Math.max(0, maxWidth - (SWATCH_SIZE + SWATCH_GAP)));
 
   const items: LegendItemGeometry[] = [];
   let boxWidth = 0;
@@ -169,8 +183,8 @@ export function measureLegend(
 
   if (vertical) {
     let y = titleHeight;
-    for (const { entry, width } of measured) {
-      items.push({ entry, x: 0, y, width: Math.min(width, maxWidth) });
+    for (const { entry, width, labelWidth } of measured) {
+      items.push({ entry, x: 0, y, width: Math.min(width, maxWidth), labelWidth: budget(labelWidth) });
       boxWidth = Math.max(boxWidth, Math.min(width, maxWidth));
       y += rowHeight + ROW_GAP;
     }
@@ -181,7 +195,7 @@ export function measureLegend(
     let y = titleHeight;
     let rowMaxWidth = 0;
     let inRow = 0;
-    for (const { entry, width } of measured) {
+    for (const { entry, width, labelWidth } of measured) {
       const wraps =
         (columns !== undefined && inRow >= columns) ||
         (columns === undefined && inRow > 0 && x + width > maxWidth);
@@ -191,7 +205,7 @@ export function measureLegend(
         y += rowHeight + ROW_GAP;
         inRow = 0;
       }
-      items.push({ entry, x, y, width });
+      items.push({ entry, x, y, width, labelWidth: budget(labelWidth) });
       x += width + ITEM_GAP;
       ++inRow;
     }
@@ -406,8 +420,7 @@ export function renderLegend(geometry: LegendGeometry, box: Rect, ctx: LayoutCon
     children.push(...symbolNodes(item.entry, x, centerY, ctx));
 
     const labelX = x + SWATCH_SIZE + SWATCH_GAP;
-    const labelBudget = Math.max(0, item.width - (SWATCH_SIZE + SWATCH_GAP));
-    const label = ellipsize(item.entry.label, font, ctx.metrics, labelBudget);
+    const label = ellipsize(item.entry.label, font, ctx.metrics, item.labelWidth);
     children.push(
       makeText(
         {

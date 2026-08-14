@@ -52,7 +52,11 @@ import {
   needsDescriptionDiagnostic,
 } from '../a11y/index.js';
 import { blockReporter } from '../encode/report.js';
-import { buildSeriesDescriptors, seriesIdentities } from '../encode/series.js';
+import {
+  buildSeriesDescriptors,
+  identitiesFromColumns,
+  seriesIdentities,
+} from '../encode/series.js';
 import { createPaletteAllocator, slotCapForFamily } from '../encode/palette.js';
 import { detectSecondAxisRequest, enforceOneAxisRule } from '../encode/axis.js';
 import { buildLegendModel, normalizeLegendAttr } from '../encode/legend.js';
@@ -496,7 +500,12 @@ function runEncode(type: ChartType, block: ResolvedBlock, ctx: LayoutContext): E
     : type.channels.some((channel) => channel.name === 'value')
       ? 'value'
       : 'x';
-  const identities = seriesIdentities(block.table, block.encoding, valueChannel);
+  // Types that colour by category resolve the columns their entities live in;
+  // everything else keys colour on the series (SPEC 11.2 rule 1).
+  const identities =
+    type.colorIdentityFields === undefined
+      ? seriesIdentities(block.table, block.encoding, valueChannel)
+      : identitiesFromColumns(block.table, type.colorIdentityFields(block));
 
   const legendRequest = normalizeLegendAttr(block.attrs.legend);
   const colors = paletteColors(block, ctx);

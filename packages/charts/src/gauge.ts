@@ -84,7 +84,7 @@ import {
 } from './internal/attrs.js';
 import { blockDiagnostic, unknownEnum } from './internal/diagnostics.js';
 import { extentOf, resolveDomain } from './internal/domain.js';
-import { formatNumber } from './internal/format.js';
+import { formatNumber, numberFormatAttr } from './internal/format.js';
 import { arcPath, polar, px, shapePath } from './internal/geometry.js';
 import type { Point } from './internal/geometry.js';
 import { hitRegion, readout } from './internal/hit.js';
@@ -596,7 +596,13 @@ function encodeGauge(input: EncodeInput): EncodeResult<ArcMark> {
   const encoding = canonical(input.encoding);
   const channel = firstChannelOf(encoding, ['value', 'y']);
   const readings = collectReadings(input, encoding);
-  const valueFormat = channelFormat(channel, readings.column) ?? stringAttr(attrs, 'format');
+  // The field and the channel are asked first; the block's `format` is the
+  // fallback. That key carries two meanings — a number pattern here, the
+  // data-section syntax on every block (SPEC 6.2) — so a gauge that writes
+  // `format: table` above an inline table meant the second, and spending it
+  // here rendered the reading as `99.94table`.
+  const valueFormat =
+    channelFormat(channel, readings.column) ?? numberFormatAttr(stringAttr(attrs, 'format'));
 
   const sweepDegrees = readArc(input);
   const showValue = boolAttr(attrs, 'showValue', true);

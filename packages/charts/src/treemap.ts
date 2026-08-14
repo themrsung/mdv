@@ -451,6 +451,16 @@ export const treemapChart: ChartType<NodeMark> = {
   level: 2,
   family: 'mark',
   channels: CHANNELS,
+  // Only the roots are coloured - every tile under a branch wears the branch's
+  // hue - so a treemap's colour entity is the *branch*, which `parent` names.
+  // The tile's own name is the fallback: a row naming no parent is a root
+  // itself. `parent` comes first so the branches take their slots before the
+  // leaves that will never spend one (SPEC 11.2 rule 1).
+  colorIdentityFields: (block) =>
+    [
+      stringAttr(block.attrs, 'parent'),
+      firstChannelOf(block.encoding, ['category', 'x', 'label'])?.field,
+    ].filter((field): field is string => field !== undefined),
   defaultEncoding: {},
   defaults: {
     tile: 'squarify',

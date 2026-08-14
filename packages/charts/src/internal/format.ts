@@ -41,6 +41,39 @@ const SI_ZERO_INDEX = 8;
 
 const CURRENCY_SYMBOLS = new Set(['$', '€', '£', '¥', '₩', '₹']);
 
+/**
+ * The values `format` takes in its *other* meaning: the data-section syntax
+ * enum (SPEC 6.2, and the common-attribute table at SPEC 1198).
+ */
+const DATA_SECTION_FORMATS = new Set([
+  'auto',
+  'table',
+  'csv',
+  'tsv',
+  'json',
+  'ndjson',
+  'columns',
+  'matrix',
+]);
+
+/**
+ * Read `format` from a block's attribute bag as a *number* format.
+ *
+ * One key, two meanings: `format` is the data-section syntax on every block
+ * (SPEC 6.2), and the number format on the handful of one-number forms that
+ * declare it in their key attributes (`metric`, SPEC 8.13). A block that
+ * carries an inline table and writes `format: table` means the first, so
+ * spending it on the second appends the word to the reading — a gauge that
+ * says `99.94table` is a wrong number on the page, not a styling slip.
+ *
+ * Data-section names are therefore never number formats. Nothing is reported:
+ * the attribute was not ignored, it was honoured by the reader.
+ */
+export function numberFormatAttr(format: string | undefined): string | undefined {
+  if (format === undefined) return undefined;
+  return DATA_SECTION_FORMATS.has(format.trim()) ? undefined : format;
+}
+
 /** A parsed d3-style number pattern. */
 export interface NumberFormatSpec {
   prefix: string;

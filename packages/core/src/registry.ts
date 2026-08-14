@@ -358,6 +358,27 @@ export interface ChartType<M extends Mark = Mark> {
   /** Per-type attribute defaults, also cascade level 1 (`stack: 'none'`, `corner: 4`). */
   readonly defaults?: Partial<BlockAttrs>;
   /**
+   * The columns whose **values** are the entities colour is keyed on, for types
+   * that colour by a category rather than by a series (SPEC 11.2 rule 1:
+   * "colour follows the entity"). A pie's entity is its slice, a treemap's its
+   * tile, a sankey's its node — none of which is a `series`.
+   *
+   * Given, core allocates palette slots to the distinct values of these
+   * columns, unioned in first-appearance order, instead of to
+   * {@link seriesIdentities}. The type resolves the names itself because it
+   * alone knows where they live: a pie reads whichever of `category`/`x`/
+   * `label` the author bound, a sankey reads its `source` and `target`
+   * *attributes* — which are column names, not channels.
+   *
+   * Return several columns and an entity appearing in more than one gets one
+   * identity and one slot, attributed to the column that introduced it: a
+   * sankey node is the same colour at both ends of its ribbon.
+   *
+   * Omitted, the type colours by series — the default, and right for every
+   * type whose legend names a series.
+   */
+  readonly colorIdentityFields?: (block: ResolvedBlock) => readonly string[];
+  /**
    * `$id` of this type's JSON Schema in `@mdv/spec` (SPEC Appendix D), e.g.
    * `"https://mdv.dev/schema/1.0/block/bar.json"`. Core runs schema validation
    * before calling {@link validate}, so `MDV3010` and friends come out of the
