@@ -15,21 +15,21 @@ These numbers came from:
 - **Platform** — Darwin 25.6.0 arm64
 - **Runtime** — Node 26.7.0 (V8 14.6.202.34-node.28)
 
-**2 of 11 budgets fail.**
+All 11 budgets hold, 1 inside the tolerance only.
 
-| Operation (SPEC 24.1) | Measured shape | Budget | Median | Verdict |
-|---|---|---|---|---|
-| First contentful chart, 50-block document | 36 KB, 50 blocks, 24 rows | ≤ 100 ms | 1.82 ms | within budget |
-| Incremental update, one attribute changed | 1 KB, 1 block, 60 rows | ≤ 5 ms | 0.268 ms | within budget |
-| Interaction frame (hover, crosshair) | 10 KB, 1 block, 600 rows, 600 hit regions | ≤ 8 ms | 0.014 ms | within budget |
-| Prepare + encode + layout, 1 000-row line chart | 16 KB, 1 block, 1,000 rows | ≤ 8 ms | 2.02 ms | within budget |
-| Parse 100 KB document (≈50 blocks) | 106 KB, 50 blocks | ≤ 30 ms | 17.10 ms | within budget |
-| Parse 1 MB document | 1.02 MB, 500 blocks | ≤ 250 ms | 184 ms | within budget |
-| PDF export, 50-page document | 32 KB, 40 blocks, 24 rows, 20 pages | ≤ 3 s | 47.32 ms | within budget |
-| Resize reflow, 20 visible blocks | 11 KB, 20 blocks, 24 rows | ≤ 50 ms | 2.71 ms | within budget |
-| Layout + render, 10 000-point scatter (canvas) | 97 KB, 1 block, 10,000 rows | ≤ 40 ms | 40.83 ms | over budget, inside the 10 % tolerance |
-| Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area` | 687.6 KB minified | ≤ 65 KB | 219.3 KB | FAILS |
-| Bundle: every Level 2 chart type | 687.6 KB minified | ≤ 140 KB | 219.3 KB | FAILS |
+| Operation (SPEC 24.1)                                | Measured shape                            | Budget   | Median   | Verdict                                |
+| ---------------------------------------------------- | ----------------------------------------- | -------- | -------- | -------------------------------------- |
+| First contentful chart, 50-block document            | 36 KB, 50 blocks, 24 rows                 | ≤ 100 ms | 1.90 ms  | within budget                          |
+| Incremental update, one attribute changed            | 1 KB, 1 block, 60 rows                    | ≤ 5 ms   | 0.276 ms | within budget                          |
+| Interaction frame (hover, crosshair)                 | 10 KB, 1 block, 600 rows, 600 hit regions | ≤ 8 ms   | 0.011 ms | within budget                          |
+| Prepare + encode + layout, 1 000-row line chart      | 16 KB, 1 block, 1,000 rows                | ≤ 8 ms   | 2.10 ms  | within budget                          |
+| Parse 100 KB document (≈50 blocks)                   | 106 KB, 50 blocks                         | ≤ 30 ms  | 18.00 ms | within budget                          |
+| Parse 1 MB document                                  | 1.02 MB, 500 blocks                       | ≤ 250 ms | 193 ms   | within budget                          |
+| PDF export, 50-page document                         | 32 KB, 40 blocks, 24 rows, 20 pages       | ≤ 3 s    | 47.58 ms | within budget                          |
+| Resize reflow, 20 visible blocks                     | 11 KB, 20 blocks, 24 rows                 | ≤ 50 ms  | 3.00 ms  | within budget                          |
+| Layout + render, 10 000-point scatter (canvas)       | 97 KB, 1 block, 10,000 rows               | ≤ 40 ms  | 42.38 ms | over budget, inside the 10 % tolerance |
+| Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area` | 532.4 KB minified                         | ≤ 175 KB | 169.7 KB | within budget                          |
+| Bundle: every Level 2 chart type                     | 685.2 KB minified                         | ≤ 225 KB | 219.1 KB | within budget                          |
 
 ## What these numbers leave out
 
@@ -39,7 +39,7 @@ measurement, so every substitution is listed here.
 - **Incremental update, one attribute changed** — One attribute changed, re-laid out and re-serialised. This build has no incremental cache, so the number is a full recompute of the affected block.
 - **Interaction frame (hover, crosshair)** — Pick + readout only: the DOM write half of the frame needs a document, and the "never drops below 60 fps" clause needs a session, not a fixture.
 - **Layout + render, 10 000-point scatter (canvas)** — canvas: measured through the SVG string backend; there is no canvas yet.
-- **Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area`** — esbuild `--minify --format=esm --platform=browser`, gzip level 9, with `react` and `react-dom` external — the host ships React with or without MDV.
+- **Bundle: `@mdv/core` + `@mdv/react` + `bar,line,area`** — esbuild `--minify --format=esm --platform=browser`, gzip level 9, with `react` and `react-dom` external — the host ships React with or without MDV. Three types and no more: `@mdv/react` registers none, so this row measures what it names rather than the whole catalog.
 - **Bundle: every Level 2 chart type** — Measured as the whole Level 2 reader — core, the React binding and every Level 1 and Level 2 type — since a bundle holding the Level 2 types alone could not draw a document.
 
 ## Cases
