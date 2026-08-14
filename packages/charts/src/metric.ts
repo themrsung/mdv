@@ -35,11 +35,11 @@ import type {
   TextMark,
 } from '@mdv/core';
 import type { PlannedEncodeResult } from './internal/plan.js';
-import type { Point } from './internal/geometry.js';
 import { blockDiagnostic, unknownEnum } from './internal/diagnostics.js';
 import { cell, cellNumber, findColumn, firstChannelOf } from './internal/table.js';
-import { finite, isFiniteNumber, sum as sumOf } from './internal/num.js';
+import { finite, sum as sumOf } from './internal/num.js';
 import { curvePath, px } from './internal/geometry.js';
+import { sparkPoints } from './internal/spark.js';
 import { enumAttr, numberAttr, listAttr, rawAttr, stringAttr } from './internal/attrs.js';
 import { formatNumber } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
@@ -326,7 +326,7 @@ export const metricChart: ChartType<Mark> = {
     // ── Trend sparkline (SPEC 8.13) ───────────────────────────────────────────
     if (trendHeight > 0) {
       const top = Math.max(cursor + lineGap, y + height - trendHeight);
-      const points = sparklinePoints(plan.trend, x, top, width, trendHeight);
+      const points = sparkPoints(plan.trend, x, top, width, trendHeight);
       if (points.length > 1) {
         const d = curvePath(points, 'linear');
         if (d.length > 0) {
@@ -485,31 +485,6 @@ function deltaColor(
   if (tone === 'good') return status.good;
   if (tone === 'critical') return status.critical;
   return neutral;
-}
-
-/** Lay the sparkline out inside its strip, flat-lining a constant series. */
-function sparklinePoints(
-  values: readonly number[],
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): Point[] {
-  const usable = values.filter(isFiniteNumber);
-  if (usable.length === 0) return [];
-  let lo = usable[0] ?? 0;
-  let hi = lo;
-  for (const value of usable) {
-    if (value < lo) lo = value;
-    if (value > hi) hi = value;
-  }
-  const span = hi - lo;
-  const step = usable.length > 1 ? width / (usable.length - 1) : 0;
-  return usable.map((value, i) => ({
-    x: x + step * i,
-    // A constant series draws a flat line through the middle, not a divide-by-zero.
-    y: span === 0 ? y + height / 2 : y + height - ((value - lo) / span) * height,
-  }));
 }
 
 /** The table view for a tile: the figure, its delta, and the trend it carries. */

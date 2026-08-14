@@ -266,7 +266,11 @@ describe('the stubs stay honest about being stubs', () => {
   });
 
   it('borrows the table minimum width, because a table is what gets drawn', () => {
-    expect(byName('sparkline').minWidth).toBe(byName('table').minWidth);
+    // Over every stub, for the same reason as above: `sparkline` was the example
+    // until it graduated, and it took a real 80 px minimum with it.
+    for (const spec of UNIMPLEMENTED_TYPES) {
+      expect(byName(spec.name).minWidth, spec.name).toBe(byName('table').minWidth);
+    }
   });
 
   it('targets the row, because the row is what is on screen', () => {
@@ -275,16 +279,22 @@ describe('the stubs stay honest about being stubs', () => {
 
   it('lists each stub exactly once, at the level SPEC 16.1 assigns it', () => {
     const levels = new Map(UNIMPLEMENTED_TYPES.map((spec) => [spec.name, spec.level]));
-    expect(levels.get('sparkline')).toBe(2);
+    expect(levels.size).toBe(UNIMPLEMENTED_TYPES.length);
     expect(levels.get('map')).toBe(3);
     expect(levels.get('network')).toBe(3);
     expect(levels.get('gantt')).toBe(3);
+    // Nothing below Level 3 degrades any more: `sparkline` was the last Level 2
+    // name here, and every one of the thirteen now draws.
+    for (const spec of UNIMPLEMENTED_TYPES) {
+      expect(spec.level, spec.name).toBe(3);
+    }
   });
 
   it('drops a name from the list the moment the real module lands', () => {
     // `histogram` graduated (SPEC 8.7), `box` after it (SPEC 8.8), then
     // `heatmap` (SPEC 8.9), the price charts (SPEC 8.10, 8.11), `waterfall`,
-    // `radar`, `gauge`, `funnel`, `treemap` and `sankey` (SPEC 8.12). This list is the *only*
+    // `radar`, `gauge`, `funnel`, `treemap`, `sankey` and finally `sparkline`
+    // (SPEC 8.12). This list is the *only*
     // thing that decides whether a name degrades, so a name left on it after its
     // module arrives would keep drawing the table however complete the module is.
     const names = UNIMPLEMENTED_TYPES.map((spec) => spec.name);
@@ -300,6 +310,7 @@ describe('the stubs stay honest about being stubs', () => {
     expect(names).not.toContain('funnel');
     expect(names).not.toContain('treemap');
     expect(names).not.toContain('sankey');
+    expect(names).not.toContain('sparkline');
     const real = runChart(byName('histogram'), prices(), { encoding: { x: { field: 'close' } } });
     expect(codesOf(real)).toEqual([]);
     expect(nodesOfKind(real.laid.nodes, 'rect').length).toBeGreaterThan(0);
@@ -344,5 +355,14 @@ describe('the stubs stay honest about being stubs', () => {
     });
     expect(codesOf(dial)).toEqual(['MDV3050']);
     expect(nodesOfKind(dial.laid.nodes, 'path').length).toBeGreaterThan(0);
+    // A sparkline draws one path and no chrome at all, which is the point of
+    // asserting it here: the stub it replaced drew a table, and a table is
+    // exactly what a reader must no longer fall back to for this name.
+    const strip = runChart(byName('sparkline'), prices(), {
+      encoding: { y: { field: 'close' } },
+    });
+    expect(codesOf(strip)).toEqual([]);
+    expect(nodesOfKind(strip.laid.nodes, 'path').length).toBeGreaterThan(0);
+    expect(strip.laid.hits).toEqual([]);
   });
 });

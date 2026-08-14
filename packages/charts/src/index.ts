@@ -26,6 +26,7 @@ import { metricChart } from './metric.js';
 import { ohlcChart, ohlcvChart } from './ohlc.js';
 import { radarChart } from './radar.js';
 import { sankeyChart } from './sankey.js';
+import { sparklineChart } from './sparkline.js';
 import { tableChart } from './table.js';
 import { treemapChart } from './treemap.js';
 import { unimplementedChartTypes } from './unimplemented.js';
@@ -48,6 +49,8 @@ export { radarChart } from './radar.js';
 export type { RadarEncodeResult } from './radar.js';
 export { sankeyChart } from './sankey.js';
 export type { SankeyEncodeResult } from './sankey.js';
+export { sparklineChart } from './sparkline.js';
+export type { SparklineEncodeResult } from './sparkline.js';
 export { tableChart } from './table.js';
 export { treemapChart } from './treemap.js';
 export type { TreemapEncodeResult } from './treemap.js';
@@ -84,12 +87,9 @@ export const LEVEL_1_TYPE_NAMES = [
  * `candlestick`, `radar`, `gauge`, `funnel`, `waterfall`, `treemap`, `sankey`,
  * `sparkline`.
  *
- * `box`, `funnel`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar`,
- * `sankey`, `treemap` and `waterfall` are drawn (see
- * {@link level2ChartTypes}). The rest are registered as known-but-unimplemented:
- * they render their data as a table with `MDV1500` (SPEC 15.2) rather than
- * erroring. `candlestick` resolves through `ohlc`'s alias, so there are twelve
- * registrations for thirteen names.
+ * All thirteen are **drawn** (see {@link level2ChartTypes}) — nothing at this
+ * level degrades to a table with `MDV1500` any more. `candlestick` resolves
+ * through `ohlc`'s alias, so there are twelve registrations for thirteen names.
  */
 export const LEVEL_2_TYPE_NAMES = [
   'box',
@@ -132,10 +132,11 @@ export const level1ChartTypes: readonly ChartType[] = [
 /**
  * The Level 2 types this reader actually draws, sorted by name.
  *
- * Everything in {@link LEVEL_2_TYPE_NAMES} that is **not** here is still
- * registered, as a stub that degrades to a table. Registering the drawn ones
- * separately keeps `chartTypesForLevel` honest: a type is in the list for its
- * own level whether it draws or degrades, and this is the set that draws.
+ * Every name in {@link LEVEL_2_TYPE_NAMES} is now here, `candlestick` by way of
+ * `ohlc`'s alias. The list stays separate from {@link builtinChartTypes} anyway:
+ * it is what a Level 2 claim means, and keeping it apart from the Level 3 stubs
+ * keeps `chartTypesForLevel` honest — a type is in the list for its own level
+ * whether it draws or degrades, and this is the set that draws.
  */
 export const level2ChartTypes: readonly ChartType[] = [
   boxChart,
@@ -147,6 +148,7 @@ export const level2ChartTypes: readonly ChartType[] = [
   ohlcvChart,
   radarChart,
   sankeyChart,
+  sparklineChart,
   treemapChart,
   waterfallChart,
 ];
@@ -154,7 +156,7 @@ export const level2ChartTypes: readonly ChartType[] = [
 /**
  * Every built-in chart type, sorted by name.
  *
- * Includes the Level 2 and Level 3 **stubs**, which is deliberate: registering a
+ * Includes the Level 3 **stubs**, which is deliberate: registering a
  * type this reader cannot draw is what turns "unknown block type, hope core
  * copes" into a table with a diagnostic that names the type and the conformance
  * level the document needs (SPEC 15.2). Filter with {@link chartTypesForLevel}

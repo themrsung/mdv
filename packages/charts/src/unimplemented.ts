@@ -22,12 +22,12 @@
  *    real enhanced-table renderer, the real `a11yTable`, the real hit regions
  *    and the real PDF export rather than a bespoke fallback widget.
  *
- * This module implements (2). Every Level 2 and Level 3 type in SPEC 16.1 is
- * registered here as a stub whose `encode` emits `MDV1500` and then delegates to
- * `table`'s encoder, and whose `layout` is `table`'s layout verbatim. The result
- * is that upgrading `sparkline` from "known" to "drawn" later is purely additive:
- * delete its entry from {@link UNIMPLEMENTED_TYPES}, add the real module, and
- * every other seam is unchanged.
+ * This module implements (2): a stub whose `encode` emits `MDV1500` and then
+ * delegates to `table`'s encoder, and whose `layout` is `table`'s layout
+ * verbatim. Upgrading a type from "known" to "drawn" is purely additive — delete
+ * its entry from {@link UNIMPLEMENTED_TYPES}, add the real module, and every
+ * other seam is unchanged. Every Level 2 type has now made that trip; what is
+ * left here is Level 3 (SPEC 16.1), which this reader does not claim.
  *
  * **`validate` never returns an error.** An error would make core render the
  * error card, which is exactly the outcome SPEC 15.2 forbids. Nothing about an
@@ -162,21 +162,17 @@ interface UnimplementedSpec {
 }
 
 /**
- * Every Level 2 and Level 3 type in SPEC 16.1 this reader does not draw, sorted
- * by name.
+ * Every type in SPEC 16.1 this reader does not draw, sorted by name.
  *
- * `box`, `funnel`, `gauge`, `heatmap`, `histogram`, `ohlc`, `ohlcv`, `radar`,
- * `treemap` and `waterfall` are absent because they are drawn for real;
- * `candlestick` is
- * absent because SPEC 8.11 makes it an **alias** of `ohlc`, and the registry
- * resolves aliases, so registering it separately would produce two types that
- * disagree about their own name.
+ * All thirteen Level 2 names are absent: twelve are drawn for real, and
+ * `candlestick` is an **alias** of `ohlc` (SPEC 8.11) that the registry resolves,
+ * so registering it separately would produce two types that disagree about their
+ * own name. What remains is Level 3, and the list is expected to keep shrinking.
  */
 export const UNIMPLEMENTED_TYPES: readonly UnimplementedSpec[] = [
   { name: 'gantt', level: 3, summary: 'a Gantt chart of the schedule' },
   { name: 'map', level: 3, summary: 'a choropleth or point map' },
   { name: 'network', level: 3, summary: 'a node-link diagram' },
-  { name: 'sparkline', level: 2, summary: 'an inline sparkline' },
 ];
 
 /**

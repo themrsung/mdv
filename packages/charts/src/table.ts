@@ -55,11 +55,11 @@ import {
   compareNumbers,
   compareStrings,
   finite,
-  isFiniteNumber,
   safeDiv,
   sum as sumOf,
 } from './internal/num.js';
 import { curvePath, px } from './internal/geometry.js';
+import { sparkPoints } from './internal/spark.js';
 import { formatValue } from './internal/format.js';
 import { hitRegion, readout } from './internal/hit.js';
 import { labelFont, readableOn, solid } from './internal/paint.js';
@@ -936,30 +936,6 @@ function heatColor(
   const ratio = clamp(safeDiv(value - lo, hi - lo, 0), 0, 1);
   const index = Math.min(steps.length - 1, Math.round(ratio * (steps.length - 1)));
   return steps[index];
-}
-
-/** Lay out an in-cell sparkline. */
-function sparkPoints(
-  values: readonly number[],
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-): { x: number; y: number }[] {
-  const usable = values.filter(isFiniteNumber);
-  if (usable.length === 0 || width <= 0 || height <= 0) return [];
-  let lo = usable[0] ?? 0;
-  let hi = lo;
-  for (const value of usable) {
-    if (value < lo) lo = value;
-    if (value > hi) hi = value;
-  }
-  const span = hi - lo;
-  const step = usable.length > 1 ? width / (usable.length - 1) : 0;
-  return usable.map((value, index) => ({
-    x: x + step * index,
-    y: span === 0 ? y + height / 2 : y + height - ((value - lo) / span) * height,
-  }));
 }
 
 export default tableChart;
