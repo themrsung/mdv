@@ -49,6 +49,16 @@ export const META_FILE = 'meta.json';
 /** The ordered diagnostics a case pins, if it pins any. */
 export const DIAGNOSTICS_FILE = 'diagnostics.json';
 
+/**
+ * The SPEC 24.1 budget a `perf/` case is measured against, if it is one.
+ *
+ * Named here rather than in `perf.ts` for the same reason {@link META_FILE} is:
+ * discovery has to recognise a case's files before anything knows what they
+ * mean, so that one lying beside no `input.mdv` is reported as the half-deleted
+ * case it is.
+ */
+export const BUDGET_FILE = 'budget.json';
+
 /** The golden artefacts a case may ship, by the check that compares each. */
 export const GOLDEN_FILES = {
   ast: 'expected.ast.json',
@@ -393,7 +403,12 @@ async function walk(
 
   // Not a case. Files that look like a case's are a misplaced or half-deleted one.
   for (const file of files) {
-    if (file === META_FILE || file === DIAGNOSTICS_FILE || file.startsWith('expected.')) {
+    if (
+      file === META_FILE ||
+      file === DIAGNOSTICS_FILE ||
+      file === BUDGET_FILE ||
+      file.startsWith('expected.')
+    ) {
       issues.push({ path: `${rel}/${file}`, message: `${file} beside no ${INPUT_FILE}` });
     }
   }

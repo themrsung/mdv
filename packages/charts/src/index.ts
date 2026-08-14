@@ -222,12 +222,45 @@ export const level2ChartTypes: readonly ChartType[] = [
  * const registry = createChartRegistry(builtinChartTypes);
  * registry.freeze();
  * ```
+ *
+ * The shape of this declaration is load-bearing, and both halves of it were paid
+ * for in bundle bytes. `Array.prototype.sort` mutates its receiver, so a bundler
+ * cannot prove `[...].sort(...)` is pure; unannotated, this becomes a side effect
+ * at module scope that can never be dropped, and because it names every type,
+ * *importing `barChart` alone pulls all twenty in*. Hence the call and the
+ * `@__PURE__`, which says "drop me if nobody reads me" — true here, since the
+ * array never escapes.
+ *
+ * The annotation alone is not enough, which is the subtle half. `@__PURE__`
+ * licenses dropping the *call*, but the argument is evaluated separately, and
+ * `[...a, ...b]` is not droppable: spreading runs `a[Symbol.iterator]`, which any
+ * object is free to define, so the array literal stays, the three lists it names
+ * stay, and all twenty modules come with them — a barrel that tree-shakes to
+ * 72 KB instead of 14 KB, with the annotation sitting right there looking
+ * correct. Passing the lists as *arguments* and spreading inside the callee
+ * leaves nothing but identifier references at module scope, and identifiers go
+ * away with the statement that reads them.
+ *
+ * `packages/charts/test/index.test.ts` asserts the order this produces, and the
+ * `bundle/level-1` row of `pnpm perf` fails loudly if either half stops working.
  */
-export const builtinChartTypes: readonly ChartType[] = [
-  ...level1ChartTypes,
-  ...level2ChartTypes,
-  ...unimplementedChartTypes,
-].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+export const builtinChartTypes: readonly ChartType[] = /* @__PURE__ */ sortedByName(
+  level1ChartTypes,
+  level2ChartTypes,
+  unimplementedChartTypes,
+);
+
+/**
+ * Alphabetical by {@link ChartType.name}.
+ *
+ * Takes the groups rather than the joined array so that the join — a spread, and
+ * therefore opaque to a bundler — happens behind the `@__PURE__` above rather
+ * than in front of it. The concatenation is fresh and does not escape, so sorting
+ * it in place is safe.
+ */
+function sortedByName(...groups: readonly (readonly ChartType[])[]): readonly ChartType[] {
+  return groups.flat().sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+}
 
 /**
  * The built-in types at or below `level`.
