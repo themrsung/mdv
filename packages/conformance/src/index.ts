@@ -28,6 +28,26 @@ export {
 export { coverageOf } from './coverage.js';
 export type { CoverageInput } from './coverage.js';
 
+export {
+  PDFUA_FLAVOUR,
+  VeraPdfError,
+  exportCase,
+  exportCorpus,
+  findVeraPdf,
+  parseVeraPdfText,
+  pdfNameOf,
+  renderPdfUaReport,
+  runVeraPdf,
+  tallyPdfUa,
+} from './pdfua.js';
+export type {
+  PdfUaExport,
+  PdfUaExportOptions,
+  PdfUaReport,
+  PdfUaRun,
+  PdfUaVerdict,
+} from './pdfua.js';
+
 export { buildReport, renderReport } from './report.js';
 
 export {

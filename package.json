@@ -17,6 +17,8 @@
     "conformance": "pnpm --filter @mdv/conformance build && node packages/conformance/dist/bin.js",
     "conformance:report": "pnpm --filter @mdv/conformance build && node packages/conformance/dist/bin.js --out CONFORMANCE.md",
     "conformance:update": "pnpm --filter @mdv/conformance build && node packages/conformance/dist/bin.js --update",
+    "pdfua": "pnpm --filter @mdv/conformance build && node scripts/pdfua.mjs",
+    "pdfua:report": "pnpm run pdfua --write",
     "perf": "pnpm -r --workspace-concurrency=1 --filter \"./packages/**\" build && node scripts/perf.mjs",
     "perf:report": "pnpm run perf --write",
     "test": "vitest run",
