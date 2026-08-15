@@ -199,6 +199,102 @@ describe('embedSource (SPEC 28.9)', () => {
   });
 });
 
+describe('PDF/UA identification (ISO 14289-1 clause 5)', () => {
+  it('declares the claim in XMP under `profile: pdf-ua-1`', async () => {
+    const bytes = await exportPdf(smallDocument(), exportContext(), {
+      profile: 'pdf-ua-1',
+      compress: false,
+    });
+    const text = decoder.decode(bytes);
+    expect(text).toContain('xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/"');
+    expect(text).toContain('<pdfuaid:part>1</pdfuaid:part>');
+  });
+
+  it('does not claim conformance it was not asked for', async () => {
+    const bytes = await exportPdf(smallDocument(), exportContext(), {
+      compress: false,
+    });
+    // A tagged file is not a PDF/UA file. The structure tree is written for
+    // every profile; the *claim* is what `pdf-ua-1` adds, and a file that
+    // announces a standard it was not built to is worse than one that stays
+    // quiet — a validator would then be right to fail it.
+    expect(decoder.decode(bytes)).not.toContain('pdfuaid');
+  });
+});
+
+describe('PDF/UA structure (ISO 14289-1)', () => {
+  /**
+   * One document that exercises every clause this suite pins, so the assertions
+   * below all read the same bytes: a heading jump, a table, a link and a note.
+   */
+  async function uaBytes(): Promise<string> {
+    const doc = resolvedDocument([
+      heading(1, 'Top'),
+      // Authored `###` under `#`: a jump the tagger has to compact away.
+      heading(3, 'Deep'),
+      {
+        type: 'paragraph',
+        children: [
+          { type: 'link', url: 'https://example.org/', children: [{ type: 'text', value: 'the site' }] },
+          { type: 'text', value: ' and a note' },
+          { type: 'footnoteReference', identifier: 'a', label: 'a' },
+        ],
+      },
+      table(['Region', 'Revenue'], [['North', '120']]),
+      {
+        type: 'footnoteDefinition',
+        identifier: 'a',
+        label: 'a',
+        children: [paragraph('The note body.')],
+      },
+    ]);
+    const bytes = await exportPdf(doc, exportContext(), {
+      profile: 'pdf-ua-1',
+      compress: false,
+    });
+    return decoder.decode(bytes);
+  }
+
+  it('sets /Tabs /S on every page (7.18.3)', async () => {
+    const text = await uaBytes();
+    // A page whose annotations are ordered by anything but the structure is a
+    // page a keyboard cannot walk in the order the document reads.
+    expect(text).toContain('/Tabs /S');
+  });
+
+  it('gives the link annotation /Contents and a /StructParent (7.18.1, 7.18.5)', async () => {
+    const text = await uaBytes();
+    expect(text).toContain('/Subtype /Link');
+    // `/Contents` is what a screen reader announces; without it the annotation
+    // is an unlabelled rectangle.
+    expect(text).toContain('/Contents (the site)');
+    expect(text).toMatch(/\/StructParent \d+/);
+  });
+
+  it('tags the link with an /OBJR back to the annotation (7.18.5)', async () => {
+    const text = await uaBytes();
+    expect(text).toContain('/Type /OBJR');
+  });
+
+  it('scopes header cells (7.5)', async () => {
+    const text = await uaBytes();
+    expect(text).toContain('/Scope /Column');
+  });
+
+  it('names the note and files it in the ID tree (7.9)', async () => {
+    const text = await uaBytes();
+    expect(text).toContain('/ID (note1)');
+    expect(text).toContain('/IDTree');
+  });
+
+  it('emits no /RoleMap, because every type it writes is standard (7.1)', async () => {
+    const text = await uaBytes();
+    // A role map that maps a standard type to itself is circular, and a
+    // validator is right to reject it.
+    expect(text).not.toContain('/RoleMap');
+  });
+});
+
 describe('front matter', () => {
   it('reads `pdf:` from the document and lets the caller override it', () => {
     const doc = resolvedDocument([paragraph('x')], {

@@ -189,11 +189,13 @@ for (const e of report.exports) {
   if (e.refused !== undefined) process.stderr.write(`REFUSED ${e.id}: ${e.refused}\n`);
 }
 if (report.run !== undefined) {
-  const byFile = new Map(report.run.verdicts.map((v) => [v.file, v.compliant]));
+  const byFile = new Map(report.run.verdicts.map((v) => [v.file, v]));
   for (const e of report.exports) {
-    if (e.file !== undefined && byFile.get(resolve(e.file)) !== true) {
-      process.stderr.write(`FAIL ${e.id}\n`);
-    }
+    if (e.file === undefined) continue;
+    const verdict = byFile.get(resolve(e.file));
+    if (verdict?.compliant === true) continue;
+    const clauses = verdict === undefined ? 'not validated' : verdict.rules.join(' ');
+    process.stderr.write(`FAIL ${e.id}${clauses === '' ? '' : ` — ${clauses}`}\n`);
   }
 }
 process.stderr.write(`${tally.passed} passed, ${tally.failed} failed, ${tally.refused} refused\n`);

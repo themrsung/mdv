@@ -209,6 +209,22 @@ function xmlEscape(value: string): string {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * The PDF/UA identification schema (ISO 14289-1 clause 5).
+ *
+ * Without this block a file can satisfy every structural rule in the standard
+ * and still not *be* a PDF/UA file: clause 5 is what lets a reader know the
+ * claim is being made, and it is the first thing a validator checks. It is the
+ * one part of conformance that costs nothing and is silent when forgotten.
+ */
+function pdfUaIdentification(profile: string): string {
+  if (profile !== 'pdf-ua-1') return '';
+  return `
+  <rdf:Description rdf:about="" xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/">
+   <pdfuaid:part>1</pdfuaid:part>
+  </rdf:Description>`;
+}
+
 /** The XMP packet of SPEC 28.9: everything needed to reproduce the bytes. */
 export function xmpPacket(build: PdfBuild, buildTime: Date): string {
   const { meta } = build;
@@ -239,7 +255,7 @@ export function xmpPacket(build: PdfBuild, buildTime: Date): string {
    <mdv:theme>${xmlEscape(meta.theme)}</mdv:theme>
    <mdv:locale>${xmlEscape(meta.locale)}</mdv:locale>
    <mdv:fonts>standard-14</mdv:fonts>
-  </rdf:Description>
+  </rdf:Description>${pdfUaIdentification(build.options.profile)}
  </rdf:RDF>
 </x:xmpmeta>
 <?xpacket end="w"?>`;
@@ -289,6 +305,10 @@ export async function writePdf(build: PdfBuild, ctx: PdfExportContext): Promise<
 
   // ── pages, pass 2: resources, content, annotations ─────────────────────────
   const contents: string[] = [];
+  // Annotations live in the same number tree as the pages, keyed after them:
+  // `/StructParent` on the annotation, `/OBJR` on the element, and the tree
+  // between the two (ISO 32000-1 14.7.4.4, ISO 14289-1 7.18.5).
+  const annotParents: { key: number; node: StructElement; ref: PDFRef; page: PDFRef }[] = [];
   for (let i = 0; i < rendered.pages.length; i += 1) {
     const page = rendered.pages[i];
     const target = pdfPages[i];
@@ -305,6 +325,10 @@ export async function writePdf(build: PdfBuild, ctx: PdfExportContext): Promise<
     target.node.set(PDFName.of('Contents'), streamRef);
     target.node.set(PDFName.of('Resources'), resources);
     target.node.set(PDFName.of('StructParents'), context.obj(i));
+    // Tab order follows the structure, not the order the annotations happen to
+    // be listed in (ISO 14289-1 7.18.3). Required on any page with annotations,
+    // and harmless — and honest — on every other page.
+    target.node.set(PDFName.of('Tabs'), PDFName.of('S'));
 
     const annots: PDFRef[] = [];
     for (const link of page.links) {
@@ -319,27 +343,31 @@ export async function writePdf(build: PdfBuild, ctx: PdfExportContext): Promise<
         if (ref !== undefined) dest = [ref, 'XYZ', null, Number(formatNumber(link.dest.yPt)), null];
       }
       if (link.url === undefined && dest === undefined) continue;
-      annots.push(
-        context.register(
-          context.obj({
-            Type: 'Annot',
-            Subtype: 'Link',
-            Rect: rect,
-            Border: [0, 0, 0],
-            // Bit 3 (Print): an annotation that does not print is invisible on
-            // the only medium this file is for.
-            F: 4,
-            ...action,
-            ...(dest === undefined ? {} : { Dest: dest as never }),
-          }),
-        ),
+      const key = rendered.pages.length + annotParents.length;
+      const ref = context.register(
+        context.obj({
+          Type: 'Annot',
+          Subtype: 'Link',
+          Rect: rect,
+          Border: [0, 0, 0],
+          // Bit 3 (Print): an annotation that does not print is invisible on
+          // the only medium this file is for.
+          F: 4,
+          // What the link says, for a reader that cannot see it in the line.
+          Contents: PDFString.of(link.text),
+          StructParent: key,
+          ...action,
+          ...(dest === undefined ? {} : { Dest: dest as never }),
+        }),
       );
+      annotParents.push({ key, node: link.struct, ref, page: target.ref });
+      annots.push(ref);
     }
     target.node.set(PDFName.of('Annots'), context.obj(annots));
   }
 
   // ── structure tree (SPEC 28.8) ─────────────────────────────────────────────
-  writeStructureTree(pdf, build, pageRefOf);
+  writeStructureTree(pdf, build, pageRefOf, annotParents);
 
   // ── bookmarks (SPEC 28.7) ──────────────────────────────────────────────────
   if (options.bookmarks) writeOutline(pdf, build, pageRefOf);
@@ -535,9 +563,18 @@ function writeStructureTree(
   pdf: PDFDocument,
   build: PdfBuild,
   pageRefOf: (index: number) => PDFRef | undefined,
+  annots: readonly { key: number; node: StructElement; ref: PDFRef; page: PDFRef }[],
 ): void {
   const context = pdf.context;
   const rootRef = context.nextRef();
+  const objrs = new Map<StructElement, { ref: PDFRef; page: PDFRef }[]>();
+  for (const annot of annots) {
+    const list = objrs.get(annot.node);
+    if (list === undefined) objrs.set(annot.node, [{ ref: annot.ref, page: annot.page }]);
+    else list.push({ ref: annot.ref, page: annot.page });
+  }
+  /** Every `/ID` in the document, for the name tree the spec then requires. */
+  const ids: { id: string; ref: PDFRef }[] = [];
 
   // Pre-order reference allocation: object numbers then follow reading order,
   // which is both deterministic and pleasant to read in a decompressed file.
@@ -570,6 +607,12 @@ function writeStructureTree(
         emit(kid, self);
       }
     }
+    // The annotation is a kid of the element, not a stranger sitting on the
+    // page: this is the half of the link tag that `/StructParent` answers.
+    for (const objr of objrs.get(node) ?? []) {
+      kids.push(context.obj({ Type: 'OBJR', Obj: objr.ref, Pg: objr.page }));
+    }
+    if (node.id !== undefined) ids.push({ id: node.id, ref: self });
 
     context.assign(
       self,
@@ -578,6 +621,8 @@ function writeStructureTree(
         S: node.type,
         P: parent,
         ...(ownPage === undefined ? {} : { Pg: ownPage }),
+        ...(node.id === undefined ? {} : { ID: PDFString.of(node.id) }),
+        ...(node.scope === undefined ? {} : { A: { O: 'Table', Scope: node.scope } }),
         ...(node.alt === undefined ? {} : { Alt: PDFHexString.fromText(node.alt) }),
         ...(node.actualText === undefined
           ? {}
@@ -598,7 +643,20 @@ function writeStructureTree(
       .filter((r): r is PDFRef => r !== undefined);
     nums.push(i, context.register(context.obj(owners as never)));
   }
+  // Annotations key straight to their element — a single ref, not an array,
+  // because an annotation has exactly one parent.
+  for (const annot of [...annots].sort((a, b) => a.key - b.key)) {
+    const ref = refs.get(annot.node);
+    if (ref !== undefined) nums.push(annot.key, ref);
+  }
   const parentTree = context.register(context.obj({ Nums: nums as never }));
+
+  // A name tree for the `/ID`s, which the spec requires as soon as one exists.
+  const sorted = [...ids].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const names: unknown[] = [];
+  for (const entry of sorted) names.push(PDFString.of(entry.id), entry.ref);
+  const idTree =
+    names.length === 0 ? undefined : context.register(context.obj({ Names: names as never }));
 
   const documentRef = refs.get(build.rendered.structure);
   context.assign(
@@ -607,10 +665,10 @@ function writeStructureTree(
       Type: 'StructTreeRoot',
       ...(documentRef === undefined ? {} : { K: [documentRef] }),
       ParentTree: parentTree,
-      ParentTreeNextKey: build.rendered.pages.length,
-      // `Note` and `TOCI` are standard; the map exists so a viewer that does not
-      // know a type still has somewhere to look.
-      RoleMap: { Note: 'Note', TOCI: 'TOCI', Caption: 'Caption' },
+      ParentTreeNextKey: build.rendered.pages.length + annots.length,
+      ...(idTree === undefined ? {} : { IDTree: idTree }),
+      // No `/RoleMap`: every type this exporter emits is a standard one, and a
+      // map that sends `Note` to `Note` is a circular mapping (ISO 14289-1 7.1).
     }),
   );
 

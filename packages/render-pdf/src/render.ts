@@ -30,7 +30,7 @@ import { fontKeyOf, needsShaping, standardFace } from './fonts.js';
 import { parseColorOr, toGray } from './color.js';
 import type { Rgba } from './color.js';
 import { ellipsize, fontFor } from './text.js';
-import type { LineBox, PlacedRun, TextStyle } from './text.js';
+import type { LineBox, PlacedRun, TextRun, TextStyle } from './text.js';
 import type { Destination, Drawable, PageElement, PdfPage } from './paginate.js';
 import type { DocStyle } from './style.js';
 import type { ResolvedPdfOptions, RunningSlots } from './options.js';
@@ -58,6 +58,21 @@ export interface StructElement {
   alt: string | undefined;
   /** `/ActualText` — when the glyphs are not the text, e.g. a list marker. */
   actualText: string | undefined;
+  /**
+   * `/ID` — a name for this element, unique in the document.
+   *
+   * Only a `Note` needs one, and it needs one absolutely: ISO 14289-1 7.9
+   * requires it, because a note is the one element a reader is expected to
+   * arrive at from somewhere else.
+   */
+  id: string | undefined;
+  /**
+   * `/Scope` on a table header cell (ISO 14289-1 7.5).
+   *
+   * A `TH` that does not say which cells it heads leaves the reader to guess
+   * from geometry, which is exactly what the tag exists to avoid.
+   */
+  scope: 'Row' | 'Column' | undefined;
   kids: StructKid[];
 }
 
@@ -70,6 +85,43 @@ export interface LinkAnnotation {
   url: string | undefined;
   /** Internal target: a page and a distance from the *bottom* of that page. */
   dest: { pageIndex: number; yPt: number } | undefined;
+  /**
+   * `/Contents` — what the link says, for a reader that cannot see where it
+   * sits in the text (ISO 14289-1 7.18.1, 7.18.5).
+   */
+  text: string;
+  /**
+   * The `Link` structure element this annotation belongs to. The writer ties
+   * the two together with an `/OBJR` kid and a `/StructParent` key; an
+   * untagged link is a link a screen reader announces as nothing at all.
+   */
+  struct: StructElement;
+}
+
+/**
+ * A link part-way through being drawn: open at the first run that carries the
+ * target, closed by the run that does not (or by the end of the line).
+ */
+interface OpenLink {
+  /** Target identity, so two adjacent links to *different* places stay apart. */
+  target: string;
+  struct: StructElement;
+  rect: readonly [number, number, number, number];
+  /** False until the first run has contributed ink, so `rect` means something. */
+  started: boolean;
+  text: string;
+  url: string | undefined;
+  dest: string | undefined;
+}
+
+/** How far apart two runs may sit and still be one link, in points. */
+const JOIN_TOLERANCE_PT = 0.25;
+
+/** What a run points at, or `undefined` when it is not a link. */
+function linkTarget(run: TextRun): string | undefined {
+  if (run.href !== undefined) return `url:${run.href}`;
+  if (run.dest !== undefined) return `dest:${run.dest}`;
+  return undefined;
 }
 
 /** One page, ready to be written. */
@@ -138,6 +190,13 @@ function segmentMerges(segment: string): boolean {
   return segment.includes('@');
 }
 
+/** `H3` → `3`; anything else → `undefined`. */
+function headingLevel(tag: string): number | undefined {
+  if (tag.length !== 2 || tag[0] !== 'H') return undefined;
+  const level = Number(tag[1]);
+  return Number.isInteger(level) && level >= 1 && level <= 6 ? level : undefined;
+}
+
 /**
  * Rebuilds the structure tree from the flat element stream.
  *
@@ -153,10 +212,36 @@ class StructBuilder {
     type: 'Document',
     alt: undefined,
     actualText: undefined,
+    id: undefined,
+    scope: undefined,
     kids: [],
   };
   /** Open nodes, deepest last, paired with the path segment that opened them. */
   readonly #stack: { segment: string; node: StructElement }[] = [];
+  /** Authored heading levels currently open, strictly increasing. */
+  readonly #headings: number[] = [];
+  #notes = 0;
+
+  /**
+   * The tag a heading gets, which is not always the one the author typed.
+   *
+   * ISO 14289-1 7.4.2 wants the heading sequence to start at `H1` and to
+   * descend one level at a time. A document whose top heading is `##` — or one
+   * that jumps `#` to `###` — reads correctly to a human and fails the
+   * standard, so the authored levels are compacted onto the sequence the
+   * standard asks for. The hierarchy is preserved exactly: a heading is one
+   * level deeper than the last heading it sits under, and no deeper.
+   */
+  #headingTag(level: number): string {
+    while (
+      this.#headings.length > 0 &&
+      (this.#headings[this.#headings.length - 1] as number) >= level
+    ) {
+      this.#headings.pop();
+    }
+    this.#headings.push(level);
+    return `H${String(Math.min(6, this.#headings.length))}`;
+  }
 
   /** Open (or reuse) the chain for `path` and return the leaf. */
   open(path: readonly string[]): StructElement {
@@ -171,11 +256,20 @@ class StructBuilder {
     for (let i = shared; i < path.length; i += 1) {
       const segment = path[i] as string;
       const parent = this.#stack[i - 1]?.node ?? this.root;
+      const tag = segmentTag(segment);
+      const level = headingLevel(tag);
+      if (tag === 'Note') this.#notes += 1;
       const node: StructElement = {
         kind: 'element',
-        type: segmentTag(segment),
+        type: level === undefined ? tag : this.#headingTag(level),
         alt: undefined,
         actualText: undefined,
+        // A serial, not the note's own id: a note referenced twice is two
+        // elements, and two elements may not share an `/ID`.
+        id: tag === 'Note' ? `note${String(this.#notes)}` : undefined,
+        // Every header cell this exporter emits heads a column: the paginator
+        // only ever marks a whole row as the header (SPEC 12.2).
+        scope: tag === 'TH' ? 'Column' : undefined,
         kids: [],
       };
       parent.kids.push(node);
@@ -216,7 +310,12 @@ interface PageBuild {
   links: LinkAnnotation[];
   mcidOwners: StructElement[];
   /** Pending internal links, resolved once every destination has a page. */
-  pending: { rect: readonly [number, number, number, number]; name: string }[];
+  pending: {
+    rect: readonly [number, number, number, number];
+    name: string;
+    text: string;
+    struct: StructElement;
+  }[];
 }
 
 class Renderer {
@@ -230,6 +329,8 @@ class Renderer {
   readonly #builds: PageBuild[] = [];
   /** Where each footnote body landed, so its reference can link to it. */
   readonly #noteDests = new Map<string, { pageIndex: number; yPt: number }>();
+  /** The element currently being drawn, so a link can nest inside it. */
+  #leaf: StructElement | undefined;
   #shaping = false;
 
   constructor(input: RenderInput) {
@@ -271,6 +372,8 @@ class Renderer {
     // not ours to assume: a rule or a cell background sets `rg` between lines.
     let font: string | undefined;
     let fill: string | undefined;
+    /** The link being drawn, if the run before this one was inside one. */
+    let open: OpenLink | undefined;
 
     for (const placed of line.runs) {
       if (placed.run.text === '') continue;
@@ -294,9 +397,26 @@ class Renderer {
         body.push(O.fillColor(color.r, color.g, color.b));
         fill = wantFill;
       }
+      // A link is one target, not one run. `[the site](u)` is two runs by the
+      // time the line breaker has had it, and emitting an annotation per run
+      // gives a screen reader two links that each say half a label. So a run
+      // that carries on the open link — same target, starting where the last
+      // one stopped — extends it instead of starting another.
+      const target = linkTarget(placed.run);
+      if (open !== undefined && (target !== open.target || x > open.rect[2] + JOIN_TOLERANCE_PT)) {
+        this.#closeLink(build, open);
+        open = undefined;
+      }
+      const linked = target !== undefined;
+      // A tagged link is a `Link` element of its own, nested inside whatever
+      // the run sits in, holding the run's ink and — once the writer has an
+      // object number for it — the annotation itself (ISO 14289-1 7.18.5).
+      if (target !== undefined) open ??= this.#openLink(placed.run, target);
+      const link = open;
+      if (link !== undefined) this.#markLink(build, body, link.struct);
       body.push(O.textMatrix([1, 0, 0, 1, x, y]), O.showText(placed.run.text, resource));
+      if (link !== undefined) body.push(O.endMarkedContent());
 
-      const linked = placed.run.href !== undefined || placed.run.dest !== undefined;
       const rule = (offset: number): void => {
         const w = Math.max(this.#policy.minStrokePt, placed.font.size * 0.055);
         decorations.push(
@@ -312,23 +432,85 @@ class Renderer {
       if (linked) rule(-placed.font.size * 0.11);
       if (placed.run.strike === true) rule(placed.font.size * 0.26);
 
-      if (linked) this.#addLink(build, placed, x, y);
+      if (link !== undefined) this.#extendLink(link, placed, x, y);
     }
+    // The line ends the link whatever it was doing: a link that wraps gets one
+    // annotation per line, because a `/Rect` is a single rectangle.
+    if (open !== undefined) this.#closeLink(build, open);
 
     if (body.length > 0) build.ops.push(O.beginText(), ...body, O.endText());
     build.ops.push(...decorations);
   }
 
-  #addLink(build: PageBuild, placed: PlacedRun, x: number, baseline: number): void {
+  /**
+   * Open a `Link` element for the run about to be drawn.
+   *
+   * It nests inside the element the run belongs to — a link in a paragraph is
+   * part of that paragraph, not a sibling of it — which is why the ink goes in
+   * a nested `BDC`: the reader walks into the link and back out again in the
+   * middle of the sentence, exactly as it reads.
+   */
+  #openLink(run: TextRun, target: string): OpenLink {
+    const node: StructElement = {
+      kind: 'element',
+      type: 'Link',
+      alt: undefined,
+      actualText: undefined,
+      id: undefined,
+      scope: undefined,
+      kids: [],
+    };
+    (this.#leaf ?? this.#struct.root).kids.push(node);
+    return {
+      target,
+      struct: node,
+      rect: [0, 0, 0, 0],
+      started: false,
+      text: '',
+      url: run.href,
+      dest: run.dest,
+    };
+  }
+
+  /** Mark one run's ink as belonging to an open link. */
+  #markLink(build: PageBuild, ops: O.PdfOp[], struct: StructElement): void {
+    const mcid = build.mcidOwners.length;
+    build.mcidOwners.push(struct);
+    struct.kids.push({ kind: 'mcid', mcid, pageIndex: build.page.index });
+    ops.push(O.beginMarkedContent('Link', mcid));
+  }
+
+  /** Grow the annotation rectangle and the announced text over one more run. */
+  #extendLink(open: OpenLink, placed: PlacedRun, x: number, baseline: number): void {
     const size = placed.font.size;
-    const rect = [x, baseline - size * 0.25, x + placed.widthPt, baseline + size * 0.85] as const;
-    const href = placed.run.href;
-    if (href !== undefined) {
-      build.links.push({ rect, url: href, dest: undefined });
+    const top = baseline + size * 0.85;
+    const bottom = baseline - size * 0.25;
+    const right = x + placed.widthPt;
+    open.rect = open.started
+      ? [
+          Math.min(open.rect[0], x),
+          Math.min(open.rect[1], bottom),
+          Math.max(open.rect[2], right),
+          Math.max(open.rect[3], top),
+        ]
+      : [x, bottom, right, top];
+    open.started = true;
+    open.text += placed.run.text;
+  }
+
+  /** File the finished link as an annotation for the writer to place. */
+  #closeLink(build: PageBuild, open: OpenLink): void {
+    if (!open.started) return;
+    const rect = open.rect;
+    // What the link *says*, not what it points at: `/Contents` is read aloud.
+    const text = open.text.trim();
+    if (open.url !== undefined) {
+      build.links.push({ rect, url: open.url, dest: undefined, text, struct: open.struct });
       return;
     }
-    const dest = placed.run.dest;
-    if (dest !== undefined) build.pending.push({ rect, name: dest });
+    if (open.dest !== undefined) {
+      build.pending.push({ rect, name: open.dest, text, struct: open.struct });
+    }
   }
 
   // ── primitives ─────────────────────────────────────────────────────────────
@@ -425,7 +607,9 @@ class Renderer {
     leaf.kids.push({ kind: 'mcid', mcid, pageIndex: build.page.index });
 
     build.ops.push(O.saveState(), O.beginMarkedContent(leaf.type, mcid));
+    this.#leaf = leaf;
     this.#drawAll(build, el.drawables);
+    this.#leaf = undefined;
     build.ops.push(O.endMarkedContent(), O.restoreState());
   }
 
@@ -588,12 +772,12 @@ class Renderer {
   #resolveLinks(): void {
     if (!this.#options.links) return;
     for (const build of this.#builds) {
-      for (const { rect, name } of build.pending) {
+      for (const { rect, name, text, struct } of build.pending) {
         const target = name.startsWith('note-')
           ? this.#noteDests.get(name.slice('note-'.length))
           : this.#lookupDestination(name);
         if (target === undefined) continue;
-        build.links.push({ rect, url: undefined, dest: target });
+        build.links.push({ rect, url: undefined, dest: target, text, struct });
       }
     }
   }

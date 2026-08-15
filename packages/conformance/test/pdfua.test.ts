@@ -19,7 +19,7 @@
  * - a run with no validator reports its files as unvalidated, never as passing.
  */
 
-import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -173,8 +173,46 @@ describe('parseVeraPdfText', () => {
     ].join('\n');
 
     expect(parseVeraPdfText(output, files)).toEqual([
-      { file: files[0], compliant: true },
-      { file: files[1], compliant: false },
+      { file: files[0], compliant: true, rules: [] },
+      { file: files[1], compliant: false, rules: [] },
+    ]);
+  });
+
+  it('keeps the clauses a file broke', () => {
+    // The shape veraPDF really prints under `--format text --verbose`: the
+    // flavour trails the file name on the verdict line, and each broken rule
+    // gets an indented line of its own. Parsed by hand once, pinned here, so
+    // that a change in that layout fails a test rather than turning fifty
+    // failures into fifty blanks.
+    const output = [
+      `FAIL ${files[0]} ua1`,
+      '  FAIL 5-1',
+      '  FAIL 7.21.4.1-1',
+      `PASS ${files[1]} ua1`,
+    ].join('\n');
+
+    expect(parseVeraPdfText(output, files)).toEqual([
+      { file: files[0], compliant: false, rules: ['5-1', '7.21.4.1-1'] },
+      { file: files[1], compliant: true, rules: [] },
+    ]);
+  });
+
+  it('reports a file under the name it was asked about', async () => {
+    // veraPDF prints the file it opened, not the argument it was given: on a
+    // Mac a temporary directory is reached through a symlink (`/tmp` is
+    // `/private/tmp`), so the two names differ for every file in a real run. A
+    // verdict filed under the resolved name would be invisible to the caller
+    // that exported it, and fifty files would read as unvalidated.
+    const dir = await workdir();
+    await mkdir(join(dir, 'real'), { recursive: true });
+    await writeFile(join(dir, 'real', 'a.pdf'), '%PDF-1.7\n');
+    await symlink(join(dir, 'real'), join(dir, 'link'));
+    const asked = join(dir, 'link', 'a.pdf');
+
+    const output = `PASS ${join(dir, 'real', 'a.pdf')}\n`;
+
+    expect(parseVeraPdfText(output, [asked])).toEqual([
+      { file: asked, compliant: true, rules: [] },
     ]);
   });
 
@@ -220,8 +258,8 @@ describe('tallyPdfUa', () => {
         flavour: PDFUA_FLAVOUR,
         output: '',
         verdicts: [
-          { file: resolve('/tmp/a.pdf'), compliant: true },
-          { file: resolve('/tmp/b.pdf'), compliant: false },
+          { file: resolve('/tmp/a.pdf'), compliant: true, rules: [] },
+          { file: resolve('/tmp/b.pdf'), compliant: false, rules: ['5-1', '7.21.4.1-1'] },
         ],
       },
     };
@@ -231,5 +269,9 @@ describe('tallyPdfUa', () => {
     expect(text).toContain('**1 passed, 1 failed, 1 refused**');
     expect(text).toMatch(/\| `b` \| FAIL \|/);
     expect(text).toContain('veraPDF 1.30.2');
+    // A failure has to say what broke. "FAIL" on its own is a report nobody can
+    // act on, and the clause is the only part of it that leads anywhere.
+    expect(text).toMatch(/\| `b` \| FAIL \| `5-1`, `7\.21\.4\.1-1` \|/);
+    expect(text).toContain('| `5-1` | 1 |');
   });
 });

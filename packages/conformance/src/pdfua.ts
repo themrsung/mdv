@@ -47,6 +47,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { realpathSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve as resolvePath } from 'node:path';
 import { promisify } from 'node:util';
@@ -63,6 +64,24 @@ import { conformanceConfig } from './run.js';
 import type { Corpus, FixtureCase } from './types.js';
 
 const run = promisify(execFile);
+
+/**
+ * The path a verdict is filed under.
+ *
+ * veraPDF prints the file it opened, not the argument it was given, and on a
+ * Mac a temporary directory reaches it through a symlink (`/tmp` is
+ * `/private/tmp`). Comparing the two as written would lose every verdict, so
+ * both sides are canonicalised the same way. A path that does not exist is
+ * still resolved, because the parser is also fed strings in tests.
+ */
+function canonicalPath(file: string): string {
+  const absolute = resolvePath(file);
+  try {
+    return realpathSync(absolute);
+  } catch {
+    return absolute;
+  }
+}
 
 /** The veraPDF flavour identifier for PDF/UA-1 (ISO 14289-1). */
 export const PDFUA_FLAVOUR = 'ua1';
@@ -202,9 +221,20 @@ export class VeraPdfError extends Error {
 
 /** One file's verdict. */
 export interface PdfUaVerdict {
-  /** Absolute path, as the validator printed it. */
+  /**
+   * Absolute path, as the run was *given* it — not as the validator printed it.
+   * The two differ whenever a temporary directory is reached through a symlink
+   * (`/tmp` is `/private/tmp` on a Mac), and a caller that exported a file to
+   * one name has no way to look it up under the other.
+   */
   readonly file: string;
   readonly compliant: boolean;
+  /**
+   * The ISO 14289-1 clauses the file broke, as veraPDF numbers them (`5-1` is
+   * clause 5, test 1). A failure with no clauses would be a report that cannot
+   * be acted on, so a `FAIL` keeps the detail lines that followed it.
+   */
+  readonly rules: readonly string[];
 }
 
 /** A whole validator run. */
@@ -255,25 +285,36 @@ export function parseVeraPdfText(
   output: string,
   expected: readonly string[],
 ): readonly PdfUaVerdict[] {
-  const wanted = new Set(expected.map((f) => resolvePath(f)));
+  const wanted = new Set(expected.map((f) => canonicalPath(f)));
   const found = new Map<string, boolean>();
+  const rules = new Map<string, string[]>();
+  let current: string | undefined;
   for (const line of output.split(/\r?\n/)) {
     // Both orders are accepted — `PASS <file>` is what the tool prints, and a
-    // trailing verdict is the other shape a reasonable CLI might use. Anything
-    // else (the failed-check detail lines that `-v` adds) is not a verdict line
-    // and is skipped, which is why the count is checked afterwards.
+    // trailing verdict is the other shape a reasonable CLI might use.
     const lead = /^\s*(PASS|FAIL)\s+(.+?)\s*$/.exec(line);
     const trail = /^\s*(.+?)\s+(PASS|FAIL)\s*$/.exec(line);
     const hit = lead ?? trail;
     if (hit === null) continue;
-    const [verdict, file] = lead !== null ? [hit[1], hit[2]] : [hit[2], hit[1]];
-    if (file === undefined || verdict === undefined) continue;
-    const path = resolvePath(file);
-    if (!wanted.has(path)) continue;
+    const [verdict, rest] = lead !== null ? [hit[1], hit[2]] : [hit[2], hit[1]];
+    if (rest === undefined || verdict === undefined) continue;
+    // `--verbose` writes `FAIL <file> <flavour>` and then indents one
+    // `FAIL <clause>` line per broken rule. The file list decides which of the
+    // two a line is: a name we asked about is a verdict, and anything else
+    // under the last verdict is that file's detail.
+    const path = [rest, rest.replace(/\s+\S+$/, '')]
+      .map((c) => canonicalPath(c))
+      .find((c) => wanted.has(c));
+    if (path === undefined) {
+      if (current !== undefined && verdict === 'FAIL') rules.get(current)?.push(rest);
+      continue;
+    }
     if (found.has(path)) {
-      throw new VeraPdfError(`veraPDF reported ${file} twice`, output);
+      throw new VeraPdfError(`veraPDF reported ${rest} twice`, output);
     }
     found.set(path, verdict === 'PASS');
+    rules.set(path, []);
+    current = path;
   }
   const missing = [...wanted].filter((f) => !found.has(f));
   if (missing.length > 0) {
@@ -283,10 +324,14 @@ export function parseVeraPdfText(
       output,
     );
   }
-  return expected.map((f) => ({
-    file: resolvePath(f),
-    compliant: found.get(resolvePath(f)) === true,
-  }));
+  return expected.map((f) => {
+    const path = canonicalPath(f);
+    return {
+      file: resolvePath(f),
+      compliant: found.get(path) === true,
+      rules: rules.get(path) ?? [],
+    };
+  });
 }
 
 /**
@@ -393,7 +438,7 @@ export function tallyPdfUa(report: PdfUaReport): {
 /** Render the Markdown report. */
 export function renderPdfUaReport(report: PdfUaReport): string {
   const { passed, failed, refused, unvalidated } = tallyPdfUa(report);
-  const byFile = new Map((report.run?.verdicts ?? []).map((v) => [v.file, v.compliant]));
+  const byFile = new Map((report.run?.verdicts ?? []).map((v) => [v.file, v]));
   const lines: string[] = [];
   lines.push('# PDF/UA conformance');
   lines.push('');
@@ -412,22 +457,50 @@ export function renderPdfUaReport(report: PdfUaReport): string {
       `${unvalidated > 0 ? `, ${unvalidated} not validated` : ''}** of ${report.exports.length} cases.`,
   );
   lines.push('');
-  lines.push('| Case | Result | Bytes | Export diagnostics |');
-  lines.push('| --- | --- | ---: | --- |');
+  lines.push('| Case | Result | Broke | Bytes | Export diagnostics |');
+  lines.push('| --- | --- | --- | ---: | --- |');
   for (const e of report.exports) {
+    const verdict = e.file === undefined ? undefined : byFile.get(resolvePath(e.file));
     const result =
       e.file === undefined
         ? 'refused'
-        : !byFile.has(resolvePath(e.file))
+        : verdict === undefined
           ? 'not validated'
-          : byFile.get(resolvePath(e.file)) === true
+          : verdict.compliant
             ? 'pass'
             : 'FAIL';
+    const broke =
+      verdict === undefined || verdict.rules.length === 0
+        ? '—'
+        : verdict.rules.map((r) => `\`${r}\``).join(', ');
     const codes =
       e.diagnostics.length === 0 ? '—' : e.diagnostics.map((c) => `\`${c}\``).join(', ');
-    lines.push(`| \`${e.id}\` | ${result} | ${e.bytes === undefined ? '—' : e.bytes} | ${codes} |`);
+    lines.push(
+      `| \`${e.id}\` | ${result} | ${broke} | ${e.bytes === undefined ? '—' : e.bytes} | ${codes} |`,
+    );
   }
   lines.push('');
+  // A corpus that fails tends to fail the same way fifty times over, so the
+  // clauses are counted as well as listed: which rules are broken, and how
+  // widely, is the difference between a report and a to-do list.
+  const clauses = new Map<string, number>();
+  for (const v of report.run?.verdicts ?? []) {
+    for (const rule of v.rules) clauses.set(rule, (clauses.get(rule) ?? 0) + 1);
+  }
+  if (clauses.size > 0) {
+    lines.push('## Clauses broken');
+    lines.push('');
+    lines.push('ISO 14289-1 clauses, as veraPDF numbers them (`5-1` is clause 5, test 1).');
+    lines.push('');
+    lines.push('| Clause | Files |');
+    lines.push('| --- | ---: |');
+    for (const [rule, count] of [...clauses].sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    )) {
+      lines.push(`| \`${rule}\` | ${count} |`);
+    }
+    lines.push('');
+  }
   const refusals = report.exports.filter((e) => e.refused !== undefined);
   if (refusals.length > 0) {
     lines.push('## Refused');
